@@ -13,16 +13,16 @@
 # To check out codes and compile:
 # for target option "-t openmp", the default is prod-openmp
 module load fre/bronx-7
-fremake -x CM4_proto.xml -p ncrc2.intel -t openmp cm4p1_compile
+fremake -x CM4_proto.xml -p ncrc2.intel -t prod-openmp cm4p1_compile
 
-# To run regression test (for the coupled experiment CM4_c192L48_am4a1_2000, year 2000 forcing): 
-frerun -r basic -x CM4_proto.xml -p ncrc2.intel -t openmp CM4_c192L48_am4a1_2000
+# To run regression test (for the coupled experiment CM4_c96L48_am4a1r1_2000climo, year 2000 forcing): 
+frerun -r basic -x CM4_proto.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4a1r1_2000climo
 
 # To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
-frerun -x CM4_proto.xml -p ncrc2.intel -t openmp CM4_c192L48_am4a1_2000
+frerun -x CM4_proto.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4a1r1_2000climo
 
 # To run fredb after an experiment is finished to manually add it to the database:
-fredb -x CM4_proto.xml -p gfdl.ncrc2-intel -t openmp -n CM4_c192L48_am4a1_2000
+fredb -x CM4_proto.xml -p gfdl.ncrc2-intel -t prod-openmp -n CM4_c96L48_am4a1r1_2000climo
 
 # To check what is the input data of this experiment:
 inputfiles -x CM4_proto.xml -p ncrc2.intel
@@ -254,7 +254,8 @@ configuration.
       <property name="REFERENCE_awg"     value=""/>
       <csh><![CDATA[
         module use ~fms/local/modulefiles
-        module load intel/12-12.0.4.191
+        #module load intel/12-12.0.4.191 #need more up-to-date compiler for ulm
+        module load intel/13.0.079
         module load netcdf/4.1.1-intel-12
         module load mpt/2.06
         module load $(FRE_VERSION)
@@ -276,12 +277,10 @@ configuration.
     <platform name="gfdl.default">
       <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)/$(name)"/>
       <directory stem="$(FRE_STEM)">
-<!-- MDBI requires these to be listed in order to show the path under "Platform Environment" -->
         <archive>$ARCHIVE/$(stem)/$(name)/$(platform)-$(target)</archive>
         <postProcess>$(archiveDir)/pp</postProcess>
-        <analysis>$(NB_ROOT)/$(platform)-$(target)/analysis</analysis>
+        <analysis>$(NB_ROOT)</analysis><!--Do not change this! This is the directory under which  frepp looks for mom6 clone. It is the frepp $out_dir. -->
 	<ptmp>/ptmp/$USER</ptmp>
-<!-- /MDBI -->
       </directory>
       <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML"/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GFDL)"/>
@@ -295,12 +294,14 @@ configuration.
         module purge
         module load $(FRE_VERSION)
         module load fre-analysis
+        module load git
            setenv FREVERSION $(FRE_VERSION)           
            setenv NBROOT $(NB_ROOT)
            mkdir -p $NBROOT
            cd $NBROOT
-/home/Niki.Zadeh/bin/git_clone_mom6_fix.csh 
-        ]]>
+/home/Niki.Zadeh/bin/git_clone_mom6_fix.csh
+
+       ]]>
       </csh>
     </platform>
 
