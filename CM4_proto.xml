@@ -219,6 +219,7 @@ configuration.
         module load PrgEnv-intel/4.0.46
         module swap intel intel/12.0.5.220
         module load $(FRE_VERSION)
+        module load git
  
         setenv KMP_STACKSIZE 512m
         setenv NC_BLKSZ 1M
@@ -368,6 +369,9 @@ Experiment to build executable.
 #==For Ulm==
            cvs up -r tikal_201403_act_options_cjg atmos_param/strat_cloud/aerosol_cloud.F90 atmos_param/strat_cloud/strat_cloud.F90 atmos_param/strat_cloud/strat_cloud_utilities.F90 atmos_param/strat_cloud/strat_nml.h
 
+#==For JPD Drag Tests==
+           cvs up -r drag_min_jpd_20141030 atmos_param/monin_obukhov/monin_obukhov.F90
+           cvs up -r drag_min_jpd_20141030 atmos_param/monin_obukhov/monin_obukhov_kernel.F90
 	</csh>
       </source>
       <compile>
@@ -401,6 +405,10 @@ Experiment to build executable.
       <description domainName="LM3" communityName="land_lad2" communityVersion="$(RELEASE)" communityGrid=""/>
       <source>
         <codeBase version="$(RELEASE)"> land_lad2 </codeBase>
+        <csh>
+          mv land_lad2/land_model.F90 land_lad2/land_model.F90.ORIG
+          cp /ncrc/home2/John.Krasting/updates/20141030/land_lad2/land_model.F90 land_lad2/land_model.F90
+        </csh>
       </source>
       <compile>
         <cppDefs>$(F2003_FLAGS) -DUSE_LOG_DIAG_FIELD_INFO</cppDefs>
@@ -3343,6 +3351,205 @@ OVERRIDE_EOF
    </input> 
 </experiment>
 
+<experiment name="CM4i_c96L48_am4a2r1_drag_min_mom_2000climo" inherit="CM4i_c96L48_am4a2r1_2000climo">
+   <input>
+     <namelist name="monin_obukhov_nml">
+        stable_option = 2,
+        rich_crit = 1.0,
+        zeta_trans = 0.5,
+        drag_min_mom = 1.e-03
+     </namelist>
+      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_1deg']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data_1deg']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS_data_1deg']/input/node())"/>
+
+      <csh type="always"><![CDATA[
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $ireload == 1 ) then
+ if ( $irun == 1 ) then
+  set restart_flag = 'n'
+ else
+  set restart_flag = 'r'
+ endif
+else
+  set restart_flag = 'r'
+endif
+
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+
+cat >> $work/INPUT/MOM_override << OVERRIDE_EOF
+#override RESTORE_SALINITY = False
+#override ADJUST_NET_FRESH_WATER_TO_ZERO = False
+#override ENERGYSAVEDAYS = 73.0
+#override USE_OCMIP2_CFC = False
+
+OVERRIDE_EOF
+
+####COMMON ALWAYS CSH ENDS######
+
+      ]]></csh>
+
+
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">cwg_include/diag_table/diag_table_drag</dataSource>
+     </dataFile>
+   </input> 
+</experiment>
+
+<experiment name="CM4i_c96L48_am4a2r1_coast_rough_2000climo" inherit="CM4i_c96L48_am4a2r1_2000climo">
+   <input>
+     <namelist name="land_model_nml">
+        layout   = $land_layout,
+        io_layout = $land_io_layout,
+        tau_snow_T_adj = 604800,
+        prohibit_negative_canopy_water=.false.,
+        use_coast_rough = .true.,
+        use_coast_topo_rough = .false.
+      </namelist>
+      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_1deg']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data_1deg']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS_data_1deg']/input/node())"/>
+
+      <csh type="always"><![CDATA[
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $ireload == 1 ) then
+ if ( $irun == 1 ) then
+  set restart_flag = 'n'
+ else
+  set restart_flag = 'r'
+ endif
+else
+  set restart_flag = 'r'
+endif
+
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+
+cat >> $work/INPUT/MOM_override << OVERRIDE_EOF
+#override RESTORE_SALINITY = False
+#override ADJUST_NET_FRESH_WATER_TO_ZERO = False
+#override ENERGYSAVEDAYS = 73.0
+#override USE_OCMIP2_CFC = False
+
+OVERRIDE_EOF
+
+####COMMON ALWAYS CSH ENDS######
+
+      ]]></csh>
+
+
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">cwg_include/diag_table/diag_table_drag</dataSource>
+     </dataFile>
+   </input> 
+</experiment>
+
+<experiment name="CM4i_c96L48_am4a2r1_drag_min_mom_coast_rough_2000climo" inherit="CM4i_c96L48_am4a2r1_2000climo">
+   <input> 
+     <namelist name="monin_obukhov_nml">
+        stable_option = 2,
+        rich_crit = 1.0,
+        zeta_trans = 0.5,
+        drag_min_mom = 1.e-03
+     </namelist> 
+     <namelist name="land_model_nml">
+        layout   = $land_layout,
+        io_layout = $land_io_layout,
+        tau_snow_T_adj = 604800,
+        prohibit_negative_canopy_water=.false.,
+        use_coast_rough = .true.,
+        use_coast_topo_rough = .false.
+      </namelist>
+      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_1deg']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data_1deg']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS_data_1deg']/input/node())"/>
+
+      <csh type="always"><![CDATA[
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $ireload == 1 ) then
+ if ( $irun == 1 ) then
+  set restart_flag = 'n'
+ else
+  set restart_flag = 'r'
+ endif
+else
+  set restart_flag = 'r'
+endif
+
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+
+cat >> $work/INPUT/MOM_override << OVERRIDE_EOF
+#override RESTORE_SALINITY = False
+#override ADJUST_NET_FRESH_WATER_TO_ZERO = False
+#override ENERGYSAVEDAYS = 73.0
+#override USE_OCMIP2_CFC = False
+
+OVERRIDE_EOF
+
+####COMMON ALWAYS CSH ENDS######
+
+      ]]></csh>
+
+
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">cwg_include/diag_table/diag_table_drag</dataSource>
+     </dataFile>
+   </input> 
+</experiment>
+
 <experiment name="CM4i_c96L48_am4a2r1_1860forc" inherit="CM4i_c96L48_am4a1r1_1860forc">
    <input> 
       <namelist file="$(AWG_INPUT_HOME)/nml/am4a2r1_physics.nml"/>
@@ -4062,6 +4269,206 @@ endif
   </experiment>
 
 
+<experiment name="CM4i_c96L48_am4a1r1_1pct-co2-2X" inherit="CM4i_c96L48_am4a1r1_1860forc">
+
+  <input>
+
+      <dataTable>
+"ATM" , "co2_dvmr_restore", "CO2",     "INPUT/co2_data.nc", .false.,  1.0e-06
+"ATM" , "co2_dvmr_rad",     "CO2",     "INPUT/co2_data.nc", .false.,  1.0e-06
+      </dataTable>
+
+      <namelist name="atmos_co2_nml">
+       do_co2_restore = .true.               
+       restore_tscale = 3.1536e7,
+       restore_klimit = 24
+       co2_radiation_override = .true.
+       do_co2_emissions = .false.
+      </namelist>
+
+      <namelist name="icebergs_nml">
+        really_debug=.FALSE.
+        debug=.FALSE.
+        verbose=.FALSE.
+        verbose_hrs=7200
+        use_operator_splitting=.TRUE.
+        bergy_bit_erosion_fraction=0.0
+        sicn_shift=0.1
+        parallel_reprod=.TRUE.
+        traj_sample_hrs=0
+        add_weight_to_ocean=.false.
+        vel_lim = 1.e4
+        accel_lim = 1.e4
+      </namelist>
+
+      <namelist name="radiation_driver_nml">
+        rad_time_step= 10800,
+        time_varying_solar_constant = .false.,
+        solar_dataset_entry = 1860,1,1,0,0,
+        rad_package = 'sea_esf',
+        do_clear_sky_pass=.true.,
+        calc_hemi_integrals = .false.,
+        renormalize_sw_fluxes=.true.,
+        all_step_diagnostics = .true.,
+        zenith_spec = 'diurnally_varying',
+        use_co2_tracer_field = .true.,
+        using_restart_file = .false.
+      </namelist>
+
+      <namelist name="radiative_gases_nml">
+        verbose = 3
+        gas_printout_freq = 240
+
+        time_varying_co2 = .false.,
+        co2_variation_type = 'linear',
+        co2_dataset_entry = 1860,1,1,0,0,
+        co2_specification_type = 'base_and_trend',
+        co2_floor = 100.0E-06,
+        co2_ceiling = 1600.0E-06,
+        co2_data_source = 'predicted'
+
+        time_varying_ch4 = .false.,
+        ch4_variation_type = 'linear'
+        ch4_dataset_entry = 1860,1,1,0,0,
+        ch4_specification_type = 'time_series'
+        ch4_data_source = 'input'
+
+        time_varying_n2o = .false.,
+        n2o_variation_type = 'linear'
+        n2o_dataset_entry = 1860,1,1,0,0,
+        n2o_specification_type = 'time_series'
+        n2o_data_source = 'input'
+
+        time_varying_f11 = .false.,
+        f11_variation_type = 'linear'
+        f11_dataset_entry = 1860,1,1,0,0,
+        f11_specification_type = 'time_series'
+        f11_data_source = 'input'
+
+        time_varying_f12 = .false.,
+        f12_variation_type = 'linear'
+        f12_dataset_entry = 1860,1,1,0,0,
+        f12_specification_type = 'time_series'
+        f12_data_source = 'input'
+
+        time_varying_f113 = .false.,
+        f113_variation_type = 'linear'
+        f113_dataset_entry = 1860,1,1,0,0,
+        f113_specification_type = 'time_series'
+        f113_data_source = 'input'
+
+        time_varying_f22 = .false.,
+        f22_variation_type = 'linear'
+        f22_dataset_entry = 1860,1,1,0,0,
+        f22_specification_type = 'time_series'
+        f22_data_source = 'input'
+      </namelist>
+
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/John.Krasting/cwg/IC/CM4i_c96L48_am4a1r1_1pct-co2-2X_00010101_20141021.tar</dataSource>
+      </dataFile>
+
+      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_1deg']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
+
+      <!-- Time Mean Volcanic Aerosol Forcing:  From Larry Horowitz -->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CWG_HOME)/input/volcano/mean_hist/asmsw_data.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CWG_HOME)/input/volcano/mean_hist/extlw_data.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CWG_HOME)/input/volcano/mean_hist/extsw_data.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CWG_HOME)/input/volcano/mean_hist/omgsw_data.nc</dataSource>
+      </dataFile>
+
+      <!-- Ozone Climatology File From CM3 -->
+      <dataFile label="input" target="INPUT/o3.climatology.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CWG_HOME)/input/ozone/CM3_mean_o3_climatology_accmip_1860.nc</dataSource>
+      </dataFile>
+
+      <!-- Mean Solar Cycle 1856 to 1866:  From Dan Schwarzkopf and Larry Horowitz -->
+      <dataFile label="input" target="INPUT/lean_solar_spectral_data.dat" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CWG_HOME)/input/solar/CMIP5_1856_1866avg_monthly_data_b18_TIM</dataSource>
+      </dataFile>
+
+      <dataFile label="input" target="INPUT/co2_data.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/pdata/esm/ipcc_ar5/datasets/forcings/co2_data.1PctTo2X.nc</dataSource>
+      </dataFile>
+
+      <csh type="always"><![CDATA[
+grep "ADDITIONAL 1860 DIAGNOSTICS" $work/diag_table
+
+if ( "$status" == "1") then
+cat >> $work/diag_table << DIAGTABLE_EOF
+#ADDITIONAL 1860 DIAGNOSTICS
+"atmos_level",                 1,  "months", 1, "days", "time",
+"atmos_co2",                  "pwt",                "pwt",                "atmos_level", "all", .true.,  "none", 2
+"atmos_co2_restoring",        "co2_restore",        "co2_restore",        "atmos_level", "all", .true.,  "none", 2
+"dynamics",                   "area",               "area",               "atmos_level", "all", .false., "none", 2
+"dynamics",                   "co2",                "co2",                "atmos_level", "all", .true.,  "none", 2
+"dynamics",                   "co2_dvmr",           "co2_dvmr",           "atmos_level", "all", .true.,  "none", 2
+"flux",                       "co2_atm",            "co2_atm",            "atmos_level", "all", .true.,  "none", 2
+"flux",                       "co2_surf",           "co2_surf",           "atmos_level", "all", .true.,  "none", 2
+"flux",                       "co2_flux",           "co2_flux",           "atmos_level", "all", .true.,  "none", 2
+"flux",                       "co2_mol_flux",       "co2_mol_flux",       "atmos_level", "all", .true.,  "none", 2
+"flux",                       "co2_atm_dvmr",       "co2_atm_dvmr",       "atmos_level", "all", .true.,  "none", 2
+"flux",                       "co2_surf_dvmr",      "co2_surf_dvmr",      "atmos_level", "all", .true.,  "none", 2
+DIAGTABLE_EOF
+
+endif
+      ]]></csh>
+
+      <csh type="always"><![CDATA[
+grep "ADDITIONAL 1860 TRACERS" $work/field_table
+if ( "$status" == "1") then
+
+cat >> $work/field_table << FIELDTABLE_EOF
+# ADDITIONAL 1860 TRACERS
+# CO2 tracer
+## Note: atm transport and land model expect moist mmr. 
+##       set co2 units: kg/kg  (mass mixing ratio) for both atm and lnd field table entries.
+##       convert atm IC field table entry from dry vmr value to **dry** mmr
+## Note: for atm cold start from constant co2 value, instead of using field table to initialize co2,
+##       create atmos_tracers.res.nc with co2 moist mmr values
+##
+ "TRACER", "atmos_mod",    "co2"
+           "longname",     "carbon dioxide"
+           "units",        "kg/kg"
+           "convection",   "all"
+           "profile_type","fixed","surface_value = 434.5626E-06"/
+#
+ "TRACER", "land_mod",     "co2"
+           "longname",     "carbon dioxide"
+           "units",        "kg/kg" /
+FIELDTABLE_EOF
+
+endif
+      ]]></csh>
+
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data_1deg']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+
+      <csh type="always"><![CDATA[
+cat >> $work/INPUT/MOM_override << OVERRIDE_EOF
+#override ENERGYSAVEDAYS = 73.0
+#override USE_OCMIP2_CFC = False
+OVERRIDE_EOF
+      ]]></csh>
+
+      <csh type="always"><![CDATA[
+set restart_flag = 'r' 
+      ]]></csh>
+
+  </input>
+</experiment> 
  
   <!-- OCEAN  and ICE post-processing-->
   <experiment name="OM4i_postprocess">
