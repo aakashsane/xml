@@ -33,7 +33,7 @@ inputfiles -x CM4_proto.xml -p ncrc2.intel
   <property name="RELEASE" value="tikal_201409"/>                <!-- CVS tag for source code -->
   <property name="MOM6_DATE" value="2014.08.29"/>                <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>             <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"  value="$(RELEASE)_awgUpdates_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
+  <property name="FRE_STEM"  value="$(RELEASE)_dragUpdates_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
   <property name="FRE_VERSION" value="fre/bronx-7"/>             <!-- fre/bronx-7 not supported on Zeus; use fre/bronx-6 -->
   <property name="ANALYSIS_SWITCH" value="on"/>
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
@@ -276,11 +276,11 @@ configuration.
     </platform>
 
     <platform name="gfdl.default">
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)/$(name)"/>
+      <property name="NB_ROOT"  value="/nbhome/$USER/$(FRE_STEM)/$(name)"/><!--Do not change this! Other platforms use  the same value. -->
       <directory stem="$(FRE_STEM)">
         <archive>$ARCHIVE/$(stem)/$(name)/$(platform)-$(target)</archive>
         <postProcess>$(archiveDir)/pp</postProcess>
-        <analysis>$(NB_ROOT)</analysis><!--Do not change this! This is the directory under which  frepp looks for mom6 clone. It is the frepp $out_dir. -->
+        <analysis>$(NB_ROOT)</analysis><!--Do not change this! frepp translates this to $out_dir. This is also the directory under which  frepp looks for mom6 clone.  -->
 	<ptmp>/ptmp/$USER</ptmp>
       </directory>
       <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML"/>
@@ -305,7 +305,11 @@ configuration.
        ]]>
       </csh>
     </platform>
-
+    <!-- Ideally the following commands should replace the git_clone_mom6_fix_args.csh script above
+	 but a bug in fre (parsing ":" )  prevents the commands to run as such
+    git clone - -recursive -b dev/master/2014.10.09 "http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6.git" mom6
+    git clone -b dev "http://gitlab.gfdl.noaa.gov/mdt/xml.git" mdt_xml	 
+     -->
     <platform name="gfdl.ncrc2-default">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
@@ -332,6 +336,7 @@ configuration.
   <!--The property MOM6_SRC should point to the mom6 src code that is checked out. It is needed by MOM6 to access its inpu data files-->
   <property name="MOM6_SRC"  value="$root/cm4p1_compile/src/mom6"/>  <!-- cm4p1_compile is the compile experiment name -->
 
+  <!-- cm4p1_compile is the compile experiment name -->
   <experiment name="cm4p1_compile">
     <description>
 
@@ -406,8 +411,7 @@ Experiment to build executable.
       <source>
         <codeBase version="$(RELEASE)"> land_lad2 </codeBase>
         <csh>
-          mv land_lad2/land_model.F90 land_lad2/land_model.F90.ORIG
-          cp /ncrc/home2/John.Krasting/updates/20141030/land_lad2/land_model.F90 land_lad2/land_model.F90
+          cvs up -r drag_updates_jpk_20141104 land_lad2/land_model.F90
         </csh>
       </source>
       <compile>
@@ -4510,10 +4514,10 @@ set restart_flag = 'r'
 	 #Take care of iceberg restarts and trajectories
          cd $work/RESTART
          ncrcat icebergs.res.nc.* icebergs.res.nc
-         rm -f icebergs.res.nc.*
+         if ( -e icebergs.res.nc )  rm -f icebergs.res.nc.*
          cd $work
          ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
-         rm -f iceberg_trajectories.nc.* 
+         if ( -e iceberg_trajectories.nc ) rm -f iceberg_trajectories.nc.* 
          #Save the last line of timestats without the first (step number) column as a signature of MOM6 answers
          tail -1 timestats | cut -c8- > RESTART/$enddate.timestats.res
          #Save the whole timestats under ascii/
