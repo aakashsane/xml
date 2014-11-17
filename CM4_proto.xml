@@ -31,9 +31,9 @@ inputfiles -x CM4_proto.xml -p ncrc2.intel
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <property name="RELEASE" value="tikal_201409"/>                <!-- CVS tag for source code -->
-  <property name="MOM6_DATE" value="2014.08.29"/>                <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>             <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"  value="$(RELEASE)_dragUpdates_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
+  <property name="MOM6_DATE" value="2014.11.14"/>                <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG" value="dev/master"/>             <!-- git tag for MOM6 source code -->
+  <property name="FRE_STEM"  value="tikal_201409_drag_Ming_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
   <property name="FRE_VERSION" value="fre/bronx-7"/>             <!-- fre/bronx-7 not supported on Zeus; use fre/bronx-6 -->
   <property name="ANALYSIS_SWITCH" value="on"/>
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
@@ -120,12 +120,6 @@ be controlled by changing properties below.
   <property name="PP_OCEAN_CHUNK_B" value="20yr"/> 
 
 
-<!--=========================================-->
-<!--= Properties needed for OM4 EXPERIMENTS =-->
-<!--=========================================-->
-   <property name="PROD_SIMTIME_OM4"   value="5"/>
-   <property name="PROD_RUNTIME_OM4"   value="16:00:00"/>
-   <property name="PROD_SEGTIME_OM4"   value="03:15:00"/>
 <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
    <property name="reference_tag"      value="tikal_201407_plus_3cjgUpdates_mom6_2014.07.23"/>
                               <!--reproduces "tikal_201403_mom6_2014.07.01_with_cjgUpdates"/-->
@@ -296,20 +290,11 @@ configuration.
         module load $(FRE_VERSION)
         module load fre-analysis
         module load git
-           setenv FREVERSION $(FRE_VERSION)           
-           setenv NBROOT $(NB_ROOT)
-           mkdir -p $NBROOT
-           cd $NBROOT
-/home/Niki.Zadeh/bin/git_clone_mom6_fix_args.csh -b $(MOM6_GIT_TAG) -g noaa-gfdl-mom6.git
-
+        setenv FREVERSION $(FRE_VERSION)           
+        setenv NBROOT $(NB_ROOT)
        ]]>
       </csh>
     </platform>
-    <!-- Ideally the following commands should replace the git_clone_mom6_fix_args.csh script above
-	 but a bug in fre (parsing ":" )  prevents the commands to run as such
-    git clone - -recursive -b dev/master/2014.10.09 "http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6.git" mom6
-    git clone -b dev "http://gitlab.gfdl.noaa.gov/mdt/xml.git" mdt_xml	 
-     -->
     <platform name="gfdl.ncrc2-default">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
@@ -333,8 +318,8 @@ configuration.
 <!--===========-->
 <!--= COMPILE =-->
 <!--===========-->
-  <!--The property MOM6_SRC should point to the mom6 src code that is checked out. It is needed by MOM6 to access its inpu data files-->
-  <property name="MOM6_SRC"  value="$root/cm4p1_compile/src/mom6"/>  <!-- cm4p1_compile is the compile experiment name -->
+  <!--The property MOM6_EXAMPLESshould point to the mom6 directory that is checked out. It is needed by MOM6 to access its inpu data files-->
+  <property name="MOM6_EXAMPLES"  value="$root/cm4p1_compile/src/mom6"/>
 
   <!-- cm4p1_compile is the compile experiment name -->
   <experiment name="cm4p1_compile">
@@ -360,6 +345,7 @@ Experiment to build executable.
      <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid=""/>
       <source>
         <codeBase version="$(RELEASE)"> shared </codeBase>
+            <csh> cvs up -r ulm_block_z1l shared/mpp/include/mpp_domains_define.inc shared/mpp/mpp_domains.F90 </csh>
       </source>
       <compile>
         <cppDefs>$(F2003_FLAGS) -Duse_libMPI -Duse_netCDF </cppDefs>
@@ -377,7 +363,11 @@ Experiment to build executable.
 #==For JPD Drag Tests==
            cvs up -r drag_min_jpd_20141030 atmos_param/monin_obukhov/monin_obukhov.F90
            cvs up -r drag_min_jpd_20141030 atmos_param/monin_obukhov/monin_obukhov_kernel.F90
-	</csh>
+#==ulm+===
+	   #for am4c1r1 runs
+           cvs up -r lowsen20141106_miz atmos_param/shallow_cu/uw_conv.F90 atmos_param/shallow_cu/deep_conv.F90 atmos_param/shallow_cu/conv_plumes_k.F90
+        </csh>
+
       </source>
       <compile>
         <cppDefs>$(F2003_FLAGS) -DCLUBB</cppDefs>
@@ -440,19 +430,22 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
       </compile>
     </component>
 
-    <component name="mom6" requires="fms" paths="mom6/config_src/dynamic mom6/config_src/coupled_driver mom6/src/*/ mom6/src/*/*/">
+    <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/">
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/github_mirror">
-        <codeBase version="$(MOM6_GIT_TAG)"> noaa-gfdl-mom6.git </codeBase>
+        <codeBase version="$(MOM6_GIT_TAG)"> noaa-gfdl-mom6-examples.git </codeBase>
         <csh>
-          mv noaa-gfdl-mom6 mom6
+          mv noaa-gfdl-mom6-examples mom6
+          pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
           if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
-            pushd mom6/examples; rm -f .datasets
             ln -s /scratch2/portfolios/GFDL/gfdlscr/John.Krasting/pdata/gfdl_O/datasets/ .datasets
-            popd
+          else
+            ln -s /lustre/f1/pdata/gfdl_O/datasets/ .datasets
           endif
-          test -e mom6/examples/.datasets
+          popd	  
+
+          test -e mom6/.datasets
           if ($status != 0) then
             echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
           endif
@@ -767,12 +760,40 @@ endif
 
 # Copy AWG ascii input files to GFDL (waiting for FRE to do this for us)
 if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
-  module switch gcp/2.2 gcp/2.1
+  module switch gcp/2.2 gcp/2.1 #not needed with bronx-8
+
   set xmldirlocal = `dirname $rtsxml`
   set xmldirRemote = `echo $xmldirlocal | sed -r "$patternSedHome;$patternSedCTMP;$patternSedCPERM;$patternSedFS;$patternSedLTFS"`
   gcp --batch -cd -r --sync $xmldirlocal/awg_include gfdl:$(AWG_INPUT_HOME_GFDL)/..
   gcp --batch -cd -r --sync $xmldirlocal/awg_include gfdl:$xmldirRemote/
-  module switch gcp/2.1 gcp/2.2
+  #trick to copy MOM6 directory but avoid traversing the .datasets links
+  tar cvf mom6.tar -C $(MOM6_EXAMPLES) .
+#  gcp --batch -cd -r --sync mom6.tar gfdl:$(NB_ROOT)/
+
+cat >  prepost_gfdl << untar_at_gfdl_EOF
+   mkdir -p $(NB_ROOT)
+   cd $(NB_ROOT)
+   module load gcp
+   gcp gaea:$workDir/mom6.tar .
+   if( -e mom6.tar ) then
+     mkdir mom6
+     tar xvf mom6.tar -C mom6
+   else
+     git clone --recursive -b $(MOM6_GIT_TAG) http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6-examples.git mom6
+   endif
+   if(! -d mdt_xml) git clone -b dev "http://gitlab.gfdl.noaa.gov/mdt/xml.git" mdt_xml
+   ln -s mdt_xml/awg_include $xmldirRemote/
+untar_at_gfdl_EOF
+
+   msub -m n -j oe -r y -S /bin/tcsh -W umask=022 -l partition=gfdl -N ${FRE_JOBID}_prepost -q stage -l walltime=1:00:00 -l size=1 prepost_gfdl
+
+#If gcp preserved permissions we could do the following instead of the above msub
+#  mkdir mom6
+#  tar xvf mom6.tar -C ./mom6
+#  \rm mom6/.datasets
+#  gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
+
+  module switch gcp/2.1 gcp/2.2 #not needed with bronx-8
 endif
 
 # create dummy MOM6 parameter file for do_ocean=.false.
@@ -807,11 +828,6 @@ if (-e $work/INPUT/coupler.res) then
       endif      
    end
 endif
-
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override RESTORE_SALINITY = False
-#override ADJUST_NET_FRESH_WATER_TO_ZERO = False
-OVERRIDE_EOF
 
 ####COMMON ALWAYS CSH ENDS######
 
@@ -1211,6 +1227,17 @@ else if ( "$npes" == "6975" ) then
   set ocean_npes   = "4671"
 
 #npes= 6975  main_loop= 252.023227  ATM= 238.648825  OCN= 231.217848  SYPD= 9.39248
+
+else if ( "$npes" == "32" ) then
+#This setting is only for testing fast e2e
+  set atmos_npes = "1152"
+  set atmos_nthreads = "2"
+  set nxblocks = "" ; set nyblocks = "" ; set physics_window = "8,3"
+  set fv_layout    =   "12,16"; set fv_io_layout    =  "2,4"
+  set land_layout  =   "12,16"; set land_io_layout  =  "2,4"
+  set ice_layout   =   "144,8"; set ice_io_layout   =  "2,4"
+  set ocn_layout   =   "90,72"; set ocn_io_layout   =  "2,4"; set ocn_mask_table = "mask_table.1809.90x72"
+  set ocean_npes   = "4671"
 
 else
   if ( $echoOn ) unset echo
@@ -2342,6 +2369,128 @@ Experiment name = $(name)
 <!--==========================================-->
 <!--= CLIMO EXPERIMENTS with do_ocean=.false.=-->
 <!--==========================================-->
+ <experiment name="c96L48_am4c1r2_2000climo" inherit="c96L48_am4a1r1_2000climo">
+    <description
+communityProject="$(ProjectID)" 
+communityModel="am4c1" 
+communityModelID="am4c1"
+communityExperimentName="$(name)" 
+communityExperimentID="$(name)" >
+
+Ming Zhao Nov.7, 2014 xml
+ /autofs/na2_home2/Ming.Zhao/cwg/input_cwg/CM4_cwg.xml
+
+    </description>
+   <input>
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.37,
+        Ashear        = 25.0, 
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+      </namelist>
+     <namelist name="rotstayn_klein_mp_nml">
+        rk_act_only_if_ql_gt_qmin = .true.
+     </namelist>
+     <namelist name="strat_cloud_nml">
+        up_strat_opt = 2
+        var_limit_opt = 2
+        var_limit = 0.3
+        aerosol_activation_scheme = "total"
+        qthalfwidth    = 0.2
+        do_pdf_clouds = .true.
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 8.0,
+        Dmin = 1.0e-07,
+        n_land = 300.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 1.e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-6,
+        eros_scale_t = 3.e-6,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.4
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 1.0
+        use_sub_seasalt = .false.
+      </namelist>
+      <namelist name="uw_conv_nml">
+        use_online_aerosol = .true.,
+        iclosure        = 0,
+        rkm_sh          = 3.0,
+        cldhgt_max      = 50.e3,
+        do_uwcmt        = .false.,
+        apply_tendency  = .true.,
+        wmin_ratio      = 0.05,
+        do_lands        = .false.
+        landfact_m      = 0.5
+        lochoice        = 0
+        lofactor0       = 0.75
+        do_deep         = .true.,
+        idpchoice       = 1
+        do_rescale      = .true.
+        use_sub_seasalt = .false.
+        wrel_min=1.
+       </namelist>
+      <namelist name="uw_plume_nml">
+        rmaxfrac = 0.15
+        auto_th0 = 1.0e-3,
+        tcrit    = -25.15,
+        frac_drs = 0.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 8
+        peff_l = 1.25e-5
+        peff_i = 2.5-5
+        do_pevap = .true.
+        hcevap   = 0.9
+        cfrac    = 0.15
+       </namelist>
+       <namelist name="deep_conv_nml">
+        rkm_dp1 = 2
+        rkm_dp2 = 0.1
+        norder = 1
+        cbmf_dp_frac1 = 1.
+        cbmf_dp_frac2 = 1.
+        crh_th_ocean = 0.5
+        crh_th_land  = 0.5
+        cape_th = 100.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.9
+        auto_th0_d = 1.0e-3
+        tcrit_d    = -25.15,
+        peff_l_d = 6.e-5
+        peff_i_d = 12.e-5
+        frac_limit_d = 0.25
+        dcapedm_th = 100
+        lofactor_d = 0.75
+        do_lod_rkm   = .false.
+        do_lod_cfrac = .false.
+        do_lod_tcrit = .false.
+        do_forcedlifting_d = .false.
+      </namelist>
+    </input>
+  </experiment>
+
  <experiment name="c96L48_am4b2r1_2000climo" inherit="c96L48_am4a1r1_2000climo">
     <description
 communityProject="$(ProjectID)" 
@@ -2859,60 +3008,60 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
   <experiment name="OM4_data">
     <input>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/MOM_input
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/MOM_input
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/layer_coord.nc
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/layer_coord.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/seawifs_1998-2006_smoothed_2X.v20140616.nc
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/seawifs_1998-2006_smoothed_2X.v20140616.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/tidal_amplitude.v20140616.nc
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/tidal_amplitude.v20140616.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/MOM_channels_global_025
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/MOM_channels_global_025
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/vgrid_75_2m.nc
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/vgrid_75_2m.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/WOA05_pottemp_salt.nc 
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/WOA05_pottemp_salt.nc 
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/mask_table.808.45x72
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.808.45x72
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/mask_table.1053.90x45
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.1053.90x45
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/mask_table.1809.90x72
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.1809.90x72
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/mask_table.1309.90x54     
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.1309.90x54     
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/mask_table.96.32x18     
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.96.32x18     
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/mask_table.242.32x36     
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.242.32x36     
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/mask_table.274.36x36     
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.274.36x36     
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/mask_table.548.32x72     
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.548.32x72     
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/mask_table.33.16x18     
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.33.16x18     
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/mask_table.315.32x45    
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.315.32x45    
      </dataFile>
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
-        <dataSource site="nescc">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/examples/ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
      </dataFile>
 
      <namelist name="MOM_input_nml" >
@@ -2942,59 +3091,59 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
   <experiment name="OM4_data_1deg">
     <input>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/MOM_input
+       $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/MOM_input
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/seawifs_1998-2006_GOLD_smoothed_2X.nc
+       $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/seawifs_1998-2006_GOLD_smoothed_2X.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/tideamp.nc
+       $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/tideamp.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/temp_restore.nc
+        $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/temp_restore.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/salt_restore.nc
+        $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/salt_restore.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/Vertical_coordinate.nc
+        $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/Vertical_coordinate.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/WOA05_pottemp_salt.nc 
+       $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/WOA05_pottemp_salt.nc 
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/sst_ice_clim.nc
+        $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/sst_ice_clim.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/OM3_zgrid.nc
+        $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/OM3_zgrid.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/cfc.bc.nc
+        $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/cfc.bc.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/gustiness_qscat.nc
+        $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/gustiness_qscat.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/sgs_h2.nc
+        $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/sgs_h2.nc
      </dataFile>      
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/geothermal_heating_cm2g.nc
+        $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/geothermal_heating_cm2g.nc
      </dataFile>
      <!--  Was present in the ESM2G XML ... is it necessary?  Does not appear that we are using Max's Scheme  
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        $(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/INPUT/Lee_wave_TKE.nc
+        $(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/INPUT/Lee_wave_TKE.nc
      </dataFile>
      -->      
      <!-- CM2G63L diagtable includes diagnostics for all components; we need a slim-downed list
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_SRC)/examples/coupled_AM2_SIS/CM2G63L/diag_table</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/examples/coupled_AM2_SIS/CM2G63L/diag_table</dataSource>
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/coupled_AM2_LM2_SIS/CM2G63L/diag_table</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/coupled_AM2_LM2_SIS/CM2G63L/diag_table</dataSource>
      </dataFile> 
      -->
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
-        <dataSource site="nescc">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/examples/ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
      </dataFile>
 
      <!--Diag Table Additions to Match ESM2G-->
@@ -3010,11 +3159,6 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
 "ocean_model", "mass_wt","mass_wt","ocean_month_snap","all",.false.,"none",2
 "ocean_model", "col_height","col_height","ocean_month_snap","all",.false.,"none",2
 
-"ocean_model","temp_z","temp","ocean_annual_z","all",.true.,"none",2
-"ocean_model","salt_z","salt","ocean_annual_z","all",.true.,"none",2
-"ocean_model","age_z","age","ocean_annual_z","all",.true.,"none",2
-"ocean_model","uh_z" ,"uh" ,"ocean_annual_z","all",.true.,"none",2
-"ocean_model","vh_z" ,"vh" ,"ocean_annual_z","all",.true.,"none",2
      </diagTable>
 
      <namelist name="MOM_input_nml" >
@@ -3041,13 +3185,13 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
   <experiment name="SIS_data">
     <input>
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="nescc">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/examples/ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
      </dataFile>
 
      <dataFile label="input" target="INPUT/ice_model.res.nc" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/.datasets/OM4_025/INPUT/ice_model.res.v20140620.nc
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/.datasets/OM4_025/INPUT/ice_model.res.v20140620.nc
      </dataFile> 
 
      <namelist name="ice_model_nml">
@@ -3096,14 +3240,14 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
   <experiment name="SIS_data_1deg">
     <input>
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="nescc">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/examples/ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
      </dataFile>
 
      <!--
      <dataFile label="input" target="INPUT/ice_model.res.nc" chksum="" size="" timestamp="">
-       $(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/.datasets/OM4_025/INPUT/ice_model.res.v20140620.nc
+       $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/.datasets/OM4_025/INPUT/ice_model.res.v20140620.nc
      </dataFile> 
      -->
      <namelist name="ice_model_nml">
@@ -3153,34 +3297,34 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
   <experiment name="OM4_CORE_data">
     <input>
       <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/data_table</dataSource>
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/data_table</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/ncar_precip.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/ncar_precip.clim.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/ncar_rad.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/ncar_rad.clim.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/q_10_mod.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/q_10_mod.clim.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/runoff.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/runoff.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/salt_restore.v20140616.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/salt_restore.v20140616.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/slp.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/slp.clim.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/t_10_mod.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/t_10_mod.clim.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/u_10_mod.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/u_10_mod.clim.nc</dataSource>
       </dataFile>      
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_SRC)/examples/ocean_SIS/OM4_025/INPUT/v_10_mod.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/v_10_mod.clim.nc</dataSource>
       </dataFile>
 
      </input>
@@ -3303,25 +3447,19 @@ if (-e $work/INPUT/coupler.res) then
       endif      
    end
 endif
-
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override RESTORE_SALINITY = False
-#override ADJUST_NET_FRESH_WATER_TO_ZERO = False
-#override ENERGYSAVEDAYS = 73.0
-#override USE_OCMIP2_CFC = False
-
-OVERRIDE_EOF
-
 ####COMMON ALWAYS CSH ENDS######
 
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override ENERGYSAVEDAYS = 73.0
+OVERRIDE_EOF
       ]]></csh>
 
 
     </input>
 
     <runtime>
-      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="900" runTime="12:00:00">
-        <segment simTime="12" units="months" runTime="03:00:00"/>
+      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="900" runTime="15:00:00">
+        <segment simTime="12" units="months" runTime="05:00:00"/>
       </production>
       <regression name="basic">
         <run days="10" npes="900" runTimePerJob="01:20:00"/><!---->
@@ -3329,24 +3467,27 @@ OVERRIDE_EOF
 
       <regression name="rts"> 
         <run days="5 5" npes="900" runTimePerJob="01:20:00"/><!---->
+        <run days="10"  npes="924" runTimePerJob="01:20:00"/><!---->
       </regression>
 
       <regression name="restarts">
         <run days="5 5" npes="900" runTimePerJob="01:20:00"/><!---->
       </regression>
 
+      <regression name="timing">
+        <run days="10" npes="924" runTimePerJob="01:20:00"/><!---->
+        <run days="10" npes="1024" runTimePerJob="01:20:00"/><!---->
+      </regression>
       <reference restart="$(REFERENCE)/archive/1x0m10d_900pe/restart/00010111.tar"/>
 
     </runtime>
 
     <postProcess>
       <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='OM4i_postprocess']/postProcess/node())"/>
     </postProcess>
 
   </experiment>
-
 
 <experiment name="CM4i_c96L48_am4a2r1_2000climo" inherit="CM4i_c96L48_am4a1r1_2000climo">
    <input> 
@@ -3354,6 +3495,7 @@ OVERRIDE_EOF
       <namelist file="$(AWG_INPUT_HOME)/nml/am4a2r1_c96.nml"/>
    </input> 
 </experiment>
+
 
 <experiment name="CM4i_c96L48_am4a2r1_drag_min_mom_2000climo" inherit="CM4i_c96L48_am4a2r1_2000climo">
    <input>
@@ -3398,16 +3540,12 @@ if (-e $work/INPUT/coupler.res) then
       endif      
    end
 endif
+####COMMON ALWAYS CSH ENDS######
 
 cat >> $work/INPUT/MOM_override << OVERRIDE_EOF
-#override RESTORE_SALINITY = False
-#override ADJUST_NET_FRESH_WATER_TO_ZERO = False
 #override ENERGYSAVEDAYS = 73.0
 #override USE_OCMIP2_CFC = False
-
 OVERRIDE_EOF
-
-####COMMON ALWAYS CSH ENDS######
 
       ]]></csh>
 
@@ -3464,15 +3602,12 @@ if (-e $work/INPUT/coupler.res) then
    end
 endif
 
+####COMMON ALWAYS CSH ENDS######
+
 cat >> $work/INPUT/MOM_override << OVERRIDE_EOF
-#override RESTORE_SALINITY = False
-#override ADJUST_NET_FRESH_WATER_TO_ZERO = False
 #override ENERGYSAVEDAYS = 73.0
 #override USE_OCMIP2_CFC = False
-
 OVERRIDE_EOF
-
-####COMMON ALWAYS CSH ENDS######
 
       ]]></csh>
 
@@ -3535,15 +3670,12 @@ if (-e $work/INPUT/coupler.res) then
    end
 endif
 
+####COMMON ALWAYS CSH ENDS######
+
 cat >> $work/INPUT/MOM_override << OVERRIDE_EOF
-#override RESTORE_SALINITY = False
-#override ADJUST_NET_FRESH_WATER_TO_ZERO = False
 #override ENERGYSAVEDAYS = 73.0
 #override USE_OCMIP2_CFC = False
-
 OVERRIDE_EOF
-
-####COMMON ALWAYS CSH ENDS######
 
       ]]></csh>
 
@@ -4200,15 +4332,6 @@ if (-e $work/INPUT/coupler.res) then
       endif      
    end
 endif
-
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override RESTORE_SALINITY = False
-#override ADJUST_NET_FRESH_WATER_TO_ZERO = False
-#override ENERGYSAVEDAYS = 73.0
-#override USE_OCMIP2_CFC = False
-
-OVERRIDE_EOF
-
 ####COMMON ALWAYS CSH ENDS######
 
 grep "ADDITIONAL 1860 TRACERS" $work/field_table
@@ -4236,6 +4359,10 @@ FIELDTABLE_EOF
 
 endif
 
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override ENERGYSAVEDAYS = 73.0
+#override USE_OCMIP2_CFC = False
+OVERRIDE_EOF
       ]]></csh>
 
       <!--MOM6 Input datasets-->
@@ -4255,6 +4382,7 @@ endif
 
       <regression name="rts"> <!--fits on t1-->
         <run days="5 5" npes="900" runTimePerJob="01:20:00"/><!---->
+        <run days="10"  npes="924" runTimePerJob="01:20:00"/><!---->
       </regression>
 
       <regression name="restarts">
@@ -4272,8 +4400,825 @@ endif
 
   </experiment>
 
-
+ 
 <experiment name="CM4i_c96L48_am4a1r1_1pct-co2-2X" inherit="CM4i_c96L48_am4a1r1_1860forc">
+
+  <input>
+
+      <dataTable>
+"ATM" , "co2_dvmr_restore", "CO2",     "INPUT/co2_data.nc", .false.,  1.0e-06
+"ATM" , "co2_dvmr_rad",     "CO2",     "INPUT/co2_data.nc", .false.,  1.0e-06
+      </dataTable>
+
+      <namelist name="atmos_co2_nml">
+       do_co2_restore = .true.               
+       restore_tscale = 3.1536e7,
+       restore_klimit = 24
+       co2_radiation_override = .true.
+       do_co2_emissions = .false.
+      </namelist>
+
+      <namelist name="icebergs_nml">
+        really_debug=.FALSE.
+        debug=.FALSE.
+        verbose=.FALSE.
+        verbose_hrs=7200
+        use_operator_splitting=.TRUE.
+        bergy_bit_erosion_fraction=0.0
+        sicn_shift=0.1
+        parallel_reprod=.TRUE.
+        traj_sample_hrs=0
+        add_weight_to_ocean=.false.
+        vel_lim = 1.e4
+        accel_lim = 1.e4
+      </namelist>
+
+      <namelist name="radiation_driver_nml">
+        rad_time_step= 10800,
+        time_varying_solar_constant = .false.,
+        solar_dataset_entry = 1860,1,1,0,0,
+        rad_package = 'sea_esf',
+        do_clear_sky_pass=.true.,
+        calc_hemi_integrals = .false.,
+        renormalize_sw_fluxes=.true.,
+        all_step_diagnostics = .true.,
+        zenith_spec = 'diurnally_varying',
+        use_co2_tracer_field = .true.,
+        using_restart_file = .false.
+      </namelist>
+
+      <namelist name="radiative_gases_nml">
+        verbose = 3
+        gas_printout_freq = 240
+
+        time_varying_co2 = .false.,
+        co2_variation_type = 'linear',
+        co2_dataset_entry = 1860,1,1,0,0,
+        co2_specification_type = 'base_and_trend',
+        co2_floor = 100.0E-06,
+        co2_ceiling = 1600.0E-06,
+        co2_data_source = 'predicted'
+
+        time_varying_ch4 = .false.,
+        ch4_variation_type = 'linear'
+        ch4_dataset_entry = 1860,1,1,0,0,
+        ch4_specification_type = 'time_series'
+        ch4_data_source = 'input'
+
+        time_varying_n2o = .false.,
+        n2o_variation_type = 'linear'
+        n2o_dataset_entry = 1860,1,1,0,0,
+        n2o_specification_type = 'time_series'
+        n2o_data_source = 'input'
+
+        time_varying_f11 = .false.,
+        f11_variation_type = 'linear'
+        f11_dataset_entry = 1860,1,1,0,0,
+        f11_specification_type = 'time_series'
+        f11_data_source = 'input'
+
+        time_varying_f12 = .false.,
+        f12_variation_type = 'linear'
+        f12_dataset_entry = 1860,1,1,0,0,
+        f12_specification_type = 'time_series'
+        f12_data_source = 'input'
+
+        time_varying_f113 = .false.,
+        f113_variation_type = 'linear'
+        f113_dataset_entry = 1860,1,1,0,0,
+        f113_specification_type = 'time_series'
+        f113_data_source = 'input'
+
+        time_varying_f22 = .false.,
+        f22_variation_type = 'linear'
+        f22_dataset_entry = 1860,1,1,0,0,
+        f22_specification_type = 'time_series'
+        f22_data_source = 'input'
+      </namelist>
+
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/John.Krasting/cwg/IC/CM4i_c96L48_am4a1r1_1pct-co2-2X_00010101_20141021.tar</dataSource>
+      </dataFile>
+
+      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_1deg']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
+
+      <!-- Time Mean Volcanic Aerosol Forcing:  From Larry Horowitz -->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CWG_HOME)/input/volcano/mean_hist/asmsw_data.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CWG_HOME)/input/volcano/mean_hist/extlw_data.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CWG_HOME)/input/volcano/mean_hist/extsw_data.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CWG_HOME)/input/volcano/mean_hist/omgsw_data.nc</dataSource>
+      </dataFile>
+
+      <!-- Ozone Climatology File From CM3 -->
+      <dataFile label="input" target="INPUT/o3.climatology.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CWG_HOME)/input/ozone/CM3_mean_o3_climatology_accmip_1860.nc</dataSource>
+      </dataFile>
+
+      <!-- Mean Solar Cycle 1856 to 1866:  From Dan Schwarzkopf and Larry Horowitz -->
+      <dataFile label="input" target="INPUT/lean_solar_spectral_data.dat" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CWG_HOME)/input/solar/CMIP5_1856_1866avg_monthly_data_b18_TIM</dataSource>
+      </dataFile>
+
+      <dataFile label="input" target="INPUT/co2_data.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/pdata/esm/ipcc_ar5/datasets/forcings/co2_data.1PctTo2X.nc</dataSource>
+      </dataFile>
+
+      <csh type="always"><![CDATA[
+grep "ADDITIONAL 1860 DIAGNOSTICS" $work/diag_table
+
+if ( "$status" == "1") then
+cat >> $work/diag_table << DIAGTABLE_EOF
+#ADDITIONAL 1860 DIAGNOSTICS
+"atmos_level",                 1,  "months", 1, "days", "time",
+"atmos_co2",                  "pwt",                "pwt",                "atmos_level", "all", .true.,  "none", 2
+"atmos_co2_restoring",        "co2_restore",        "co2_restore",        "atmos_level", "all", .true.,  "none", 2
+"dynamics",                   "area",               "area",               "atmos_level", "all", .false., "none", 2
+"dynamics",                   "co2",                "co2",                "atmos_level", "all", .true.,  "none", 2
+"dynamics",                   "co2_dvmr",           "co2_dvmr",           "atmos_level", "all", .true.,  "none", 2
+"flux",                       "co2_atm",            "co2_atm",            "atmos_level", "all", .true.,  "none", 2
+"flux",                       "co2_surf",           "co2_surf",           "atmos_level", "all", .true.,  "none", 2
+"flux",                       "co2_flux",           "co2_flux",           "atmos_level", "all", .true.,  "none", 2
+"flux",                       "co2_mol_flux",       "co2_mol_flux",       "atmos_level", "all", .true.,  "none", 2
+"flux",                       "co2_atm_dvmr",       "co2_atm_dvmr",       "atmos_level", "all", .true.,  "none", 2
+"flux",                       "co2_surf_dvmr",      "co2_surf_dvmr",      "atmos_level", "all", .true.,  "none", 2
+DIAGTABLE_EOF
+
+endif
+      ]]></csh>
+
+      <csh type="always"><![CDATA[
+grep "ADDITIONAL 1860 TRACERS" $work/field_table
+if ( "$status" == "1") then
+
+cat >> $work/field_table << FIELDTABLE_EOF
+# ADDITIONAL 1860 TRACERS
+# CO2 tracer
+## Note: atm transport and land model expect moist mmr. 
+##       set co2 units: kg/kg  (mass mixing ratio) for both atm and lnd field table entries.
+##       convert atm IC field table entry from dry vmr value to **dry** mmr
+## Note: for atm cold start from constant co2 value, instead of using field table to initialize co2,
+##       create atmos_tracers.res.nc with co2 moist mmr values
+##
+ "TRACER", "atmos_mod",    "co2"
+           "longname",     "carbon dioxide"
+           "units",        "kg/kg"
+           "convection",   "all"
+           "profile_type","fixed","surface_value = 434.5626E-06"/
+#
+ "TRACER", "land_mod",     "co2"
+           "longname",     "carbon dioxide"
+           "units",        "kg/kg" /
+FIELDTABLE_EOF
+
+endif
+      ]]></csh>
+
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data_1deg']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS_data_1deg']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+
+      <csh type="always"><![CDATA[
+cat >> $work/INPUT/MOM_override << OVERRIDE_EOF
+#override ENERGYSAVEDAYS = 73.0
+#override USE_OCMIP2_CFC = False
+OVERRIDE_EOF
+      ]]></csh>
+
+      <csh type="always"><![CDATA[
+set restart_flag = 'r' 
+      ]]></csh>
+
+  </input>
+
+  <runtime>
+      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="1878" runTime="12:00:00">
+        <segment simTime="12" units="months" runTime="03:00:00"/>
+      </production>
+      <regression name="basic">
+        <run days="10" npes="1878" runTimePerJob="01:20:00"/><!---->
+      </regression>
+      <regression name="rts"> <!--fits on t1-->
+        <run days="5 5" npes="1878" runTimePerJob="01:20:00"/><!---->
+      </regression>
+
+      <reference restart="$(REFERENCE)/archive/1x0m10d_1878pe/restart/00010111.tar"/>
+    </runtime>
+
+</experiment> 
+
+  <!-- OCEAN  and ICE post-processing-->
+  <experiment name="OM4i_postprocess">
+    <postProcess>
+        <csh><![CDATA[
+	 #Take care of iceberg restarts and trajectories
+         cd $work/RESTART
+         ncrcat icebergs.res.nc.* icebergs.res.nc
+         if ( -e icebergs.res.nc )  rm -f icebergs.res.nc.*
+         cd $work
+         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
+         if ( -e iceberg_trajectories.nc ) rm -f iceberg_trajectories.nc.* 
+         #Save the last line of timestats without the first (step number) column as a signature of MOM6 answers
+         tail -1 timestats | cut -c8- > RESTART/$enddate.timestats.res
+         #Save the whole timestats under ascii/
+         mv timestats $enddate.timestats
+         mv timestats.nc $enddate.timestats.nc
+         #Make a directory to trick FRE to pick up and archive in ascii
+         mkdir extra.results
+         mv *velocity_truncations CPU_stats MOM_parameter_doc* extra.results/
+         ]]></csh>
+      <!--REFINE DIAG SCRIPT -->
+      <!--refineDiag_data_stager.csh calculates global averages of basic quantities and stores them in a sqlit database file-->
+      <!--By default a refineDiag script causes the annual history files to be unpacked and saved in /ptmp/$USER-->
+      <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/refineDiag_data_stager.csh"/>
+
+      <component type="ocean_monthly"   start="$(ANA_CLIMO_START)" source="ocean_month">
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)" source="ocean_month">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/coupled_AM2_LM2_SIS/CM2G63L/ocn_monthly.frepp"/>
+        </timeSeries>
+
+        <timeAverage source="monthly" interval="$(PP_OCEAN_CHUNK)" >
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
+	</timeAverage>
+        <timeAverage source="monthly" interval="$(PP_OCEAN_CHUNK_B)" >
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
+	</timeAverage>
+      </component>
+
+      <component type="ocean_annual"    start="$(ANA_CLIMO_START)"  source="ocean_annual">
+        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/coupled_AM2_LM2_SIS/CM2G63L/ocn_annual.frepp"/>
+        </timeAverage>
+        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/coupled_AM2_LM2_SIS/CM2G63L/ocn_annual.frepp"/>
+        </timeAverage>
+      </component>
+
+      <component type="ocean_annual_z" start="$(ANA_CLIMO_START)" source="ocean_annual_z">
+        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/coupled_AM2_LM2_SIS/CM2G63L/ocn_annual_z.frepp"/>
+        </timeAverage>
+        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/coupled_AM2_LM2_SIS/CM2G63L/ocn_annual_z.frepp"/>
+        </timeAverage>
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)" source="ocean_annual_z"/>
+        <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK_B)" source="ocean_annual_z"/>	
+      </component>
+      
+      <component type="ice"  start="$(ANA_CLIMO_START)"  source="ice_month">
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"  source="ice_month">
+	   <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+	</timeSeries>   
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)"  source="ice_month">
+	   <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+	</timeSeries>   
+        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK)"/>
+        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK_B)"/>
+      </component>      
+      <!--The following mdbi_logger component is a trial to make the db ingestor run when the yearly data arrives
+          in order to update the "Monitoring" section of the DB.
+          The intention was not to do anything besides that update. We do not really want an annual timeseries.
+          But unfortunately frepp still tries to create a timeseries.-->      
+      <component type="mdbi_logger"   start="$(ANA_CLIMO_START)" source="ocean_annual">
+        <timeSeries freq="monthly"  chunkLength="1yr" source="ocean_annual">
+         <variables>salt_flux</variables>
+         <analysis switch="on" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
+        </timeSeries>
+      </component>
+      <component type="ocean_snap"      start="$(ANA_CLIMO_START)" source="ocean_month_snap">
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)"/>
+        <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK)"/>
+        <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK_B)"/>
+      </component>
+      <component type="ocean_annual_z"  start="$(ANA_CLIMO_START)" source="ocean_annual_z">
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)"/>
+        <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK)"/>
+        <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK_B)"/>
+        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK)" />
+        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK_B)" />
+      </component>      
+      <component type="ocean_scalar_month" start="$(ANA_CLIMO_START)" source="ocean_scalar_month">
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"   />
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)" />
+      </component>
+      <component type="ocean_scalar_annual" start="$(ANA_CLIMO_START)" source="ocean_scalar_annual">
+        <timeSeries freq="annual" chunkLength="$(PP_OCEAN_CHUNK)"   />
+        <timeSeries freq="annual" chunkLength="$(PP_OCEAN_CHUNK_B)" />
+      </component>
+    </postProcess>
+  </experiment> 
+
+      
+  <experiment name="OM4_postprocess">
+    <postProcess>
+        <csh><![CDATA[
+	 #Take care of iceberg restarts and trajectories
+         cd $work/RESTART
+         ncrcat icebergs.res.nc.* icebergs.res.nc
+         if ( -e icebergs.res.nc )  rm -f icebergs.res.nc.*
+         cd $work
+         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
+         if ( -e iceberg_trajectories.nc ) rm -f iceberg_trajectories.nc.* 
+         #Save the last line of timestats without the first (step number) column as a signature of MOM6 answers
+         tail -1 timestats | cut -c8- > RESTART/$enddate.timestats.res
+         #Save the whole timestats under ascii/
+         mv timestats $enddate.timestats
+         mv timestats.nc $enddate.timestats.nc
+         #Make a directory to trick FRE to pick up and archive in ascii
+         mkdir extra.results
+         mv *velocity_truncations CPU_stats MOM_parameter_doc* extra.results/
+         ]]></csh>
+      <!--REFINE DIAG SCRIPT -->
+      <!--refineDiag_data_stager.csh calculates global averages of basic quantities and stores them in a sqlit database file-->
+      <!--By default a refineDiag script causes the annual history files to be unpacked and saved in /ptmp/$USER-->
+      <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh $(NB_ROOT)/mom6/tools/analysis/refineDiag_data_stager.csh"/>
+
+      <component type="ocean_monthly"   start="$(ANA_CLIMO_START)" source="ocean_month">
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)" source="ocean_month">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_monthly.frepp"/>
+        </timeSeries>
+
+        <timeAverage source="monthly" interval="$(PP_OCEAN_CHUNK)" >
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
+	</timeAverage>
+        <timeAverage source="monthly" interval="$(PP_OCEAN_CHUNK_B)" >
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
+	</timeAverage>
+      </component>
+
+      <component type="ocean_annual"    start="$(ANA_CLIMO_START)"  source="ocean_annual">
+        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual.frepp"/>
+        </timeAverage>
+        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual.frepp"/>
+        </timeAverage>
+      </component>
+
+      <component type="ocean_annual_z" start="$(ANA_CLIMO_START)" source="ocean_annual_z">
+        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual_z.frepp"/>
+        </timeAverage>
+        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual_z.frepp"/>
+        </timeAverage>
+
+        <timeSeries freq="imonthly" chunkLength="$(PP_OCEAN_CHUNK_B)" source="ocean_annual_z"/>
+        <timeSeries freq="annual"   chunkLength="$(PP_OCEAN_CHUNK_B)" source="ocean_annual_z"/>
+	
+      </component>
+
+      
+      <component type="ice"  start="$(ANA_CLIMO_START)"  source="ice_month">
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"  source="ice_month">
+	   <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+	</timeSeries>   
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)"  source="ice_month">
+	   <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+	</timeSeries>   
+        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK)"/>
+        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK_B)"/>
+      </component>     
+      <!--The following mdbi_logger component is a trial to make the db ingestor run when the yearly data arrives
+          in order to update the "Monitoring" section of the DB.
+          The intention was not to do anything besides that update. We do not really want an annual timeseries.
+          But unfortunately frepp still tries to create a timeseries.-->      
+      <component type="mdbi_logger"   start="$(ANA_CLIMO_START)" source="ocean_annual">
+        <timeSeries freq="monthly"  chunkLength="1yr" source="ocean_annual">
+         <variables>salt_flux</variables>
+         <analysis switch="on" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
+        </timeSeries>
+      </component>     
+    </postProcess>
+  </experiment> 
+
+<experiment name="CM4i_c96L48_am4c1r2_2000climo" inherit="CM4i_c96L48_am4a1r1_2000climo">
+   <input>
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.37,
+        Ashear        = 25.0, 
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+      </namelist>
+     <namelist name="rotstayn_klein_mp_nml">
+        rk_act_only_if_ql_gt_qmin = .true.
+     </namelist>
+     <namelist name="strat_cloud_nml">
+        up_strat_opt = 2
+        var_limit_opt = 2
+        var_limit = 0.3
+        aerosol_activation_scheme = "total"
+        qthalfwidth    = 0.2
+        do_pdf_clouds = .true.
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 8.0,
+        Dmin = 1.0e-07,
+        n_land = 300.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 1.e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-6,
+        eros_scale_t = 3.e-6,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.4
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 1.0
+        use_sub_seasalt = .false.
+      </namelist>
+      <namelist name="uw_conv_nml">
+        use_online_aerosol = .true.,
+        iclosure        = 0,
+        rkm_sh          = 3.0,
+        cldhgt_max      = 50.e3,
+        do_uwcmt        = .false.,
+        apply_tendency  = .true.,
+        wmin_ratio      = 0.05,
+        do_lands        = .false.
+        landfact_m      = 0.5
+        lochoice        = 0
+        lofactor0       = 0.75
+        do_deep         = .true.,
+        idpchoice       = 1
+        do_rescale      = .true.
+        use_sub_seasalt = .false.
+        wrel_min=1.
+       </namelist>
+      <namelist name="uw_plume_nml">
+        rmaxfrac = 0.15
+        auto_th0 = 1.0e-3,
+        tcrit    = -25.15,
+        frac_drs = 0.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 8
+        peff_l = 1.25e-5
+        peff_i = 2.5-5
+        do_pevap = .true.
+        hcevap   = 0.9
+        cfrac    = 0.15
+       </namelist>
+       <namelist name="deep_conv_nml">
+        rkm_dp1 = 2
+        rkm_dp2 = 0.1
+        norder = 1
+        cbmf_dp_frac1 = 1.
+        cbmf_dp_frac2 = 1.
+        crh_th_ocean = 0.5
+        crh_th_land  = 0.5
+        cape_th = 100.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.9
+        auto_th0_d = 1.0e-3
+        tcrit_d    = -25.15,
+        peff_l_d = 6.e-5
+        peff_i_d = 12.e-5
+        frac_limit_d = 0.25
+        dcapedm_th = 100
+        lofactor_d = 0.75
+        do_lod_rkm   = .false.
+        do_lod_cfrac = .false.
+        do_lod_tcrit = .false.
+        do_forcedlifting_d = .false.
+      </namelist>
+   </input>
+
+</experiment>
+
+<experiment name="CM4i_c96L48_am4c1r2_1860forc" inherit="CM4i_c96L48_am4a1r1_1860forc">
+   <input>
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.37,
+        Ashear        = 25.0, 
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+      </namelist>
+     <namelist name="rotstayn_klein_mp_nml">
+        rk_act_only_if_ql_gt_qmin = .true.
+     </namelist>
+     <namelist name="strat_cloud_nml">
+        up_strat_opt = 2
+        var_limit_opt = 2
+        var_limit = 0.3
+        aerosol_activation_scheme = "total"
+        qthalfwidth    = 0.2
+        do_pdf_clouds = .true.
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 8.0,
+        Dmin = 1.0e-07,
+        n_land = 300.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 1.e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-6,
+        eros_scale_t = 3.e-6,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.4
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 1.0
+        use_sub_seasalt = .false.
+      </namelist>
+      <namelist name="uw_conv_nml">
+        use_online_aerosol = .true.,
+        iclosure        = 0,
+        rkm_sh          = 3.0,
+        cldhgt_max      = 50.e3,
+        do_uwcmt        = .false.,
+        apply_tendency  = .true.,
+        wmin_ratio      = 0.05,
+        do_lands        = .false.
+        landfact_m      = 0.5
+        lochoice        = 0
+        lofactor0       = 0.75
+        do_deep         = .true.,
+        idpchoice       = 1
+        do_rescale      = .true.
+        use_sub_seasalt = .false.
+        wrel_min=1.
+       </namelist>
+      <namelist name="uw_plume_nml">
+        rmaxfrac = 0.15
+        auto_th0 = 1.0e-3,
+        tcrit    = -25.15,
+        frac_drs = 0.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 8
+        peff_l = 1.25e-5
+        peff_i = 2.5-5
+        do_pevap = .true.
+        hcevap   = 0.9
+        cfrac    = 0.15
+       </namelist>
+       <namelist name="deep_conv_nml">
+        rkm_dp1 = 2
+        rkm_dp2 = 0.1
+        norder = 1
+        cbmf_dp_frac1 = 1.
+        cbmf_dp_frac2 = 1.
+        crh_th_ocean = 0.5
+        crh_th_land  = 0.5
+        cape_th = 100.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.9
+        auto_th0_d = 1.0e-3
+        tcrit_d    = -25.15,
+        peff_l_d = 6.e-5
+        peff_i_d = 12.e-5
+        frac_limit_d = 0.25
+        dcapedm_th = 100
+        lofactor_d = 0.75
+        do_lod_rkm   = .false.
+        do_lod_cfrac = .false.
+        do_lod_tcrit = .false.
+        do_forcedlifting_d = .false.
+      </namelist>
+   </input>
+
+</experiment>
+
+ 
+<experiment name="CM4i_c96L48_am4c1r2_drag_min_mom_2000climo" inherit="CM4i_c96L48_am4c1r2_2000climo">
+   <input>
+     <namelist name="monin_obukhov_nml">
+        stable_option = 2,
+        rich_crit = 1.0,
+        zeta_trans = 0.5,
+        drag_min_mom = 1.e-03
+     </namelist>
+      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_1deg']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data_1deg']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS_data_1deg']/input/node())"/>
+
+      <csh type="always"><![CDATA[
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $ireload == 1 ) then
+ if ( $irun == 1 ) then
+  set restart_flag = 'n'
+ else
+  set restart_flag = 'r'
+ endif
+else
+  set restart_flag = 'r'
+endif
+
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+####COMMON ALWAYS CSH ENDS######
+
+cat >> $work/INPUT/MOM_override << OVERRIDE_EOF
+#override ENERGYSAVEDAYS = 73.0
+#override USE_OCMIP2_CFC = False
+OVERRIDE_EOF
+
+      ]]></csh>
+
+
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">cwg_include/diag_table/diag_table_drag</dataSource>
+     </dataFile>
+   </input> 
+</experiment>
+
+<experiment name="CM4i_c96L48_am4c1r2_coast_rough_2000climo" inherit="CM4i_c96L48_am4c1r2_2000climo">
+   <input>
+     <namelist name="land_model_nml">
+        layout   = $land_layout,
+        io_layout = $land_io_layout,
+        tau_snow_T_adj = 604800,
+        prohibit_negative_canopy_water=.false.,
+        use_coast_rough = .true.,
+        use_coast_topo_rough = .false.
+      </namelist>
+      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_1deg']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data_1deg']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS_data_1deg']/input/node())"/>
+
+      <csh type="always"><![CDATA[
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $ireload == 1 ) then
+ if ( $irun == 1 ) then
+  set restart_flag = 'n'
+ else
+  set restart_flag = 'r'
+ endif
+else
+  set restart_flag = 'r'
+endif
+
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+
+####COMMON ALWAYS CSH ENDS######
+
+cat >> $work/INPUT/MOM_override << OVERRIDE_EOF
+#override ENERGYSAVEDAYS = 73.0
+#override USE_OCMIP2_CFC = False
+OVERRIDE_EOF
+
+      ]]></csh>
+
+
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">cwg_include/diag_table/diag_table_drag</dataSource>
+     </dataFile>
+   </input> 
+</experiment>
+
+<experiment name="CM4i_c96L48_am4c1r2_drag_min_mom_coast_rough_2000climo" inherit="CM4i_c96L48_am4c1r2_2000climo">
+   <input> 
+     <namelist name="monin_obukhov_nml">
+        stable_option = 2,
+        rich_crit = 1.0,
+        zeta_trans = 0.5,
+        drag_min_mom = 1.e-03
+     </namelist> 
+     <namelist name="land_model_nml">
+        layout   = $land_layout,
+        io_layout = $land_io_layout,
+        tau_snow_T_adj = 604800,
+        prohibit_negative_canopy_water=.false.,
+        use_coast_rough = .true.,
+        use_coast_topo_rough = .false.
+      </namelist>
+      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_1deg']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data_1deg']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS_data_1deg']/input/node())"/>
+
+      <csh type="always"><![CDATA[
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $ireload == 1 ) then
+ if ( $irun == 1 ) then
+  set restart_flag = 'n'
+ else
+  set restart_flag = 'r'
+ endif
+else
+  set restart_flag = 'r'
+endif
+
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+
+####COMMON ALWAYS CSH ENDS######
+
+cat >> $work/INPUT/MOM_override << OVERRIDE_EOF
+#override ENERGYSAVEDAYS = 73.0
+#override USE_OCMIP2_CFC = False
+OVERRIDE_EOF
+
+      ]]></csh>
+
+
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">cwg_include/diag_table/diag_table_drag</dataSource>
+     </dataFile>
+   </input> 
+</experiment>
+
+<experiment name="CM4i_c96L48_am4c1r2_1pct-co2-2X" inherit="CM4i_c96L48_am4c1r2_1860forc">
 
   <input>
 
@@ -4472,113 +5417,77 @@ set restart_flag = 'r'
       ]]></csh>
 
   </input>
+
+  <runtime>
+      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="1878" runTime="12:00:00">
+        <segment simTime="12" units="months" runTime="03:00:00"/>
+      </production>
+      <regression name="basic">
+        <run days="10" npes="1878" runTimePerJob="01:20:00"/><!---->
+      </regression>
+      <regression name="rts"> <!--fits on t1-->
+        <run days="5 5" npes="1878" runTimePerJob="01:20:00"/><!---->
+      </regression>
+
+      <reference restart="$(REFERENCE)/archive/1x0m10d_1878pe/restart/00010111.tar"/>
+  </runtime>
+
 </experiment> 
  
-  <!-- OCEAN  and ICE post-processing-->
-  <experiment name="OM4i_postprocess">
-    <postProcess>
-      <component type="ocean_snap"      start="$(ANA_CLIMO_START)" source="ocean_month_snap">
-        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"/>
-        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)"/>
-        <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK)"/>
-        <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK_B)"/>
-      </component>
-      <component type="ocean_annual_z"  start="$(ANA_CLIMO_START)" source="ocean_annual_z">
-        <timeSeries freq="annual" chunkLength="$(PP_OCEAN_CHUNK)"/>
-        <timeSeries freq="annual" chunkLength="$(PP_OCEAN_CHUNK_B)"/>
-        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK)" />
-        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK_B)" />
-      </component>
-      <component type="ocean_z"         start="$(ANA_CLIMO_START)" source="ocean_month_z">
-        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)" source="ocean_month_z"/>
-        <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK)" source="ocean_month_z"/>
-      </component>
-
-      <component type="ocean_scalar_month" start="$(ANA_CLIMO_START)" source="ocean_scalar_month">
-        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"   />
-        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)" />
-      </component>
-
-      <component type="ocean_scalar_annual" start="$(ANA_CLIMO_START)" source="ocean_scalar_annual">
-        <timeSeries freq="annual" chunkLength="$(PP_OCEAN_CHUNK)"   />
-        <timeSeries freq="annual" chunkLength="$(PP_OCEAN_CHUNK_B)" />
-      </component>
-
-    </postProcess>
-  </experiment> 
-
-      
-  <experiment name="OM4_postprocess">
-    <postProcess>
-        <csh><![CDATA[
-	 #Take care of iceberg restarts and trajectories
-         cd $work/RESTART
-         ncrcat icebergs.res.nc.* icebergs.res.nc
-         if ( -e icebergs.res.nc )  rm -f icebergs.res.nc.*
-         cd $work
-         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
-         if ( -e iceberg_trajectories.nc ) rm -f iceberg_trajectories.nc.* 
-         #Save the last line of timestats without the first (step number) column as a signature of MOM6 answers
-         tail -1 timestats | cut -c8- > RESTART/$enddate.timestats.res
-         #Save the whole timestats under ascii/
-         mv timestats $enddate.timestats
-         mv timestats.nc $enddate.timestats.nc
-
-         #Make a directory to trick FRE to pick up and archive in ascii
-         mkdir extra.results
-
-         mv *velocity_truncations CPU_stats MOM_parameter_doc* extra.results/
-
-         ]]></csh>
-      <!--REFINE DIAG SCRIPT -->
-      <!--refineDiag_data_stager.csh calculates global averages of basic quantities and stores them in a sqlit database file-->
-      <!--By default a refineDiag script causes the annual history files to be unpacked and saved in /ptmp/$USER-->
-      <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/refineDiag_data_stager.csh"/>
-
-      <component type="ocean_monthly"   start="$(ANA_CLIMO_START)" source="ocean_month">
-        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)" source="ocean_month">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/examples/ocean_SIS/OM4_025/ocn_monthly.frepp"/>
-        </timeSeries>
-
-        <timeAverage source="monthly" interval="$(PP_OCEAN_CHUNK)" >
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
-	</timeAverage>
-        <timeAverage source="monthly" interval="$(PP_OCEAN_CHUNK_B)" >
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
-	</timeAverage>
-      </component>
-
-      <component type="ocean_annual"    start="$(ANA_CLIMO_START)"  source="ocean_annual">
-        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK_B)"/>
-        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/examples/ocean_SIS/OM4_025/ocn_annual.frepp"/>
-        </timeAverage>
-      </component>
-
-      <component type="ice"  start="$(ANA_CLIMO_START)"  source="ice_month">
-        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"  source="ice_month">
-	   <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
-	</timeSeries>   
-        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK)"/>
-        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK_B)"/>
-      </component>
-      
-      <!--The following mdbi_logger component is a trial to make the db ingestor run when the yearly data arrives
-          in order to update the "Monitoring" section of the DB.
-          The intention was not to do anything besides that update. We do not really want an annual timeseries.
-          But unfortunately frepp still tries to create a timeseries. -->
-      <component type="mdbi_logger"   start="$(ANA_CLIMO_START)" source="ocean_annual">
-        <timeSeries freq="annual"  chunkLength="1yr" source="ocean_annual">
-         <variables>salt_flux</variables>
-         <analysis switch="on" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
-        </timeSeries>
-      </component>
-
-    </postProcess>
-  </experiment> 
-
-
  
+  <experiment name="faste2e_20141112_8" inherit="CM4_c96L48_am4a1r1_2000climo">
+    <description
+communityProject="TEST" 
+communityModel="test" 
+communityModelID="test"
+communityExperimentName="$(name)" 
+communityExperimentID="$(name)" >
+    </description>
+    <realization r="1" i="1" p="1"/>
+    <communityComment>
+Experiment name = $(name)
+    </communityComment>
+    <scenario 
+      communityForcing="N/A"
+      startTime="$(EXP_AMIP_START)"
+      endTime="$(EXP_AMIP_END)" 
+      parentExperimentID="N/A" 
+      parentExperimentRIP="N/A" 
+      branch_time="0.0">
+    </scenario>
+     <input>
+      <csh type="always">
+        <![CDATA[
+#NOT TO BE USED WITH REGULAR FRE RUNS!! ONLY FOR TESTING!!
+#Override the runCommand 
+unalias runCommand
+@ currentSegp1 = $currentSeg + 1
+cat > $work/time_stamp.out << TIMESTAMP_EOF
+   $currentSeg   1   1   0   0   0  Jan
+   $currentSegp1 1   1   0   0   0  Jan
+TIMESTAMP_EOF
+
+
+cat >  prep_history_gfdl << prep_history_gfdl_EOF
+   mkdir -p $outputDirRemoteHistory/history
+   cd $outputDirRemoteHistory/history
+   ln -s /archive/Niki.Zadeh/testing_20141017/CM4_c96L48_am4a1r1_2000climo/gfdl.ncrc2-intel-prod-openmp/history/${currentSeg}.nc .
+prep_history_gfdl_EOF
+
+   msub -m n -j oe -r y -S /bin/tcsh -W umask=022 -l partition=gfdl -N ${FRE_JOBID}_prep_history -q stage -l walltime=0:00:05 -l size=1 prep_history_gfdl_EOF
+
+
+
+alias runCommand 'touch dummy_history_${currentSeg}.nc;touch some_dummy_text.out;mkdir RESTART;touch RESTART/dummy_restart.res.nc;sleep 300'
+       ]]>
+      </csh>
+     </input>
+    <runtime>
+      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="32" runTime="01:00:00">
+           <segment simTime="12" units="months" runTime="00:10:00"/>
+       </production>
+    </runtime>
+ </experiment>
  </experimentSuite>
 
 
