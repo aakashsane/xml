@@ -31,7 +31,7 @@ inputfiles -x CM4_proto.xml -p ncrc2.intel
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <property name="RELEASE" value="tikal_201409"/>                <!-- CVS tag for source code -->
-  <property name="MOM6_DATE" value="2014.11.14"/>                <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE" value="2014.11.17"/>                <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>             <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"  value="tikal_201409_drag_Ming_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
   <property name="FRE_VERSION" value="fre/bronx-7"/>             <!-- fre/bronx-7 not supported on Zeus; use fre/bronx-6 -->
@@ -3186,9 +3186,16 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
     <input>
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+       <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
      </dataFile>
+
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
+       <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
+         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
+     </dataFile>
+
 
      <dataFile label="input" target="INPUT/ice_model.res.nc" chksum="" size="" timestamp="">
        $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/.datasets/OM4_025/INPUT/ice_model.res.v20140620.nc
@@ -3241,8 +3248,14 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
     <input>
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+       <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+     </dataFile>
+
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
+       <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
+         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
      </dataFile>
 
      <!--
@@ -3458,7 +3471,7 @@ OVERRIDE_EOF
     </input>
 
     <runtime>
-      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="900" runTime="15:00:00">
+      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="1878" runTime="15:00:00">
         <segment simTime="12" units="months" runTime="05:00:00"/>
       </production>
       <regression name="basic">
@@ -3468,6 +3481,7 @@ OVERRIDE_EOF
       <regression name="rts"> 
         <run days="5 5" npes="900" runTimePerJob="01:20:00"/><!---->
         <run days="10"  npes="924" runTimePerJob="01:20:00"/><!---->
+        <run days="10"  npes="1878" runTimePerJob="01:20:00"/><!---->
       </regression>
 
       <regression name="restarts">
@@ -4690,7 +4704,7 @@ set restart_flag = 'r'
           The intention was not to do anything besides that update. We do not really want an annual timeseries.
           But unfortunately frepp still tries to create a timeseries.-->      
       <component type="mdbi_logger"   start="$(ANA_CLIMO_START)" source="ocean_annual">
-        <timeSeries freq="monthly"  chunkLength="1yr" source="ocean_annual">
+        <timeSeries freq="annual"  chunkLength="1yr" source="ocean_annual">
          <variables>salt_flux</variables>
          <analysis switch="on" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
         </timeSeries>
@@ -4714,6 +4728,9 @@ set restart_flag = 'r'
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)" />
       </component>
       <component type="ocean_scalar_annual" start="$(ANA_CLIMO_START)" source="ocean_scalar_annual">
+        <!--frepp: ERROR: Cannot create ocean_scalar_annual annual timeSeries unless you generate timeSeries freq='monthly' -->
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"   />
+        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)" />
         <timeSeries freq="annual" chunkLength="$(PP_OCEAN_CHUNK)"   />
         <timeSeries freq="annual" chunkLength="$(PP_OCEAN_CHUNK_B)" />
       </component>
@@ -5402,7 +5419,7 @@ endif
       <!--MOM6 Input datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='OM4_data_1deg']/input/node())"/>
       <!--SIS Input datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='SIS_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='SIS_data_1deg']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
 
       <csh type="always"><![CDATA[
