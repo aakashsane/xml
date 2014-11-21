@@ -33,7 +33,7 @@ inputfiles -x CM4_proto.xml -p ncrc2.intel
   <property name="RELEASE" value="tikal_201409"/>                <!-- CVS tag for source code -->
   <property name="MOM6_DATE" value="2014.11.17"/>                <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>             <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"  value="tikal_201409_drag_Ming_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
+  <property name="FRE_STEM"  value="tikal_201409_drag_Mingc1r2_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
   <property name="FRE_VERSION" value="fre/bronx-7"/>             <!-- fre/bronx-7 not supported on Zeus; use fre/bronx-6 -->
   <property name="ANALYSIS_SWITCH" value="on"/>
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
@@ -318,7 +318,7 @@ configuration.
 <!--===========-->
 <!--= COMPILE =-->
 <!--===========-->
-  <!--The property MOM6_EXAMPLESshould point to the mom6 directory that is checked out. It is needed by MOM6 to access its inpu data files-->
+  <!--The property MOM6_EXAMPLES should point to the mom6 directory that is checked out. It is needed by MOM6 to access its inpu data files-->
   <property name="MOM6_EXAMPLES"  value="$root/cm4p1_compile/src/mom6"/>
 
   <!-- cm4p1_compile is the compile experiment name -->
@@ -433,9 +433,15 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
     <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/">
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/github_mirror">
-        <codeBase version="$(MOM6_GIT_TAG)"> noaa-gfdl-mom6-examples.git </codeBase>
+        <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase>
         <csh>
-          mv noaa-gfdl-mom6-examples mom6
+          git clone -b $(MOM6_GIT_TAG) http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6-examples.git mom6
+          pushd mom6
+          git submodule init src/MOM6  tools/python/025gridGeneration/MIDAS
+          git clone --recursive http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6.git src/MOM6
+          git submodule update
+          popd
+
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
           if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
@@ -535,6 +541,10 @@ $baseDate
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land</dataSource>
       </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">cwg_include/diag_table/diag_table_drag</dataSource>
+      </dataFile>
+ 
     </input>
   </experiment>
 
@@ -593,7 +603,7 @@ $baseDate
         <dataSource platform="$(platform)">$(CWG_HOME)/input/CM4i_hydrography_20140729.tar</dataSource>
       </dataFile>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CWG_HOME)/IC/CM4i_C96L48_LM3_OM4_1deg_grid_19810101.remapped.v20140730-2.tar</dataSource>
+        <dataSource platform="$(platform)">$(CWG_HOME)/IC/CM4i_C96L48_LM3_OM4_1deg_grid_19810101.remapped.v20140903.tar</dataSource>
       </dataFile>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CWG_HOME)/input/CM4i_mosaic_20140729.tar</dataSource>
@@ -758,7 +768,7 @@ else
   exit 53
 endif
 
-# Copy AWG ascii input files to GFDL (waiting for FRE to do this for us)
+# Copy AWG and OWG ascii input files to GFDL (waiting for FRE to do this for us)
 if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
   module switch gcp/2.2 gcp/2.1 #not needed with bronx-8
 
@@ -779,19 +789,17 @@ cat >  prepost_gfdl << untar_at_gfdl_EOF
      mkdir mom6
      tar xvf mom6.tar -C mom6
    else
-     git clone --recursive -b $(MOM6_GIT_TAG) http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6-examples.git mom6
+          git clone -b $(MOM6_GIT_TAG) http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6-examples.git mom6
+          pushd mom6
+          git submodule init tools/python/025gridGeneration/MIDAS
+          git submodule update
+          popd
    endif
    if(! -d mdt_xml) git clone -b dev "http://gitlab.gfdl.noaa.gov/mdt/xml.git" mdt_xml
    ln -s mdt_xml/awg_include $xmldirRemote/
 untar_at_gfdl_EOF
 
    msub -m n -j oe -r y -S /bin/tcsh -W umask=022 -l partition=gfdl -N ${FRE_JOBID}_prepost -q stage -l walltime=1:00:00 -l size=1 prepost_gfdl
-
-#If gcp preserved permissions we could do the following instead of the above msub
-#  mkdir mom6
-#  tar xvf mom6.tar -C ./mom6
-#  \rm mom6/.datasets
-#  gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
 
   module switch gcp/2.1 gcp/2.2 #not needed with bronx-8
 endif
@@ -2119,9 +2127,10 @@ Experiment name = $(name)
       </regression>
 
       <reference restart="$(REFERENCE)/archive/1x0m8d_432pe/restart/19800109.tar"/>
+      <!-- curator tolerates only one reference per experiment
       <reference restart="$(REFERENCE_awg)/1x0m8d_432pe/restart/19800109.tar"/>
       <reference restart="$(REFERENCE_awg)/1x0m10d_432pe/restart/19800111.tar"/>
-
+      -->
     </runtime>
 
     <postProcess>
@@ -2312,8 +2321,10 @@ Experiment name = $(name)
       </regression>
 
       <reference restart="$(REFERENCE)/archive/1x0m8d_864pe/restart/19800109.tar"/>
+      <!--
       <reference restart="$(REFERENCE_awg)/1x0m8d_864pe/restart/19800109.tar"/>
       <reference restart="$(REFERENCE_awg)/1x0m10d_864pe/restart/19800111.tar"/>
+      -->
    </runtime>
 
     <postProcess>
@@ -2604,8 +2615,10 @@ Experiment name = $(name)
         <run months="1" npes="3456" runTimePerJob="00:30:00"/>
       </regression>
       <reference restart="$(REFERENCE)/archive/1x0m10d_432pe/restart/00010111.tar"/>
+      <!--
       <reference restart="$(REFERENCE_awg)/1x0m10d_432pe/restart/00010111.tar"/>
       <reference restart="$(REFERENCE_awg)/1x0m8d_432pe/restart/00010109.tar"/>
+      -->
     </runtime>
 
     <postProcess>
@@ -2700,8 +2713,10 @@ Experiment name = $(name)
       </regression>
 
       <reference restart="$(REFERENCE)/archive/1x0m8d_864pe/restart/00010109.tar"/>     
+      <!--
       <reference restart="$(REFERENCE_awg)/1x0m8d_864pe/restart/00010109.tar"/>
       <reference restart="$(REFERENCE_awg)/1x0m10d_864pe/restart/00010111.tar"/>
+      -->
     </runtime>
 
     <postProcess>
@@ -2722,6 +2737,137 @@ Experiment name = $(name)
 <!--=======================-->
 <!--= CM4 EXPERIMENTS     =-->
 <!--=======================-->
+
+<experiment name="CM4_c96L48_am4c1r2_drag_min_mom_coast_rough_2000climo" inherit="CM4_c96L48_am4c1r2_2000climo">
+   <input>
+     <namelist name="monin_obukhov_nml">
+        stable_option = 2,
+        rich_crit = 1.0,
+        zeta_trans = 0.5,
+        drag_min_mom = 1.e-03
+     </namelist>
+     <namelist name="land_model_nml">
+        layout   = $land_layout,
+        io_layout = $land_io_layout,
+        tau_snow_T_adj = 604800,
+        prohibit_negative_canopy_water=.false.,
+        use_coast_rough = .true.,
+        use_coast_topo_rough = .false.
+      </namelist>
+   </input>
+</experiment>
+
+<experiment name="CM4_c96L48_am4c1r2_2000climo" inherit="CM4_c96L48_am4a1r1_2000climo">
+   <input>
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.37,
+        Ashear        = 25.0, 
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+      </namelist>
+     <namelist name="rotstayn_klein_mp_nml">
+        rk_act_only_if_ql_gt_qmin = .true.
+     </namelist>
+     <namelist name="strat_cloud_nml">
+        up_strat_opt = 2
+        var_limit_opt = 2
+        var_limit = 0.3
+        aerosol_activation_scheme = "total"
+        qthalfwidth    = 0.2
+        do_pdf_clouds = .true.
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 8.0,
+        Dmin = 1.0e-07,
+        n_land = 300.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 1.e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-6,
+        eros_scale_t = 3.e-6,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.4
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 1.0
+        use_sub_seasalt = .false.
+      </namelist>
+      <namelist name="uw_conv_nml">
+        use_online_aerosol = .true.,
+        iclosure        = 0,
+        rkm_sh          = 3.0,
+        cldhgt_max      = 50.e3,
+        do_uwcmt        = .false.,
+        apply_tendency  = .true.,
+        wmin_ratio      = 0.05,
+        do_lands        = .false.
+        landfact_m      = 0.5
+        lochoice        = 0
+        lofactor0       = 0.75
+        do_deep         = .true.,
+        idpchoice       = 1
+        do_rescale      = .true.
+        use_sub_seasalt = .false.
+        wrel_min=1.
+       </namelist>
+      <namelist name="uw_plume_nml">
+        rmaxfrac = 0.15
+        auto_th0 = 1.0e-3,
+        tcrit    = -25.15,
+        frac_drs = 0.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 8
+        peff_l = 1.25e-5
+        peff_i = 2.5-5
+        do_pevap = .true.
+        hcevap   = 0.9
+        cfrac    = 0.15
+       </namelist>
+       <namelist name="deep_conv_nml">
+        rkm_dp1 = 2
+        rkm_dp2 = 0.1
+        norder = 1
+        cbmf_dp_frac1 = 1.
+        cbmf_dp_frac2 = 1.
+        crh_th_ocean = 0.5
+        crh_th_land  = 0.5
+        cape_th = 100.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.9
+        auto_th0_d = 1.0e-3
+        tcrit_d    = -25.15,
+        peff_l_d = 6.e-5
+        peff_i_d = 12.e-5
+        frac_limit_d = 0.25
+        dcapedm_th = 100
+        lofactor_d = 0.75
+        do_lod_rkm   = .false.
+        do_lod_cfrac = .false.
+        do_lod_tcrit = .false.
+        do_forcedlifting_d = .false.
+      </namelist>
+   </input>
+
+</experiment>
 
 <experiment name="CM4_c96L48_am4b2r1_2000climo" inherit="CM4_c96L48_am4a1r1_2000climo">
    <input> 

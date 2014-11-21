@@ -69,7 +69,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 <!-- ncrc platforms -->
 	
     <platform name="ncrc2.intel">
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -159,15 +159,11 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
            source $MODULESHOME/init/csh
            module use -a /home/John.Krasting/local/modulefiles
            module purge
-           module load jpk-analysis/0.0.4
            module load $(FRE_VERSION)
+           module load fre-analysis
            module load git
-           #Some tricks to use the refineDiag and analysis scripts from a checkout of MOM6 at gfdl 
            setenv FREVERSION $(FRE_VERSION)           
            setenv NBROOT $(NB_ROOT)
-           mkdir -p $NBROOT
-           cd $NBROOT
-/home/Niki.Zadeh/bin/git_clone_mom6_fix.csh 
          ]]></csh>
 <!--The following are not used, but needed by fre -->
      <property name="SGI_FLAGS" value=""/>
@@ -204,19 +200,24 @@ Make the executable for ocean-ice experiments.
 
       <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/">
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/github_mirror">
-            <codeBase version="$(MOM6_GIT_TAG)"> noaa-gfdl-mom6-examples.git </codeBase>
+            <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase>
             <csh>
-          mv noaa-gfdl-mom6-examples mom6
+          git clone -b $(MOM6_GIT_TAG) http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6-examples.git mom6
+          pushd mom6
+          git submodule init src/MOM6 src/SIS2 tools/python/025gridGeneration/MIDAS
+          git clone --recursive http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6.git src/MOM6
+          git submodule update
+          popd
+
+          pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
           if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
-            pushd mom6
             ln -s /scratch2/portfolios/GFDL/gfdlscr/John.Krasting/pdata/gfdl_O/datasets/ .datasets
-            popd
           else
-            pushd mom6
             ln -s /lustre/f1/pdata/gfdl_O/datasets/ .datasets
-            popd
           endif
+          popd	  
+
           test -e mom6/.datasets
           if ($status != 0) then
             echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
@@ -553,6 +554,41 @@ LAYOUT_EOF
 
 # runCommand:
   alias runCommand "aprun -n $ocean_npes -d 1 ./$executable:t"
+
+
+# Copy OWG ascii input files to GFDL (waiting for FRE to do this for us)
+if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
+  #trick to copy MOM6 directory but avoid traversing the .datasets links
+  tar cvf mom6.tar -C $(MOM6_EXAMPLES) .
+
+cat >  prepost_gfdl << untar_at_gfdl_EOF
+   mkdir -p $(NB_ROOT)
+   cd $(NB_ROOT)
+   module load gcp
+   gcp gaea:$workDir/mom6.tar .
+   if( -e mom6.tar ) then
+     mkdir mom6
+     tar xvf mom6.tar -C mom6
+   else
+          git clone -b $(MOM6_GIT_TAG) http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6-examples.git mom6
+          pushd mom6
+          git submodule init tools/python/025gridGeneration/MIDAS
+          git submodule update
+          popd
+   endif
+untar_at_gfdl_EOF
+
+   msub -m n -j oe -r y -S /bin/tcsh -W umask=022 -l partition=gfdl -N ${FRE_JOBID}_prepost -q stage -l walltime=1:00:00 -l size=1 prepost_gfdl
+
+#If gcp preserved permissions we could do the following instead of the above msub
+#  mkdir mom6
+#  tar xvf mom6.tar -C ./mom6
+#  \rm mom6/.datasets
+#  gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
+
+endif
+
+
       ]]></csh>
 
     </input>
