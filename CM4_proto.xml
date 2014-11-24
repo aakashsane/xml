@@ -4861,14 +4861,6 @@ set restart_flag = 'r'
         <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK)"/>
         <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK_B)"/>
       </component>
-      <component type="ocean_annual_z"  start="$(ANA_CLIMO_START)" source="ocean_annual_z">
-        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"/>
-        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)"/>
-        <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK)"/>
-        <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK_B)"/>
-        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK)" />
-        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK_B)" />
-      </component>      
       <component type="ocean_scalar_month" start="$(ANA_CLIMO_START)" source="ocean_scalar_month">
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"   />
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)" />
@@ -4938,7 +4930,7 @@ set restart_flag = 'r'
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual_z.frepp"/>
         </timeAverage>
 
-        <timeSeries freq="imonthly" chunkLength="$(PP_OCEAN_CHUNK_B)" source="ocean_annual_z"/>
+        <timeSeries freq="monthly"  chunkLength="$(PP_OCEAN_CHUNK_B)" source="ocean_annual_z"/>
         <timeSeries freq="annual"   chunkLength="$(PP_OCEAN_CHUNK_B)" source="ocean_annual_z"/>
 	
       </component>
@@ -4959,7 +4951,7 @@ set restart_flag = 'r'
           The intention was not to do anything besides that update. We do not really want an annual timeseries.
           But unfortunately frepp still tries to create a timeseries.-->      
       <component type="mdbi_logger"   start="$(ANA_CLIMO_START)" source="ocean_annual">
-        <timeSeries freq="monthly"  chunkLength="1yr" source="ocean_annual">
+        <timeSeries freq="annual"  chunkLength="1yr" source="ocean_annual">
          <variables>salt_flux</variables>
          <analysis switch="on" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
         </timeSeries>
