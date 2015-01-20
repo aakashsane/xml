@@ -213,10 +213,6 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
 
-    <platform name="gfdl.default">
-      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.ncrc2-intel']/node())" />
-    </platform>
-
 </setup>
 
    <property name="MOM6_EXAMPLES"  value="$root/$(LIBS_ROOT)/src/mom6"/>
@@ -882,6 +878,79 @@ touch $work/INPUT/SIS_override
 
 </experiment>
 
+  <experiment name="OM4i_postprocess">
+
+      <postProcess> 
+         <csh><![CDATA[
+         cd $work/RESTART
+         ncrcat icebergs.res.nc.* icebergs.res.nc
+         if(-e icebergs.res.nc) rm -f icebergs.res.nc.*
+         cd $work
+         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
+         rm -f iceberg_trajectories.nc.* 
+         #Save the last line of timestats without the first (step number) column as a signature of MOM6 answers
+         tail -1 timestats | cut -c8- > RESTART/$enddate.timestats.res
+         #Save the whole timestats under ascii/
+         mv timestats $enddate.timestats
+         mv timestats.nc $enddate.timestats.nc
+
+         #Make a directory to trick FRE to pick up and archive in ascii
+         mkdir extra.results
+
+         mv *velocity_truncations CPU_stats MOM_parameter_doc* extra.results/
+
+         ]]></csh>
+
+      <!--REFINE DIAG SCRIP -->
+      <!--By default a refineDiag script causes the annual data to be unpacked and saved in /ptmp/$USER-->
+      <!--MOM6_refineDiag.csh is currently empty and is here only to cause the unpack annual history files in /ptmp-->
+      <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh"/>
+      <!--PostProcessing component models-->
+      <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/ocn_monthly.frepp"/>
+        </timeSeries>
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_month">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/ocn_monthly.frepp"/>
+        </timeSeries>
+      </component>
+
+      <component type="ocean_annual_z" start="$(PP_START_YEAR)" source="ocean_annual_z"  sourceGrid="ocean-tripolar">
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/ocn_annual_z.frepp"/>
+        </timeAverage>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/ocn_annual_z.frepp"/>
+        </timeAverage>
+
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>
+	
+      </component>
+
+      <component type="ocean_annual" start="$(PP_START_YEAR)"  source="ocean_annual"  sourceGrid="ocean-tripolar"> 
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/ocn_annual.frepp"/>
+        </timeAverage>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/ocn_annual.frepp"/>
+        </timeAverage>
+      </component>
+
+      <component type="ice"  start="$(PP_START_YEAR)"  source="ice_month"  sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"  source="ice_month">
+	   <analysis switch="$(ANALYSIS_SWITCH)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+	</timeSeries>   
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)"  source="ice_month">
+           <analysis switch="$(ANALYSIS_SWITCH)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+        </timeSeries>
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+
+     </postProcess>
+
+</experiment>
 <experiment name="OM4_SIS_baseline_TEST" inherit="OM4_SIS_baseline">
 <!--The following description tags are needed to put the experiment in the MDBI-->
 <description communityProject="TEST" communityModel="OM4_SIS_baseline_TEST $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
@@ -1281,8 +1350,16 @@ OVERRIDE_EOF
    </input>
 </experiment>
 <experiment name="MOM6_GOLD_SIS" inherit="MOM6_SIS_compile">
-<description>                                                
- GOLD_SIS test case                                     
+<description communityProject="OWG" communityModel="MOM6_GOLD_SIS $(FRE_STEM)" communityModelID="OWG_MOM6_GOLD_SIS" communityExperimentName="$(name)" >
+ global 1 degree i test case
+    <scenario 
+      communityForcing="CORE"
+      parentExperimentID="N/A" 
+      parentExperimentRIP="N/A" 
+      startTime="$(PP_START_YEAR)"
+      endTime="$(PP_END_YEAR)" 
+      branch_time="0.0">
+    </scenario>
 </description>                                               
      <input>                                                 
      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
@@ -1402,6 +1479,18 @@ OVERRIDE_EOF
        ice_mask_table='MOM_mask_table'
      </namelist>
 
+<diagTable order="append">
+#================
+# Additional DIAGNOSTICS
+#================
+"ocean_annual_z",       1,  "years", 1, "days", "time",
+"ocean_model", "temp_int","temp_int","ocean_month_snap","all",.false.,"none",2
+"ocean_model", "salt_int","salt_int","ocean_month_snap","all",.false.,"none",2
+"ocean_model", "col_mass","col_mass","ocean_month_snap","all",.false.,"none",2
+"ocean_model", "mass_wt","mass_wt","ocean_month_snap","all",.false.,"none",2
+"ocean_model", "col_height","col_height","ocean_month_snap","all",.false.,"none",2
+</diagTable>
+
      <csh type="always">
         <![CDATA[
 #------------------------------------------
@@ -1462,7 +1551,7 @@ cd $work
    </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4i_postprocess']/postProcess/node())"/>
     </postProcess>
 
 </experiment>
