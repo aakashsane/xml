@@ -19,7 +19,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2015.01.13"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2015.01.20"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="FRE_VERSION"  value="fre/bronx-9"/>
@@ -34,7 +34,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
    <property name="ANALYSIS_SWITCH" value="on"/>
 
    <property name="PROD_RUNTIME"         value="16:00:00"/>
-   <property name="PROD_SEGTIME"         value="03:45:00"/>
+   <property name="PROD_SEGTIME"         value="04:10:00"/>
    <property name="PROD_NPES"            value="2997"/> 
 <!-- Not used anymore
    <property name="MASK_TABLE"           value="mask_table.1053.90x45"/>
@@ -65,7 +65,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 <!-- ncrc platforms -->
 	
     <platform name="ncrc2.intel">
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_o</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -1349,6 +1349,55 @@ OVERRIDE_EOF
 
    </input>
 </experiment>
+
+<experiment name="OM4_SIS_baseline_kppbf" inherit="OM4_SIS_baseline">
+<!--The following description tags are needed to put the experiment in the MDBI-->
+<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
+Baseline with backscatter diagnostics and bugfix for KPP shear
+</description>
+
+   <input>
+     
+     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+
+     <csh type="always">
+        <![CDATA[
+#===Have to repeat whatever is in the parent experiment===
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
+else
+   set restart_flag = 'r'
+endif
+
+ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc
+
+touch $work/INPUT/MOM_override
+
+#=========================================================
+#Append to diag_table
+#=======================
+if ( $irun == 1 ) then
+cat >> $work/diag_table << DIAG_EOF
+#================
+# Additional DIAGNOSTICS
+#================
+ "ocean_model", "Res_fn",   "Res_fn",   "ocean_annual", "all", "mean", "none",2
+DIAG_EOF
+
+endif
+
+       ]]>
+      </csh>
+   </input>
+   <runtime>   
+      <production simTime="5" units="years" npes="$(PROD_NPES)" runTime="$(PROD_RUNTIME)">
+           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
+      </production>
+   </runtime>
+</experiment>
+
+
+
 <experiment name="MOM6_GOLD_SIS" inherit="MOM6_SIS_compile">
 <description communityProject="OWG" communityModel="MOM6_GOLD_SIS $(FRE_STEM)" communityModelID="OWG_MOM6_GOLD_SIS" communityExperimentName="$(name)" >
  global 1 degree i test case
@@ -1484,11 +1533,6 @@ OVERRIDE_EOF
 # Additional DIAGNOSTICS
 #================
 "ocean_annual_z",       1,  "years", 1, "days", "time",
-"ocean_model", "temp_int","temp_int","ocean_month_snap","all",.false.,"none",2
-"ocean_model", "salt_int","salt_int","ocean_month_snap","all",.false.,"none",2
-"ocean_model", "col_mass","col_mass","ocean_month_snap","all",.false.,"none",2
-"ocean_model", "mass_wt","mass_wt","ocean_month_snap","all",.false.,"none",2
-"ocean_model", "col_height","col_height","ocean_month_snap","all",.false.,"none",2
 </diagTable>
 
      <csh type="always">

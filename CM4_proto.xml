@@ -12,7 +12,7 @@
 
 # To check out codes and compile:
 # for target option "-t openmp", the default is prod-openmp
-module load fre/bronx-7
+module load fre/bronx-9
 fremake -x CM4_proto.xml -p ncrc2.intel -t prod-openmp cm4_compile
 
 # To run regression test (for the coupled experiment CM4_c96L48_am4a1r1_2000climo, year 2000 forcing): 
@@ -31,7 +31,7 @@ inputfiles -x CM4_proto.xml -p ncrc2.intel
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <property name="RELEASE" value="ulm"/>                <!-- CVS tag for source code -->
-  <property name="MOM6_DATE" value="2014.12.24"/>                  <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE" value="2015.01.20"/>                  <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"  value="$(RELEASE)_plus_LowSens_Drag_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
   <property name="FRE_VERSION" value="fre/bronx-9"/>             <!-- -->
@@ -3076,6 +3076,47 @@ Experiment name = $(name)
 
 </experiment>
 
+<experiment name="CM4_c96L48_am4c3_2000_meke" inherit="CM4_c96L48_am4c3_2000">
+  <description communityProject="$(ProjectID)" communityModel="CM4_AM4a1_SIS  $(MOM6_GIT_TAG)" communityModelID="CM4_AM4a1_SIS" communityExperimentName="$(name)">
+CM4 (c3) with ocean eddy parameterization (MEKE) turned on.
+  </description>
+  <input> 
+    <csh type="always"><![CDATA[
+#Any inheriting experiment that needs a  type="always" csh block should repeat the contents of csh block of the parent
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
+else
+   set restart_flag = 'r'
+endif
+
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+####COMMON ALWAYS CSH ENDS######
+
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+MEKE_KHTH_FAC = 1.0
+MEKE_ALPHA_RHINES = 0.05
+MEKE_ALPHA_EADY = 0.05
+KH_RES_FN_POWER = 100
+INTERPOLATE_RES_FN = False
+GILL_EQUATORIAL_LD = True
+OVERRIDE_EOF
+    ]]></csh>
+
+  </input> 
+</experiment>
 
  <experiment name="CM4_c96L48_am4a1r1_2000climo" inherit="CM4_c96L48_am4a3_2000"/>
  <experiment name="CM4_c96L48_am4a3_2000" inherit="cm4_compile">
