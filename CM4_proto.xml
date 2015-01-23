@@ -121,10 +121,8 @@ be controlled by changing properties below.
 
 
 <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-   <property name="reference_tag"      value="tikal_201407_plus_3cjgUpdates_mom6_2014.07.23"/>
-                              <!--reproduces "tikal_201403_mom6_2014.07.01_with_cjgUpdates"/-->
-                              <!--reproduces "tikal_201407_plus_3cjgUpdates_mom6_2014.07.23"/-->
-
+   <property name="reference_tag"      value="ulm_answers"/>
+                            
 
 <!--=================-->
 <!--= CHANGING NPES =-->
@@ -4917,7 +4915,7 @@ set restart_flag = 'r'
       <!--Also, the presence of a refineDiag script causes the history files for the last completed year to be unpacked /ptmp/$USER-->
       <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh /home/fms/local/opt/fre-analysis/test/eem/code/cm4_web_analysis/refineDiagScript/refineDiag_data_stager_globalAve.csh"/>
 
-      <component type="ocean_monthly"   start="$(ANA_CLIMO_START)" source="ocean_month">
+      <component type="ocean_monthly"   start="$(ANA_CLIMO_START)" source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/coupled_AM2_LM3_SIS/CM2G63L/ocn_monthly.frepp"/>
         </timeSeries>
@@ -4930,7 +4928,7 @@ set restart_flag = 'r'
 	</timeAverage>
       </component>
 
-      <component type="ocean_annual"    start="$(ANA_CLIMO_START)"  source="ocean_annual">
+      <component type="ocean_annual"    start="$(ANA_CLIMO_START)"  source="ocean_annual" sourceGrid="ocean-tripolar">
         <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/coupled_AM2_LM3_SIS/CM2G63L/ocn_annual.frepp"/>
         </timeAverage>
@@ -4939,7 +4937,7 @@ set restart_flag = 'r'
         </timeAverage>
       </component>
 
-      <component type="ocean_annual_z" start="$(ANA_CLIMO_START)" source="ocean_annual_z">
+      <component type="ocean_annual_z" start="$(ANA_CLIMO_START)" source="ocean_annual_z" sourceGrid="ocean-tripolar">
         <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/coupled_AM2_LM3_SIS/CM2G63L/ocn_annual_z.frepp"/>
         </timeAverage>
@@ -4950,7 +4948,7 @@ set restart_flag = 'r'
         <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK_B)" source="ocean_annual_z"/>	
       </component>
       
-      <component type="ice"  start="$(ANA_CLIMO_START)"  source="ice_month">
+      <component type="ice"  start="$(ANA_CLIMO_START)"  source="ice_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"  source="ice_month">
 	   <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
 	</timeSeries>   
@@ -4961,13 +4959,13 @@ set restart_flag = 'r'
         <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK_B)"/>
       </component>      
 
-      <component type="ocean_snap"      start="$(ANA_CLIMO_START)" source="ocean_month_snap">
+      <component type="ocean_snap"      start="$(ANA_CLIMO_START)" source="ocean_month_snap" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"/>
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)"/>
         <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK)"/>
         <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK_B)"/>
       </component>
-      <component type="ocean_annual_z"  start="$(ANA_CLIMO_START)" source="ocean_annual_z">
+      <component type="ocean_annual_z"  start="$(ANA_CLIMO_START)" source="ocean_annual_z" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"/>
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)"/>
         <timeSeries freq="annual"  chunkLength="$(PP_OCEAN_CHUNK)"/>
@@ -4975,12 +4973,11 @@ set restart_flag = 'r'
         <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK)" />
         <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK_B)" />
       </component>      
-      <component type="ocean_scalar_month" start="$(ANA_CLIMO_START)" source="ocean_scalar_month">
+      <component type="ocean_scalar_month" start="$(ANA_CLIMO_START)" source="ocean_scalar_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"   />
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)" />
       </component>
-      <component type="ocean_scalar_annual" start="$(ANA_CLIMO_START)" source="ocean_scalar_annual">
-        <!--frepp: ERROR: Cannot create ocean_scalar_annual annual timeSeries unless you generate timeSeries freq='monthly' -->
+      <component type="ocean_scalar_annual" start="$(ANA_CLIMO_START)" source="ocean_scalar_annual" sourceGrid="ocean-tripolar">
         <timeSeries freq="annual" chunkLength="$(PP_OCEAN_CHUNK)"   />
         <timeSeries freq="annual" chunkLength="$(PP_OCEAN_CHUNK_B)" />
       </component>
@@ -5012,7 +5009,7 @@ set restart_flag = 'r'
       <!--By default a refineDiag script causes the annual history files to be unpacked and saved in /ptmp/$USER-->
       <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh /home/fms/local/opt/fre-analysis/test/eem/code/cm4_web_analysis/refineDiagScript/refineDiag_data_stager_globalAve.csh"/>
 
-      <component type="ocean_monthly"   start="$(ANA_CLIMO_START)" source="ocean_month">
+      <component type="ocean_monthly"   start="$(ANA_CLIMO_START)" source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_monthly.frepp"/>
         </timeSeries>
@@ -5025,7 +5022,7 @@ set restart_flag = 'r'
 	</timeAverage>
       </component>
 
-      <component type="ocean_annual"    start="$(ANA_CLIMO_START)"  source="ocean_annual">
+      <component type="ocean_annual"    start="$(ANA_CLIMO_START)"  source="ocean_annual" sourceGrid="ocean-tripolar">
         <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual.frepp"/>
         </timeAverage>
@@ -5034,7 +5031,7 @@ set restart_flag = 'r'
         </timeAverage>
       </component>
 
-      <component type="ocean_annual_z" start="$(ANA_CLIMO_START)" source="ocean_annual_z">
+      <component type="ocean_annual_z" start="$(ANA_CLIMO_START)" source="ocean_annual_z" sourceGrid="ocean-tripolar">
         <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual_z.frepp"/>
         </timeAverage>
@@ -5048,7 +5045,7 @@ set restart_flag = 'r'
       </component>
 
       
-      <component type="ice"  start="$(ANA_CLIMO_START)"  source="ice_month">
+      <component type="ice"  start="$(ANA_CLIMO_START)"  source="ice_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"  source="ice_month">
 	   <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
 	</timeSeries>   
