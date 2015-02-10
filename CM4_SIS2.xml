@@ -13,19 +13,19 @@
 # To check out codes and compile:
 # for target option "-t openmp", the default is prod-openmp
 module load fre/bronx-9
-fremake -x CM4_proto.xml -p ncrc2.intel -t prod-openmp cm4_compile
+fremake -x CM4_SIS2.xml -p ncrc2.intel -t prod-openmp cm4_sis2_compile
 
 # To run regression test (for the coupled experiment CM4_c96L48_am4a1r1_2000climo, year 2000 forcing): 
-frerun -r basic -x CM4_proto.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4a1r1_2000climo
+frerun -r basic -x CM4_SIS2.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4a1r1_2000climo
 
 # To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
-frerun -x CM4_proto.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4a1r1_2000climo
+frerun -x CM4_SIS2.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4a1r1_2000climo
 
 # To run fredb after an experiment is finished to manually add it to the database:
-fredb -x CM4_proto.xml -p gfdl.ncrc2-intel -t prod-openmp -n CM4_c96L48_am4a1r1_2000climo
+fredb -x CM4_SIS2.xml -p gfdl.ncrc2-intel -t prod-openmp -n CM4_c96L48_am4a1r1_2000climo
 
 # To check what is the input data of this experiment:
-inputfiles -x CM4_proto.xml -p ncrc2.intel
+inputfiles -x CM4_SIS2.xml -p ncrc2.intel
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
@@ -109,8 +109,8 @@ be controlled by changing properties below.
 
   <!-- make sure to change current_date in coupler_nml accordingly -->
   <property name="EXP_CLIMO_START" value="0001"/>
-  <property name="EXP_CLIMO_END"   value="0030"/>
-  <property name="EXP_CLIMO_LEN"   value="30"/>
+  <property name="EXP_CLIMO_END"   value="0060"/>
+  <property name="EXP_CLIMO_LEN"   value="60"/>
   <property name="ANA_CLIMO_START" value="0001"/>
   <property name="ANA_CLIMO_END"   value="0010"/>
   <property name="ANA_CLIMO_LEN"   value="10yr"/>
@@ -182,7 +182,7 @@ configuration.
 
     <platform name="ncrc2.intel">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_f</project>
+      <project>gfdl_o</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
 	<root>$HOME/$(stem)</root>
@@ -2924,6 +2924,71 @@ OVERRIDE_EOF
   </input> 
 </experiment>
 
+<experiment name="CM4_c96L48_am4c3_2000_sis2_meke_fixed" inherit="CM4_c96L48_am4c3_2000_sis2">
+  <description communityProject="$(ProjectID)" communityModel="CM4_AM4a1_SIS  $(MOM6_GIT_TAG)" communityModelID="CM4_AM4a1_SIS" communityExperimentName="$(name)">
+CM4 (c3) with ocean eddy parameterization (MEKE) turned on. Corrected ocean_rough, ocean_albedo and icebergs since CM4_c96L48_am4c3_2000_sis2_meke
+  </description>
+  <input> 
+    <namelist name="icebergs_nml">
+        really_debug=.FALSE.
+        debug=.FALSE.
+        verbose=.FALSE.
+        verbose_hrs=7200
+        use_operator_splitting=.TRUE.
+        bergy_bit_erosion_fraction=0.0
+        sicn_shift=0.1
+        parallel_reprod=.TRUE.
+        traj_sample_hrs=0
+        add_weight_to_ocean=.false.
+    </namelist>
+    <namelist name="ocean_albedo_nml">
+            ocean_albedo_option = 5
+    </namelist>
+    <namelist name="ocean_rough_nml">
+            rough_scheme = 'beljaars'
+    </namelist>
+    <csh type="always"><![CDATA[
+#Any inheriting experiment that needs a  type="always" csh block should repeat the contents of csh block of the parent
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
+else
+   set restart_flag = 'r'
+endif
+
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+####COMMON ALWAYS CSH ENDS######
+
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+MEKE_KHTH_FAC = 1.0
+MEKE_ALPHA_RHINES = 0.05
+MEKE_ALPHA_EADY = 0.05
+KH_RES_FN_POWER = 100
+INTERPOLATE_RES_FN = False
+GILL_EQUATORIAL_LD = True
+OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << OVERRIDE_EOF
+#override MAXTRUNC = 1500
+OVERRIDE_EOF
+    ]]></csh>
+
+  </input> 
+</experiment>
+
+
 
 
 <!--================================-->
@@ -2992,7 +3057,6 @@ OVERRIDE_EOF
        $(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.622.36x72
      </dataFile>
 
-
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
@@ -3027,6 +3091,10 @@ OVERRIDE_EOF
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+     </dataFile>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/SIS_input</dataSource>
