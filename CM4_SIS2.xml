@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!-- MDT XML version 20140522 -->
+<!-- MDT XML -->
 
 <!-- GFDL Model Development Team (MDT) documentation: http://cobweb.gfdl.noaa.gov/~niz/mdt/ -->
 <!-- GFDL MDT Atmosphere Working Group (AWG) documentation: http://cobweb.gfdl.noaa.gov/~cjg/awg/ -->
@@ -11,27 +11,29 @@
       <project>gfdl_YOURGROUPLETTER</project>
 
 # To check out codes and compile:
-# for target option "-t openmp", the default is prod-openmp
+     
 module load fre/bronx-9
-fremake -x CM4_proto.xml -p ncrc2.intel -t prod-openmp cm4_compile
+fremake -x CM4_SIS2.xml -p ncrc2.intel -t prod-openmp cm4_sis2_compile
 
-# To run regression test (for the coupled experiment CM4_c96L48_am4a1r1_2000climo, year 2000 forcing): 
-frerun -r basic -x CM4_proto.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4a1r1_2000climo
+# To run regression test : 
+frerun -r basic -x CM4_SIS2.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4c3_2000_sis2_meke
 
 # To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
-frerun -x CM4_proto.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4a1r1_2000climo
+frerun -x CM4_SIS2.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4c3_2000_sis2_meke
 
+
+#EXTRAs      
 # To run fredb after an experiment is finished to manually add it to the database:
-fredb -x CM4_proto.xml -p gfdl.ncrc2-intel -t prod-openmp -n CM4_c96L48_am4a1r1_2000climo
+fredb -x CM4_SIS2.xml -p gfdl.ncrc2-intel -t prod-openmp -n CM4_c96L48_am4c3_2000_sis2_meke
 
 # To check what is the input data of this experiment:
-inputfiles -x CM4_proto.xml -p ncrc2.intel
+inputfiles -x CM4_SIS2.xml -p ncrc2.intel
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <property name="RELEASE" value="ulm"/>                <!-- CVS tag for source code -->
-  <property name="MOM6_DATE" value="2015.01.20"/>                  <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE" value="2015.02.10"/>                  <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"  value="$(RELEASE)_plus_LowSens_Drag_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
   <property name="FRE_VERSION" value="fre/bronx-9"/>             <!-- -->
@@ -73,44 +75,9 @@ have not yet been documented in the peer-reviewed literature, as well as outputs
 from integrations with these models.
 -->
 
-<!--====================-->
-<!--= AMIP EXPERIMENTS =-->
-<!--====================-->
-
-<!--
-AMIP simulations are configured to start in 1980 with the first year being a 
-spin-up year. Postprocessing and analysis are performed starting in 1981. The 
-length of the simulation and analysis period can be controlled by changing 
-properties below.
--->
-
-  <!-- make sure to change current_date in coupler_nml accordingly -->
-  <property name="EXP_AMIP_START" value="1980"/>
-  <property name="EXP_AMIP_END"   value="2000"/>
-  <property name="EXP_AMIP_LEN"   value="21"/>
-  <property name="ANA_AMIP_START" value="1981"/>
-  <property name="ANA_AMIP_END"   value="2000"/>
-  <property name="ANA_AMIP_LEN"   value="20yr"/>
-  <!-- Post-processing chunk length -->
-  <!-- ANA_AMIP_LEN must be an integer multiple of PP_AMIP_CHUNK -->
-  <property name="PP_AMIP_CHUNK" value="5yr"/>
-
-<!--=====================================-->
-<!--= RFP, CESS SENSITIVITY EXPERIMENTS =-->
-<!--=====================================-->
-
-<!--
-Experiments to compute RFP (Radiative Flux Perturbation) and Cess sensitivity 
-were originally configured by Larry Horowitz. Experiments are configured to 
-start in year 0001, postprocessing and analysis are performed starting from 
-the second year (0002). The length of the simulation and analysis period can 
-be controlled by changing properties below.
--->
-
-  <!-- make sure to change current_date in coupler_nml accordingly -->
   <property name="EXP_CLIMO_START" value="0001"/>
-  <property name="EXP_CLIMO_END"   value="0030"/>
-  <property name="EXP_CLIMO_LEN"   value="30"/>
+  <property name="EXP_CLIMO_END"   value="0060"/>
+  <property name="EXP_CLIMO_LEN"   value="60"/>
   <property name="ANA_CLIMO_START" value="0001"/>
   <property name="ANA_CLIMO_END"   value="0010"/>
   <property name="ANA_CLIMO_LEN"   value="10yr"/>
@@ -141,48 +108,13 @@ Choosing a particular PE number is a balancing act. The higher npes,
 the faster the model throughput, but also the lower the model efficiency
 (i.e. the overall simulation will cost more in terms of core hours).
 
-Available options for c96L48:
-
-  +========+======================+======================+
-  |npes    |  Suggested run time for 12 month segment    |
-  |        |    am4a3             |    am4b3             |
-  +========+======================+======================+
-  |   432  |    09:00:00          |    09:00:00          |
-  |   864  |    05:20:00          |    05:20:00          |
-  |  1152  |    04:00:00          |    04:00:00          |
-  | *1728* |    03:00:00          |    03:00:00          |
-  |  2304  |    02:30:00          |    02:30:00          |
-  |  3456  |    02:15:00          |    02:15:00          |
-  +========+======================+======================+
-
-Available options for c192L48:
-
-  +========+======================+======================+
-  |npes    |  Suggested run time for 12 month segment    |
-  |        |    am4a3             |    am4b3             |
-  +========+======================+======================+
-  |  1152  |    16:00:00 (?)      |    16:00:00 (?)      |
-  |  2304  |    09:00:00          |    09:00:00          |
-  |  3456  |    07:00:00          |    07:00:00          |
-  | *4608* |    05:20:00          |    06:00:00          |
-  |  6912  |    04:00:00          |    05:00:00          |
-  +========+======================+======================+
-
-Note: default settings are *highlighted*. Suggested 
-run time values may need to be adjusted for your specific
-configuration.
-      
 -->
 
   <setup>
 
-<!-- MDBI -->
-    <fmsRelease>fmsversion</fmsRelease>
-<!-- /MDBI -->
-
     <platform name="ncrc2.intel">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
 	<root>$HOME/$(stem)</root>
@@ -552,35 +484,6 @@ $baseDate
     </input>
   </experiment>
 
-  <experiment name="amip_data">
-    <input>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/sst/hadisst.186912-201401.tar</dataSource>
-      </dataFile>
-      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/data_table/data_table_amip</dataSource>
-      </dataFile>
-      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/data_table/data_table_co2</dataSource>
-      </dataFile>
-    </input>
-  </experiment>
-
-  <experiment name="climo_data">
-    <input>
-      <dataFile label="input" target="INPUT/hadisst_sst.data.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/common/sst.climo.1981-2000.data.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/hadisst_ice.data.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/common/ice.climo.1981-2000.data.nc</dataSource>
-      </dataFile>
-      <!-- Repeat data_table_amip but not data_table_co2 -->
-      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/data_table/data_table_amip</dataSource>
-      </dataFile>
-    </input>
-  </experiment>
-
   <experiment name="c96_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -597,381 +500,6 @@ $baseDate
       </dataFile>
     </input>
   </experiment>
-
-  <experiment name="c96_data_1deg">
-    <input>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CWG_HOME)/input/19810101.static_veg.remapped_to_C96_CM4i.v20140730.tar</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CWG_HOME)/input/CM4i_hydrography_20140729.tar</dataSource>
-      </dataFile>
-      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CWG_HOME)/IC/CM4i_C96L48_LM3_OM4_1deg_grid_19810101.remapped.v20140903.tar</dataSource>
-      </dataFile>
-      <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CWG_HOME)/input/CM4i_mosaic_20140729.tar</dataSource>
-      </dataFile>
-    </input>
-  </experiment>
-
-
-  <experiment name="c96_atmos_domain_decomp">
-<!--
-c96 means 96x96 grid points per face
-fv_layout=X,Y means a domain decomposition of iec=96/X , jec=96/Y per face.
-E.g.  fv_layout="3,24" gives:
-  X-AXIS =   32  32  32
-  Y-AXIS =    4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4   4
-
-NOTE: In the follwoing npes is the number of PE cores reserved but it may NOT be equal to the actual number of PE's used.
-      Since many of the following configurations add to the same number of npes, I arbitarily incremented npes by 1 to distingush them.
-      This would cost one node (32 cores) of resources.
-      We should go back to use the override mechanism of FRE to avoid this.  
--->    
-    <input>
-      <csh><![CDATA[
-# Some possible domain decompositionsn.
-set do_ocean = "false"
-set do_concurrent_radiation = ".false."
-set domains_stack_size = "2097152"
-
-if ( "$npes" == "432" ) then
-  set atmos_npes = "432"
-  set atmos_nthreads = "1"
-  set nxblocks = "4" ; set nyblocks = "2" 
-  set fv_layout    =   "3,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "3,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,3";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,3";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "864" ) then
-  set atmos_npes = "864"
-  set atmos_nthreads = "1"
-  set nxblocks = "2" ; set nyblocks = "2" 
-  set fv_layout    =   "6,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "6,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,6";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,6";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "865" ) then
-  set atmos_npes = "432"
-  set atmos_nthreads = "2"
-  set nxblocks = "4" ; set nyblocks = "2" 
-  set fv_layout    =   "3,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "3,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,3";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,3";  set ice_io_layout   =  "1,3"
-
-#Don't know how to run with  atmos_nthreads = "3". I get:
-#aprun -d 3 -n 288 ./fms_cm4_compile.x
-#apsched: claim exceeds reservation's node-count
-#
-#else if ( "$npes" == "866" ) then
-#  set atmos_npes = "288"
-#  set atmos_nthreads = "3"
-#  set nxblocks = "3" ; set nyblocks = "1" 
-#  set fv_layout    =   "3,16";   set fv_io_layout    =  "1,4"
-#  set land_layout  =   "3,16";   set land_io_layout  =  "1,4"
-#  set ocean_layout =   "144,2";  set ocean_io_layout =  "1,2"
-#  set ice_layout   =   "144,2";  set ice_io_layout   =  "1,2"
-
-else if ( "$npes" == "867" ) then
-  set atmos_npes = "216"
-  set atmos_nthreads = "4"
-  set nxblocks = "4" ; set nyblocks = "4" 
-  set fv_layout    =   "3,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "3,12";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "72,3";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "72,3";  set ice_io_layout   =  "1,3"
-
-#aprun -d 6 -n 144 ./fms_cm4_compile.x
-#apsched: claim exceeds reservation's node-count
-#else if ( "$npes" == "869" ) then
-#  set atmos_npes = "144"
-#  set atmos_nthreads = "6"
-#  set nxblocks = "3" ; set nyblocks = "2" 
-#  set fv_layout    =   "2,12";  set fv_io_layout    =  "1,4"
-#  set land_layout  =   "2,12";  set land_io_layout  =  "1,4"
-#  set ocean_layout =   "72,2";  set ocean_io_layout =  "1,2"
-#  set ice_layout   =   "72,2";  set ice_io_layout   =  "1,2"
-
-else if ( "$npes" == "870" ) then
-  set atmos_npes = "432"
-  set do_concurrent_radiation = ".true.";set radiation_nthreads = "1"
-  set atmos_nthreads = "1"
-  set nxblocks = "4" ; set nyblocks = "2" 
-  set fv_layout    =   "3,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "3,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,3";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,3";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "1152" ) then
-  set atmos_npes = "576"
-  set atmos_nthreads = "2"
-  set nxblocks = "1" ; set nyblocks = "2" 
-  set fv_layout    =   "8,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,12";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,4"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,72"; set ocn_io_layout   =  "1,4"
-
-else if ( "$npes" == "1153" ) then
-  set atmos_npes = "576"
-  set atmos_nthreads = "2"
-  set nxblocks = "2" ; set nyblocks = "3" 
-  set fv_layout    =   "6,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "6,16";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,4"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,72"; set ocn_io_layout   =  "1,4"
-
-else if ( "$npes" == "1154" ) then
-  set atmos_npes = "576"
-  set atmos_nthreads = "2"
-  set nxblocks = "2" ; set nyblocks = "2" 
-  set fv_layout    =   "6,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "6,16";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,4"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,72"; set ocn_io_layout   =  "1,4"
-
-else if ( "$npes" == "1155" ) then
-  set atmos_npes = "288"
-  set atmos_nthreads = "4"
-  set nxblocks = "3" ; set nyblocks = "4" 
-  set fv_layout    =   "4,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "4,12";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "72,4"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "72,4"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "1728" ) then
-  set atmos_npes = "1728"
-  set atmos_nthreads = "1"
-  set nxblocks = "1" ; set nyblocks = "2" 
-  set fv_layout    =   "12,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,12";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,12";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "1729" ) then
-  set atmos_npes = "864"
-  set atmos_nthreads = "2"
-  set nxblocks = "2" ; set nyblocks = "2" 
-  set fv_layout    =   "6,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "6,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,6";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,6";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "1730" ) then
-  set atmos_npes = "432"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "2" 
-  set fv_layout    =   "3,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "3,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,3";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,3";  set ice_io_layout   =  "1,3"
-else if ( "$npes" == "1731" ) then
-  set atmos_npes = "432"
-  set atmos_nthreads = "4"
-  set nxblocks = "1" ; set nyblocks = "4" 
-  set fv_layout    =   "3,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "3,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,3";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,3";  set ice_io_layout   =  "1,3"
-else if ( "$npes" == "1732" ) then
-  set atmos_npes = "432"
-  set atmos_nthreads = "4"
-  set nxblocks = "4" ; set nyblocks = "1" 
-  set fv_layout    =   "3,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "3,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,3";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,3";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "1733" ) then
-  set atmos_npes = "216"
-  set atmos_nthreads = "8"
-  set nxblocks = "4" ; set nyblocks = "2" 
-  set fv_layout    =   "3,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "3,12";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "72,3";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "72,3";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "1740" ) then
-  set atmos_npes = "432"
-  set do_concurrent_radiation = ".true.";set radiation_nthreads = "2"
-  set atmos_nthreads = "2"
-  set nxblocks = "4" ; set nyblocks = "2" 
-  set fv_layout    =   "3,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "3,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,3";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,3";  set ice_io_layout   =  "1,3"
-  set domains_stack_size = "2097152"
-
-else if ( "$npes" == "2304" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "2"
-  set nxblocks = "1" ; set nyblocks = "2"
-  set fv_layout    =   "12,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,8";  set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,8";  set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "2592" ) then
-  set atmos_npes = "864"
-  set atmos_nthreads = "2"
-set do_concurrent_radiation = ".true." ; set radiation_nthreads = "1"
-  set nxblocks = 2
-  set nyblocks = 2
-  set fv_layout    =   "6,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "6,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,6";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,6";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "3072" ) then
-  set atmos_npes = "768"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "2" 
-  set fv_layout    =   "8,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,16";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "128,6"; set ice_io_layout   =  "1,3"
-  set ocn_layout   =   "128,6";   set ocn_io_layout =  "1,3"
-
-else if ( "$npes" == "3456_1" ) then
-  set atmos_npes = "3456"
-  set atmos_nthreads = "1"
-  set nxblocks = "2" ; set nyblocks = "2"
-  set fv_layout    =   "24,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "24,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,24";  set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,24";  set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "3457" ) then
-  set atmos_npes = "1728"
-  set atmos_nthreads = "2"
-  set nxblocks = "1" ; set nyblocks = "2"
-  set fv_layout    =   "12,24";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "12,24";   set land_io_layout  =  "1,3"
-  set ocean_layout =   "144,12";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,12";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "3459" ) then 
-  set atmos_npes = "864"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "2"
-  set fv_layout    =   "6,24";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "6,24";   set land_io_layout  =  "1,3"
-  set ocean_layout =   "144,6";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,6";  set ice_io_layout   =  "1,3"
-
-
-else if ( "$npes" == "3456" ) then 
-  set atmos_npes = "432"
-  set atmos_nthreads = "8"
-  set nxblocks = "2" ; set nyblocks = "4" 
-  set fv_layout    =   "6,12";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "6,12";   set land_io_layout  =  "1,3"
-  set ocean_layout =   "144,3";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,3";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "3470" ) then
-  set atmos_npes = "864"
-  set atmos_nthreads = "2"
-set do_concurrent_radiation = ".true." ; set radiation_nthreads = "2"
-  set nxblocks = 2
-  set nyblocks = 2
-  set fv_layout    =   "6,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "6,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,6";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,6";  set ice_io_layout   =  "1,3"
-
-#FATAL from PE  4524: Domain Decomposition:  Cubed Sphere compute domain has a minium requirement of 4 points in X and Y
-#This means components of fv_layout for c96 could at most be 96/4=24
-#So, atmos_nthreads = 1 does not work for any npes > 24x24x6=3456
-#else if ( "$npes" == "4608" ) then
-#  set atmos_npes = "4608"
-#  set atmos_nthreads = "1"
-#  set nxblocks = "1" ; set nyblocks = "6" 
-#  set fv_layout    =   "24,32"; set fv_io_layout    =  "1,4"
-#  set land_layout  =   "24,32"; set land_io_layout  =  "1,4"
-#  set ocean_layout =   "144,32"; set ocean_io_layout =  "1,4"
-#  set ice_layout   =   "144,32"; set ice_io_layout   =  "1,4"
-
-#FATAL from PE  2271: Domain Decomposition:  Cubed Sphere compute domain has a minium requirement of 4 points in X and Y, respectively
-
-else if ( "$npes" == "4609" ) then
-  set atmos_npes = "2304"
-  set atmos_nthreads = "2"
-  set nxblocks = "1" ; set nyblocks = "2" 
-  set fv_layout    =   "16,24"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "16,24"; set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,16"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,16"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "4611" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "4"
-  set nxblocks = "1" ; set nyblocks = "6" 
-  set fv_layout    =   "12,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16"; set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,8"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "4612" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "4"
-  set nxblocks = "4" ; set nyblocks = "1" 
-  set fv_layout    =   "8,24"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,24"; set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,8"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "4613" ) then
-  set atmos_npes = "576"
-  set atmos_nthreads = "8"
-  set nxblocks = "3" ; set nyblocks = "8" 
-  set fv_layout    =   "8,12"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,12"; set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,4"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,4"; set ice_io_layout   =  "1,4"
-
-
-else if ( "$npes" == "6912" ) then
-  set atmos_npes = "864"
-  set atmos_nthreads = "8"
-  set nxblocks = "1" ; set nyblocks = "8"
-  set fv_layout    =   "12,12";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "12,12";   set land_io_layout  =  "1,3"
-  set ocean_layout =   "144,6";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,6";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "6913" ) then
-  set atmos_npes = "1728"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "4"
-  set fv_layout    =   "12,24";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "12,24";   set land_io_layout  =  "1,3"
-  set ocean_layout =   "144,12";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,12";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "6914" ) then
-  set atmos_npes = "3456"
-  set atmos_nthreads = "2"
-  set nxblocks = "2" ; set nyblocks = "4"
-  set fv_layout    =   "24,24";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "24,24";   set land_io_layout  =  "1,3"
-  set ocean_layout =   "144,24";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,24";  set ice_io_layout   =  "1,3"
-
-else
-  if ( $echoOn ) unset echo
-  echo "*ERROR*: npes == '$npes' is not supported in xml."
-  if ( $echoOn ) set echo
-  exit 1
-endif
-
-      ]]></csh>
-      
-    </input>
-  </experiment>
-
 
   <experiment name="common_csh_blocks">
     <input>
@@ -1073,314 +601,6 @@ endif
       
      </input>
   </experiment>
- 
-  <experiment name="c192_data">
-    <input>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/19810101.static_veg.remapped_to_C192_OM4_025.v20140714.tar</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/c192_OM4_025_hydrography_v20140708.tar </dataSource>
-      </dataFile>
-      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/ic/awg_C192L48_LM3_OM4_025_grid_19810101.remapped.v20140714.tar</dataSource>
-      </dataFile>
-      <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/grid/c192_OM4_025_grid_v20140708.tar</dataSource>
-      </dataFile>
-    </input>
-  </experiment>
-
-  <experiment name="c192_atmos_domain_decomp">
-    <input>
-      <csh><![CDATA[
-# Possible domain decomposition for c192 atmosphere only experiments (numbers from Rusty Benson).
-set domains_stack_size = "3097152"
-set do_ocean = "false"
-set do_concurrent_radiation = ".false."
-
-if ( "$npes" == "864" ) then
-  set atmos_npes = "864"
-  set atmos_nthreads = "1"
-  set nxblocks = "2" ; set nyblocks = "2" 
-  set fv_layout    =   "6,24";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "6,24";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,6"; set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,6"; set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "865" ) then
-  set atmos_npes = "432"
-  set atmos_nthreads = "2"
-  set nxblocks = "2" ; set nyblocks = "4" 
-  set fv_layout    =   "6,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "6,12";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,3"; set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,3"; set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "1152" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "1"
-  set nxblocks = "1" ; set nyblocks = "1" 
-  set fv_layout    =   "8,24";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,24";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,8"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "1153" ) then
-  set atmos_npes = "576"
-  set atmos_nthreads = "2"
-  set nxblocks = "3" ; set nyblocks = "8" 
-  set fv_layout    =   "8,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,12";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,4"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,4"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "1155" ) then
-  set atmos_npes = "288"
-  set atmos_nthreads = "4"
-  set nxblocks = "6" ; set nyblocks = "8" 
-  set fv_layout    =   "4,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "4,12";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "72,4"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "72,4"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "2304" ) then
-  set atmos_npes = "2304"
-  set atmos_nthreads = "1"
-  set nxblocks = "1" ; set nyblocks = "1" 
-  set fv_layout    =   "16,24";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "16,24";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,16"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,16"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "2305" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "2"
-  set nxblocks = "3" ; set nyblocks = "4" 
-  set fv_layout    =   "8,24";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,24";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,8"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "2308" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "2"
-  set nxblocks = "1" ; set nyblocks = "4" 
-  set fv_layout    =   "12,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,8"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "2306" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "2"
-  set nxblocks = "2" ; set nyblocks = "4" 
-  set fv_layout    =   "8,24";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,24";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,8"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "2307" ) then
-  set atmos_npes = "576"
-  set atmos_nthreads = "4"
-  set nxblocks = "3" ; set nyblocks = "8" 
-  set fv_layout    =   "8,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,12";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,4"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,4"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "2311" ) then
-  set atmos_npes = "576"
-  set atmos_nthreads = "4"
-  set nxblocks = "6" ; set nyblocks = "4" 
-  set fv_layout    =   "4,24";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "4,24";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,4"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,4"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "2312" ) then
-  set atmos_npes = "576"
-  set atmos_nthreads = "4"
-  set nxblocks = "4" ; set nyblocks = "1" 
-  set fv_layout    =   "8,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,12";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,4"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,4"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "2313" ) then
-  set atmos_npes = "576"
-  set atmos_nthreads = "4"
-  set nxblocks = "6" ; set nyblocks = "1" 
-  set fv_layout    =   "8,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,12";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,4"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,4"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "2309" ) then
-  set atmos_npes = "288"
-  set atmos_nthreads = "8"
-  set nxblocks = "6" ; set nyblocks = "8" 
-  set fv_layout    =   "4,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "4,12";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "72,4"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "72,4"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "2310" ) then
-  set atmos_npes = "288"
-  set atmos_nthreads = "8"
-  set nxblocks = "8" ; set nyblocks = "1" 
-  set fv_layout    =   "4,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "4,12";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "72,4"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "72,4"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "2314" ) then
-  set atmos_npes = "288"
-  set atmos_nthreads = "8"
-  set nxblocks = "6" ; set nyblocks = "1" 
-  set fv_layout    =   "4,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "4,12";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "72,4"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "72,4"; set ice_io_layout   =  "1,4"
-
-
-else if ( "$npes" == "3456" ) then
-  set atmos_npes = "3456"
-  set atmos_nthreads = "1"
-  set nxblocks = "1" ; set nyblocks = "1"
-  set fv_layout    =   "24,24";   set fv_io_layout    =  "1,4"
-  set land_layout  =   "24,24";   set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,24";  set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,24";  set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "3457" ) then
-  set atmos_npes = "1728"
-  set atmos_nthreads = "2"
-  set nxblocks = "2" ; set nyblocks = "4" 
-  set fv_layout    =   "12,24";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,24";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,12"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,12"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "3459" ) then
-  set atmos_npes = "864"
-  set atmos_nthreads = "4"
-  set nxblocks = "4" ; set nyblocks = "4" 
-  set fv_layout    =   "6,24";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "6,24";  set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,6"; set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,6"; set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "3463" ) then 
-  set atmos_npes = "432"
-  set atmos_nthreads = "8"
-  set nxblocks = "4" ; set nyblocks = "8" 
-  set fv_layout    =   "6,12";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "6,12";   set land_io_layout  =  "1,3"
-  set ocean_layout =   "144,3";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,3";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "4608" ) then
-  set atmos_npes = "4608"
-  set atmos_nthreads = "1"
-  set nxblocks = "1" ; set nyblocks = "3" 
-  set fv_layout    =   "24,32"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "24,32"; set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,32"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,32"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "4609" ) then
-  set atmos_npes = "2304"
-  set atmos_nthreads = "2"
-  set nxblocks = "2" ; set nyblocks = "4" 
-  set fv_layout    =   "16,24"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "16,24"; set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,16"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,16"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "4611" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "6" 
-  set fv_layout    =   "12,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16"; set land_io_layout  =  "1,4"
-  set ocean_layout =   "144,8"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "4612" ) then
-  set atmos_npes = "576"
-  set atmos_nthreads = "8"
-  set nxblocks = "3" ; set nyblocks = "8" 
-  set fv_layout    =   "8,12"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,12"; set land_io_layout  =  "1,4"
-  set ocean_layout =   "72,8"; set ocean_io_layout =  "1,4"
-  set ice_layout   =   "72,8"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "6144" ) then
-  set atmos_npes = "1536"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "2" 
-  set fv_layout    =   "8,32"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,32"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "128,12"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "6145" ) then
-  set atmos_npes = "1536"
-  set atmos_nthreads = "4"
-  set nxblocks = "3" ; set nyblocks = "3" 
-  set fv_layout    =   "8,32"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,32"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "128,12"; set ice_io_layout   =  "1,4"
-
-else if ( "$npes" == "6912" ) then
-  set atmos_npes = "864"
-  set atmos_nthreads = "8"
-  set nxblocks = "2" ; set nyblocks = "8"
-  set fv_layout    =   "12,12";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "12,12";   set land_io_layout  =  "1,3"
-  set ocean_layout =   "144,6";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,6";  set ice_io_layout   =  "1,3"
-
-else if ( "$npes" == "6913" ) then
-  set atmos_npes = "1728"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "2" 
-  set fv_layout    =   "12,24";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "12,24";   set land_io_layout  =  "1,3"
-  set ocean_layout =   "144,12";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,12";  set ice_io_layout   =  "1,3"
-  set domains_stack_size = "2097152"
-
-else if ( "$npes" == "6915" ) then
-  set atmos_npes = "1728"
-  set atmos_nthreads = "4"
-  set nxblocks = "4" ; set nyblocks = "2" 
-  set fv_layout    =   "12,24";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "12,24";   set land_io_layout  =  "1,3"
-  set ocean_layout =   "144,12";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,12";  set ice_io_layout   =  "1,3"
-  set domains_stack_size = "2097152"
-
-else if ( "$npes" == "6914" ) then
-  set atmos_npes = "864"
-  set atmos_nthreads = "8"
-  set nxblocks = "2" ; set nyblocks = "4" 
-  set fv_layout    =   "12,12";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "12,12";   set land_io_layout  =  "1,3"
-  set ocean_layout =   "144,6";  set ocean_io_layout =  "1,3"
-  set ice_layout   =   "144,6";  set ice_io_layout   =  "1,3"
-  set domains_stack_size = "2097152"
-
-else
-  if ( $echoOn ) unset echo
-  echo "*ERROR*: npes == '$npes' is not supported in this xml."
-  if ( $echoOn ) set echo
-  exit 1
-endif
-      ]]></csh>
-
-    </input>
-  </experiment>
 
   <experiment name="c96_coupled_domain_decomp">
     <input>
@@ -1471,9 +691,6 @@ else if ( "$npes" == "3168" ) then
   set ice_layout   =   "144,3"; set ice_io_layout   =  "1,3"
   set ocn_layout   =   "32,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
   set ocean_npes = "2304"
-
-#npes= 3168  main_loop= 556.145360  ATM= 504.227122  OCN= 528.297102  SYPD= 4.2563
-#npes= 3168  main_loop= 556.754100  ATM= 503.647652  OCN= 528.220859  SYPD= 4.25165
 
 else if ( "$npes" == "3169" ) then
   set atmos_npes = "432"
@@ -1569,9 +786,6 @@ else if ( "$npes" == "3584" ) then
   set ocn_layout   =   "45,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.808.45x72"
   set ocean_npes   = "2432"
 
-#npes= 3584  main_loop= 423.286286  ATM= 399.471799  OCN= 391.183390  SYPD= 5.59225
-#npes= 3584  main_loop= 419.922637  ATM= 395.322781  OCN= 391.138917  SYPD= 5.63705
-
 else if ( "$npes" == "5279" ) then
   set atmos_npes = "864"
   set atmos_nthreads = "2"
@@ -1581,8 +795,6 @@ else if ( "$npes" == "5279" ) then
   set ice_layout   =   "72,12"; set ice_io_layout   =  "2,4"
   set ocn_layout   =   "90,54"; set ocn_io_layout   =  "2,6"; set ocn_mask_table = "mask_table.1309.90x54"
   set ocean_npes   = "3551"
-
-#npes= 5279  main_loop= 313.143484  ATM= 295.694495  OCN= 290.264955  SYPD= 7.55923
 
 else if ( "$npes" == "6975" ) then
   set atmos_npes = "1152"
@@ -1603,19 +815,6 @@ else if ( "$npes" == "13792" ) then
   set ice_layout   =   "144,8"; set ice_io_layout   =  "2,4"
   set ocn_layout   =   "90,144"; set ocn_io_layout   =  "2,4"; set ocn_mask_table = "mask_table.3785.90x144"
   set ocean_npes   = "9175"
-
-#npes= 6975  main_loop= 252.023227  ATM= 238.648825  OCN= 231.217848  SYPD= 9.39248
-
-else if ( "$npes" == "32" ) then
-#This setting is only for testing fast e2e
-  set atmos_npes = "1152"
-  set atmos_nthreads = "2"
-  set nxblocks = "" ; set nyblocks = "" 
-  set fv_layout    =   "12,16"; set fv_io_layout    =  "2,4"
-  set land_layout  =   "12,16"; set land_io_layout  =  "2,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "2,4"
-  set ocn_layout   =   "90,72"; set ocn_io_layout   =  "2,4"; set ocn_mask_table = "mask_table.1809.90x72"
-  set ocean_npes   = "4671"
 
 else
   if ( $echoOn ) unset echo
@@ -1645,471 +844,12 @@ SIS_LAYOUT_EOF
     </input>
   </experiment>
 
-
-  <experiment name="c192_coupled_domain_decomp">
-    <input>
-      <csh><![CDATA[
-# Coupled configurations
-set do_ocean = "true"
-set do_concurrent_radiation = ".false."
-set domains_stack_size = "3097152"
-if ( "$npes" == "1152" ) then
-  set atmos_npes = "864"
-  set atmos_nthreads = "1"
-  set nxblocks = "1" ; set nyblocks = "1" 
-  set fv_layout    =   "6,24";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "6,24";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,6"; set ice_io_layout   =  "1,3"
-  set ocn_layout   =   "24,12"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set ocean_npes = "288"
-
-else if ( "$npes" == "1119" ) then
-  set atmos_npes = "864"
-  set atmos_nthreads = "1"
-  set nxblocks = "1" ; set nyblocks = "1"
-  set fv_layout    =   "6,24";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "6,24";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,6"; set ice_io_layout   =  "1,3"
-  set ocn_layout   =   "16,18"; set ocn_io_layout   =  "4,2"; set ocn_mask_table = "mask_table.33.16x18"
-  set ocean_npes = "255"
-
-else if ( "$npes" == "1728" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "1"
-  set nxblocks = "1" ; set nyblocks = "1"
-  set fv_layout    =   "12,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "0,0"; set ocn_io_layout   =  "1,1"; set ocn_mask_table = "MOM_mask_table"
-  set ocean_npes = "576"
-
-else if ( "$npes" == "1632" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "1"
-  set nxblocks = "1" ; set nyblocks = "1" 
-  set fv_layout    =   "12,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,18"; set ocn_io_layout   =  "1,1"; set ocn_mask_table = "mask_table.96.32x18"
-  set ocean_npes = "480"
-else if ( "$npes" == "1633" ) then
-  set atmos_npes = "576"
-  set atmos_nthreads = "2"
-  set nxblocks = "3" ; set nyblocks = "4" 
-  set fv_layout    =   "8,12";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,12";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,4"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,18"; set ocn_io_layout   =  "1,1"; set ocn_mask_table = "mask_table.96.32x18"
-  set ocean_npes = "480"
-
-else if ( "$npes" == "3456" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "2"
-  set nxblocks = "1" ; set nyblocks = "4" 
-  set fv_layout    =   "12,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,36"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set ocean_npes = "1152"
-
-else if ( "$npes" == "3457" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "2"
-  set nxblocks = "1" ; set nyblocks = "4" 
-  set fv_layout    =   "12,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "0,0"; set ocn_io_layout   =  "1,1"; set ocn_mask_table = "MOM_mask_table"
-  set ocean_npes = "1152"
-
-else if ( "$npes" == "3458" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "2"
-  set nxblocks = "1" ; set nyblocks = "4" 
-  set fv_layout    =   "12,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "36,32"; set ocn_io_layout   =  "1,1"; set ocn_mask_table = "MOM_mask_table"
-  set ocean_npes = "1152"
-
-
-
-else if ( "$npes" == "3210" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "2"
-  set nxblocks = "1" ; set nyblocks = "4" 
-  set fv_layout    =   "12,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,36"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.242.32x36"
-  set ocean_npes = "910"
-
-else if ( "$npes" == "3429" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "2"
-  set nxblocks = "1" ; set nyblocks = "4" 
-  set fv_layout    =   "12,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,45"; set ocn_io_layout   =  "1,5"; set ocn_mask_table = "mask_table.315.32x45"
-  set ocean_npes = "1125"
-
-else if ( "$npes" == "3744" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "2"
-  set nxblocks = "1" ; set nyblocks = "4" 
-  set fv_layout    =   "12,16";  set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16";  set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,45"; set ocn_io_layout   =  "1,5"; set ocn_mask_table = "MOM_mask_table"
-  set ocean_npes = "1440"
-
-
-
-else if ( "$npes" == "6364" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "4"
-  set fv_layout    =   "12,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.548.32x72"
-  set ocean_npes = "1756"
-
-else if ( "$npes" == "6912" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "4"
-  set fv_layout    =   "12,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set ocean_npes = "2304"
-
-else if ( "$npes" == "7200" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "4"
-  set fv_layout    =   "12,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "36,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set ocean_npes = "2592"
-
-else if ( "$npes" == "6592" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "4"
-  set fv_layout    =   "12,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "36,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.622.36x72"
-  set ocean_npes = "1970"
-
-else if ( "$npes" == "13024" ) then
-  set atmos_npes = "2304"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "4"
-  set fv_layout    =   "12,32"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,32"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,16"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "72,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.1402.72x72"
-  set ocean_npes = "3782"
-
-else if ( "$npes" == "13824" ) then
-  set atmos_npes = "2304"
-  set atmos_nthreads = "4"
-  set nxblocks = "4" ; set nyblocks = "1" 
-  set fv_layout    =   "24,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "24,16"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,16"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "64,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set ocean_npes = "4608"
-
-else if ( "$npes" == "7040" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "4"
-  set nxblocks = "4" ; set nyblocks = "1" 
-  set fv_layout    =   "12,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "45,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.808.45x72"
-  set do_ocean = "true"
-  set ocean_npes   = "2432"
-
-else if ( "$npes" == "7008" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "4" 
-  set fv_layout    =   "12,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "75,32"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set do_ocean = "true"
-  set ocean_npes   = "2400"
-
-else if ( "$npes" == "7848" ) then
-  set atmos_npes = "1152"
-  set atmos_nthreads = "4"
-  set nxblocks = "" ; set nyblocks = "" 
-  set fv_layout    =   "12,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "12,16"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "45,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set do_ocean = "true"
-  set ocean_npes   = "3240"
-
-else if ( "$npes" == "15696" ) then
-  set atmos_npes = "2304"
-  set atmos_nthreads = "4"
-  set nxblocks = "" ; set nyblocks = ""
-  set fv_layout    =   "24,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "24,16"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,16"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "90,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set do_ocean = "true"
-  set ocean_npes   = "6480"
-
-else if ( "$npes" == "8169" ) then
-  set atmos_npes = "1536"
-  set atmos_nthreads = "4"
-  set nxblocks = "" ; set nyblocks = "" 
-  set fv_layout    =   "8,32"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,32"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "128,12"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "45,45"; set ocn_io_layout   =  "1,5"; set ocn_mask_table = "MOM_mask_table"
-  set do_ocean = "true"
-  set ocean_npes   = "2025"
-
-else if ( "$npes" == "8448" ) then
-  set atmos_npes = "1536"
-  set atmos_nthreads = "4"
-  set nxblocks = "" ; set nyblocks = ""
-  set fv_layout    =   "8,32"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,32"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "128,12"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set do_ocean = "true"
-  set ocean_npes   = "2304"
-
-else if ( "$npes" == "8576" ) then
-  set atmos_npes = "1536"
-  set atmos_nthreads = "4"
-  set nxblocks = "" ; set nyblocks = "" 
-  set fv_layout    =   "8,32"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "8,32"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "128,12"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "45,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.808.45x72"
-  set do_ocean = "true"
-  set ocean_npes   = "2432"
-
-else if ( "$npes" == "9344" ) then
-  set atmos_npes = "1728"
-  set atmos_nthreads = "4"
-  set nxblocks = "2" ; set nyblocks = "4"
-  set fv_layout    =   "12,24";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "12,24";   set land_io_layout  =  "1,3"
-  set ice_layout   =   "144,12";  set ice_io_layout   =  "1,3"
-  set ocn_layout   =   "45,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.808.45x72"
-  set do_ocean = "true"
-  set ocean_npes   = "2432"
-#SYPD= 5.71746  npes= 9344  main_loop= 414.016546  ATM= 392.145506  OCN= 381.589754
-
-else if ( "$npes" == "12595" ) then
-  set atmos_npes = "2304"
-  set atmos_nthreads = "4"
-  set nxblocks = "" ; set nyblocks = ""
-  set fv_layout    =   "24,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "24,16"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,16"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "64,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.1229.64x72"
-  set ocean_npes = "3379"
-#npes= 12595  main_loop= 349.973723  ATM= 345.592016  OCN= 292.770137  SYPD= 6.76372
-
-else if ( "$npes" == "9344" ) then
-  set atmos_npes = "1728"
-  set atmos_nthreads = "4"
-  set nxblocks = "" ; set nyblocks = "" 
-  set fv_layout    =   "12,24";   set fv_io_layout    =  "1,3"
-  set land_layout  =   "12,24";   set land_io_layout  =  "1,3"
-  set ice_layout   =   "144,12";  set ice_io_layout   =  "1,3"
-  set ocn_layout   =   "45,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.808.45x72"
-  set do_ocean = "true"
-  set ocean_npes   = "2432"
-#SYPD= 5.71746  npes= 9344  main_loop= 414.016546  ATM= 392.145506  OCN= 381.589754
-
-else if ( "$npes" == "12595" ) then
-  set atmos_npes = "2304"
-  set atmos_nthreads = "4"
-  set nxblocks = "" ; set nyblocks = "" 
-  set fv_layout    =   "24,16"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "24,16"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "144,16"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "64,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.1229.64x72"
-  set ocean_npes = "3379"
-#npes= 12595  main_loop= 349.973723  ATM= 345.592016  OCN= 292.770137  SYPD= 6.76372
-
-else
-  if ( $echoOn ) unset echo
-  echo "*ERROR*: npes == '$npes' is not supported in this xml."
-  if ( $echoOn ) set echo
-  exit 1
-endif
-
-cat > $work/INPUT/MOM_layout << LAYOUT_EOF
-LAYOUT = $ocn_layout
-#override IO_LAYOUT = $ocn_io_layout
-MASKTABLE = $ocn_mask_table
-LAYOUT_EOF
-
-cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
-#override undef NIPROC
-#override undef NJPROC
-#override undef NIPROC_IO
-#override undef NJPROC_IO
-#override LAYOUT = $ice_layout
-#override IO_LAYOUT = $ice_io_layout
-SIS_LAYOUT_EOF
-
-      ]]></csh>
-
-
-      </input>
-  </experiment>
-
-
 <!--================================-->
 <!--= TEMPLATES FOR POSTPROCESSING =-->
 <!--================================-->
 
-  <experiment name="c96_amip_postprocess">
-    <postProcess>
-
-      <component type="atmos" zInterp="era40" start="$(ANA_AMIP_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
-        <timeSeries freq="3hr" source="atmos_8xdaily" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmos8xDailyTS/*)">
-            <xi:fallback/>
-          </xi:include>
-<!-- MDBI, this switch must be on to trigger "fredb" automatically -->
-          <analysis switch="$(MDBIswitch)" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
-<!-- /MDBI -->
-        </timeSeries>
-        <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmos4xDailyTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeSeries freq="daily" source="atmos_daily" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosDailyTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosMonthTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh -c amip"/>
-	</timeAverage>  
-        <timeAverage source="monthly" interval="$(ANA_AMIP_LEN)">
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh -c amip"/>
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosMonthAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-        <timeAverage source="annual" interval="$(PP_AMIP_CHUNK)" calcInterval="$(PP_AMIP_CHUNK)"/>
-        <timeAverage source="annual" interval="$(ANA_AMIP_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosAnnualAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-      </component>
-
-      <component type="atmos_level" start="$(ANA_AMIP_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
-        <timeSeries freq="annual" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosLevelAnnualTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_AMIP_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosLevelMonthAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-      </component>
-
-      <component type="atmos_month_aer" start="$(ANA_AMIP_START)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_AMIP_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosMonthAerAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-      </component>
-
-      <component type="atmos_diurnal" start="$(ANA_AMIP_START)" source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
-      </component>
-
-      <component type="atmos_scalar" start="$(ANA_AMIP_START)" source="atmos_scalar">
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
-      </component>
-
-<!-- FULL CHEMISTRY -->
-      <component type="tracer_level" start="$(ANA_AMIP_START)" source="atmos_tracer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
-        <timeSeries freq="annual" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/tracerAnnualTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_AMIP_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/tracerMonthAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-      </component>
-
-<!-- LAND -->
-      <component type="land" start="$(ANA_AMIP_START)" source="land_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK)"/>
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/landMonthTS/*)" >
-            <xi:fallback/>
-	  </xi:include>
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_AMIP_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/landMonthAve/*)" >
-            <xi:fallback/>
-	  </xi:include>
-        </timeAverage>
-      </component>
-
-      <component type="land_cubic" start="$(ANA_AMIP_START)" source="land_month" cubicToLatLon="none">
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)" >
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/landMonthTSNative/*)" >
-            <xi:fallback/>
-	  </xi:include>
-        </timeSeries>
-        <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/landDailyTSNative/*)">
-            <xi:fallback/>
-	  </xi:include>
-        </timeSeries>
-      </component>
-
-    </postProcess>
-  </experiment>
-
   <experiment name="c96_climo_postprocess">
     <postProcess>
-
       <component type="atmos" zInterp="era40" start="$(ANA_CLIMO_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
         <timeSeries freq="3hr" source="atmos_8xdaily" chunkLength="$(PP_CLIMO_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmos8xDailyTS/*)">
@@ -2237,538 +977,17 @@ SIS_LAYOUT_EOF
     </postProcess>
   </experiment>
 
-  <experiment name="c192_amip_postprocess">
-    <postProcess>
-
-      <component type="atmos" zInterp="era40" start="$(ANA_AMIP_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
-        <timeSeries freq="3hr" source="atmos_8xdaily" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmos8xDailyTS/*)">
-            <xi:fallback/>
-          </xi:include>
-<!-- MDBI, this switch must be on to trigger "fredb" automatically -->
-          <analysis switch="$(MDBIswitch)" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
-<!-- /MDBI -->
-        </timeSeries>
-        <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmos4xDailyTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeSeries freq="daily" source="atmos_daily" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosDailyTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosMonthTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh -c amip"/>
-	</timeAverage>
-        <timeAverage source="monthly" interval="$(ANA_AMIP_LEN)">
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh -c amip"/>
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosMonthAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-        <timeAverage source="annual" interval="$(PP_AMIP_CHUNK)" calcInterval="$(PP_AMIP_CHUNK)"/>
-        <timeAverage source="annual" interval="$(ANA_AMIP_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosAnnualAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-      </component>
-
-      <component type="atmos_level" start="$(ANA_AMIP_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
-        <timeSeries freq="annual" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosLevelAnnualTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh -c amip"/>
-	</timeAverage>
-        <timeAverage source="monthly" interval="$(ANA_AMIP_LEN)">
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh -c amip"/>
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosLevelMonthAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-      </component>
-
-      <component type="atmos_month_aer" start="$(ANA_AMIP_START)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="360,576" interpMethod="conserve_order1">
-        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_AMIP_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/atmosMonthAerAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-      </component>
-
-      <component type="atmos_diurnal" start="$(ANA_AMIP_START)" source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
-      </component>
-
-      <component type="atmos_scalar" start="$(ANA_AMIP_START)" source="atmos_scalar">
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
-      </component>
-
-<!-- FULL CHEMISTRY -->
-      <component type="tracer_level" start="$(ANA_AMIP_START)" source="atmos_tracer" sourceGrid="atmos-cubedsphere" xyInterp="360,576" interpMethod="conserve_order1">
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
-        <timeSeries freq="annual" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/tracerAnnualTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_AMIP_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/tracerMonthAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-      </component>
-
-<!-- LAND -->
-      <component type="land" start="$(ANA_AMIP_START)" source="land_month" sourceGrid="land-cubedsphere" xyInterp="360,576" interpMethod="conserve_order1">
-        <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK)"/>
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/landMonthTS/*)" >
-            <xi:fallback/>
-	  </xi:include>
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_AMIP_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/landMonthAve/*)" >
-            <xi:fallback/>
-	  </xi:include>
-        </timeAverage>
-      </component>
-
-      <component type="land_cubic" start="$(ANA_AMIP_START)" source="land_month" cubicToLatLon="none">
-        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)" >
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/landMonthTSNative/*)" >
-            <xi:fallback/>
-	  </xi:include>
-        </timeSeries>
-        <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/landDailyTSNative/*)">
-            <xi:fallback/>
-	  </xi:include>
-        </timeSeries>
-      </component>
-
-    </postProcess>
-  </experiment>
-
-  <experiment name="c192_climo_postprocess">
-    <postProcess>
-
-      <component type="atmos" zInterp="era40" start="$(ANA_CLIMO_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
-        <timeSeries freq="3hr" source="atmos_8xdaily" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmos8xDailyTS/*)">
-            <xi:fallback/>
-          </xi:include>
-<!-- MDBI, this switch must be on to trigger "fredb" automatically -->
-          <analysis switch="$(MDBIswitch)" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
-<!-- /MDBI -->
-        </timeSeries>
-        <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmos4xDailyTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeSeries freq="daily" source="atmos_daily" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosDailyTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosMonthTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)">
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh"/>
-	</timeAverage> 
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK_B)">
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh"/>
-	</timeAverage> 
-        <timeAverage source="monthly" interval="$(ANA_CLIMO_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosMonthAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-        <timeAverage source="annual" interval="$(PP_CLIMO_CHUNK)" calcInterval="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="annual" interval="$(ANA_CLIMO_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosAnnualAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-      </component>
-
-      <component type="atmos_level" start="$(ANA_CLIMO_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="annual" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosLevelAnnualTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_CLIMO_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosLevelMonthAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-      </component>
-
-      <component type="atmos_month_aer" start="$(ANA_CLIMO_START)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="360,576" interpMethod="conserve_order1">
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_CLIMO_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosMonthAerAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-      </component>
-
-      <component type="atmos_diurnal" start="$(ANA_CLIMO_START)" source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
-      </component>
-
-      <component type="atmos_scalar" start="$(ANA_CLIMO_START)" source="atmos_scalar">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-      </component>
-
-<!-- FULL CHEMISTRY -->
-      <component type="tracer_level" start="$(ANA_CLIMO_START)" source="atmos_tracer" sourceGrid="atmos-cubedsphere" xyInterp="360,576" interpMethod="conserve_order1">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="annual" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/tracerAnnualTS/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_CLIMO_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/tracerMonthAve/*)">
-            <xi:fallback/>
-          </xi:include>
-        </timeAverage>
-      </component>
-
-<!-- LAND -->
-      <component type="land" start="$(ANA_CLIMO_START)" source="land_month" sourceGrid="land-cubedsphere" xyInterp="360,576" interpMethod="conserve_order1">
-        <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/landMonthTS/*)" >
-            <xi:fallback/>
-	  </xi:include>
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_CLIMO_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/landMonthAve/*)" >
-            <xi:fallback/>
-	  </xi:include>
-        </timeAverage>
-      </component>
-
-      <component type="land_cubic" start="$(ANA_CLIMO_START)" source="land_month" cubicToLatLon="none">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)" >
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/landMonthTSNative/*)" >
-            <xi:fallback/>
-	  </xi:include>
-        </timeSeries>
-        <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/landDailyTSNative/*)">
-            <xi:fallback/>
-	  </xi:include>
-        </timeSeries>
-      </component>
-
-    </postProcess>
-  </experiment>
-
-
-
-<!--====================-->
-<!--= AMIP EXPERIMENTS =-->
-<!--====================-->
-
-  <experiment name="c96L48_am4a3" inherit="cm4_sis2_compile">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p3" 
-communityModelID="am4p3"
-communityExperimentName="$(name)" 
-     >
-<!-- /MDBI -->
-
-AM4 prototype configuration "am4a3" from MDT Atmosphere Working Group.
-Configuration derived from "c96L48_am4a1r1"
-
-- c96 horizontal grid with approximately 100km resolution and 48 vertical levels.
-- Convection based on "double-plume" from Ming Zhao.
-- Tiedtke cloud scheme
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
-
-    </description>
-
-<!-- MDBI -->
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="flux_exchange_nml">
-        nblocks=$atmos_nthreads
-      </namelist>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-	 nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>       
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p3_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a3_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a3_c96.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p3_amip.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
-        dt_atmos = 1200,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_atmos_domain_decomp']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
-      <!--SIS Input datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
-
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="1728" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="3:00:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8"   npes="432" overrideParams="xgrid_nml:make_exchange_reproduce=.true."  runTimePerJob="02:30:00"/>
-      </regression>
-      <regression name="rts">
-        <run days="4 4"  npes="432" overrideParams="xgrid_nml:make_exchange_reproduce=.true."  runTimePerJob="02:30:00"/>
-        <run days="8"    npes="864" overrideParams="xgrid_nml:make_exchange_reproduce=.true."  runTimePerJob="02:30:00"/>
-      </regression>
-
-      <regression name="restarts">
-        <run days="4 4" npes="432" overrideParams="xgrid_nml:make_exchange_reproduce=.true."  runTimePerJob="02:30:00"/>
-      </regression>
-
-      <reference restart="$(REFERENCE)/archive/1x0m8d_432pe/restart/19800109.tar"/>
-
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-  
-
-  <experiment name="c96L48_am4c3" inherit="c96L48_am4a3">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p3" 
-communityModelID="am4p3"
-communityExperimentName="$(name)" 
-    >
-<!-- /MDBI -->
-
-AM4 prototype configuration "am4c3" from MDT Atmosphere Working Group.
-Configuration derived from "c96L48_am4c1r2"
-
-- c96 horizontal grid with approximately 100km resolution and 48 vertical levels.
-- Convection based on "double-plume" and low climate sensitivity from Ming Zhao.
-- Tiedtke cloud scheme
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
-
-    </description>
-
-<!-- MDBI -->
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-   <input> 
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4c3_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4c3_c96.nml"/>
-   </input> 
-
-  </experiment>
-
-
-<!--=====================-->
-<!--= CLIMO EXPERIMENTS =-->
-<!--=====================-->
-<!-- do_ocean=.false. -->
-
-
- <experiment name="c96L48_am4a3_2000climo" inherit="cm4_sis2_compile">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p3" 
-communityModelID="am4p3"
-communityExperimentName="$(name)" 
-     >
-<!-- /MDBI -->
-
-Same model as c96L48_am4a3, but
-configuration with present-day climatological SSTs, present-day GHGs and aerosols.
-
-    </description>
-
-<!-- MDBI -->
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_CLIMO_START)"
-      endTime="$(EXP_CLIMO_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="flux_exchange_nml">
-        nblocks=$atmos_nthreads
-      </namelist>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-	 nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p3_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a3_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a3_c96.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p3_2000climo.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1,1,1,0,0,0,
-        calendar = 'noleap'
-        dt_atmos = 1200,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_atmos_domain_decomp']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
-      <!--SIS Input datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="1728" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="3:00:00"/>
-      </production>
-      <regression name="basic">
-        <run days="10"   npes="432"  runTimePerJob="02:30:00"/>
-      </regression>
-      <regression name="rts">
-        <run days="5 5"  npes="432"  runTimePerJob="02:30:00"/>
-      </regression>
-      <regression name="restarts">
-        <run days="5 5" npes="432"  runTimePerJob="02:30:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1" npes="432"  runTimePerJob="02:00:00"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00"/>
-        <run months="1" npes="1728" runTimePerJob="00:45:00"/>
-        <run months="1" npes="2304" runTimePerJob="00:30:00"/>
-        <run months="1" npes="3456" runTimePerJob="00:30:00"/>
-      </regression>
-      <reference restart="$(REFERENCE)/archive/1x0m10d_432pe/restart/00010111.tar"/>
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-
-  <experiment name="c96L48_am4c3_2000climo" inherit="c96L48_am4a3_2000climo">
-   <input> 
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4c3_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4c3_c96.nml"/>
-   </input> 
- </experiment>
-
-
 <!--=======================-->
 <!--= CM4 EXPERIMENTS     =-->
 <!--=======================-->
-
 
  <experiment name="CM4_c96L48_am4a3_2000_sis2" inherit="cm4_sis2_compile">
 
 <!-- MDBI -->
     <description
 communityProject="$(ProjectID)" 
-communityModel="CM4_c96L48_am4a1r1_SIS  $(MOM6_GIT_TAG)" 
-communityModelID="CM4_c96L48_am4a1r1_SIS"
+communityModel="CM4_c96L48_am4a3_SIS2  $(MOM6_GIT_TAG)" 
+communityModelID="CM4_c96L48_am4a3_SIS2"
 communityExperimentName="$(name)">
 <!-- /MDBI -->
 
@@ -2877,19 +1096,39 @@ communityExperimentName="$(name)">
 
   </experiment>
 
- <experiment name="CM4_c96L48_am4c3_2000_sis2" inherit="CM4_c96L48_am4a3_2000_sis2">
+<experiment name="CM4_c96L48_am4c3_2000_sis2" inherit="CM4_c96L48_am4a3_2000_sis2">
+  <description communityProject="$(ProjectID)" communityModel="CM4_AM4c3_SIS2  $(MOM6_GIT_TAG)" communityModelID="CM4_AM4c3_SIS2" communityExperimentName="$(name)">
+CM4 (c3) 
+  </description>
    <input>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4c3_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4c3_c96.nml"/>
    </input>
-
 </experiment>
 
 <experiment name="CM4_c96L48_am4c3_2000_sis2_meke" inherit="CM4_c96L48_am4c3_2000_sis2">
-  <description communityProject="$(ProjectID)" communityModel="CM4_AM4a1_SIS  $(MOM6_GIT_TAG)" communityModelID="CM4_AM4a1_SIS" communityExperimentName="$(name)">
-CM4 (c3) with ocean eddy parameterization (MEKE) turned on.
+  <description communityProject="$(ProjectID)" communityModel="CM4_AM4c3_SIS2  $(MOM6_GIT_TAG)" communityModelID="CM4_AM4c3_SIS2" communityExperimentName="$(name)">
+CM4 (c3) with ocean eddy parameterization (MEKE) turned on. Corrected ocean_rough, ocean_albedo and icebergs since CM4_c96L48_am4c3_2000_sis2_meke
   </description>
   <input> 
+    <namelist name="icebergs_nml">
+        really_debug=.FALSE.
+        debug=.FALSE.
+        verbose=.FALSE.
+        verbose_hrs=7200
+        use_operator_splitting=.TRUE.
+        bergy_bit_erosion_fraction=0.0
+        sicn_shift=0.1
+        parallel_reprod=.TRUE.
+        traj_sample_hrs=0
+        add_weight_to_ocean=.false.
+    </namelist>
+    <namelist name="ocean_albedo_nml">
+            ocean_albedo_option = 5
+    </namelist>
+    <namelist name="ocean_rough_nml">
+            rough_scheme = 'beljaars'
+    </namelist>
     <csh type="always"><![CDATA[
 #Any inheriting experiment that needs a  type="always" csh block should repeat the contents of csh block of the parent
 ####COMMON ALWAYS CSH BEGINS######
@@ -2922,12 +1161,14 @@ KH_RES_FN_POWER = 100
 INTERPOLATE_RES_FN = False
 GILL_EQUATORIAL_LD = True
 OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << OVERRIDE_EOF
+#override MAXTRUNC = 1500
+OVERRIDE_EOF
     ]]></csh>
 
   </input> 
 </experiment>
-
-
 
 <!--================================-->
 <!--= OCEAN-ICE DATA (0.25 degree) =-->
@@ -3012,14 +1253,16 @@ OVERRIDE_EOF
 
   </experiment>
 
-
-
   <experiment name="SIS2_data">
     <input>
 
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+     </dataFile>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/SIS_input</dataSource>
@@ -3037,44 +1280,6 @@ OVERRIDE_EOF
          restart_output_dir = 'RESTART/',
          parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
      </namelist>
-
-     </input>
-  </experiment>
-
-
-  <!--CORE forcing and salt restore data and data_table-->
-  <experiment name="OM4_CORE_data">
-    <input>
-      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/data_table</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/ncar_precip.clim.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/ncar_rad.clim.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/q_10_mod.clim.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/runoff.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/salt_restore.v20140616.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/slp.clim.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/t_10_mod.clim.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/u_10_mod.clim.nc</dataSource>
-      </dataFile>      
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/v_10_mod.clim.nc</dataSource>
-      </dataFile>
 
      </input>
   </experiment>
@@ -3134,7 +1339,6 @@ OVERRIDE_EOF
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual_z.frepp"/>
         </timeAverage>
 
-        <timeSeries freq="monthly"  chunkLength="$(PP_OCEAN_CHUNK_B)" source="ocean_annual_z"/>
         <timeSeries freq="annual"   chunkLength="$(PP_OCEAN_CHUNK_B)" source="ocean_annual_z"/>
 	
       </component>
