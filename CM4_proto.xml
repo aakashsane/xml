@@ -457,7 +457,7 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
   <experiment name="common_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/common/sea_esf_aug2013.cpio</dataSource>
+        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/common/sea_esf_dec2014.cpio</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/lm3_data_20130815.tar</dataSource>
@@ -2989,59 +2989,6 @@ For more information please refer to the
 
   </experiment>
 
- <!--renamed from CM4_c192L48_am4a3_2000_touchstoneOcean to CM4_c192L48_am4a3_2000_OceanPert1 -->
- <experiment name="CM4_c192L48_am4a3_2000_OceanPert1" inherit="CM4_c192L48_am4a3_2000">
-   <input> 
-         <csh type="always"><![CDATA[
-#Any inheriting experiment that needs a  type="always" csh block should repeat the contents of csh block of the parent
-####COMMON ALWAYS CSH BEGINS######
-# MOM6 restart switch
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-# adjustment of dry mass first time only
-set adjust_dry_mass = ".true."
-if (-e $work/INPUT/coupler.res) then
-   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   foreach i (1 2 3 4 5 6)
-      if ( $t1[$i] != $t2[$i] ) then
-         set adjust_dry_mass = ".false."
-         break   
-      endif      
-   end
-endif
-####COMMON ALWAYS CSH ENDS######
-
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override ADJUST_NET_FRESH_WATER_TO_ZERO = False
-#override HENYEY_IGW_BACKGROUND = False
-#override KD = 1.0E-07
-#override DT = 1200
-#override CHECK_BAD_SURFACE_VALS = True
-#override MIXEDLAYER_RESTRAT = True
-#override FOX_KEMPER_ML_RESTRAT_COEF = 20.
-#override BAD_VAL_SSS_MAX = 75.0
-OVERRIDE_EOF
-
-     ]]></csh>
-
-   </input> 
-    <runtime>
-      <!--Some load-balanced configs for production runs
-          npes="3429" SYPD ~ 2.5
-          npes="9344" SYPD ~ 5
-      -->
-      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="3429" runTime="12:00:00">
-        <segment simTime="12" units="months" runTime="12:00:00"/>
-      </production>
-    </runtime>
-
- </experiment>
-
  <experiment name="CM4_c192L48_am4c2r1_2000climo" inherit="CM4_c192L48_am4c3_2000"/>
  <experiment name="CM4_c192L48_am4c3_2000" inherit="CM4_c192L48_am4a3_2000">
    <input> 
@@ -5471,11 +5418,10 @@ set restart_flag = 'r'
 
     <runtime>
       <regression name="basic">
-        <run days="10" npes="3456" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:20:00"/><!---->
+        <run days="10" npes="3456" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:20:00"/>
       </regression>
-
-      <regression name="rts"> <!--fits on t1-->
-        <run days="5 5" npes="3456" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:20:00"/><!---->
+      <regression name="rts">
+        <run days="5 5" npes="3456" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:20:00"/>
      </regression>
 
       <regression name="timings">
@@ -5490,115 +5436,146 @@ set restart_flag = 'r'
       </regression>
 
     </runtime>
-  </experiment>
-
-  <experiment name="faste2e" inherit="CM4i_c96L48_am4a3_2000">
-    <description
-communityProject="TEST" 
-communityModel="test_nnz" 
-communityModelID="test_nnz"
-communityExperimentName="$(name)" 
-    >
-    </description>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_CLIMO_START)"
-      endTime="$(EXP_CLIMO_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-     <input>
-      <csh type="always">
-        <![CDATA[
-#NOT TO BE USED WITH REGULAR FRE RUNS!! ONLY FOR TESTING!!
-#Override the runCommand 
-unalias runCommand
-@ currentSegp1 = $currentSeg + 1
-cat > $work/time_stamp.out << TIMESTAMP_EOF
-   $currentSeg   1   1   0   0   0  Jan
-   $currentSegp1 1   1   0   0   0  Jan
-TIMESTAMP_EOF
-
-#This won't do it
-#cat >  prep_history_gfdl << prep_history_gfdl_EOF
-#   mkdir -p $outputDirRemoteHistory/history
-#   cd $outputDirRemoteHistory/history
-##   ln -s /archive/Niki.Zadeh/testing_20141017/CM4_c96L48_am4a1r1_2000climo/gfdl.ncrc2-intel-prod-openmp/history/${currentSeg}.nc .
-#   ln -s /archive/Niki.Zadeh/ulm_prerelease_plus_LowSens_Drag_mom6_2014.11.17/CM4i_c96L48_am4a1r1n_2000climo/gfdl.ncrc2-intel-prod-openmp/history/${currentSeg}.nc .
-#prep_history_gfdl_EOF
-#
-#   msub -m n -j oe -r y -S /bin/tcsh -W umask=022 -l partition=gfdl -N ${FRE_JOBID}_prep_history -q stage -l walltime=0:00:05 -l size=1 prep_history_gfdl
-#
+</experiment>
 
 
-alias runCommand 'touch dummy_history_${currentSeg}.nc;touch some_dummy_text.out;mkdir RESTART;touch RESTART/dummy_restart.res.nc;sleep 300'
-       ]]>
-      </csh>
-     </input>
-    <runtime>
-      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="32" runTime="01:00:00">
-           <segment simTime="12" units="months" runTime="00:10:00"/>
-       </production>
-    </runtime>
- </experiment>
- 
- <experiment name="mom6_ocean_only" inherit="CM4_c96L48_am4a3_2000">
-    <input>
-     <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1,1,1,0,0,0,
-        calendar = 'NOLEAP'
-        dt_atmos = 1200,
-        dt_cpld  = 3600,
-        use_lag_fluxes = .false.
-        concurrent = .false.
-        do_atmos = .false.
-        do_land  = .false.
-        do_ocean = .true.
-        ocean_npes = $ocean_npes
-        atmos_npes = 0
+<!--Experiments with touchstone-like ocean configurations. From Chris Golaz -->
+   
+<experiment name="CM4_c96L48_am4a3_sw05_2000" inherit="CM4_c96L48_am4a3_2000">
+   <description>
+
+Coupled experiment consisting of
+- c96L48_am4a3_sw_upd05 atmosphere
+- MOM6 in the 'touchstone' configuration
+
+   </description>
+   <input> 
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.5,
+        Ashear        = 25.0, 
+        radperturb    = 0.10, 
+        critjump      = 0.10,
       </namelist>
-      <namelist name="flux_exchange_nml">
-            debug_stocks = .FALSE.
-            divert_stocks_report = .TRUE.
-            do_area_weighted_flux = .FALSE.
+      <namelist name="esfsw_driver_nml">
+        do_sw_continuum = .true.
       </namelist>
-      <namelist name="static_veg_nml">
-        use_static_veg = .false.
+      <namelist name="esfsw_parameters_nml">
+        sw_resolution = 'med',
+        sw_diff_streams = 1
       </namelist>
-      <namelist name="river_nml">
-        do_rivers = .false.
-      </namelist>
-      <namelist name="topo_rough_nml">
-       use_topo_rough    = .false.
-      </namelist>
+         <csh type="always"><![CDATA[
+#Any inheriting experiment that needs a  type="always" csh block should repeat the contents of csh block of the parent
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
+else
+   set restart_flag = 'r'
+endif
 
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+####COMMON ALWAYS CSH ENDS######
 
-      <!--MOM6 Input datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_CORE_data']/input/node())"/>
-      <!--SIS Input datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='SIS_data']/input/node())"/>
-     <dataFile label="initCond" target="INPUT/">
-       <dataSource site="$(site)">/lustre/f1/unswept/Baoqiang.Xiang/archive/init_cond/cm4/c96L48_am4a1r1_2000climo/00060101.tar</dataSource>
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override ADJUST_NET_FRESH_WATER_TO_ZERO = False
+#override HENYEY_IGW_BACKGROUND = False
+#override KD = 1.0E-07
+#override DT = 1200
+#override CHECK_BAD_SURFACE_VALS = False
+#override MIXEDLAYER_RESTRAT = True
+#override FOX_KEMPER_ML_RESTRAT_COEF = 20.
+#override BAD_VAL_SSS_MAX = 75.0
+OVERRIDE_EOF
+
+     ]]></csh>
+   </input> 
+
+</experiment>
+
+
+<experiment name="CM4_c192L48_am4a3_sw04_2000" inherit="CM4_c192L48_am4a3_2000">
+   <description>
+
+Coupled experiment consisting of
+- c192L48_am4a3_sw_upd04 atmosphere
+- MOM6 in the 'touchstone' configuration
+
+   </description>
+   <input> 
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/ulm/Chris.Golaz_CM4_c192L48_am4a3_nrseq_2000_00040101ic.tar</dataSource>
       </dataFile>
-  </input>
-     <runtime>
-       <regression name="basic">
-         <run days="10"   npes="1152"  runTimePerJob="00:30:00"/>
-       </regression>
-     </runtime>
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.35,
+        Ashear        = 25.0, 
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+      </namelist>
+      <namelist name="esfsw_driver_nml">
+        do_sw_continuum = .true.
+      </namelist>
+      <namelist name="esfsw_parameters_nml">
+        sw_resolution = 'med',
+        sw_diff_streams = 1
+      </namelist>
+         <csh type="always"><![CDATA[
+#Any inheriting experiment that needs a  type="always" csh block should repeat the contents of csh block of the parent
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
+else
+   set restart_flag = 'r'
+endif
 
- </experiment>
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+####COMMON ALWAYS CSH ENDS######
+
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override ADJUST_NET_FRESH_WATER_TO_ZERO = False
+#override HENYEY_IGW_BACKGROUND = False
+#override KD = 1.0E-07
+#override DT = 1200
+#override CHECK_BAD_SURFACE_VALS = False
+#override MIXEDLAYER_RESTRAT = True
+#override FOX_KEMPER_ML_RESTRAT_COEF = 20.
+#override BAD_VAL_SSS_MAX = 75.0
+OVERRIDE_EOF
+
+     ]]></csh>
+   </input> 
+
+  </experiment>
 
 
  </experimentSuite>

@@ -3,7 +3,7 @@
 <!-- GFDL Model Development Team (MDT) documentation: http://cobweb.gfdl.noaa.gov/~niz/mdt/ -->
 <!-- GFDL MDT Atmosphere Working Group (AWG) documentation: http://cobweb.gfdl.noaa.gov/~cjg/awg/ -->
 
-<!-- Model configurations in support of MDT Atmosphere Working Group (AWG), v20141124 revision -->
+<!-- Model configurations in support of MDT Atmosphere Working Group (AWG), v20141222b revision -->
 
 <!-- QUICK START GUIDE:
 
@@ -12,14 +12,14 @@
 # .. module load git
 # .. mkdir -p $home/awg/ulm
 # .. cd $home/awg/ulm
-# .. git clone -b awg_v20141124 http://gitlab.gfdl.noaa.gov/mdt/xml.git mdt_xml_v20141124
+# .. git clone -b awg_v20141222b http://gitlab.gfdl.noaa.gov/mdt/xml.git mdt_xml_v20141222
 
 # Change YOURGROUPLETTER to your group, such as f, w, o...
       <project>gfdl_YOURGROUPLETTER</project>
 
 # To check out source code and compile:
 # .. module load fre/bronx-8
-# .. fremake -x awg.xml -p ncrc2.intel -t openmp cm4p3_v20141124
+# .. fremake -x awg.xml -p ncrc2.intel -t openmp cm4p3_v20141222
 
 # To run regression test (with staging):
 # .. frerun -S -r basic -x awg.xml -p ncrc2.intel -t openmp c192L48_am4a3
@@ -35,16 +35,16 @@
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <property name="RELEASE" value="ulm"/>                <!-- CVS tag for source code -->
+  <property name="MOM6_DATE" value="2014.11.17"/>                  <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM" value="awg/$(RELEASE)"/>
-  <property name="MOM6_GIT_TAG" value="dev/master/2014.11.17"/>  <!-- git tag for MOM6 source code -->
-  <property name="MOM6_EXAMPLES"  value="$root/cm4p3_v20141124/src/mom6"/>
-  <property name="FRE_VERSION" value="bronx-8"/>
+  <property name="FRE_VERSION" value="fre/bronx-8"/>             <!-- -->
   <property name="ANALYSIS_SWITCH" value="on"/>
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
   <property name="ProjectID" value="AWG"/>                       <!-- database top level -->
 
-  <property name="AWG_INPUT_HOME_GAEA" value="$HOME/awg/ulm_prerelease/xml_v20141124/awg_include"/>
-  <property name="AWG_INPUT_HOME_GFDL" value="/home/$USER/ncrc/awg/ulm_prerelease/xml_v20141124/awg_include"/>
+  <property name="AWG_INPUT_HOME_GAEA" value="$HOME/awg/ulm/xml_v20141222/awg_include"/>
+  <property name="AWG_INPUT_HOME_GFDL" value="/home/$USER/ncrc/awg/ulm/xml_v20141222/awg_include"/>
 
 <!--
 GFDL FAIR USE POLICY
@@ -88,11 +88,11 @@ properties below.
 
   <!-- make sure to change current_date in coupler_nml accordingly -->
   <property name="EXP_AMIP_START" value="1980"/>
-  <property name="EXP_AMIP_END" value="2000"/>
-  <property name="EXP_AMIP_LEN" value="21"/>
+  <property name="EXP_AMIP_END"   value="2000"/>
+  <property name="EXP_AMIP_LEN"   value="21"/>
   <property name="ANA_AMIP_START" value="1981"/>
-  <property name="ANA_AMIP_END" value="2000"/>
-  <property name="ANA_AMIP_LEN" value="20yr"/>
+  <property name="ANA_AMIP_END"   value="2000"/>
+  <property name="ANA_AMIP_LEN"   value="20yr"/>
   <!-- Post-processing chunk length -->
   <!-- ANA_AMIP_LEN must be an integer multiple of PP_AMIP_CHUNK -->
   <property name="PP_AMIP_CHUNK" value="5yr"/>
@@ -111,12 +111,12 @@ be controlled by changing properties below.
 
   <!-- make sure to change current_date in coupler_nml accordingly -->
   <property name="EXP_CLIMO_START" value="0001"/>
-  <property name="EXP_CLIMO_END" value="0011"/>
-  <property name="EXP_CLIMO_LEN" value="11"/>
+  <property name="EXP_CLIMO_END"   value="0011"/>
+  <property name="EXP_CLIMO_LEN"   value="11"/>
   <property name="ANA_CLIMO_START" value="0002"/>
-  <property name="ANA_CLIMO_END" value="0011"/>
-  <property name="ANA_CLIMO_LEN" value="10yr"/>
-  <property name="PP_CLIMO_CHUNK" value="5yr"/>
+  <property name="ANA_CLIMO_END"   value="0011"/>
+  <property name="ANA_CLIMO_LEN"   value="10yr"/>
+  <property name="PP_CLIMO_CHUNK"  value="5yr"/>
 
 <!--=================-->
 <!--= CHANGING NPES =-->
@@ -192,8 +192,9 @@ configuration.
         module unload netcdf fre
         module load PrgEnv-intel/4.0.46
         module swap intel intel/12.0.5.220
-        module load fre/$(FRE_VERSION)
+        module load $(FRE_VERSION)
         module load git
+
         setenv KMP_STACKSIZE 512m
         setenv NC_BLKSZ 1M
         setenv F_UFMTENDIAN big
@@ -214,8 +215,9 @@ configuration.
         source $MODULESHOME/init/csh
         module use -a /home/fms/local/modulefiles
         module purge
-        module load fre/$(FRE_VERSION)
+        module load $(FRE_VERSION)
         module load fre-analysis
+        module load git
         ]]>
       </csh>
     </platform>
@@ -225,15 +227,18 @@ configuration.
 <!--===========-->
 <!--= COMPILE =-->
 <!--===========-->
+  <!--The property MOM6_EXAMPLES should point to the mom6 directory that is checked out. It is needed by MOM6 to access its inpu data files-->
+  <property name="MOM6_EXAMPLES"  value="$root/cm4_compile/src/mom6"/>
 
-  <experiment name="cm4p3_v20141124">
+  <experiment name="cm4p3_v20141222">
     <description>
 
 Experiment to build executable.
-* ulm_prerelease code base
+* ulm code base
 * Chris Golaz' total activation bug fix (ulm_total_act_fix_cjg)
 * Ming Zhao's changes for low sensitivity configuration. Changes answers for all! (lowsen20141106_miz)
 * Code updates from Jhon Dunne for new surface fluxes options (drag_min_jpd_20141030)
+* Code update for icebergs to output less warnings adjustable_berg_warn_linits_jpk_20141003
     </description>
 
     <component name="fms" paths="shared">
@@ -251,13 +256,14 @@ Experiment to build executable.
       <source>
         <codeBase version="$(RELEASE)"> atmos_shared atmos_param_am3 </codeBase>
         <csh>
-           # Total activation bug fix
-           cvs update -r ulm_total_act_fix_cjg atmos_param/strat_cloud/rotstayn_klein_mp.F90
-           # For am4c3 runs. Changes answers for all!
-           cvs up -r lowsen20141106_miz atmos_param/shallow_cu/uw_conv.F90 atmos_param/shallow_cu/deep_conv.F90 atmos_param/shallow_cu/conv_plumes_k.F90
            #==For JPD Drag Tests==
            cvs up -r drag_min_jpd_20141030 atmos_param/monin_obukhov/monin_obukhov.F90
            cvs up -r drag_min_jpd_20141030 atmos_param/monin_obukhov/monin_obukhov_kernel.F90
+
+           # For am4c3 runs. Changes answers for all!
+           cvs up -r lowsen20141106_miz atmos_param/shallow_cu/uw_conv.F90 atmos_param/shallow_cu/deep_conv.F90 atmos_param/shallow_cu/conv_plumes_k.F90
+           # Total activation bug fix
+           cvs update -r ulm_total_act_fix_cjg atmos_param/strat_cloud/rotstayn_klein_mp.F90
         </csh>
       </source>
       <compile>
@@ -281,6 +287,7 @@ Experiment to build executable.
       <description domainName="Sea Ice SIS" communityName="GFDL-SIS" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
       <source>
         <codeBase version="$(RELEASE)"> ice_sis ice_param </codeBase>
+        <csh>cvs up -r adjustable_berg_warn_linits_jpk_20141003 ice_sis/ice_bergs.F90 #needed for CM4i_c96L48_am4a1r1_1pct-co2-2X</csh>
       </source>
       <compile>
         <cppDefs>$(F2003_FLAGS) -Duse_netCDF</cppDefs>
@@ -291,9 +298,13 @@ Experiment to build executable.
       <description domainName="LM3" communityName="land_lad2" communityVersion="$(RELEASE)" communityGrid=""/>
       <source>
         <codeBase version="$(RELEASE)"> land_lad2 </codeBase>
+	<csh>
+          #==For JPD Drag Tests==
+          cvs up -r merged_drag_updates_jpk_20141104_nnz land_lad2/land_model.F90
+        </csh>
       </source>
       <compile>
-        <cppDefs>$(F2003_FLAGS) -DUSE_LOG_DIAG_FIELD_INFO</cppDefs>
+        <cppDefs>$(F2003_FLAGS)</cppDefs>
 
 <!--The following csh block is needed for compiler pre-processors that are not ANSI-compliant, such as pathscale-->
 <csh> <![CDATA[
@@ -325,9 +336,10 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
         <csh>
           git clone -b $(MOM6_GIT_TAG) http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6-examples.git mom6
           pushd mom6
+          git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
           git submodule init src/MOM6  tools/python/025gridGeneration/MIDAS
           git clone --recursive http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6.git src/MOM6
-          git submodule update
+          git submodule update #This gets the right version of submodules
           popd
 
           pushd mom6
@@ -365,9 +377,13 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
       <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)"> coupler.git </codeBase>
+        <csh><![CDATA[
+        ( cd coupler && git checkout $(RELEASE) )
+        ]]>
+        </csh>
       </source>
       <compile>
-        <cppDefs>$(F2003_FLAGS)</cppDefs>
+        <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
       </compile>
     </component>
 
@@ -380,7 +396,7 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
   <experiment name="common_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/common/sea_esf_aug2013.cpio</dataSource>
+        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/common/sea_esf_dec2014.cpio</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/lm3_data_20130815.tar</dataSource>
@@ -536,9 +552,7 @@ alias runCommand "aprun -d $atmos_nthreads -n $atmos_npes ./$executable:t"
 # Copy AWG ascii input files to GFDL (waiting for FRE to do this for us)
 if ( $?batch && ! $?FRE_STAGE ) then
   if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
-    module switch gcp/2.2 gcp/2.3  # to bypass bug in gcp/2.2 (default gcp in fre/bronx-8)
     gcp --batch -cd -r --sync $(AWG_INPUT_HOME) gfdl:$(AWG_INPUT_HOME_GFDL)/..
-    module switch gcp/2.3 gcp/2.2
   endif
 endif
       ]]></csh>
@@ -634,9 +648,7 @@ alias runCommand "aprun -d $atmos_nthreads -n $atmos_npes ./$executable:t"
 # Copy AWG ascii input files to GFDL (waiting for FRE to do this for us)
 if ( $?batch && ! $?FRE_STAGE ) then
   if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
-    module switch gcp/2.2 gcp/2.3  # to bypass bug in gcp/2.2 (default gcp in fre/bronx-8)
     gcp --batch -cd -r --sync $(AWG_INPUT_HOME) gfdl:$(AWG_INPUT_HOME_GFDL)/..
-    module switch gcp/2.3 gcp/2.2
   endif
 endif
       ]]></csh>
@@ -1029,7 +1041,7 @@ touch MOM_input
 <!--= AMIP EXPERIMENTS =-->
 <!--====================-->
 
-  <experiment name="c96L48_am4a3" inherit="cm4p3_v20141124">
+  <experiment name="c96L48_am4a3" inherit="cm4p3_v20141222">
 
 <!-- MDBI -->
     <description
@@ -1124,7 +1136,39 @@ Experiment name = $(name)
 
   </experiment>
 
-  <experiment name="c192L48_am4a3" inherit="cm4p3_v20141124">
+  <experiment name="c96L48_am4a3_sw_upd05" inherit="c96L48_am4a3">
+    <description>
+
+Configuration derived from "c96L48_am4a3", but with the following updates:
+- SW water vapor continuum from David is enabled
+- slight retuning of the radiation balance (beta_rad = 0.5)
+
+This is the atmosphere in the coupled experiment
+"CM4_c96L48_am4a3_sw05_2000"
+
+    </description>
+    <input>
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.5,
+        Ashear        = 25.0, 
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+      </namelist>
+      <namelist name="esfsw_driver_nml">
+        do_sw_continuum = .true.
+      </namelist>
+      <namelist name="esfsw_parameters_nml">
+        sw_resolution = 'med',
+        sw_diff_streams = 1
+      </namelist>
+    </input>
+  </experiment>
+
+  <experiment name="c192L48_am4a3" inherit="cm4p3_v20141222">
 
 <!-- MDBI -->
     <description
@@ -1219,7 +1263,39 @@ Experiment name = $(name)
 
   </experiment>
 
-  <experiment name="c96L48_am4b3" inherit="cm4p3_v20141124">
+  <experiment name="c192L48_am4a3_sw_upd04" inherit="c192L48_am4a3">
+    <description>
+
+Configuration derived from "c192L48_am4a3", but with the following updates:
+- SW water vapor continuum from David is enabled
+- slight retuning of the radiation balance (beta_rad = 0.35)
+
+This is the atmosphere in the coupled experiment
+"CM4_c192L48_am4a3_sw04_2000"
+
+    </description>
+    <input>
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.35,
+        Ashear        = 25.0, 
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+      </namelist>
+      <namelist name="esfsw_driver_nml">
+        do_sw_continuum = .true.
+      </namelist>
+      <namelist name="esfsw_parameters_nml">
+        sw_resolution = 'med',
+        sw_diff_streams = 1
+      </namelist>
+    </input>
+  </experiment>
+
+  <experiment name="c96L48_am4b3" inherit="cm4p3_v20141222">
 
 <!-- MDBI -->
     <description
@@ -1313,7 +1389,7 @@ Experiment name = $(name)
 
   </experiment>
 
-  <experiment name="c192L48_am4b3" inherit="cm4p3_v20141124">
+  <experiment name="c192L48_am4b3" inherit="cm4p3_v20141222">
 
 <!-- MDBI -->
     <description
@@ -1406,7 +1482,7 @@ Experiment name = $(name)
 
   </experiment>
 
-  <experiment name="c96L48_am4c3" inherit="cm4p3_v20141124">
+  <experiment name="c96L48_am4c3" inherit="cm4p3_v20141222">
 
 <!-- MDBI -->
     <description
@@ -1501,7 +1577,7 @@ Experiment name = $(name)
 
   </experiment>
 
-  <experiment name="c192L48_am4c3" inherit="cm4p3_v20141124">
+  <experiment name="c192L48_am4c3" inherit="cm4p3_v20141222">
 
 <!-- MDBI -->
     <description
@@ -1596,7 +1672,7 @@ Experiment name = $(name)
 
   </experiment>
 
-  <experiment name="c96L48_am4d3" inherit="cm4p3_v20141124">
+  <experiment name="c96L48_am4d3" inherit="cm4p3_v20141222">
 
 <!-- MDBI -->
     <description
@@ -1691,7 +1767,7 @@ Experiment name = $(name)
 
   </experiment>
 
-  <experiment name="c192L48_am4d3" inherit="cm4p3_v20141124">
+  <experiment name="c192L48_am4d3" inherit="cm4p3_v20141222">
 
 <!-- MDBI -->
     <description
@@ -1790,7 +1866,7 @@ Experiment name = $(name)
 <!--= CLIMO EXPERIMENTS =-->
 <!--=====================-->
 
-  <experiment name="c96L48_am4a3_2000climo" inherit="cm4p3_v20141124">
+  <experiment name="c96L48_am4a3_2000climo" inherit="cm4p3_v20141222">
 
 <!-- MDBI -->
     <description
@@ -1897,8 +1973,37 @@ configuration with present-day climatological SSTs + 2K, present-day GHGs and ae
     </input>
   </experiment>
 
+  <experiment name="c96L48_am4a3_sw_upd05_2000climo" inherit="c96L48_am4a3_2000climo">
+    <description>
 
-  <experiment name="c192L48_am4a3_2000climo" inherit="cm4p3_v20141124">
+2000climo configuration of c96L48_am4a3_sw_upd05
+
+This is the atmosphere in the coupled experiment
+"CM4_c96L48_am4a3_sw05_2000"
+
+    </description>
+    <input>
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.5,
+        Ashear        = 25.0, 
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+      </namelist>
+      <namelist name="esfsw_driver_nml">
+        do_sw_continuum = .true.
+      </namelist>
+      <namelist name="esfsw_parameters_nml">
+        sw_resolution = 'med',
+        sw_diff_streams = 1
+      </namelist>
+    </input>
+  </experiment>
+
+  <experiment name="c192L48_am4a3_2000climo" inherit="cm4p3_v20141222">
 
 <!-- MDBI -->
     <description
@@ -2005,7 +2110,37 @@ configuration with present-day climatological SSTs + 2K, present-day GHGs and ae
     </input>
   </experiment>
 
-  <experiment name="c96L48_am4d3_2000climo" inherit="cm4p3_v20141124">
+  <experiment name="c192L48_am4a3_sw_upd04_2000climo" inherit="c192L48_am4a3_2000climo">
+    <description>
+
+2000climo configuration of c192L48_am4a3_sw_upd04
+
+This is the atmosphere in the coupled experiment
+"CM4_c192L48_am4a3_sw04_2000"
+
+    </description>
+    <input>
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.35,
+        Ashear        = 25.0, 
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+      </namelist>
+      <namelist name="esfsw_driver_nml">
+        do_sw_continuum = .true.
+      </namelist>
+      <namelist name="esfsw_parameters_nml">
+        sw_resolution = 'med',
+        sw_diff_streams = 1
+      </namelist>
+    </input>
+  </experiment>
+
+  <experiment name="c96L48_am4d3_2000climo" inherit="cm4p3_v20141222">
 
 <!-- MDBI -->
     <description
@@ -2113,7 +2248,7 @@ configuration with present-day climatological SSTs + 2K, present-day GHGs and ae
   </experiment>
 
 
-  <experiment name="c192L48_am4d3_2000climo" inherit="cm4p3_v20141124">
+  <experiment name="c192L48_am4d3_2000climo" inherit="cm4p3_v20141222">
 
 <!-- MDBI -->
     <description
