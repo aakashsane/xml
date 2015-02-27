@@ -19,7 +19,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2015.01.20"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2015.02.10"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="FRE_VERSION"  value="fre/bronx-9"/>
@@ -58,12 +58,6 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
    <property name="DEBUGLEVEL"   value=""/>
 
    <setup>
-    <!-- MDBI -->
-    <fmsRelease>fmsversion</fmsRelease>
-    <!-- /MDBI -->
-
-<!-- ncrc platforms -->
-	
     <platform name="ncrc2.intel">
       <project>gfdl_o</project>
       <directory stem="$(FRE_STEM)"/>
@@ -851,7 +845,6 @@ touch $work/INPUT/SIS_override
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual_z.frepp"/>
         </timeAverage>
 
-        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>
         <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>
 	
       </component>
@@ -909,32 +902,15 @@ touch $work/INPUT/SIS_override
       <!--PostProcessing component models-->
       <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/ocn_monthly.frepp"/>
         </timeSeries>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_month">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/ocn_monthly.frepp"/>
         </timeSeries>
-      </component>
-
-      <component type="ocean_annual_z" start="$(PP_START_YEAR)" source="ocean_annual_z"  sourceGrid="ocean-tripolar">
-        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/ocn_annual_z.frepp"/>
-        </timeAverage>
-        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/ocn_annual_z.frepp"/>
-        </timeAverage>
-
-        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>
-        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>
-	
       </component>
 
       <component type="ocean_annual" start="$(PP_START_YEAR)"  source="ocean_annual"  sourceGrid="ocean-tripolar"> 
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/ocn_annual.frepp"/>
         </timeAverage>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/ocn_annual.frepp"/>
         </timeAverage>
       </component>
 
@@ -1402,15 +1378,19 @@ endif
 <experiment name="MOM6_GOLD_SIS" inherit="MOM6_SIS_compile">
 <description communityProject="OWG" communityModel="MOM6_GOLD_SIS $(FRE_STEM)" communityModelID="OWG_MOM6_GOLD_SIS" communityExperimentName="$(name)" >
  global 1 degree i test case
-    <scenario 
+</description>                                               
+<scenario 
       communityForcing="CORE"
       parentExperimentID="N/A" 
       parentExperimentRIP="N/A" 
       startTime="$(PP_START_YEAR)"
       endTime="$(PP_END_YEAR)" 
       branch_time="0.0">
-    </scenario>
-</description>                                               
+</scenario>
+<communityComment>
+    For more information please refer to the
+    &lt;a href="http://wiki.gfdl.noaa.gov/index.php/MOM6"&gt; MOM6 Wiki.  &lt;/a&gt;
+</communityComment>
      <input>                                                 
      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/input.nml</dataSource>
@@ -1533,12 +1513,6 @@ endif
        ice_mask_table='MOM_mask_table'
      </namelist>
 
-<diagTable order="append">
-#================
-# Additional DIAGNOSTICS
-#================
-"ocean_annual_z",       1,  "years", 1, "days", "time",
-</diagTable>
 
      <csh type="always">
         <![CDATA[
