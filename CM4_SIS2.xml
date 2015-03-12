@@ -516,7 +516,7 @@ if ("${platform_domain}" == "ncrc.gov") then
      setenv MPICH_GNI_NDREG_LAZYMEM disabled	
   endif
 
-  if ( $do_ocean == "true" ) then
+  if ( $do_ocean == "true" && $concurrent == .true. ) then
     alias runCommand "aprun -d $place -n $atmos_npes ./$executable:t : -n $ocean_npes -d 1 ./$executable:t"
    else
     alias runCommand "aprun -d $place -n $atmos_npes ./$executable:t"
@@ -608,7 +608,7 @@ endif
 # Coupled configurations
   set do_ocean = "true"
   set do_concurrent_radiation = ".false."
-
+  set concurrent = .true.
   set domains_stack_size = "2097152"
 
 # CM4i setting for Zeus provided by Rusty Benson
@@ -631,6 +631,28 @@ else if ( "$npes" == "924" ) then
   set ice_layout   =   "144,3"; set ice_io_layout   =  "1,3"
   set ocn_layout   =   "10,6";  set ocn_io_layout   =  "1,6"; set ocn_mask_table = "MOM_mask_table"
   set ocean_npes = "60"
+
+else if ( "$npes" == "1024" ) then
+  set atmos_npes = "432"
+  set atmos_nthreads = "1"
+  set nxblocks = "1" ; set nyblocks = "1"
+  set fv_layout    =   "3,24";  set fv_io_layout    =  "1,4"
+  set land_layout  =   "3,24";  set land_io_layout  =  "1,4"
+  set ice_layout   =   "144,3"; set ice_io_layout   =  "1,3"
+  set ocn_layout   =   "16,36"  ; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
+  set ocean_npes = "576"
+
+else if ( "$npes" == "1152" ) then
+#FOR SERIAL RUNS ONLY
+  set concurrent = .false.
+  set atmos_npes = "1152"
+  set atmos_nthreads = "1"
+  set nxblocks = "1" ; set nyblocks = "1" 
+  set fv_layout    =   "8,24";  set fv_io_layout    =  "1,4"
+  set land_layout  =   "8,24";  set land_io_layout  =  "1,4"
+  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
+  set ocn_layout   =   "32,36"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
+  set ocean_npes = "1152"
 
 else if ("$npes" == "1878" ) then
   set atmos_npes = "864"
@@ -1069,17 +1091,13 @@ communityExperimentName="$(name)">
         <segment simTime="12" units="months" runTime="12:00:00"/>
       </production>
       <regression name="basic">
-        <run days="10" npes="1584" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="00:30:00"/><!---->
+        <run days="10" npes="1584" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="00:30:00"/>
       </regression>
 
-      <regression name="rts"> <!--fits on t1-->
-        <run days="5 5" npes="1584" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="00:30:00"/><!---->
-        <run days="10" npes="3168" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="00:20:00"/><!---->
+      <regression name="rts"> 
+        <run days="5 5" npes="1584" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="00:30:00"/>
+        <run days="10" npes="3168" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="00:20:00"/>
      </regression>
-
-      <regression name="restarts">
-        <run days="5 5" npes="1584" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:20:00"/><!---->
-      </regression>
 
       <regression name="days">
         <run days="35" npes="3456" runTimePerJob="01:30:00"/><!---->
@@ -1358,7 +1376,35 @@ OVERRIDE_EOF
     </postProcess>
   </experiment> 
 
+<experiment name="CM4_c96L48_am4a3_2000_sis2_serial" inherit="CM4_c96L48_am4a3_2000_sis2">
+  <description communityProject="$(ProjectID)" communityModel="CM4_AM4c3_SIS2  $(MOM6_GIT_TAG)" communityModelID="CM4_AM4c3_SIS2" communityExperimentName="$(name)">
+CM4 (c3) 
+  </description>
+   <input>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1,1,1,0,0,0,
+        calendar = 'NOLEAP'
+        dt_atmos = 1200,
+        dt_cpld  = 3600,
+        use_lag_fluxes = .false.
+        concurrent = .false.
+        do_ocean = .true.
+        ocean_npes = $ocean_npes
+        atmos_npes = $atmos_npes
+        atmos_nthreads = $atmos_nthreads
+      </namelist>
+   </input>
 
- </experimentSuite>
+   <runtime>
+      <regression name="basic">
+        <run days="10" npes="1152" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:30:00"/>
+      </regression>
+    </runtime>
+
+</experiment>
+
+</experimentSuite>
 
 
