@@ -19,13 +19,13 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2015.02.10"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2015.03.13"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="FRE_VERSION"  value="fre/bronx-9"/>
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-   <property name="PROD_SIMTIME"   value="20"/>
+   <property name="PROD_SIMTIME"   value="40"/>
    <!-- Post-processing start date and chunk lengths -->
    <property name="PP_START_YEAR"  value="1900"/>
    <property name="PP_END_YEAR"    value="1919"/>
@@ -354,11 +354,9 @@ Make the executable for ocean-ice experiments.
 
 
 <experiment name="OM4_SIS_baseline" inherit="MOM6_SIS_compile">
-<!--The following description tags are needed to put the experiment in the MDBI-->
 <description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
  global 1/4 degree z test case
 </description>  
-<!-- MDBI --> 
     <scenario 
       communityForcing="CORE"
       parentExperimentID="N/A" 
@@ -367,7 +365,10 @@ Make the executable for ocean-ice experiments.
       endTime="$(PP_END_YEAR)" 
       branch_time="0.0">
     </scenario>
-<!-- /MDBI -->
+    <communityComment>
+    For more information please refer to the
+    &lt;a href="http://wiki.gfdl.noaa.gov/index.php/MOM6"&gt; MOM6 Wiki.  &lt;/a&gt;
+    </communityComment>
 
      <input>
       <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
@@ -448,8 +449,9 @@ $baseDate
        <regression name="rts">
          <run days="5 5"  npes="$(PROD_NPES)"  runTimePerJob="01:30:00"/>
          <!--the following two should reproduce eachother but not the basic because basic uses mask_table-->
-         <run months="20"  npes="2304"  runTimePerJob="01:30:00"/>
-         <run months="20"  npes="1152"  runTimePerJob="01:30:00"/>
+         <run days="2"  npes="2304"  runTimePerJob="00:30:00"/>
+         <run days="1 1"  npes="2304"  runTimePerJob="00:30:00"/>
+         <run days="2"  npes="1152"  runTimePerJob="00:30:00"/>
          <!--the following is for checking the timings or production run-->
          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
        </regression>
@@ -946,11 +948,9 @@ MOM6 wiki: http://wiki.gfdl.noaa.gov/index.php/MOM6
 </experiment>
 
 <experiment name="OM4_SIS2_baseline" inherit="MOM6_SIS2_compile">
-<!--The following description tags are needed to put the experiment in the MDBI-->
-<description communityProject="OWG" communityModel="OM4_SIS2 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)" >
+    <description communityProject="OWG" communityModel="OM4_SIS2 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)" >
  global 1/4 degree z test case
-</description>  
-<!-- MDBI --> 
+    </description>  
     <scenario 
       communityForcing="CORE"
       parentExperimentID="N/A" 
@@ -959,7 +959,10 @@ MOM6 wiki: http://wiki.gfdl.noaa.gov/index.php/MOM6
       endTime="$(PP_END_YEAR)" 
       branch_time="0.0">
     </scenario>
-<!-- /MDBI -->
+    <communityComment>
+    For more information please refer to the
+    &lt;a href="http://wiki.gfdl.noaa.gov/index.php/MOM6"&gt; MOM6 Wiki.  &lt;/a&gt;
+    </communityComment>
 
      <input>
 
@@ -1040,8 +1043,8 @@ $baseDate
        <regression name="rts">
          <run days="5 5"  npes="$(PROD_NPES)"  runTimePerJob="01:30:00"/>
          <!--the following two should reproduce eachother but not the basic because basic uses mask_table-->
-         <run months="20"  npes="2304"  runTimePerJob="01:30:00"/>
-         <run months="20"  npes="1152"  runTimePerJob="01:30:00"/>
+         <run days="2"  npes="2304"  runTimePerJob="00:30:00"/>
+         <run days="2"  npes="1152"  runTimePerJob="00:30:00"/>
          <!--the following is for checking the timings or production run-->
          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
        </regression>
@@ -1167,11 +1170,10 @@ OVERRIDE_EOF
 </experiment>
 
 <experiment name="OM4_SIS_KHTH_200" inherit="OM4_SIS_baseline">
-<!--The following description tags are needed to put the experiment in the MDBI-->
 <description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
  global 1/4 degree z   KHTH_200, RES SCALED KHTH=F, res coef = default
 </description>
-<!-- MDBI -->
+
    <input>
      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
 
@@ -1595,6 +1597,7 @@ endif
          <run days="10 10" npes="32" overrideParams="ice_model_nml:layout=8,4"  runTimePerJob="00:30:00"/>
          <run days="20"    npes="64" overrideParams="ice_model_nml:layout=16,4;ice_model_nml:io_layout=1,4" runTimePerJob="00:30:00"/>
          <run days="20"    npes="32" overrideParams="ice_model_nml:layout=2,16;ice_model_nml:io_layout=1,1" runTimePerJob="00:30:00"/>
+         <run months="1"    npes="64" overrideParams="ice_model_nml:layout=16,4;ice_model_nml:io_layout=1,4" runTimePerJob="00:30:00"/>
        </regression>
        <regression name="debug">
          <run days="2"    npes="32" overrideParams="ice_model_nml:layout=8,4"  runTimePerJob="00:30:00"/>
@@ -1612,5 +1615,89 @@ endif
     </postProcess>
 
 </experiment>
+
+<experiment name="OM4_SIS_non_aggr" inherit="OM4_SIS_baseline">
+<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
+ global 1/4 degree z    perturbation
+</description>
+   <input>
+     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+AGGREGATE_FW_FORCING = False
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="OM4_SIS_KPP_min12m" inherit="OM4_SIS_baseline">
+<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
+ global 1/4 degree z  perturbation 
+</description>
+   <input>
+     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+AGGREGATE_FW_FORCING = False
+KPP%MINIMUM_OBL_DEPTH = 12.
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="OM4_SIS_KPP_min6m" inherit="OM4_SIS_baseline">
+<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
+ global 1/4 degree z  perturbation 
+</description>
+   <input>
+     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+AGGREGATE_FW_FORCING = False
+KPP%MINIMUM_OBL_DEPTH = 6.
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="OM4_SIS_KPP_min6m_lowdiff" inherit="OM4_SIS_baseline">
+<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
+ global 1/4 degree z  perturbation 
+</description>
+   <input>
+     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+AGGREGATE_FW_FORCING = False
+KPP%MINIMUM_OBL_DEPTH = 6.
+#override KD = 1.0E-05
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="OM4_SIS_KPP_min6m_lowdiff_strongMLE" inherit="OM4_SIS_baseline">
+<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
+ global 1/4 degree z perturbation
+</description>
+   <input>
+     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+AGGREGATE_FW_FORCING = False
+KPP%MINIMUM_OBL_DEPTH = 6.
+#override KD = 1.0E-05
+#override FOX_KEMPER_ML_RESTRAT_COEF = 20.0
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+
 
 </experimentSuite>
