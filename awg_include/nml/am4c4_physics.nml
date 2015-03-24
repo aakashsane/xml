@@ -1,0 +1,193 @@
+ &cloud_spec_nml
+        force_use_of_temp_for_seed = .true.
+        cloud_type_form = 'stratuw'
+/
+
+ &deep_conv_nml
+        rkm_dp1 = 2
+        rkm_dp2 = 0.1
+        norder = 1
+        cbmf_dp_frac1 = 1.
+        cbmf_dp_frac2 = 1.
+        crh_th_ocean = 0.5
+        crh_th_land  = 0.5
+        cape_th = 100.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.9
+        auto_th0_d = 1.0e-3
+        tcrit_d    = -25.15,
+        peff_l_d = 6.e-5
+        peff_i_d = 12.e-5
+        frac_limit_d = 0.25
+        dcapedm_th = 100
+        lofactor_d = 0.75
+        do_lod_rkm   = .false.
+        do_lod_cfrac = .false.
+        do_lod_tcrit = .false.
+        do_forcedlifting_d = .false.
+/
+
+ &donner_deep_clouds_W_nml
+      using_dge_sw = .true.,
+      using_dge_lw = .true.
+/
+
+ &donner_deep_nml
+      parcel_launch_level = 2
+      model_levels_in_sfcbl = 0
+      donner_deep_freq = 1200
+      write_reduced_restart_file = .true.
+      allow_mesoscale_circulation = .true.
+      do_donner_cape    = .false.
+      do_donner_plume   = .false.
+      do_donner_closure = .false.
+      do_donner_lscloud = .true.
+      do_dcape          = .false.
+      do_lands          = .false.
+      do_freezing_for_cape = .true.
+      do_freezing_for_closure = .true.
+      gama              = 0.0
+      tau               = 28800.
+      tke0              = 0.5
+      cape0             = 1000.
+      lochoice          = 10
+      do_capetau_land   = .false.
+      use_llift_criteria= .false.
+      do_ice            = .true.
+      atopevap  = 0.1
+      auto_rate = 1.e-3
+      auto_th   = 0.5e-3
+      frac      = 1.65
+      ttend_max = 0.005
+      EVAP_IN_DOWNDRAFTS  = 0.00
+      EVAP_IN_ENVIRON     = 0.00
+      ENTRAINED_INTO_MESO = 1.00
+      ANVIL_PRECIP_EFFICIENCY = 0.55
+      MESO_DOWN_EVAP_FRACTION = 0.4
+      MESO_UP_EVAP_FRACTION   = 0.05
+      wmin_ratio      = 0.05,
+      arat =  1.0, 0.26, 0.35, 0.32, 0.3, 0.54, 0.66
+      erat =  1.0, 1.30, 1.80, 2.50, 3.3, 4.50, 10.0
+      frc_internal_enthalpy_conserv = .true.
+      limit_pztm_to_tropo = .true.
+/
+
+ &entrain_nml
+        convect_shutoff = .false.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.37,
+        Ashear        = 25.0, 
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+/
+
+ &moist_processes_nml
+        do_lsc=.false., 
+        do_strat=.true.,
+        do_mca=.false., 
+        do_ras=.false., 
+        do_uw_conv=.true.,
+        do_donner_deep = .false.,
+        do_diag_clouds = .false.,
+        do_cmt=.true., 
+        cmt_mass_flux_source='uw',
+        do_rh_clouds = .false., 
+        do_gust_cv = .false.,
+        do_liq_num = .true.,
+        force_donner_moist_conserv = .false.,
+        do_donner_conservation_checks = .false.,
+        do_limit_donner = .false.,
+        do_limit_uw = .true.,
+        limit_conv_cloud_frac = .false.,
+        do_donner_before_uw = .false.,
+        do_legacy_strat_cloud = .false.,
+/
+
+ &rotstayn_klein_mp_nml
+        rk_act_only_if_ql_gt_qmin = .true.
+/
+
+ &strat_cloud_nml
+        up_strat_opt = 2
+        var_limit_opt = 2
+        var_limit = 0.3
+        aerosol_activation_scheme = "total"
+        qthalfwidth    = 0.2
+        do_pdf_clouds = .true.
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 8.0,
+        Dmin = 1.0e-07,
+        n_land = 300.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 1.e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-6,
+        eros_scale_t = 3.e-6,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.4
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 1.0
+        use_sub_seasalt = .false.
+/
+
+ &strat_clouds_W_nml
+      do_stochastic_clouds = .true.
+/
+
+ &uw_closure_nml
+        rkfre    = 0.2
+        wcrit_min= 0.2
+/
+
+ &uw_conv_nml
+        use_online_aerosol = .true.,
+        iclosure        = 0,
+        rkm_sh          = 3.0,
+        cldhgt_max      = 50.e3,
+        do_uwcmt        = .false.,
+        apply_tendency  = .true.,
+        wmin_ratio      = 0.05,
+        do_lands        = .false.
+        landfact_m      = 0.5
+        lochoice        = 0
+        lofactor0       = 0.75
+        do_deep         = .true.,
+        idpchoice       = 1
+        do_rescale      = .true.
+        use_sub_seasalt = .false.
+        wrel_min=1.
+/
+
+ &uw_plume_nml
+        rmaxfrac = 0.15
+        auto_th0 = 1.0e-3,
+        tcrit    = -25.15,
+        frac_drs = 0.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 8
+        peff_l = 1.25e-5
+        peff_i = 2.5-5
+        do_pevap = .true.
+        hcevap   = 0.9
+        cfrac    = 0.15
+/
+

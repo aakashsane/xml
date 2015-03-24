@@ -29,20 +29,6 @@
       init_co2 = 286.e-6
 /
 
- &cg_drag_nml
-      cg_drag_freq = 1200,
-      cg_drag_offset = 0,
-      Bt_0 =  0.004 ,
-      Bt_aug= 0.000,
-      Bt_nh=  0.001,
-      Bt_sh= -0.001,
-      Bt_eq=  0.000,
-      Bt_eq_width= 4.0,
-      phi0n =  30.,
-      phi0s = -30.,
-      dphin =  5.0,
-      dphis = -5.0
-/
 
  &cloud_generator_nml
       do_inhomogeneous_clouds = .true.
@@ -76,14 +62,6 @@
       diff_norm = 2.5
 /
 
- &damping_driver_nml
-      trayfric = 0.,
-      nlev_rayfric = 1,
-      do_mg_drag = .true.,
-      do_cg_drag = .true.,
-      do_topo_drag = .false.,
-      do_conserve_energy = .true.
-/
 
  &diag_cloud_nml
       linvers = .false., lcnvcld = .false.,
@@ -101,6 +79,7 @@
       file_name  = 'diag_integral.out',
       time_units = 'days',
       output_interval = 1.0
+      fields_per_print_line = 5
 /
 
  &diag_manager_nml
@@ -130,10 +109,11 @@
 /
 
  &esfsw_driver_nml
+      do_sw_continuum = .true.
 /
 
  &esfsw_parameters_nml
-      sw_resolution = 'low',
+      sw_resolution = 'med',
       sw_diff_streams = 1
 /
 
@@ -316,7 +296,7 @@
 /
 
  &secondary_organics_nml
-        gas_conc_filename ='gas_conc_3D48L_am3p9.nc'
+        gas_conc_filename ='gas_conc_3D_am3p9.nc'
 /
 
  &shortwave_driver_nml
@@ -359,6 +339,7 @@
 /
 
  &soil_nml
+      allow_neg_wl  = .true.
       init_w        = 500.
       albedo_to_use = 'brdf-maps'
       uptake_to_use = 'darcy2d-linearized'

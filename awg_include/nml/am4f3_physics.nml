@@ -4,29 +4,42 @@
 /
 
  &deep_conv_nml
-        rkm_dp1 = 2
-        rkm_dp2 = 0.1
-        norder = 1
-        cbmf_dp_frac1 = 1.
-        cbmf_dp_frac2 = 1.
+        auto_th0_d = 0.7e-3
+        tcrit_d    = -40.0,
+        peff_l_d   = 5.0e-5
+        peff_i_d   = 11.5e-5
+        rkm_dp1 = 1.5
+        rkm_dp2 = 0.001
+        norder  = 1
         crh_th_ocean = 0.5
         crh_th_land  = 0.5
-        cape_th = 100.
+        cin_th = 5.
+        cape_th = 10.
+        cwfn_th = 10.
+        frac_rkm_pert = 0.
         tau_dp = 28800.
+        tau_dp_fact = 3.
         mixing_assumption_d = 4
         do_ppen_d  = .true.
         do_pevap_d = .true.
         cfrac_d    = 0.15
         hcevap_d   = 0.9
-        auto_th0_d = 1.0e-3
-        tcrit_d    = -110.0,
+        pblfac_d   = 0.25
+        ffldep_d   = 0.
         frac_limit_d = 0.25
         dcapedm_th = 100
-        lofactor_d = 0.75
+        dcwfndm_th = 100
+        lofactor_d = 0.5
         do_lod_rkm   = .false.
         do_lod_cfrac = .false.
         do_lod_tcrit = .false.
+        do_stochastic_rkm =.false.
+        do_cgust_dp  = .true.
+        cgust_choice = 3
+        cin_fact  = 1.
         do_forcedlifting_d = .false.
+        wcrit_min_gust = 0.2
+        do_forced_conv = .false.
 /
 
  &donner_deep_clouds_W_nml
@@ -96,13 +109,20 @@
         do_legacy_strat_cloud = .false.,
 /
 
+
+&rotstayn_klein_mp_nml
+        rk_act_only_if_ql_gt_qmin = .true.
+/
+
+
  &strat_cloud_nml
         use_online_aerosol = .true.,
         U00 = 0.80,
         U00_profile = .true.,
-        rthresh = 8.0,
+        rthresh = 10.5,
         Dmin = 1.0e-07,
-        n_land = 300.e6,
+        n_land = 150.e6,
+        n_ocean = 50.e6,
         diff_thresh = 0.1,
         mc_thresh = 0.001,
         eros_scale = 1.e-6,
@@ -133,6 +153,7 @@
  &uw_conv_nml
         use_online_aerosol = .true.,
         iclosure        = 0,
+        rkm_sh1         = 15.0,
         rkm_sh          = 3.0,
         cldhgt_max      = 50.e3,
         do_uwcmt        = .false.,
@@ -140,31 +161,58 @@
         wmin_ratio      = 0.05,
         do_lands        = .false.
         landfact_m      = 0.5
-        gama            = 0.,
         lochoice        = 0
         lofactor0       = 0.75
         do_deep         = .true.,
-        idpchoice       = 1
+        idpchoice       = 2
         do_rescale      = .true.
         use_sub_seasalt = .false.
-        wrel_min=1.
+        use_new_let     = .true.
+        plev_cin        = 60000.
+        src_choice      = 1
+        wrel_min        = 1.
+        duration        = 10800
+        do_stime        = .false.
+        do_dtime        = .false.
+        stime0          = 0.8
+        dtime0          = 0.1
+        do_prog_tke     = .false.
+        tau_tke         = 7200
+        bfact           = 0.05
+        pblrat0         = 2.0
+        do_prog_gust    = .true.
+        tau_gust        = 10800
+        gfact           = 1.0
+        do_gust_qt      = .false.
+        gqt_choice      = 0
+        cgust0          = 2.
+        cgust_max       = 4.
+        sigma0          = 0.5
 /
 
  &uw_plume_nml
+        auto_th0 = 0.2e-3,
+        tcrit    = -40.0,
+        peff_l   = 5.0e-5
+        peff_i   = 11.5e-5
         rmaxfrac = 0.15
-        auto_th0 = 1.0e-3,
-        tcrit    = -110.0,
         frac_drs = 0.0
         wmin     = 0.5
         deltaqc0 = 0.5e-3 
-        do_pdfpcp= .true.
+        do_pdfpcp= .false.
         do_pmadjt= .true.
         do_emmax = .true.
         do_pnqv  = .true.
         mixing_assumption = 2
-        mp_choice = 1
+        mp_choice = 2
         do_pevap = .true.
-        hcevap   = 0.9
         cfrac    = 0.15
+        hcevap   = 0.9
+        pblfac   = 0.25
 /
+
+ &wetdep_nml
+        scale_aerosol_wetdep = 1.0
+/
+
 
