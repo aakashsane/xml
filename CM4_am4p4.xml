@@ -30,7 +30,8 @@ inputfiles -x CM4_proto.xml -p ncrc2.intel
   <property name="RELEASE" value="ulm"/>                <!-- CVS tag for source code -->
   <property name="MOM6_DATE" value="2015.03.13"/>                  <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"  value="$(RELEASE)_plusAWGupdates_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
+  <property name="AWG_GIT_TAG"  value="vanilla_dev_awg"/>          <!-- git tag for AWG  source code -->
+  <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
   <property name="FRE_VERSION" value="fre/bronx-9"/>             <!-- -->
   <property name="ANALYSIS_SWITCH" value="on"/>
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
@@ -135,7 +136,6 @@ the faster the model throughput, but also the lower the model efficiency
         module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
         module unload netcdf fre
         module load PrgEnv-intel/4.0.46
-        module swap intel intel/12.0.5.220
         module load $(FRE_VERSION)
         module load git
  
@@ -144,9 +144,6 @@ the faster the model throughput, but also the lower the model efficiency
         setenv F_UFMTENDIAN big
       ]]></csh>
 
-      <!--test new compiler options
-      <mkmfTemplate file="$HOME/fre/fre-commands/site/ncrc/intel.mk"/>
-      -->
     </platform>
 
     <platform name="ncrc2.gnu">
@@ -295,8 +292,8 @@ the faster the model throughput, but also the lower the model efficiency
     <description>
 
 Experiment to build executable.
-* ulm_201503 code base
-* MOM6 ocean code (updated to dev/master/2014.12.24)
+* ulm code base
+* MOM6 ocean code (updated to dev/master/2015.03.13)
     </description>
 
     <component name="fms" paths="shared">
@@ -311,62 +308,23 @@ Experiment to build executable.
 
     <component name="atmos_phys" requires="fms" paths="atmos_param atmos_shared">
       <description domainName="" communityName="" communityVersion="$(RELEASE)" communityGrid=""/>
-      <source>
-        <codeBase version="$(RELEASE)"> atmos_shared atmos_param_am3 </codeBase>
-        <csh>
-           #==For JPD Drag Tests==
-           cvs up -r drag_min_jpd_20141030 atmos_param/monin_obukhov/monin_obukhov.F90
-           cvs up -r drag_min_jpd_20141030 atmos_param/monin_obukhov/monin_obukhov_kernel.F90
-
-           # For am4c3 runs. Changes answers for all!
-           cvs up -r lowsen20141106_miz atmos_param/shallow_cu/uw_conv.F90 atmos_param/shallow_cu/deep_conv.F90 atmos_param/shallow_cu/conv_plumes_k.F90
-           # Total activation bug fix
-           cvs update -r ulm_total_act_fix_cjg atmos_param/strat_cloud/rotstayn_klein_mp.F90
-
-           # Fix bug that prevented that prevented moist_processes_nml:do_gust_cv and
-           # entrain_nml:convect_shutoff options from seeing UW contributions
-           # This will change answers. To recover original answers with UW double-plume
-           # configurations, set entrain_nml:convect_shutoff = .false.
-           cvs update -r ulm_convect_fix_cjg atmos_param/entrain/entrain.F90
-
-           # David Paynter fix to avoid the radiation crash in debug mode. This will change answers.
-           cvs update -r fix_debug_crash_Paynter_nnz  ./atmos_param/sea_esf_rad/esfsw_driver.F90
-
-           # Ming Zhao code changes for am4f3 
-           cvs update -r am4f3_20150225_miz atmos_param/shallow_cu/conv_plumes_k.F90 
-           cvs update -r am4f3_20150225_miz atmos_param/shallow_cu/conv_utilities_k.F90 
-           cvs update -r am4f3_20150225_miz atmos_param/shallow_cu/conv_closures.F90  
-           cvs update -r am4f3_20150225_miz atmos_param/shallow_cu/uw_conv.F90 
-           cvs update -r am4f3_20150225_miz atmos_param/shallow_cu/deep_conv.F90 
-           cvs update -r am4f3_20150225_miz atmos_param/physics_driver/physics_driver.F90  
-           cvs update -r am4f3_20150225_miz atmos_param/moist_processes/moistproc_kernels.F90  
-           cvs update -r am4f3_20150225_miz atmos_param/vert_diff/vert_diff.F90  
-           cvs update -r am4f3_20150225_miz atmos_param/vert_diff_driver/vert_diff_driver.F90
-
-           # combining Chris Golaz and Ming Zhao code changes for "atmos_param/moist_processes/moist_processes.F90"  
-           cvs update -r am4f3_convect_fix_20150303_h1g  atmos_param/moist_processes/moist_processes.F90 
-
-            # Huan Guo code changes to scale aerosol wet deposition using namelist parameter
-           cvs update -r wetDep_scale_20150311_h1g atmos_shared/tracer_driver/atmos_tracer_utilities.F90
-	</csh>
+      <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <codeBase version="$(RELEASE)"> atmos_shared.git atmos_param.git </codeBase>
+        <!-- This csh section is needed for systems that use an older git version that doesn't
+             support cloning a specific tag directly. -->
+        <csh><![CDATA[
+          ( cd atmos_param  && git checkout $(RELEASE) )
+          ( cd atmos_shared && git checkout $(RELEASE) )
+          # AWG updates
+          ( cd atmos_param  && git checkout $(AWG_GIT_TAG) )
+          ( cd atmos_shared && git checkout $(AWG_GIT_TAG) )
+          ]]>
+        </csh>
       </source>
       <compile>
         <cppDefs>$(F2003_FLAGS) -DCLUBB</cppDefs>
       </compile>
     </component>
-<!--
-    <component name="atmos_dyn" requires="fms atmos_phys" paths="atmos_coupled atmos_cubed_sphere">
-      <description domainName="CubedSphere" communityName="CubedSphere" communityVersion="$(RELEASE)" communityGrid=""/>
-      <source>
-        <codeBase version="$(RELEASE)">
-          atmos_coupled cubed_sphere_coupled
-        </codeBase>
-      </source>
-      <compile>
-        <cppDefs>$(F2003_FLAGS) -DSPMD</cppDefs>
-      </compile>
-    </component>
--->
 
     <component name="atmos_dyn" paths="atmos_drivers/coupled
                                        atmos_cubed_sphere/driver/coupled
@@ -380,9 +338,9 @@ Experiment to build executable.
         <csh><![CDATA[
           ( cd atmos_drivers && git checkout $(RELEASE) )
           ( cd atmos_cubed_sphere && git checkout $(RELEASE) )
-          # miz updates
-          ( cd atmos_drivers && git checkout user/cjg/am4f3_20150225_miz )
-          ( cd atmos_cubed_sphere && git checkout user/cjg/am4f3_20150225_miz )
+          # AWG updates
+          ( cd atmos_drivers && git checkout $(AWG_GIT_TAG) )
+          ( cd atmos_cubed_sphere && git checkout $(AWG_GIT_TAG) )
           ]]>
         </csh>
       </source>
@@ -391,27 +349,14 @@ Experiment to build executable.
       </compile>
     </component>
 
-<!--
-    <component name="ice_sis" requires="fms" paths="ice_sis ice_param">
-      <description domainName="Sea Ice SIS" communityName="GFDL-SIS" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
-      <source>
-        <codeBase version="$(RELEASE)"> ice_sis ice_param </codeBase>
-        <csh>cvs up -r adjustable_berg_warn_linits_jpk_20141003 ice_sis/ice_bergs.F90 #needed for CM4i_c96L48_am4a1r1_1pct-co2-2X</csh>
-      </source>
-      <compile>
-        <cppDefs>$(F2003_FLAGS) -Duse_netCDF</cppDefs>
-      </compile>
-    </component>
--->
-      <component paths="ice_sis ice_param" requires="fms" name="ice_sis">
+    <component paths="ice_sis ice_param" requires="fms" name="ice_sis">
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
             <codeBase version="$(RELEASE)"> ice_sis.git ice_param.git </codeBase>
          </source>
          <compile>
             <cppDefs>$(F2003_FLAGS)</cppDefs>
          </compile>
-      </component>
-
+    </component>
 
     <component name="land_lad2" requires="fms" paths="land_lad2">
       <description domainName="LM3" communityName="land_lad2" communityVersion="$(RELEASE)" communityGrid=""/>
@@ -502,8 +447,8 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
         <codeBase version="$(RELEASE)"> coupler.git </codeBase>
         <csh><![CDATA[
         ( cd coupler && git checkout $(RELEASE) )
-         # miz updates
-        ( cd coupler && git checkout user/cjg/am4f3_20150225_miz )
+         # AWG updates
+        ( cd coupler && git checkout $(AWG_GIT_TAG) )
         ]]>
         </csh>
       </source>
@@ -573,7 +518,7 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
   <experiment name="common_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/common/sea_esf_dec2014.cpio</dataSource>
+        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/common/sea_esf_dec2014.cpio</dataSource> 
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/lm3_data_20130815.tar</dataSource>
@@ -2179,6 +2124,11 @@ LAYOUT_EOF
 
 <experiment name="c96L32_am4f4" inherit="c96L32_am4a4">
    <input>
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <!--<dataSource platform="$(platform)">/lustre/f1/unswept/Ming.Zhao/archive/mdt/awg/input/ic/c96L32_initcond.nc.tar</dataSource>-->
+        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/ic/awg_C96L32_LM3_OM4_025_grid_southshifted_19810101.remapped.v20150224.tar</dataSource>
+      </dataFile>
+
       <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_c96L32.nml"/>
    </input>
@@ -2200,6 +2150,21 @@ LAYOUT_EOF
 
 <experiment name="c96L48_am4f4" inherit="c96L48_am4a4">
    <input> 
+     <!--for some reason the AWG answers for this experiment were produced 
+         with beta_rad = 0.5 for this experiment 
+         but the file wg_include/nml/am4f4_c96L48.nml has beta_rad      = 0.35 
+         Changing to reproduce the AWG answers -->
+      <namelist name="entrain_nml">
+        convect_shutoff = .false.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.5,
+        Ashear        = 25.0,
+        radperturb    = 0.10,
+        critjump      = 0.10,
+      </namelist>
+
       <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_c96L48.nml"/>
    </input> 
