@@ -15,14 +15,14 @@
 module load fre/bronx-9
 fremake -x CM4_am4p4.xml -p ncrc2.intel -t prod-openmp cm4_compile
 
-# To run regression test (for the coupled experiment CM4_c96L48_am4a1r1_2000climo, year 2000 forcing): 
-frerun -r basic -x CM4_am4p4.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4a1r1_2000climo
+# To run regression test (for the coupled experiment CM4_c96L32_am4f4_2000): 
+frerun -r basic -x CM4_am4p4.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4f4_2000
 
 # To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
-frerun -x CM4_am4p4.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4a1r1_2000climo
+frerun -x CM4_am4p4.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4f4_2000
 
 # To check what is the input data of this experiment:
-inputfiles -x CM4_proto.xml -p ncrc2.intel
+inputfiles -x CM4_am4p4.xml -p ncrc2.intel CM4_c96L32_am4f4_2000
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
@@ -35,7 +35,7 @@ inputfiles -x CM4_proto.xml -p ncrc2.intel
   <property name="FRE_VERSION" value="fre/bronx-9"/>             <!-- -->
   <property name="ANALYSIS_SWITCH" value="on"/>
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
-  <property name="ProjectID"  value="GFDL-Niki.Zadeh"/>                       <!-- database top level -->
+  <property name="ProjectID"  value="OWG"/>                       <!-- database top level -->
   <property name="DEBUGLEVEL" value=""/>
 
   <property name="AWG_INPUT_HOME_GAEA" value="awg_include"/>
@@ -109,7 +109,7 @@ the faster the model throughput, but also the lower the model efficiency
 
     <platform name="ncrc2.intel">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
 	<root>$HOME/$(stem)</root>
@@ -2437,6 +2437,14 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_c96L32.nml"/>
    </input>
+
+   <runtime>
+	<!--npes="2432" should give 4 sypd for "CM4_c96L32_am4f4_2000"-->
+        <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="2432" runTime="12:00:00">
+          <segment simTime="12" units="months" runTime="12:00:00"/>
+        </production>
+   </runtime>
+
 </experiment>
 
 <experiment name="CM4_c96L32_am4a4_2000" inherit="CM4_c96L48_am4a4_2000">
@@ -2461,6 +2469,14 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_c96L48.nml"/>
    </input>
+
+   <runtime>
+      <!--npes="3296" should give 5 sypd for "CM4_c96L48_am4f4_2000" -->
+      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="3296" runTime="12:00:00">
+          <segment simTime="12" units="months" runTime="12:00:00"/>
+      </production>
+   </runtime>
+
 </experiment>
 
 <experiment name="CM4_c96L48_am4a4_2000" inherit="cm4_compile">
@@ -2601,6 +2617,14 @@ For more information please refer to the
       <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_c192L32.nml"/>
    </input>
+
+   <runtime>
+      <!--npes="5888" should give 5.1 sypd for "CM4_c192L32_am4f4_2000" -->
+      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="5888" runTime="12:00:00">
+          <segment simTime="12" units="months" runTime="12:00:00"/>
+      </production>
+   </runtime>
+
 </experiment>
 
 <experiment name="CM4_c192L32_am4a4_2000" inherit="CM4_c192L48_am4a4_2000">
@@ -2625,6 +2649,14 @@ For more information please refer to the
       <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_c192L48.nml"/>
    </input>
+
+   <runtime>
+      <!--npes="3429" should give 2.7 sypd for "CM4_c192L48_am4f4_2000" -->
+      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="3429" runTime="12:00:00">
+          <segment simTime="12" units="months" runTime="12:00:00"/>
+      </production>
+   </runtime>
+
 </experiment>
 
 <experiment name="CM4_c192L48_am4a4_2000" inherit="cm4_compile"> 
