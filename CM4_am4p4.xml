@@ -38,8 +38,8 @@ inputfiles -x CM4_am4p4.xml -p ncrc2.intel CM4_c96L32_am4f4_2000
   <property name="ProjectID"  value="OWG"/>                       <!-- database top level -->
   <property name="DEBUGLEVEL" value=""/>
 
-  <property name="AWG_INPUT_HOME_GAEA" value="awg_include"/>
-  <property name="AWG_INPUT_HOME_ZEUS" value="awg_include"/>
+  <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
+  <property name="AWG_INPUT_HOME_NESCC" value="awg_include"/>
   <property name="AWG_INPUT_HOME_GFDL" value="/nbhome/$USER/$(FRE_STEM)/$(name)/mdt_xml/awg_include"/>
 
 <!--
@@ -206,7 +206,7 @@ the faster the model throughput, but also the lower the model efficiency
         <archive>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)</archive>
       </directory>
       <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_ZEUS)"/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_NESCC)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/scratch2/portfolios/GFDL/gfdlscr/John.Krasting/awg/mdt"/>
       <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)/$(name)"/>
       <property name="CWG_HOME"          value="/scratch2/portfolios/GFDL/gfdlscr/John.Krasting/cwg"/>
@@ -236,6 +236,48 @@ the faster the model throughput, but also the lower the model efficiency
       <xi:include xpointer="xpointer(//setup/platform[@name='nescc.intel']/node())" />
     </platform>
 
+    <platform name="theia.intel">
+      <project>gfdlport</project>
+      <directory stem="$(FRE_STEM)">
+        <root>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)</root>
+        <src>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/src</src>
+        <exec>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)/exec</exec>
+        <scripts>$HOME/$(stem)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <stdout>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <state>$HOME/$(stem)/$(name)/$(platform)-$(target)/state</state>
+        <work>/scratch2/portfolios/GFDL/gfdlscr/$USER/work/$FRE_JOBID</work>
+        <ptmp>/scratch2/portfolios/GFDL/gfdlscr/$USER/ptmp</ptmp>
+        <stmp>/scratch2/portfolios/GFDL/gfdlscr/$USER/stmp</stmp>
+        <archive>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)</archive>
+      </directory>
+
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_NESCC)"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/scratch2/portfolios/GFDL/gfdlscr/Niki.Zadeh/awg/mdt"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
+      <property name="CWG_HOME"          value="/scratch2/portfolios/GFDL/gfdlscr/John.Krasting/cwg"/>
+      <property name="REFERENCE"         value=""/>
+      <property name="ARCHIVE_INPUT_NZ"  value="/scratch2/portfolios/GFDL/gfdlscr/Niki.Zadeh/archive/input"/>
+      <csh><![CDATA[
+        module use -a /home/fms/local/modulefiles
+        module use -a /contrib/gfdl/modulefiles
+        module load intel/15.1.133
+        module load netcdf/4.3.0
+        module load hdf5/1.8.14
+        module load impi/5.0.1.035
+        module load $(FRE_VERSION)
+
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+        ]]>
+      </csh>
+    </platform>
+
+    <platform name="theia.default">
+      <xi:include xpointer="xpointer(//setup/platform[@name='theia.intel']/node())" />
+    </platform>
+    
     <platform name="gfdl.default">
       <property name="NB_ROOT"  value="/nbhome/$USER/$(FRE_STEM)/$(name)"/><!--Do not change this! Other platforms use  the same value. -->
       <directory stem="$(FRE_STEM)">
@@ -258,7 +300,10 @@ the faster the model throughput, but also the lower the model efficiency
         module load $(FRE_VERSION)
         module load fre-analysis
         module load git
-       ]]>
+        setenv FREVERSION $(FRE_VERSION)           
+        setenv NBROOT $(NB_ROOT)
+        /home/Niki.Zadeh/nnz_tools/bin/verify -m $(MOM6_GIT_TAG) -x dev
+      ]]>
       </csh>
     </platform>
     <platform name="gfdl.ncrc2-default">
@@ -272,6 +317,10 @@ the faster the model throughput, but also the lower the model efficiency
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
     <platform name="gfdl.nescc-intel">
+      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
+    </platform>
+
+    <platform name="gfdl.theia-intel">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
 
@@ -408,7 +457,7 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
 
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
-          if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
+          if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
             ln -s /scratch2/portfolios/GFDL/gfdlscr/John.Krasting/pdata/gfdl_O/datasets/ .datasets
           else
             ln -s /lustre/f1/pdata/gfdl_O/datasets/ .datasets
@@ -869,11 +918,17 @@ if ("${platform_domain}" == "ncrc.gov") then
    else
     alias runCommand "aprun -d $place -n $atmos_npes ./$executable:t"
   endif
-else if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
+else if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov" ) then
   if ( $do_ocean == "true" ) then
     alias runCommand "mpiexec_mpt -np $atmos_npes -v omplace -nt $atmos_nthreads ./$executable:t : -np $ocean_npes -v omplace -nt 1 ./$executable:t"
    else
      alias runCommand "mpiexec_mpt -np $atmos_npes -v omplace -nt $atmos_nthreads ./$executable:t"
+  endif
+else if ("${platform_domain}" == "theia.fairmont.rdhpcs.noaa.gov" ) then
+  if ( $do_ocean == "true" ) then
+    alias runCommand "mpirun -n $atmos_npes  -env I_MPI_PIN_PROCESSOR_LIST allcores:grain=1,shift=$atmos_nthreads ./$executable:t : -n $ocean_npes -env I_MPI_PIN_PROCESSOR_LIST allcores:grain=1,shift=1 ./$executable:t"
+   else
+     alias runCommand "mpirun -n $atmos_npes -env I_MPI_PIN_PROCESSOR_LIST allcores:grain=1,shift=$atmos_nthreads ./$executable:t"
   endif
 else
   echo "FATAL: Invalid platform ... unsure how to structure mpirun command"
@@ -890,7 +945,7 @@ if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
     set xmldirRemote = `echo $xmldirlocal | sed -r "$patternSedHome;$patternSedCTMP;$patternSedCPERM"`
     gcp --batch -cd -r --sync $xmldirlocal/awg_include gfdl:$(AWG_INPUT_HOME_GFDL)/..
     gcp --batch -cd -r --sync $xmldirlocal/awg_include gfdl:$xmldirRemote/
-  else if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
+  else if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
     gcp -cd -r --sync $xmldirlocal/awg_include gfdl:$(AWG_INPUT_HOME_GFDL)/..
     gcp -cd -r --sync $xmldirlocal/awg_include gfdl:$xmldirRemote/
   endif
@@ -901,7 +956,7 @@ if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
   tar xvf mom6.tar -C ./mom6 > /dev/null
   if ("${platform_domain}" == "ncrc.gov") then
     gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  else if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
+  else if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
     gcp -cd -r --sync mom6 gfdl:$(NB_ROOT)/
   endif
 endif
@@ -1795,7 +1850,6 @@ else if ( "$npes" == "9344" ) then
   set ocn_layout   =   "45,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.808.45x72"
   set do_ocean = "true"
   set ocean_npes   = "2432"
-#SYPD= 5.71746  npes= 9344  main_loop= 414.016546  ATM= 392.145506  OCN= 381.589754
 
 else if ( "$npes" == "9824" ) then
   set atmos_npes = "1728"
@@ -2441,7 +2495,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
    <runtime>
 	<!--npes="2432" should give 4 sypd for "CM4_c96L32_am4f4_2000"-->
         <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="2432" runTime="12:00:00">
-          <segment simTime="12" units="months" runTime="12:00:00"/>
+          <segment simTime="12" units="months" runTime="6:00:00"/>
         </production>
    </runtime>
 
@@ -2473,7 +2527,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
    <runtime>
       <!--npes="3296" should give 5 sypd for "CM4_c96L48_am4f4_2000" -->
       <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="3296" runTime="12:00:00">
-          <segment simTime="12" units="months" runTime="12:00:00"/>
+          <segment simTime="12" units="months" runTime="6:00:00"/>
       </production>
    </runtime>
 
@@ -2845,6 +2899,7 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
      </dataFile>
 
@@ -2916,6 +2971,7 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
      </dataFile>
 
@@ -2958,14 +3014,16 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
     <input>
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-       <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
      </dataFile>
 
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
-       <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
-         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
+        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
      </dataFile>
 
      <dataFile label="input" target="INPUT/ice_model.res.nc" chksum="" size="" timestamp="">
@@ -3019,14 +3077,16 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
     <input>
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-       <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
      </dataFile>
 
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
-       <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
-         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
+        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.icebergs</dataSource>
      </dataFile>
 
      <!--

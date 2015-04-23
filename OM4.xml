@@ -19,7 +19,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2015.03.13"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2015.04.20"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="FRE_VERSION"  value="fre/bronx-9"/>
@@ -189,7 +189,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
         module load git
         setenv FREVERSION $(FRE_VERSION)           
         setenv NBROOT $(NB_ROOT)
-       /home/Niki.Zadeh/nnz_tools/bin/verify -m $(MOM6_GIT_TAG) -x user/nnz/ulm 
+        /home/Niki.Zadeh/nnz_tools/bin/verify -m $(MOM6_GIT_TAG) -x dev 
        ]]>
       </csh>
     </platform>
@@ -227,7 +227,21 @@ Make the executable for ocean-ice experiments.
          </compile>
       </component>
 
-      <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/">
+      <component paths="ocean_shared" requires="fms" name="ocean_shared">
+      <description domainName="Ocean Generic Tracers" communityName="GFDL-ocean-shared" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
+      <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <codeBase version="$(RELEASE)"> ocean_shared.git </codeBase>
+        <csh><![CDATA[
+        ( cd ocean_shared && git checkout $(RELEASE) )
+        ]]>
+        </csh>
+      </source>
+      <compile>
+        <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+      </compile>
+    </component>
+
+      <component name="mom6" requires="fms ocean_shared" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/">
          <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/github_mirror">
         <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase>
@@ -257,7 +271,7 @@ Make the executable for ocean-ice experiments.
             </csh>
          </source>
          <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
+            <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
          </compile>
       </component>
 
@@ -308,13 +322,16 @@ Make the executable for ocean-ice experiments.
       <component name="atmos_null" paths="atmos_null atmos_param" requires="fms">
           <library path="$(MY_LIBS)/atmos_null/libatmos_null.a" headerDir="$(MY_LIBS)/atmos_null"/>
       </component>
-      <component paths="mom6" requires="fms" name="mom6">
+      <component paths="ocean_shared" requires="fms" name="ocean_shared">
+         <library path="$(MY_LIBS)/ocean_shared/libocean_shared.a" headerDir="$(MY_LIBS)/ocean_shared"/>
+      </component> 
+      <component paths="mom6" requires="fms ocean_shared" name="mom6">
          <library path="$(MY_LIBS)/mom6/libmom6.a" headerDir="$(MY_LIBS)/mom6"/>
       </component> 
       <component paths="ice_sis" requires="fms" name="ice_sis">
          <library path="$(MY_LIBS)/ice_sis/libice_sis.a" headerDir="$(MY_LIBS)/ice_sis"/>
       </component> 
-      <component name="coupler" paths="coupler" requires="fms land_null atmos_null ice_sis mom6">
+      <component name="coupler" paths="coupler" requires="fms land_null atmos_null ice_sis mom6 ocean_shared">
          <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
             <codeBase version="$(RELEASE)"> coupler.git </codeBase>
@@ -335,13 +352,16 @@ Make the executable for ocean-ice experiments.
       <component name="atmos_null" paths="atmos_null atmos_param" requires="fms">
           <library path="$(MY_LIBS)/atmos_null/libatmos_null.a" headerDir="$(MY_LIBS)/atmos_null"/>
       </component>
-      <component paths="mom6" requires="fms" name="mom6">
+      <component paths="ocean_shared" requires="fms" name="ocean_shared">
+         <library path="$(MY_LIBS)/ocean_shared/libocean_shared.a" headerDir="$(MY_LIBS)/ocean_shared"/>
+      </component> 
+      <component paths="mom6" requires="fms ocean_shared" name="mom6">
          <library path="$(MY_LIBS)/mom6/libmom6.a" headerDir="$(MY_LIBS)/mom6"/>
       </component> 
       <component paths="sis2" requires="fms" name="sis2">
          <library path="$(MY_LIBS)/sis2/libsis2.a" headerDir="$(MY_LIBS)/sis2"/>
       </component> 
-      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6">
+      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6 ocean_shared">
          <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
             <codeBase version="$(RELEASE)"> coupler.git </codeBase>
@@ -1641,7 +1661,7 @@ OVERRIDE_EOF
      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 AGGREGATE_FW_FORCING = False
-KPP%MINIMUM_OBL_DEPTH = 12.
+#override KPP%MINIMUM_OBL_DEPTH = 12.
 OVERRIDE_EOF
      ]]></csh>
    </input>
@@ -1657,7 +1677,7 @@ OVERRIDE_EOF
      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 AGGREGATE_FW_FORCING = False
-KPP%MINIMUM_OBL_DEPTH = 6.
+#override KPP%MINIMUM_OBL_DEPTH = 6.
 OVERRIDE_EOF
      ]]></csh>
    </input>
@@ -1673,7 +1693,7 @@ OVERRIDE_EOF
      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 AGGREGATE_FW_FORCING = False
-KPP%MINIMUM_OBL_DEPTH = 6.
+#override KPP%MINIMUM_OBL_DEPTH = 6.
 #override KD = 1.0E-05
 OVERRIDE_EOF
      ]]></csh>
@@ -1690,7 +1710,7 @@ OVERRIDE_EOF
      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 AGGREGATE_FW_FORCING = False
-KPP%MINIMUM_OBL_DEPTH = 6.
+#override KPP%MINIMUM_OBL_DEPTH = 6.
 #override KD = 1.0E-05
 #override FOX_KEMPER_ML_RESTRAT_COEF = 20.0
 OVERRIDE_EOF
@@ -1698,6 +1718,22 @@ OVERRIDE_EOF
    </input>
 </experiment>
 
+<experiment name="OM4_SIS_DT_THERM_7200" inherit="OM4_SIS_baseline">
+<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)">
+ global 1/4 degree z  with THERMO_SPANS_COUPLING
+</description>
 
+    <input>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+THERMO_SPANS_COUPLING = True
+#override DT_THERM = 7200
+#override DIABATIC_FIRST = False
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
 
 </experimentSuite>
