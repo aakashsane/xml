@@ -28,7 +28,7 @@ inputfiles -x CM4_am4p4.xml -p ncrc2.intel CM4_c96L32_am4f4_2000
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <property name="RELEASE" value="ulm"/>                <!-- CVS tag for source code -->
-  <property name="MOM6_DATE" value="2015.04.20"/>                  <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE" value="2015.04.24"/>                  <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="vanilla_dev_awg"/>          <!-- git tag for AWG  source code -->
   <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
@@ -334,7 +334,9 @@ the faster the model throughput, but also the lower the model efficiency
 <!--= COMPILE =-->
 <!--===========-->
   <!--The property MOM6_EXAMPLES should point to the mom6 directory that is checked out. It is needed by MOM6 to access its inpu data files-->
-  <property name="MOM6_EXAMPLES"  value="$root/cm4_compile/src/mom6"/>
+  <property name="LIBS_ROOT"      value="cm4_compile"/>
+  <property name="FMS_LIB_DIR"    value="./$(LIBS_ROOT)/$(platform)-$(target)/exec"/>
+  <property name="MOM6_EXAMPLES"  value="$root/$(LIBS_ROOT)/src/mom6"/>
 
   <!-- cm4_compile is the compile experiment name -->
   <experiment name="cm4_compile">
@@ -3009,6 +3011,35 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
 
 </experiment>
 
+  <experiment name="SIS2_data">
+    <input>
+
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+     </dataFile>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
+     </dataFile>
+     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/SIS_input</dataSource>
+     </dataFile>
+
+<!-- No init ice yet
+     <dataFile label="input" target="INPUT/ice_model.res.nc" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/.datasets/OM4_025/INPUT/ice_model.res.v20140620.nc</dataSource>
+     </dataFile>
+-->
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = '$restart_flag'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
+     </namelist>
+     </input>
+  </experiment>
 
 <experiment name="SIS_data">
     <input>

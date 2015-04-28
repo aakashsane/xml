@@ -786,7 +786,7 @@ touch $work/INPUT/SIS_override
            num_part = 6
            wd_turn = 0.0
            spec_ice=.false.
-           ice_bulk_salin = 0.05
+           ice_bulk_salin = 0.0
            alb_sno = 0.85                    ! keep CM2 setting
            alb_ice = 0.65                    ! keep CM2 setting
            t_range_melt = 1.0                ! NOTE: CM2 uses 1.0
@@ -796,7 +796,7 @@ touch $work/INPUT/SIS_override
            add_diurnal_sw = .true.
            do_ice_limit=.false.
            max_ice_limit=4.0
-           channel_viscosity=5.e5
+           channel_viscosity=0.e5
            h_lo_lim = 1.e-10
       </namelist>
 
@@ -1734,6 +1734,94 @@ THERMO_SPANS_COUPLING = True
 OVERRIDE_EOF
      ]]></csh>
    </input>
+</experiment>
+
+<experiment name="OM4_SIS_COBALT" inherit="OM4_SIS_baseline">
+   <input>
+       <!--1 day restart since COBALT cannot cold start in MOM6 !! Fix this? Also, can TOPAZ restart go to ocean_topaz.res* rather than MOM.res* ?-->
+       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+            <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/tikal/OM4_SIS_025_COBALT.res.nc.tar</dataSource>
+       </dataFile>
+
+         <namelist name="generic_tracer_nml">
+       do_generic_tracer=.true.
+       do_generic_CFC=.false.
+       do_generic_COBALT=.true.
+       do_generic_TOPAZ=.false.
+         </namelist>
+         <namelist name="diag_manager_nml">
+       max_axes = 100,
+       max_num_axis_sets = 100,
+       max_input_fields = 699
+       max_output_fields = 699
+       mix_snapshot_average_fields=.false.
+         </namelist>
+
+      <fieldTable>
+# specific humidity for moist runs
+ "TRACER", "atmos_mod", "sphum" 
+           "longname",     "specific humidity"
+           "units",        "kg/kg" /
+##	   "profile_type", "fixed", "surface_value=3.e-6" /
+# prognostic cloud scheme tracers
+  "TRACER", "atmos_mod", "liq_wat"
+            "longname",     "cloud liquid specific humidity"
+            "units",        "kg/kg" /
+  "TRACER", "atmos_mod", "ice_wat"
+            "longname",     "cloud ice water specific humidity"
+            "units",        "kg/kg" /
+  "TRACER", "atmos_mod", "cld_amt"
+            "longname",     "cloud fraction"
+            "units",        "none" /
+# sphum must be present on land as well
+ "TRACER", "land_mod",     "sphum"
+           "longname",     "specific humidity"
+           "units",        "kg/kg" /
+# test tracer for radon
+#
+# "TRACER", "atmos_mod", "radon"
+#           "longname",     "radon test tracer"
+#           "units",        "kg/kg" /      
+###.................................................
+###.................................................
+###  MDPPM for generic obgc tracers
+
+"tracer_packages","ocean_mod","generic_cobalt"
+
+names = _
+horizontal-advection-scheme = mdppm
+vertical-advection-scheme = mdppm
+ppm_hlimiter=2
+ppm_vlimiter=2
+min_tracer_limit=0.0
+/
+
+"namelists","ocean_mod","generic_cobalt/*global*"
+/
+
+"namelists","ocean_mod","generic_cobalt"
+init = f
+/
+
+      </fieldTable>
+
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+     
+     <csh type="always"><![CDATA[
+ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc 
+
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+USE_generic_tracer = True
+GENERIC_TRACER_IC_FILE = ""
+OVERRIDE_EOF
+
+#when initCond is provided restart the model
+set restart_flag = 'r'
+
+     ]]></csh>
+
+   </input>
+     
 </experiment>
 
 </experimentSuite>
