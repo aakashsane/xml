@@ -3,7 +3,7 @@
 <!-- GFDL Model Development Team (MDT) documentation: http://cobweb.gfdl.noaa.gov/~niz/mdt/ -->
 <!-- GFDL MDT Atmosphere Working Group (AWG) documentation: http://cobweb.gfdl.noaa.gov/~cjg/awg/ -->
 
-<!-- Model configurations in support of MDT Atmosphere Working Group (AWG), v20150313 revision -->
+<!-- Model configurations in support of MDT Atmosphere Working Group (AWG), v20150511 revision -->
 
 <!-- QUICK START GUIDE:
 
@@ -12,23 +12,25 @@
 # .. module load git
 # .. mkdir -p $home/awg/ulm
 # .. cd $home/awg/ulm
-# .. git clone -b awg_v20150313 http://gitlab.gfdl.noaa.gov/mdt/xml.git xml_v20150313
+# .. git clone  http://gitlab.gfdl.noaa.gov/mdt/xml.git xml_v20150511
+# .. cd xml_v20150511
+# .. git checkout user/h1g/am4g5_awgxml_20150511
 
 # Change YOURGROUPLETTER to your group, such as f, w, o...
       <project>gfdl_YOURGROUPLETTER</project>
 
 # To check out source code and compile:
 # .. module load fre/bronx-9
-# .. fremake -x awg.xml -p ncrc2.intel -t openmp cm4p4_v20150313
+# .. fremake -x awg.xml -p ncrc2.intel -t openmp cm4p5_v20150511
 
 # To run regression test (with staging):
-# .. frerun -S -r basic -x awg.xml -p ncrc2.intel -t openmp c96L32_am4a4
+# .. frerun -S -r basic -x awg.xml -p ncrc2.intel -t openmp c96L32_am4g5
 
 # To run a complete experiment (with automated database entry if MDBIswitch in "on"):
-# .. frerun -x awg.xml -p ncrc2.intel -t openmp c96L32_am4a4
+# .. frerun -x awg.xml -p ncrc2.intel -t openmp c96L32_am4g5
 
 # To run fredb after an experiment is finished to manually add it to the database:
-# .. fredb-pp -x awg.xml -p gfdl.ncrc2-intel -t openmp c96L32_am4a4
+# .. fredb-pp -x awg.xml -p gfdl.ncrc2-intel -t openmp c96L32_am4g5
 
 -->
 
@@ -43,8 +45,8 @@
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
   <property name="ProjectID" value="AWG"/>                       <!-- database top level -->
 
-  <property name="AWG_INPUT_HOME_GAEA" value="$HOME/awg/ulm/xml_v20150313/awg_include"/>
-  <property name="AWG_INPUT_HOME_GFDL" value="/home/$USER/ncrc/awg/ulm/xml_v20150313/awg_include"/>
+  <property name="AWG_INPUT_HOME_GAEA" value="$HOME/awg/ulm/xml_v20150511/awg_include"/>
+  <property name="AWG_INPUT_HOME_GFDL" value="/home/$USER/ncrc/awg/ulm/xml_v20150511/awg_include"/>
 
 <!--
 GFDL FAIR USE POLICY
@@ -135,41 +137,12 @@ Choosing a particular PE number is a balancing act. The higher npes,
 the faster the model throughput, but also the lower the model efficiency
 (i.e. the overall simulation will cost more in terms of core hours).
 
-Available options for c96L48:
-"""""""""""""""""""""""""""""
-  +========+======================+======================+
-  |        |  Suggested run time for 12 month segment    |  
-  |  npes  |    am4a4             |    am4b4             |
-  +========+======================+======================+
-  |   432  |    09:00:00          |    09:00:00          |  
-  |   864  |    05:20:00          |    05:20:00          |
-  |  1152  |    04:00:00          |    04:00:00          |
-  |**1728**|    03:00:00          |    03:00:00          |
-  |  2304  |    02:30:00          |    02:30:00          |
-  |  3456  |    02:15:00          |    02:15:00          |
-  +========+======================+======================+
-
-
-Available options for c192L48:
-""""""""""""""""""""""""""""""
-
-  +========+======================+======================+
-  |        |  Suggested run time for 12 month segment    |
-  |  npes  |    am4a4             |    am4b4             |
-  +========+======================+======================+
-  |  2304  |    09:00:00          |    09:00:00          |
-  |  3456  |    07:00:00          |    07:00:00          |
-  |**4608**|    05:20:00          |    06:00:00          |
-  |  6912  |    04:00:00          |    05:00:00          |
-  +========+======================+======================+
-
-
 Available options for c96L32:
 """"""""""""""""""""""""""""""
 
   +========+======================+======================+
   |           Suggested run time for 12 month segment    |
-  |  npes       am4a4                                    |
+  |  npes       am4g5                                    |
   +========+=============================================+
   |   432  |    09:00:00                                 |
   |   864  |    05:20:00                                 |
@@ -178,20 +151,6 @@ Available options for c96L32:
   |  2304  |    02:30:00                                 |
   |  3456  |    02:15:00                                 |
   +========+======================+======================+ 
-
-Available options for c192L32:
-""""""""""""""""""""""""""""""
-
-  +========+======================+======================+
-  |           Suggested run time for 12 month segment    |
-  |  npes       am4a4                                    |
-  +========+=============================================+
-  |  2304  |    09:00:00                                 |
-  |  3456  |    07:00:00                                 |
-  |**4608**|    04:00:00                                 |
-  |  6912  |    04:00:00                                 |
-  +========+======================+======================+
-
 
 **Note:** default settings are highlighted in **bold**. Suggested 
 run time values may need to be adjusted for your specific
@@ -210,7 +169,7 @@ configuration.
       <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)">
         <src>$HOME/$(stem)/$(name)/src</src>
-        <scripts>$HOME/$(stem)/scripts</scripts>
+        <scripts>$HOME/$(stem)/xml_v20150511/scripts</scripts>
         <stdout>/lustre/f1/$USER/$(stem)/$(name)/$(platform)-$(target)/stdout</stdout>
       </directory>
       <property name="F2003_FLAGS"         value=" -DINTERNAL_FILE_NML -g -traceback"/>
@@ -262,7 +221,7 @@ configuration.
   <!--The property MOM6_EXAMPLES should point to the mom6 directory that is checked out. It is needed by MOM6 to access its inpu data files-->
   <property name="MOM6_EXAMPLES"  value="$root/cm4_compile/src/mom6"/>
 
-  <experiment name="cm4p4_v20150313">
+  <experiment name="cm4p5_v20150511">
     <description>
 
 Experiment to build executable.
@@ -276,13 +235,20 @@ Experiment to build executable.
 * Ming Zhao code changes for am4f3 (am4f3_20150225_miz and git tags user/cjg/am4f3_20150225_miz). Changes answers.
 * Code update from Huan Guo to merge moist_processes.F90 changes (am4f3_convect_fix_20150303_h1g)
 * Huan Guo code changes to scale aerosol wet deposition using namelist parameter (wetDep_scale_20150311_h1g)
+* Changes from Paul Ginoux to enable fast aerosols.
+* Changes from Ming Zhao to decrease climate sensitivity
+* Changes from John Wilson for cg drag and topo drag
 
     </description>
 
     <component name="fms" paths="shared">
      <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid=""/>
-      <source>
-        <codeBase version="$(RELEASE)"> shared </codeBase>
+      <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <codeBase version="$(RELEASE)"> shared.git </codeBase>
+        <csh><![CDATA[
+          ( cd shared && git checkout $(RELEASE) )
+          ]]>
+        </csh>
       </source>
       <compile>
         <cppDefs>$(F2003_FLAGS) -Duse_libMPI -Duse_netCDF </cppDefs>
@@ -291,49 +257,18 @@ Experiment to build executable.
 
     <component name="atmos_phys" requires="fms" paths="atmos_param atmos_shared">
       <description domainName="" communityName="" communityVersion="$(RELEASE)" communityGrid=""/>
-      <source>
-        <codeBase version="$(RELEASE)"> atmos_shared atmos_param_am3 </codeBase>
-        <csh>
-           #==For JPD Drag Tests==
-           cvs up -r drag_min_jpd_20141030 atmos_param/monin_obukhov/monin_obukhov.F90
-           cvs up -r drag_min_jpd_20141030 atmos_param/monin_obukhov/monin_obukhov_kernel.F90
-
-           # For am4c3 runs. Changes answers for all!
-           cvs up -r lowsen20141106_miz atmos_param/shallow_cu/uw_conv.F90 atmos_param/shallow_cu/deep_conv.F90 atmos_param/shallow_cu/conv_plumes_k.F90
-           # Total activation bug fix
-           cvs update -r ulm_total_act_fix_cjg atmos_param/strat_cloud/rotstayn_klein_mp.F90
-
-           # Fix bug that prevented that prevented moist_processes_nml:do_gust_cv and
-           # entrain_nml:convect_shutoff options from seeing UW contributions
-           # This will change answers. To recover original answers with UW double-plume
-           # configurations, set entrain_nml:convect_shutoff = .false.
-           cvs update -r ulm_convect_fix_cjg atmos_param/entrain/entrain.F90
-
-           # David Paynter fix to avoid the radiation crash in debug mode. This will change answers.
-           cvs update -r fix_debug_crash_Paynter_nnz  ./atmos_param/sea_esf_rad/esfsw_driver.F90
-
-           # Ming Zhao code changes for am4f3 
-           cvs update -r am4f3_20150225_miz atmos_param/shallow_cu/conv_plumes_k.F90 
-           cvs update -r am4f3_20150225_miz atmos_param/shallow_cu/conv_utilities_k.F90 
-           cvs update -r am4f3_20150225_miz atmos_param/shallow_cu/conv_closures.F90  
-           cvs update -r am4f3_20150225_miz atmos_param/shallow_cu/uw_conv.F90 
-           cvs update -r am4f3_20150225_miz atmos_param/shallow_cu/deep_conv.F90 
-           cvs update -r am4f3_20150225_miz atmos_param/physics_driver/physics_driver.F90  
-           cvs update -r am4f3_20150225_miz atmos_param/moist_processes/moistproc_kernels.F90  
-           cvs update -r am4f3_20150225_miz atmos_param/vert_diff/vert_diff.F90  
-           cvs update -r am4f3_20150225_miz atmos_param/vert_diff_driver/vert_diff_driver.F90
-
-           # combining Chris Golaz and Ming Zhao code changes for "atmos_param/moist_processes/moist_processes.F90"  
-           cvs update -r am4f3_convect_fix_20150303_h1g  atmos_param/moist_processes/moist_processes.F90 
-
-            # Huan Guo code changes to scale aerosol wet deposition using namelist parameter
-           cvs update -r wetDep_scale_20150311_h1g atmos_shared/tracer_driver/atmos_tracer_utilities.F90
-        </csh>
-      </source>
+        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+          <codeBase version="$(RELEASE)">atmos_shared.git atmos_param.git</codeBase>
+          <csh><![CDATA[
+            ( cd atmos_shared && git checkout user/cjg/awg_v20150416 )
+            ( cd atmos_param && git checkout user/cjg/awg_v20150416 )
+           ]]>
+          </csh>
+        </source>
       <compile>
         <cppDefs>$(F2003_FLAGS) -DCLUBB</cppDefs>
       </compile>
-    </component>
+    </component> 
 
     <component name="atmos_dyn" paths="atmos_drivers/coupled
                                        atmos_cubed_sphere/driver/coupled
@@ -341,10 +276,10 @@ Experiment to build executable.
                                        atmos_cubed_sphere/model_nh_null
                                        atmos_cubed_sphere/tools" requires="fms atmos_phys">
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="user/cjg/am4f3_20150225_miz">atmos_cubed_sphere.git</codeBase>
+        <codeBase version="user/cjg/am4f3_20150225_miz">atmos_drivers.git atmos_cubed_sphere.git</codeBase>
         <csh><![CDATA[
+          ( cd atmos_drivers && git checkout user/cjg/am4f3_20150225_miz )
           ( cd atmos_cubed_sphere && git checkout user/cjg/am4f3_20150225_miz )
-          git clone --recursive -b user/cjg/am4f3_20150225_miz git@gitlab.gfdl.noaa.gov:fms/atmos_drivers.git
          ]]>
         </csh>
       </source>
@@ -371,6 +306,8 @@ Experiment to build executable.
 	<csh>
           #==For JPD Drag Tests==
           cvs up -r merged_drag_updates_jpk_20141104_nnz land_lad2/land_model.F90
+          # Protection from negative soil water divergence situations
+          cvs up -r ulm_neg_water_div_20150321_slm_pcm land_lad2/soil/soil.F90
         </csh>
       </source>
       <compile>
@@ -446,7 +383,11 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
     <component name="coupler" paths="coupler" requires="fms atmos_dyn atmos_phys land_lad2 ice_sis mom6 ocean_shared">
       <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="user/cjg/am4f3_20150225_miz"> coupler.git </codeBase>
+        <codeBase version="$(RELEASE)"> coupler.git </codeBase>
+        <csh><![CDATA[
+        ( cd coupler && git checkout user/cjg/awg_v20150416 )
+        ]]>
+        </csh>
       </source>
       <compile>
         <cppDefs>$(F2003_FLAGS)</cppDefs>
@@ -478,7 +419,6 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
   <experiment name="c96L48_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <!--<dataSource platform="$(platform)">/lustre/f1/unswept/Ming.Zhao/archive/mdt/awg/newland/initcond_with_newveg.remapped_to_c96_OM4_025.v20150120.tar</dataSource>-->
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/ic/awg_C96L48_LM3_OM4_025_grid_southshifted_19810101.remapped.v20150120.tar</dataSource>
       </dataFile>
     </input>
@@ -487,8 +427,8 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
   <experiment name="c96L32_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <!--<dataSource platform="$(platform)">/lustre/f1/unswept/Ming.Zhao/archive/mdt/awg/input/ic/c96L32_initcond.nc.tar</dataSource>-->
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/ic/awg_C96L32_LM3_OM4_025_grid_southshifted_19810101.remapped.v20150224.tar</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c96L32/topo_v20150507/awg_C96L32_LM3_OM4_025_grid_lm3p2_19810101.remapped.topodrag.v20150507.tar</dataSource>
+        <!--dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/awg/IC/awg_C96L32_LM3_OM4_025_grid_lm3p2_19810101.remapped.v20150322.tar</dataSource-->
       </dataFile>
     </input>
   </experiment>
@@ -496,7 +436,6 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
   <experiment name="c192L48_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <!--<dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L48_newLand20150302/awg_C192L48_LM3_OM4_025_grid_southshifted_19810101.remapped.v20150302.tar</dataSource>-->
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/ic/awg_C192L48_LM3_OM4_025_grid_southshifted_19810101.remapped.v20150302.tar</dataSource>
       </dataFile>
     </input>
@@ -505,19 +444,34 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
   <experiment name="c192L32_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <!--<dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20150302/awg_C192L32_LM3_OM4_025_grid_southshifted_19810101.remapped.v20150302.tar</dataSource>-->
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/ic/awg_C192L32_LM3_OM4_025_grid_southshifted_19810101.remapped.v20150302.tar</dataSource>
       </dataFile>
     </input>
   </experiment>
 
-  <experiment name="common_data">
+  <experiment name="field_table_am4p5">
+    <input>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p5</dataSource>
+      </dataFile>
+    </input>
+  </experiment>
+
+  <experiment name="field_table_am4p5_faero">
+    <input>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p5_faero</dataSource>
+      </dataFile>
+    </input>
+  </experiment>
+
+  <experiment name="common_data_lm3p2">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/common/sea_esf_dec2014.cpio</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/lm3_data_20130815.tar</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/awg/input/lm3/lm3_data_20150322.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/common/aerosol_inputs.dec2009.cpio</dataSource>
@@ -534,9 +488,6 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/historical/emissions.1x1.1859_2020.tar</dataSource>
       </dataFile>
-      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p3</dataSource>
-      </dataFile>
       <dataFile label="input" target="INPUT/anthro_so2.1859_2010.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/liteChem/input/emissions/emissions.simple.so2.1x1.1859_2020.nc</dataSource>
       </dataFile>
@@ -546,6 +497,9 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/liteChem/input/emissions/so2_0.25_volcanoes.nc</dataSource>
       </dataFile>
+      <dataFile label="input" target="INPUT/AM4_201503" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/liteChem/input/aerosol/am4_optical_table_20150325.dat</dataSource>
+      </dataFile>
 
       <diagTable>
 $name
@@ -553,7 +507,7 @@ $baseDate
 
       </diagTable>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_atmos</dataSource>
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_atmos_faero</dataSource>
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land</dataSource>
@@ -591,11 +545,12 @@ $baseDate
   </experiment>
 
 
-  <experiment name="c96_data">
+
+  <experiment name="c96_data_lm3p2">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <!--<dataSource platform="$(platform)">/lustre/f1/unswept/Ming.Zhao/archive/mdt/awg/newland/19810101.static_veg.southshifted.remapped_to_c96_OM4_025.v20150120.tar</dataSource>-->
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/19810101.static_veg.southshifted.remapped_to_c96_OM4_025.v20150120.tar</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/fre/tikal/LM3/LM3p2_C96_CM2G_historical_HC1_quick/ncrc2.default-prod/static_veg/19810101.static_veg.lm3p2.remapped_to_c96_OM4_025.v20150322.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/c96_OM4_025_hydrography_v20140620.tar</dataSource>
@@ -831,6 +786,7 @@ touch MOM_input
       <component type="atmos_diurnal" start="$(ANA_AMIP_START)" source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
         <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
         <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
+        <timeAverage source="monthly" interval="$(ANA_AMIP_LEN)"/>
       </component>
 
       <component type="atmos_scalar" start="$(ANA_AMIP_START)" source="atmos_scalar">
@@ -868,6 +824,10 @@ touch MOM_input
         <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK)">
           <xi:include href="awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/landDailyTSNative/*)"/>
         </timeSeries>
+      </component>
+
+      <component type="land_instant_cubic" start="$(ANA_AMIP_START)" source="land_month_inst" cubicToLatLon="none">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)" />
       </component>
 
     </postProcess>
@@ -923,6 +883,7 @@ touch MOM_input
       <component type="atmos_diurnal" start="$(ANA_CLIMO_START)" source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
         <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
         <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
+        <timeAverage source="monthly" interval="$(ANA_CLIMO_LEN)"/>
       </component>
 
       <component type="atmos_scalar" start="$(ANA_CLIMO_START)" source="atmos_scalar">
@@ -960,6 +921,10 @@ touch MOM_input
         <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CLIMO_CHUNK)">
           <xi:include href="awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/landDailyTSNative/*)"/>
         </timeSeries>
+      </component>
+
+      <component type="land_instant_cubic" start="$(ANA_CLIMO_START)" source="land_month_inst" cubicToLatLon="none">
+        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)" />
       </component>
 
     </postProcess>
@@ -1015,6 +980,7 @@ touch MOM_input
       <component type="atmos_diurnal" start="$(ANA_AMIP_START)" source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
         <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
         <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
+        <timeAverage source="monthly" interval="$(ANA_AMIP_LEN)"/>
       </component>
 
       <component type="atmos_scalar" start="$(ANA_AMIP_START)" source="atmos_scalar">
@@ -1052,6 +1018,10 @@ touch MOM_input
         <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK)">
           <xi:include href="awg_include/analysis/analysis_amip.xml" xpointer="xpointer(*/landDailyTSNative/*)"/>
         </timeSeries>
+      </component>
+
+      <component type="land_instant_cubic" start="$(ANA_AMIP_START)" source="land_month_inst" cubicToLatLon="none">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)" />
       </component>
 
     </postProcess>
@@ -1107,6 +1077,7 @@ touch MOM_input
       <component type="atmos_diurnal" start="$(ANA_CLIMO_START)" source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
         <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
         <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
+        <timeAverage source="monthly" interval="$(ANA_CLIMO_LEN)"/>
       </component>
 
       <component type="atmos_scalar" start="$(ANA_CLIMO_START)" source="atmos_scalar">
@@ -1146,6 +1117,10 @@ touch MOM_input
         </timeSeries>
       </component>
 
+      <component type="land_instant_cubic" start="$(ANA_CLIMO_START)" source="land_month_inst" cubicToLatLon="none">
+        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)" />
+      </component>
+
     </postProcess>
   </experiment>
 
@@ -1153,606 +1128,19 @@ touch MOM_input
 <!--= AMIP EXPERIMENTS =-->
 <!--====================-->
 
-  <experiment name="c96L32_am4a4" inherit="cm4p4_v20150313">
+  <experiment name="c96L32_am4g5" inherit="cm4p5_v20150511">
 
 <!-- MDBI -->
     <description
 communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
+communityModel="am4p5" 
+communityModelID="am4p5"
 communityExperimentName="$(name)" 
 communityExperimentID="$(name)" >
 <!-- /MDBI -->
 
-AM4 prototype configuration "am4a4" from MDT Atmosphere Working Group.
-
-- c96 horizontal grid with approximately 100km resolution and 32 vertical levels.
-- Convection based on "double-plume" from Ming Zhao.
-- Tiedtke cloud scheme
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
-
-    </description>
-
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-	 nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a4_c96L32.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_amip.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
-        dt_atmos = 1800,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond']/input/node())"/>
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="1728" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="1:30:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8"   npes="432"  runTimePerJob="00:30:00"/>
-      </regression>
-      <regression name="restarts">
-        <run days="4 4" npes="864"  runTimePerJob="00:30:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1" npes="432"  runTimePerJob="02:00:00"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00"/>
-        <run months="1" npes="1152" runTimePerJob="00:45:00"/>
-        <run months="1" npes="1728" runTimePerJob="00:45:00"/>
-        <run months="1" npes="2304" runTimePerJob="00:30:00"/>
-        <run months="1" npes="3456" runTimePerJob="00:30:00"/>
-      </regression>
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-
-
-  <experiment name="c192L32_am4a4" inherit="cm4p4_v20150313">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
-communityExperimentName="$(name)" 
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
-
-AM4 prototype configuration "am4a4" from MDT Atmosphere Working Group.
-
-- c192 horizontal grid with approximately 50km resolution and 32 vertical levels.
-- Convection based on "double-plume" from Ming Zhao.
-- Tiedtke cloud scheme
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
-
-    </description>
-
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-         nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a4_c192L32.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_amip.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
-        dt_atmos = 1200,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c192_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c192L32_initCond']/input/node())"/>
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="4608" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="4:00:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8" npes="864" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="restarts">
-        <run days="4 4" npes="1152" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1"   npes="864"  runTimePerJob="02:30:00"/> 
-        <run months="1"   npes="1152" runTimePerJob="02:00:00"/> 
-        <run months="1"   npes="2304" runTimePerJob="01:30:00"/>
-        <run months="1"   npes="3456" runTimePerJob="01:00:00"/>
-        <run months="1"   npes="4608" runTimePerJob="01:00:00"/>
-        <run months="1"   npes="6912" runTimePerJob="01:00:00"/>
-      </regression>
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c192_amip_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-
-
-  <experiment name="c96L48_am4a4" inherit="cm4p4_v20150313">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
-communityExperimentName="$(name)" 
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
-
-AM4 prototype configuration "am4a4" from MDT Atmosphere Working Group.
-Configuration derived from "c96L48_am4a1r1"
-
-- c96 horizontal grid with approximately 100km resolution and 48 vertical levels.
-- Convection based on "double-plume" from Ming Zhao.
-- Tiedtke cloud scheme
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
-
-    </description>
-
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-	 nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a4_c96L48.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_amip.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
-        dt_atmos = 1800,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="1728" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="2:30:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8"   npes="432"  runTimePerJob="00:30:00"/>
-      </regression>
-      <regression name="restarts">
-        <run days="4 4" npes="864"  runTimePerJob="00:30:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1" npes="432"  runTimePerJob="02:00:00"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00"/>
-        <run months="1" npes="1152" runTimePerJob="00:45:00"/>
-        <run months="1" npes="1728" runTimePerJob="00:45:00"/>
-        <run months="1" npes="2304" runTimePerJob="00:30:00"/>
-        <run months="1" npes="3456" runTimePerJob="00:30:00"/>
-      </regression>
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-
-
-  <experiment name="c192L48_am4a4" inherit="cm4p4_v20150313">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
-communityExperimentName="$(name)" 
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
-
-AM4 prototype configuration "am4a4" from MDT Atmosphere Working Group.
-Configuration derived from "c192L48_am4a1r1"
-
-- c192 horizontal grid with approximately 50km resolution and 48 vertical levels.
-- Convection based on "double-plume" from Ming Zhao.
-- Tiedtke cloud scheme
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
-
-    </description>
-
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-         nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a4_c192L48.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_amip.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
-        dt_atmos = 1200,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c192_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c192L48_initCond']/input/node())"/>
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="4608" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="5:20:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8" npes="864" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="restarts">
-        <run days="4 4" npes="1152" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1"   npes="864"  runTimePerJob="02:30:00"/> 
-        <run months="1"   npes="1152" runTimePerJob="02:00:00"/> 
-        <run months="1"   npes="2304" runTimePerJob="01:30:00"/>
-        <run months="1"   npes="3456" runTimePerJob="01:00:00"/>
-        <run months="1"   npes="4608" runTimePerJob="01:00:00"/>
-        <run months="1"   npes="6912" runTimePerJob="01:00:00"/>
-      </regression>
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c192_amip_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-
-
-
-
-  <experiment name="c96L48_am4b4" inherit="cm4p4_v20150313">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
-communityExperimentName="$(name)" 
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
-
-AM4 prototype alternate closure configuration "am4b4" from MDT Atmosphere Working Group.
-Configuration derived from "c96L48_am4b1r1"
-
-- c96 horizontal grid with approximately 100km resolution and 48 vertical levels.
-- Convection based on "alternate closure" from Leo Donner
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
-
-    </description>
-
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-         nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4b4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4b4_c96L48.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_amip.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
-        dt_atmos = 1200,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="1728" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="3:00:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8"   npes="432"  runTimePerJob="00:30:00"/>
-      </regression>
-      <regression name="restarts">
-        <run days="4 4" npes="864"  runTimePerJob="00:30:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1" npes="432"  runTimePerJob="02:00:00"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00"/>
-        <run months="1" npes="1152" runTimePerJob="00:45:00"/>
-        <run months="1" npes="1728" runTimePerJob="00:45:00"/>
-        <run months="1" npes="2304" runTimePerJob="00:30:00"/>
-        <run months="1" npes="3456" runTimePerJob="00:30:00"/>
-      </regression>
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-
-
-  <experiment name="c192L48_am4b4" inherit="cm4p4_v20150313">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
-communityExperimentName="$(name)" 
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
-
-AM4 prototype alternate closure configuration "am4b4" from MDT Atmosphere Working Group.
-
-c192 horizontal grid with approximately 50km resolution and 48 vertical levels.
-Convection based on "alternate closure" from Leo Donner
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
-
-    </description>
-
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-	 nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4b4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4b4_c192L48.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_amip.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
-        dt_atmos = 1200,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c192_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c192L48_initCond']/input/node())"/>
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="4608" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="6:00:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8" npes="864" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="restarts">
-        <run days="4 4" npes="1152" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1"   npes="864"  runTimePerJob="02:30:00"/> 
-        <run months="1"   npes="1152" runTimePerJob="02:00:00"/> 
-        <run months="1"   npes="2304" runTimePerJob="01:30:00"/>
-        <run months="1"   npes="3456" runTimePerJob="01:00:00"/>
-        <run months="1"   npes="4608" runTimePerJob="01:00:00"/>
-        <run months="1"   npes="6912" runTimePerJob="01:00:00"/>
-      </regression>
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c192_amip_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-
-
-
-
-
-  <experiment name="c96L32_am4f4" inherit="cm4p4_v20150313">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
-communityExperimentName="$(name)" 
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
-
-AM4 prototype configuration "am4f4" from MDT Atmosphere Working Group.
+AM4 prototype configuration "am4g5" from MDT Atmosphere Working Group.
+Derived from "am4f4", but with code modifications from Paul Ginoux, Ming Zhao, and John Wilson.
 
 - c96 horizontal grid with approximately 100km resolution and 32 vertical levels.
 - Convection based on "double-plume" from Ming Zhao.
@@ -1785,10 +1173,10 @@ Experiment name = $(name)
       </namelist>
       <!-- Namelist -->
       <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_c96L32.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_amip.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_amip.nml"/>
       <namelist name="coupler_nml">
         months = $months,
         days   = $days,
@@ -1804,9 +1192,10 @@ Experiment name = $(name)
         atmos_nthreads = $atmos_nthreads
       </namelist>
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p5_faero']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond']/input/node())"/>
     </input>
@@ -1839,304 +1228,7 @@ Experiment name = $(name)
 
 
 
-  <experiment name="c192L32_am4f4" inherit="cm4p4_v20150313">
 
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
-communityExperimentName="$(name)" 
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
-
-AM4 prototype configuration "am4f4" from MDT Atmosphere Working Group.
-
-- c192 horizontal grid with approximately 50km resolution and 32 vertical levels.
-- Convection based on "double-plume" from Ming Zhao.
-- Tiedtke cloud scheme
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
-
-Note that this experiment is NOT finally tuned, it is possible that radiation is out of balance.
-
-    </description>
-
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-         nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_c192L32.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_amip.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
-        dt_atmos = 1200,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c192_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c192L32_initCond']/input/node())"/>
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="4608" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="4:00:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8" npes="864" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="restarts">
-        <run days="4 4" npes="1152" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1"   npes="864"  runTimePerJob="02:30:00"/> 
-        <run months="1"   npes="1152" runTimePerJob="02:00:00"/> 
-        <run months="1"   npes="2304" runTimePerJob="01:30:00"/>
-        <run months="1"   npes="3456" runTimePerJob="01:00:00"/>
-        <run months="1"   npes="4608" runTimePerJob="01:00:00"/>
-        <run months="1"   npes="6912" runTimePerJob="01:00:00"/>
-      </regression>
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c192_amip_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-
-
-
-
-
-
-  <experiment name="c96L48_am4f4" inherit="cm4p4_v20150313">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
-communityExperimentName="$(name)" 
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
-
-AM4 prototype configuration "am4f4" from MDT Atmosphere Working Group.
-
-- c96 horizontal grid with approximately 100km resolution and 48 vertical levels.
-- Convection based on "double-plume" from Ming Zhao.
-- Tiedtke cloud scheme
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
-
-    </description>
-
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-         nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_c96L48.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_amip.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
-        dt_atmos = 1800,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="1728" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="2:30:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8"   npes="432"  runTimePerJob="00:30:00"/>
-      </regression>
-      <regression name="restarts">
-        <run days="4 4" npes="864"  runTimePerJob="00:30:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1" npes="432"  runTimePerJob="02:00:00"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00"/>
-        <run months="1" npes="1152" runTimePerJob="00:45:00"/>
-        <run months="1" npes="1728" runTimePerJob="00:45:00"/>
-        <run months="1" npes="2304" runTimePerJob="00:30:00"/>
-        <run months="1" npes="3456" runTimePerJob="00:30:00"/>
-      </regression>
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-
-
-
-  <experiment name="c192L48_am4f4" inherit="cm4p4_v20150313">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
-communityExperimentName="$(name)" 
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
-
-AM4 prototype configuration "am4f4" from MDT Atmosphere Working Group.
-
-- c192 horizontal grid with approximately 50km resolution and 48 vertical levels.
-- Convection based on "double-plume" from Ming Zhao.
-- Tiedtke cloud scheme
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
-
-Note that this experiment is NOT finaly tuned, it is possible that radiation is out of balance.
-
-    </description>
-
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-         nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_c192L48.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_amip.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
-        dt_atmos = 1200,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c192_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c192L48_initCond']/input/node())"/>
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="4608" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="5:20:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8" npes="864" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="restarts">
-        <run days="4 4" npes="1152" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1"   npes="864"  runTimePerJob="02:30:00"/> 
-        <run months="1"   npes="1152" runTimePerJob="02:00:00"/> 
-        <run months="1"   npes="2304" runTimePerJob="01:30:00"/>
-        <run months="1"   npes="3456" runTimePerJob="01:00:00"/>
-        <run months="1"   npes="4608" runTimePerJob="01:00:00"/>
-        <run months="1"   npes="6912" runTimePerJob="01:00:00"/>
-      </regression>
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c192_amip_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
 
 
 
@@ -2144,18 +1236,18 @@ Experiment name = $(name)
 <!--= CLIMO EXPERIMENTS =-->
 <!--=====================-->
 
-  <experiment name="c96L32_am4a4_2000climo" inherit="cm4p4_v20150313">
+  <experiment name="c96L32_am4g5_2000climo" inherit="cm4p5_v20150511">
 
 <!-- MDBI -->
     <description
 communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
+communityModel="am4p5" 
+communityModelID="am4p5"
 communityExperimentName="$(name)" 
 communityExperimentID="$(name)" >
 <!-- /MDBI -->
 
-Same model as c96L32_am4a4, but
+Same model as c96L32_am4g5, but
 configuration with present-day climatological SSTs, present-day GHGs and aerosols.
 
     </description>
@@ -2182,10 +1274,10 @@ Experiment name = $(name)
       </namelist>
       <!-- Namelist -->
       <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a4_c96L32.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_2000climo.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_2000climo.nml"/>
       <namelist name="coupler_nml">
         months = $months,
         days   = $days,
@@ -2201,218 +1293,10 @@ Experiment name = $(name)
         atmos_nthreads = $atmos_nthreads
       </namelist>
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p5_faero']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond']/input/node())"/>
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="1728" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="1:30:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8"   npes="432"  runTimePerJob="00:30:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1" npes="432"  runTimePerJob="02:00:00"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00"/>
-        <run months="1" npes="1152" runTimePerJob="00:45:00"/>
-        <run months="1" npes="1728" runTimePerJob="00:45:00"/>
-        <run months="1" npes="2304" runTimePerJob="00:30:00"/>
-        <run months="1" npes="3456" runTimePerJob="00:30:00"/>
-      </regression>
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-
-  <experiment name="c96L32_am4a4_1860climo" inherit="c96L32_am4a4_2000climo">
-    <description>
-Same model as c96L32_am4a4_2000climo, but
-configuration with present-day climatological SSTs, but pre-industrial GHGs and aerosols.
-    </description>
-    <input>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_1860climo.nml"/>
-    </input>
-  </experiment>
-
-  <experiment name="c96L32_am4a4_2000aero" inherit="c96L32_am4a4_2000climo">
-    <description>
-Same model as c96L32_am4a4_2000climo, but
-configuration with present-day climatological SSTs, pre-industrial GHGs and present-day aerosols.
-    </description>
-    <input>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_2000aero.nml"/>
-    </input>
-  </experiment>
-
-  <experiment name="c96L32_am4a4_2000climo_p2K" inherit="c96L32_am4a4_2000climo">
-    <description>
-Same model as c96L32_am4a4_2000climo, but
-configuration with present-day climatological SSTs + 2K, present-day GHGs and aerosols.
-    </description>
-    <input>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_2000climo_p2K.nml"/>
-    </input>
-  </experiment>
-
-
-
-  <experiment name="c96L48_am4f3_2000climo" inherit="cm4p4_v20150313">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
-communityExperimentName="$(name)" 
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
-
-Same model as c96L48_am4f3, but
-configuration with present-day climatological SSTs, present-day GHGs and aerosols.
-
-    </description>
-
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_CLIMO_START)"
-      endTime="$(EXP_CLIMO_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-         nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4f3_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4f3_c96L48.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_2000climo.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1,1,1,0,0,0,
-        calendar = 'noleap'
-        dt_atmos = 1200,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
-    </input>
-
-    <runtime>
-      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="1728" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="3:00:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8"   npes="432"  runTimePerJob="00:30:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1" npes="432"  runTimePerJob="02:00:00"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00"/>
-        <run months="1" npes="1152" runTimePerJob="00:45:00"/>
-        <run months="1" npes="1728" runTimePerJob="00:45:00"/>
-        <run months="1" npes="2304" runTimePerJob="00:30:00"/>
-        <run months="1" npes="3456" runTimePerJob="00:30:00"/>
-      </regression>
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-
-
-
-
-  <experiment name="c96L32_am4f4_2000climo" inherit="cm4p4_v20150313">
-
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4p4" 
-communityModelID="am4p4"
-communityExperimentName="$(name)" 
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
-
-Same model as c96L32_am4f4, but
-configuration with present-day climatological SSTs, present-day GHGs and aerosols.
-
-    </description>
-
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_CLIMO_START)"
-      endTime="$(EXP_CLIMO_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-         nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4f4_c96L32.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_2000climo.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1,1,1,0,0,0,
-        calendar = 'noleap'
-        dt_atmos = 1800,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond']/input/node())"/>
     </input>
@@ -2440,33 +1324,33 @@ Experiment name = $(name)
 
   </experiment>
 
-  <experiment name="c96L32_am4f4_1860climo" inherit="c96L32_am4f4_2000climo">
+  <experiment name="c96L32_am4g5_1860climo" inherit="c96L32_am4g5_2000climo">
     <description>
-Same model as c96L32_am4f4_2000climo, but
+Same model as c96L32_am4g5_2000climo, but
 configuration with present-day climatological SSTs, but pre-industrial GHGs and aerosols.
     </description>
     <input>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_1860climo.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_1860climo.nml"/>
     </input>
   </experiment>
 
-  <experiment name="c96L32_am4f4_2000aero" inherit="c96L32_am4f4_2000climo">
+  <experiment name="c96L32_am4g5_2000aero" inherit="c96L32_am4g5_2000climo">
     <description>
-Same model as c96L32_am4f4_2000climo, but
+Same model as c96L32_am4g5_2000climo, but
 configuration with present-day climatological SSTs, pre-industrial GHGs and present-day aerosols.
     </description>
     <input>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_2000aero.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_2000aero.nml"/>
     </input>
   </experiment>
 
-  <experiment name="c96L32_am4f4_2000climo_p2K" inherit="c96L32_am4f4_2000climo">
+  <experiment name="c96L32_am4g5_2000climo_p2K" inherit="c96L32_am4g5_2000climo">
     <description>
-Same model as c96L32_am4f4_2000climo, but
+Same model as c96L32_am4g5_2000climo, but
 configuration with present-day climatological SSTs + 2K, present-day GHGs and aerosols.
     </description>
     <input>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_2000climo_p2K.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_2000climo_p2K.nml"/>
     </input>
   </experiment>
 
