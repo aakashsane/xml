@@ -12,7 +12,7 @@
 # To check out codes and compile:
 # for target option "-t openmp", the default is prod-openmp
 module load fre/bronx-9
-fremake -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp cm4_libs_compile
+fremake -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp cm4_libs_compile -nolink
 SIS:
 fremake -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp cm4_compile
 SIS2:
@@ -37,7 +37,7 @@ inputfiles -x CM4_am4p4.xml -p ncrc2.intel CM4_c96L32_am4f4_2000
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <property name="RELEASE" value="ulm"/>                <!-- CVS tag for source code -->
-  <property name="MOM6_DATE" value="2015.04.24"/>                  <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE" value="2015.05.19"/>                  <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_p5_20150511"/>          <!-- git tag for AWG  source code -->
   <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
@@ -949,6 +949,15 @@ else if ( "$npes" == "3456" ) then
   set ocean_layout =   "144,6";  set ocean_io_layout =  "1,3"
   set ice_layout   =   "144,6";  set ice_io_layout   =  "1,3"
 
+else if ( "$npes" == "3458" ) then
+  set atmos_npes = "432"
+  set atmos_nthreads = "8"
+  set nxblocks = "4" ; set nyblocks = "2"
+  set fv_layout    =   "3,24";  set fv_io_layout    =  "1,4"
+  set land_layout  =   "3,24";  set land_io_layout  =  "1,4"
+  set ocean_layout =   "144,3"; set ocean_io_layout =  "1,3"
+  set ice_layout   =   "144,3"; set ice_io_layout   =  "1,3"
+
 else if ( "$npes" == "3470" ) then
   set atmos_npes = "864"
   set atmos_nthreads = "2"
@@ -969,6 +978,14 @@ else if ( "$npes" == "4608" ) then
   set ocean_layout =   "144,4"; set ocean_io_layout =  "1,4"
   set ice_layout   =   "144,4"; set ice_io_layout   =  "1,4"
 
+else if ( "$npes" == "4609" ) then
+  set atmos_npes = "1152"
+  set atmos_nthreads = "4"
+  set nxblocks = "2" ; set nyblocks = "2" 
+  set fv_layout    =   "12,16"; set fv_io_layout    =  "1,4"
+  set land_layout  =   "12,16"; set land_io_layout  =  "1,4"
+  set ocean_layout =   "144,8"; set ocean_io_layout =  "1,4"
+  set ice_layout   =   "144,8"; set ice_io_layout   =  "1,4"
 
 #FATAL from PE  4524: Domain Decomposition:  Cubed Sphere compute domain has a minium requirement of 4 points in X and Y
 #This means components of fv_layout for c96 could at most be 96/4=24
@@ -1339,6 +1356,16 @@ else if ( "$npes" == "2432" ) then
   set ocn_layout   =   "36,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.622.36x72"
   set ocean_npes = "1970"
 
+else if ( "$npes" == "4672" ) then
+  set atmos_npes = "432"
+  set atmos_nthreads = "2"
+  set nxblocks = "1" ; set nyblocks = "2" 
+  set fv_layout    =   "3,24";  set fv_io_layout    =  "1,4"
+  set land_layout  =   "3,24";  set land_io_layout  =  "1,4"
+  set ice_layout   =   "144,3"; set ice_io_layout   =  "1,3"
+  set ocn_layout   =   "72,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.1402.72x72"
+  set ocean_npes = "3782"
+
 else if ( "$npes" == "2560" ) then
   set atmos_npes = "288"
   set atmos_nthreads = "2"
@@ -1348,6 +1375,17 @@ else if ( "$npes" == "2560" ) then
   set ice_layout   =   "72,4";  set ice_io_layout   =  "1,4"
   set ocn_layout   =   "36,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.622.36x72"
   set ocean_npes = "1970"
+
+else if ( "$npes" == "4960" ) then
+  set atmos_npes = "576"
+  set atmos_nthreads = "2"
+  set nxblocks = "1" ; set nyblocks = "2"
+  set fv_layout    =   "8,12";  set fv_io_layout    =  "1,4"
+  set land_layout  =   "8,12";  set land_io_layout  =  "1,4"
+  set ice_layout   =   "144,4"; set ice_io_layout   =  "1,4"
+  set ocn_layout   =   "72,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.1402.72x72"
+  set ocean_npes = "3782"
+
 
 else if ( "$npes" == "2880" ) then
   set atmos_npes = "216"
@@ -1428,6 +1466,18 @@ else if ( "$npes" == "6975" ) then
   set ice_layout   =   "144,8"; set ice_io_layout   =  "2,4"
   set ocn_layout   =   "90,72"; set ocn_io_layout   =  "2,4"; set ocn_mask_table = "mask_table.1809.90x72"
   set ocean_npes   = "4671"
+
+
+else if ( "$npes" == "6400" ) then
+  set atmos_npes = "864"
+  set atmos_nthreads = "2"
+  set nxblocks = "1" ; set nyblocks = "2" 
+  set fv_layout    =   "12,12"; set fv_io_layout    =  "2,4"
+  set land_layout  =   "12,12"; set land_io_layout  =  "2,4"
+  set ice_layout   =   "72,12"; set ice_io_layout   =  "2,4"
+  set ocn_layout   =   "90,72"; set ocn_io_layout   =  "2,4"; set ocn_mask_table = "mask_table.1809.90x72"
+  set ocean_npes   = "4671"
+
 
 ####Experimental setups
 else if ( "$npes" == "1600_1" ) then
@@ -2424,9 +2474,12 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         <run days="4 4" npes="432" overrideParams="xgrid_nml:make_exchange_reproduce=.true."  runTimePerJob="02:30:00"/>
       </regression>
       
+      <regression name="debug">
+        <run days="1" npes="3458"  runTimePerJob="02:30:00"/>
+      </regression>
+      
       <regression name="timing">
-        <run months="1" npes="9216"  runTimePerJob="00:30:00"/>
-        <run months="1" npes="9217"  runTimePerJob="00:30:00"/>
+        <run months="1" npes="4609"  runTimePerJob="00:30:00"/>
       </regression>
 
       <regression name="timings">
@@ -2590,7 +2643,7 @@ For more information please refer to the
     </input>
 
     <runtime>
-      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="2560" runTime="12:00:00">
+      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="2432" runTime="12:00:00">
         <segment simTime="12" units="months" runTime="12:00:00"/>
       </production>
       <regression name="basic">
@@ -2612,7 +2665,7 @@ For more information please refer to the
       </regression>
 
       <regression name="timing">
-        <run months="1" npes="1376" runTimePerJob="01:00:00"/>
+        <run months="1" npes="4672" runTimePerJob="01:00:00"/>
       </regression>
 
       <regression name="timingsL32">
@@ -4135,9 +4188,6 @@ $baseDate
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_atmos</dataSource>
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_atmos_fullchemOnly_v20140325</dataSource>
-      </dataFile>
-      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land</dataSource>
       </dataFile>
     </input>
@@ -4590,6 +4640,40 @@ Do not use it for science!!!
      </input>
   </experiment>
 
+<experiment name="CM4_c96L32_am4g5_2000_sis2_EPBL" inherit="CM4_c96L32_am4g5_2000_sis2">
+								       
+   <input>
+      <csh type="always"><![CDATA[
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
+else
+   set restart_flag = 'r'
+endif
+
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+
+####COMMON ALWAYS CSH ENDS######
+
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_KPP = False
+#override ENERGETICS_SFC_PBL = True
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
 
 <experiment name="CM4_c96L32_am4g5_2000_sis2" inherit="cm4_sis2_compile">
     <description
@@ -4692,6 +4776,10 @@ For more information please refer to the
 
       <regression name="debug">
         <run days="1" npes="1584" runTimePerJob="02:00:00"/>
+      </regression>
+
+      <regression name="timing">
+        <run months="1" npes="6400" runTimePerJob="01:00:00"/>
       </regression>
 
       <regression name="timingsL32">
