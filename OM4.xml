@@ -19,7 +19,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2015.04.24"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2015.05.19"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="FRE_VERSION"  value="fre/bronx-9"/>
@@ -1104,6 +1104,110 @@ OVERRIDE_EOF
    </input>
 
 </experiment>
+
+<experiment name="OM4_SIS2_EPBL" inherit="OM4_SIS2_baseline">
+   <input>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_KPP = False
+#override ENERGETICS_SFC_PBL = True
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="OM4_SIS2_EPBL_mstar_1.5" inherit="OM4_SIS2_baseline">
+   <input>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_KPP = False
+#override ENERGETICS_SFC_PBL = True
+#override MSTAR = 1.5
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="OM4_SIS2_EPBL_mstar_10" inherit="OM4_SIS2_baseline">
+   <input>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_KPP = False
+#override ENERGETICS_SFC_PBL = True
+#override MSTAR = 10.
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="OM4_SIS2_EPBL_nstar_0.1" inherit="OM4_SIS2_baseline">
+   <input>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_KPP = False
+#override ENERGETICS_SFC_PBL = True
+#override NSTAR = 0.1
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="OM4_SIS2_EPBL_nstar_0.3" inherit="OM4_SIS2_baseline">
+   <input>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_KPP = False
+#override ENERGETICS_SFC_PBL = True
+#override NSTAR = 0.3
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="OM4_SIS2_EPBL_MtoT_0.1" inherit="OM4_SIS2_baseline">
+   <input>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_KPP = False
+#override ENERGETICS_SFC_PBL = True
+#override MKE_TO_TKE_EFFIC = 0.1 
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="OM4_SIS2_EPBL_TKEdecay_10" inherit="OM4_SIS2_baseline">
+   <input>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_KPP = False
+#override ENERGETICS_SFC_PBL = True
+#override TKE_DECAY = 10.0 
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="OM4_SIS2_EPBL_use_omega" inherit="OM4_SIS2_baseline">
+   <input>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_KPP = False
+#override ENERGETICS_SFC_PBL = True
+#override ML_USE_OMEGA = True 
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
 
 <experiment name="OM4_SIS_noBG" inherit="OM4_SIS_baseline">
 <!--The following description tags are needed to put the experiment in the MDBI-->
