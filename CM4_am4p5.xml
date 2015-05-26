@@ -26,18 +26,18 @@ frerun -r basic -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4g5_
 
 # To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
 SIS:
-frerun -x CM4_am4p4.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4f4_2000
+frerun -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4g5_2000
 SIS2
-frerun -x CM4_am4p4.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4f4_2000_sis2
+frerun -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4g5_2000_sis2
 
 # To check what is the input data of this experiment:
-inputfiles -x CM4_am4p4.xml -p ncrc2.intel CM4_c96L32_am4f4_2000
+inputfiles -x CM4_am4p5.xml -p ncrc2.intel CM4_c96L32_am4f4_2000
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <property name="RELEASE" value="ulm"/>                <!-- CVS tag for source code -->
-  <property name="MOM6_DATE" value="2015.05.19"/>                  <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE" value="2015.05.23"/>                  <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_p5_20150511"/>          <!-- git tag for AWG  source code -->
   <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
@@ -81,8 +81,8 @@ from integrations with these models.
 -->
 
   <property name="EXP_CLIMO_START" value="0001"/>
-  <property name="EXP_CLIMO_END"   value="0005"/>
-  <property name="EXP_CLIMO_LEN"   value="5"/>
+  <property name="EXP_CLIMO_END"   value="0100"/>
+  <property name="EXP_CLIMO_LEN"   value="100"/>
   <property name="ANA_CLIMO_START" value="0001"/>
   <property name="ANA_CLIMO_END"   value="0090"/>
   <property name="ANA_CLIMO_LEN"   value="90yr"/>
@@ -4637,6 +4637,24 @@ Do not use it for science!!!
          restart_output_dir = 'RESTART/',
          parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
      </namelist>
+      <namelist name="icebergs_nml">
+        really_debug=.FALSE.
+        debug=.FALSE.
+        verbose=.FALSE.
+        verbose_hrs=7200
+        use_operator_splitting=.TRUE.
+        bergy_bit_erosion_fraction=0.0
+        sicn_shift=0.1
+        parallel_reprod=.TRUE.
+        traj_sample_hrs=0
+        add_weight_to_ocean=.false.
+      </namelist>
+      <namelist name="ocean_albedo_nml">
+            ocean_albedo_option = 5
+      </namelist>
+      <namelist name="ocean_rough_nml">
+            rough_scheme = 'beljaars'
+      </namelist>
      </input>
   </experiment>
 
