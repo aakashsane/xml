@@ -1554,7 +1554,6 @@ endif
      </dataFile>                                                                                     
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">                         
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/MOM_input</dataSource> 
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/MOM_override</dataSource>
      </dataFile>                                                                                       
 
       <!--gridSpec mosaic datasets-->
@@ -1741,6 +1740,91 @@ endif
     </postProcess>
 
 </experiment>
+
+<experiment name="MOM6_GOLD_SIS_generic_CFC" inherit="MOM6_GOLD_SIS">
+   <input>
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1970,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'NOLEAP',
+       dt_cpld  = 7200,
+       dt_atmos = 7200,
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.true.
+     </namelist>
+         <namelist name="generic_tracer_nml">
+       do_generic_tracer=.true.
+       do_generic_CFC=.true.
+       do_generic_COBALT=.false.
+       do_generic_TOPAZ=.false.
+         </namelist>
+
+      <diagTable order="append">
+#================
+# Additional DIAGNOSTICS
+#================
+#
+#==================
+# GENERIC TRACERS
+#==================
+#
+## tracer quantities
+"generic_tracers",          1,  "days", 1, "days", "time",
+"generic_cfc","cfc_11",     "cfc_11",     "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc_12",     "cfc_12",     "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc_11_stf", "cfc_11_stf", "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc_12_stf", "cfc_12_stf", "generic_tracers","all",.true.,"none",2
+
+      </diagTable>
+
+     <csh>
+        <![CDATA[
+#
+# Copy MOM6 input files needed for postprocessing  to GFDL (waiting for FRE to do this for us)
+#
+set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
+if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
+  #trick to copy MOM6 directory but avoid traversing the .datasets links
+  tar cvf mom6.tar --exclude='.datasets' -C $(MOM6_EXAMPLES) . > /dev/null
+  #tar cvf mom6.tar  --exclude='.datasets' --exclude='src' --exclude='INPUT'  -C $(MOM6_EXAMPLES) . > /dev/null
+  mkdir mom6
+  tar xvf mom6.tar -C ./mom6 > /dev/null
+  if ("${platform_domain}" == "ncrc.gov") then
+    gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
+  else if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
+    gcp -cd -r --sync mom6 gfdl:$(NB_ROOT)/
+  endif
+endif
+
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_OCMIP2_CFC = False
+USE_generic_tracer = True
+GENERIC_TRACER_IC_FILE = "MOM_GENERIC_CFC_IC.res.nc"
+OVERRIDE_EOF
+
+#Add null CFC's to a restart file
+cd $work/INPUT
+ncap -O --script 'cfc_11 = ptemp * 0.0 ; cfc_12 = ptemp * 0.0' GOLD_IC.2010.11.15.nc MOM_GENERIC_CFC_IC.res.nc
+#CFC is constant_init_tracer so the ice fluxes are not needed.
+\rm ice_ocmip2_cfc.res.nc
+
+     ]]></csh>
+
+   </input>
+
+</experiment>
+
+
 
 <experiment name="OM4_SIS_non_aggr" inherit="OM4_SIS_baseline">
 <description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
