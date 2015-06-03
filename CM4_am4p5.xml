@@ -37,7 +37,7 @@ inputfiles -x CM4_am4p5.xml -p ncrc2.intel CM4_c96L32_am4f4_2000
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <property name="RELEASE" value="ulm"/>                <!-- CVS tag for source code -->
-  <property name="MOM6_DATE" value="2015.05.23"/>                  <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE" value="2015.05.27"/>                  <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_p5_20150511"/>          <!-- git tag for AWG  source code -->
   <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
@@ -80,12 +80,12 @@ have not yet been documented in the peer-reviewed literature, as well as outputs
 from integrations with these models.
 -->
 
-  <property name="EXP_CLIMO_START" value="0001"/>
-  <property name="EXP_CLIMO_END"   value="0100"/>
-  <property name="EXP_CLIMO_LEN"   value="100"/>
-  <property name="ANA_CLIMO_START" value="0001"/>
-  <property name="ANA_CLIMO_END"   value="0090"/>
-  <property name="ANA_CLIMO_LEN"   value="90yr"/>
+  <property name="EXP_CLIMO_START"  value="0001"/>
+  <property name="EXP_CLIMO_END"    value="0020"/>
+  <property name="EXP_CLIMO_LEN"    value="20"/>
+  <property name="ANA_CLIMO_START"  value="0001"/>
+  <property name="ANA_CLIMO_END"    value="0020"/>
+  <property name="ANA_CLIMO_LEN"    value="20yr"/>
   <property name="PP_CLIMO_CHUNK"   value="5yr"/>
   <property name="PP_CLIMO_CHUNK_B" value="20yr"/>
   <property name="PP_OCEAN_CHUNK"   value="5yr"/> 
@@ -492,15 +492,15 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
 
     <component name="mom6" requires="fms ocean_shared" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/">
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
-      <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/github_mirror">
+      <source versionControl="git" root="http://github.com">
         <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase>
         <csh>
-          git clone -b $(MOM6_GIT_TAG) http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6-examples.git mom6
+          git clone -b $(MOM6_GIT_TAG) http://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
-          git submodule init src/MOM6  tools/python/025gridGeneration/MIDAS
-          git clone --recursive http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6.git src/MOM6
-          git clone             http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-sis2.git src/SIS2
+          git submodule init src/MOM6 src/SIS2 tools/python/025gridGeneration/MIDAS
+          git clone --recursive http://github.com/NOAA-GFDL/MOM6.git src/MOM6 
+          git clone             http://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git submodule update #This gets the right version of submodules
           popd
 

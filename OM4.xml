@@ -19,7 +19,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2015.05.19"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2015.05.27"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="FRE_VERSION"  value="fre/bronx-9"/>
@@ -243,15 +243,15 @@ Make the executable for ocean-ice experiments.
 
       <component name="mom6" requires="fms ocean_shared" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/">
          <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/github_mirror">
+         <source versionControl="git" root="http://github.com">
         <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase>
         <csh>
-          git clone -b $(MOM6_GIT_TAG) http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6-examples.git mom6
+          git clone -b $(MOM6_GIT_TAG) http://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
           git submodule init src/MOM6 src/SIS2 tools/python/025gridGeneration/MIDAS
-          git clone --recursive http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-mom6.git src/MOM6 
-          git clone             http://gitlab.gfdl.noaa.gov/github_mirror/noaa-gfdl-sis2.git src/SIS2
+          git clone --recursive http://github.com/NOAA-GFDL/MOM6.git src/MOM6 
+          git clone             http://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git submodule update #This gets the right version of submodules
           popd
 
@@ -1112,6 +1112,7 @@ OVERRIDE_EOF
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override USE_KPP = False
 #override ENERGETICS_SFC_PBL = True
+#override BT_USE_VISC_REM_U_UH0 = False
 OVERRIDE_EOF
      ]]></csh>
    </input>
@@ -1945,6 +1946,12 @@ OVERRIDE_EOF
        max_input_fields = 699
        max_output_fields = 699
        mix_snapshot_average_fields=.false.
+         </namelist>
+         <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 6500000
+            stack_size =0
          </namelist>
 
       <fieldTable>
