@@ -89,8 +89,8 @@ from integrations with these models.
 -->
 
   <property name="EXP_CPLD_START"   value="0001"/>
-  <property name="EXP_CPLD_END"     value="0050"/>
-  <property name="EXP_CPLD_LEN"     value="50"/>
+  <property name="EXP_CPLD_END"     value="0060"/>
+  <property name="EXP_CPLD_LEN"     value="60"/>
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/>
 
@@ -4891,23 +4891,21 @@ OVERRIDE_EOF
    </input>
 </experiment>
 
- 
-  <experiment name="faste2e" inherit="CM4_c96L32_am4g5_2000_sis2_EPBL1.2">
+  <experiment name="faste2e" inherit="CM4_c96L32_am4g5_2000_sis2">
     <description
 communityProject="GFDL-Niki.Zadeh" 
-communityModel="CM4_c96L32_am4g5_2000_sis2_EPBL1.2 re-post-processed $(FRE_VERSION)" 
-communityModelID="CM4_c96L32_am4g5_2000_sis2_EPBL1.2"
+communityModel="CM4_c96L32_am4g5_2000_sis2_meke_dEddParameters_1_ELASTIC_KPP10_BT_2 re-post-processed $(FRE_VERSION)" 
+communityModelID="CM4_c96L32_am4g5_2000_sis2_meke_dEddParameters_1_ELASTIC_KPP10_BT_2"
 communityExperimentName="$(name)">
 This  is an experiment to simulate the post-processing of any experiment given the history data on gfdl archive.
 
 This is designed for the purposes of quicklly testing post-processing workflow for existing history data ( that would otherwise require too much time and compute resources to regenerate from scratch).
 
-
 This instance was run with fre version $(FRE_VERSION) initiating on $(platform)
-      
+
     </description>
     <communityComment>
-The &lt;a href="http://cobweb.gfdl.noaa.gov:8080/mdbi/index.jsp#exper_id_DtnV9WYu8n"&gt; original experiment &lt;/a&gt; was run by Bonnie Samuels on $(platform) with code tag $(FRE_STEM)
+The &lt;a href=""&gt; original experiment &lt;/a&gt; was run by Bill Hurlin on $(platform)
 
 For more information on CM4 coupled models please refer to the
 &lt;a href="http://wiki.gfdl.noaa.gov/index.php/MDT_Coupled"&gt; Coupled Working Group Wiki.  &lt;/a&gt;
@@ -4932,6 +4930,16 @@ For more information on CM4 coupled models please refer to the
       <csh type="always">
         <![CDATA[
 #NOT TO BE USED WITH REGULAR FRE RUNS!! ONLY FOR TESTING!!
+
+cat > $work/additional_setup << link_hist_EOF
+\rm -rf /archive/Niki.Zadeh/$(FRE_STEM)/$(name)/gfdl.ncrc2-intel-prod-openmp/history/\$firstDate.nc.tar
+ln -s  /archive/Bill.Hurlin/$(FRE_STEM)/CM4_c96L32_am4g5_2000_sis2_meke_dEddParameters_1_ELASTIC_KPP10_BT_2/gfdl.ncrc2-intel-prod-openmp/history/\$firstDate.nc.tar /archive/Niki.Zadeh/$(FRE_STEM)/$(name)/gfdl.ncrc2-intel-prod-openmp/history/
+link_hist_EOF
+
+chmod +x $work/additional_setup
+gcp $work/additional_setup gfdl:$(NB_ROOT)/mom6/
+
+
 #Override the runCommand 
 unalias runCommand
 @ currentSegp1 = $currentSeg + 1
