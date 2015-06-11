@@ -1,16 +1,43 @@
 <?xml version="1.0"?>
 <!-- MDT XML version 20140522 -->
 
-<!-- GFDL Model Development Team (MDT) documentation: http://cobweb.gfdl.noaa.gov/~niz/mdt/ -->
+<!--
+GFDL FAIR USE POLICY
+
+GFDL recognizes the essential nature of collaboration in the scientific
+enterprise, including the importance of novel application and analysis of our
+models. In order to maximize mutual benefit from collaboration, the use of
+experimental GFDL models** should be done in a manner that ensures that
+individuals involved in model development receive proper credit for their
+work; in order to minimize the potential for misapplication of experimental
+models, collaborations should actively engage model developers. Publication of
+results using experimental GFDL models should be done in consultation with
+scientists that participated in the model development. Consultation with GFDL
+model developers should occur before submission of publications based on
+experimental GFDL models, and should include agreement on the appropriate level
+of acknowledgment, co-authorship and participation by the model developers.
+Since experimental models have not been thoroughly vetted, experimental GFDL
+models and their output should be distributed only after consultation with the
+developers of the model. After a GFDL model has been described in a
+peer-reviewed publication it is no longer experimental, and results based on
+the model should cite the publication(s) describing the model.
+ 
+** "Experimental GFDL models" refers to models (e.g., a coupled climate model),
+model components (e.g., parameterization schemes), model configurations (e.g.,
+the specific arrangement and parameter settings of model components) arising
+from model development efforts at GFDL, but whose formulation and configuration
+have not yet been documented in the peer-reviewed literature, as well as outputs
+from integrations with these models.
+-->
+
+<!-- GFDL Model Development Team (MDT) documentation: http://wiki.gfdl.noaa.gov/index.php/MDT_Coupled -->
 <!-- GFDL MDT Atmosphere Working Group (AWG) documentation: http://cobweb.gfdl.noaa.gov/~cjg/awg/ -->
 
 <!-- QUICK START GUIDE:
 
-# Change YOURGROUPLETTER to your group, such as f, w, o...
-      <project>gfdl_YOURGROUPLETTER</project>
+# Change the occcurances of YOURGROUPLETTER in this file to your group letter (small), such as f, w, o, g+,...
 
 # To check out codes and compile:
-# for target option "-t openmp", the default is prod-openmp
 module load fre/bronx-9
 fremake -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp cm4_libs_compile -nolink
 SIS:
@@ -44,60 +71,42 @@ NOTES:
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
-  <property name="RELEASE" value="ulm"/>                <!-- CVS tag for source code -->
-  <property name="MOM6_DATE" value="2015.05.27"/>                  <!-- git tag date for MOM6 source code -->
+  <!--User shoould set the following properties according to the plan for the production run-->	
+  <property name="RELEASE"      value="ulm"/>              <!-- Release tag for the shared source code -->
+  <property name="MOM6_DATE"    value="2015.06.03"/>      <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
-  <property name="AWG_GIT_TAG"  value="awg_p5_20150511"/>          <!-- git tag for AWG  source code -->
+  <property name="AWG_GIT_TAG"  value="awg_p5_20150511"/> <!-- git tag for AWG  source code -->
+  <property name="ProjectID"    value="MDT"/>             <!-- database top level -->
+
+  <property name="PROD_SIMTIME"     value="60"/>   <!--simulation length in years-->
+  <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
+  <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
+
+  <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
+      and are not needed for the run or post-processing -->   
+  <property name="EXP_CPLD_START"   value="0001"/> <!--simulation start year--> 
+  <property name="EXP_CPLD_END"     value="0060"/> <!--simulation end   year--> 
+  
+  <!--The rest of the properties need not to be changed by the user unless to customize the run-->
+
   <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
-  <property name="FRE_VERSION" value="fre/bronx-9"/>             <!-- -->
-  <property name="ANALYSIS_SWITCH" value="on"/>
+  <property name="FRE_VERSION" value="fre/bronx-9"/>             <!-- fre version to be used -->
+  <property name="ANALYSIS_SWITCH" value="on"/>                  <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
-  <property name="ProjectID"  value="MDT"/>                       <!-- database top level -->
+
+ 
+  <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
+  <property name="reference_tag"   value="ulm_plusAWGp5updates_answers"/>
+                          
   <property name="DEBUGLEVEL" value=""/>
+
+  <!--========================================-->
+  <!--Do not change the rest of the properties-->
+  <!--========================================-->
 
   <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
   <property name="AWG_INPUT_HOME_NESCC" value="awg_include"/>
   <property name="AWG_INPUT_HOME_GFDL" value="/nbhome/$USER/$(FRE_STEM)/$(name)/mdt_xml/awg_include"/>
-
-<!--
-GFDL FAIR USE POLICY
-
-GFDL recognizes the essential nature of collaboration in the scientific
-enterprise, including the importance of novel application and analysis of our
-models. In order to maximize mutual benefit from collaboration, the use of
-experimental GFDL models** should be done in a manner that ensures that
-individuals involved in model development receive proper credit for their
-work; in order to minimize the potential for misapplication of experimental
-models, collaborations should actively engage model developers. Publication of
-results using experimental GFDL models should be done in consultation with
-scientists that participated in the model development. Consultation with GFDL
-model developers should occur before submission of publications based on
-experimental GFDL models, and should include agreement on the appropriate level
-of acknowledgment, co-authorship and participation by the model developers.
-Since experimental models have not been thoroughly vetted, experimental GFDL
-models and their output should be distributed only after consultation with the
-developers of the model. After a GFDL model has been described in a
-peer-reviewed publication it is no longer experimental, and results based on
-the model should cite the publication(s) describing the model.
- 
-** "Experimental GFDL models" refers to models (e.g., a coupled climate model),
-model components (e.g., parameterization schemes), model configurations (e.g.,
-the specific arrangement and parameter settings of model components) arising
-from model development efforts at GFDL, but whose formulation and configuration
-have not yet been documented in the peer-reviewed literature, as well as outputs
-from integrations with these models.
--->
-
-  <property name="EXP_CPLD_START"   value="0001"/>
-  <property name="EXP_CPLD_END"     value="0060"/>
-  <property name="EXP_CPLD_LEN"     value="60"/>
-  <property name="PP_CPLD_CHUNK_A"  value="5yr"/>
-  <property name="PP_CPLD_CHUNK_B"  value="20yr"/>
-
-
-<!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-   <property name="reference_tag"   value="ulm_plusAWGp5updates_answers"/>
-                            
 
 <!--=================-->
 <!--= CHANGING NPES =-->
@@ -105,7 +114,7 @@ from integrations with these models.
 
 <!--
 This xml includes a number of predefined options for the number of PEs.
-Changing the number of PEs can be accomplished by simply 
+Changing the number of PEs can be accomplished by 
 modifying 'npes' and segment 'runTime' in the xml <production> block:
 
       <production simTime="$(EXP_AMIP_LEN)" units="years" npes="1728" runTime="16:00:00">
@@ -2668,7 +2677,7 @@ For more information please refer to the
     </input>
 
     <runtime>
-      <production simTime="$(EXP_CPLD_LEN)" units="years" npes="2432" runTime="12:00:00">
+      <production simTime="$(PROD_SIMTIME)" units="years" npes="2432" runTime="12:00:00">
         <segment simTime="12" units="months" runTime="12:00:00"/>
       </production>
       <regression name="basic">
@@ -3175,7 +3184,7 @@ OVERRIDE_EOF
     </input>
 
     <runtime>
-      <production simTime="$(EXP_CPLD_LEN)" units="years" npes="1792" runTime="15:00:00">
+      <production simTime="$(PROD_SIMTIME)" units="years" npes="1792" runTime="15:00:00">
         <segment simTime="12" units="months" runTime="05:00:00"/>
       </production>
       
@@ -3892,7 +3901,7 @@ OVERRIDE_EOF
     </input>
 
     <runtime>
-      <production simTime="$(EXP_CPLD_LEN)" units="years" npes="1878" runTime="12:00:00">
+      <production simTime="$(PROD_SIMTIME)" units="years" npes="1878" runTime="12:00:00">
         <segment simTime="12" units="months" runTime="03:00:00"/>
       </production>
       <regression name="basic">
@@ -4801,7 +4810,7 @@ For more information please refer to the
     </input>
 
     <runtime>
-        <production simTime="$(EXP_CPLD_LEN)" units="years" npes="2560" runTime="12:00:00">
+        <production simTime="$(PROD_SIMTIME)" units="years" npes="2560" runTime="12:00:00">
           <segment simTime="12" units="months" runTime="6:00:00"/>
         </production>
       <regression name="basic">
@@ -4953,7 +4962,7 @@ alias runCommand 'touch dummy_history_${currentSeg}.nc;touch some_dummy_text.out
       </csh>
      </input>
     <runtime>
-      <production simTime="$(EXP_CPLD_LEN)" units="years" npes="32" runTime="01:00:00">
+      <production simTime="$(PROD_SIMTIME)" units="years" npes="32" runTime="01:00:00">
            <segment simTime="12" units="months" runTime="00:05:00"/>
        </production>
     </runtime>
