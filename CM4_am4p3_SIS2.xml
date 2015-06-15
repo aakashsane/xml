@@ -1,51 +1,6 @@
 <?xml version="1.0"?>
 
 <!-- MDT XML -->
-
-<!-- GFDL Model Development Team (MDT) documentation: http://cobweb.gfdl.noaa.gov/~niz/mdt/ -->
-<!-- GFDL MDT Atmosphere Working Group (AWG) documentation: http://cobweb.gfdl.noaa.gov/~cjg/awg/ -->
-
-<!-- QUICK START GUIDE:
-
-# Change YOURGROUPLETTER to your group, such as f, w, o...
-      <project>gfdl_YOURGROUPLETTER</project>
-
-# To check out codes and compile:
-     
-module load fre/bronx-9
-fremake -x CM4_SIS2.xml -p ncrc2.intel -t prod-openmp cm4_sis2_compile
-
-# To run regression test : 
-frerun -r basic -x CM4_SIS2.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4c3_2000_sis2_meke
-
-# To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
-frerun -x CM4_SIS2.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4c3_2000_sis2_meke
-
-
-#EXTRAs      
-# To run fredb after an experiment is finished to manually add it to the database:
-fredb -x CM4_SIS2.xml -p gfdl.ncrc2-intel -t prod-openmp -n CM4_c96L48_am4c3_2000_sis2_meke
-
-# To check what is the input data of this experiment:
-inputfiles -x CM4_SIS2.xml -p ncrc2.intel
--->
-
-<experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
-
-  <property name="RELEASE" value="ulm"/>                <!-- CVS tag for source code -->
-  <property name="MOM6_DATE" value="2015.04.24"/>                  <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"  value="$(RELEASE)_plus_LowSens_Drag_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
-  <property name="FRE_VERSION" value="fre/bronx-9"/>             <!-- -->
-  <property name="ANALYSIS_SWITCH" value="on"/>
-  <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
-  <property name="ProjectID" value="MDT"/>                       <!-- database top level -->
-  <property name="DEBUGLEVEL" value=""/>
-
-  <property name="AWG_INPUT_HOME_GAEA" value="awg_include"/>
-  <property name="AWG_INPUT_HOME_ZEUS" value="awg_include"/>
-  <property name="AWG_INPUT_HOME_GFDL" value="/nbhome/$USER/$(FRE_STEM)/$(name)/mdt_xml/awg_include"/>
-
 <!--
 GFDL FAIR USE POLICY
 
@@ -75,21 +30,65 @@ have not yet been documented in the peer-reviewed literature, as well as outputs
 from integrations with these models.
 -->
 
-  <property name="EXP_CLIMO_START" value="0001"/>
-  <property name="EXP_CLIMO_END"   value="0060"/>
-  <property name="EXP_CLIMO_LEN"   value="60"/>
-  <property name="ANA_CLIMO_START" value="0001"/>
-  <property name="ANA_CLIMO_END"   value="0010"/>
-  <property name="ANA_CLIMO_LEN"   value="10yr"/>
-  <property name="PP_CLIMO_CHUNK"  value="5yr"/>
-  <property name="PP_CLIMO_CHUNK_B" value="20yr"/>
-  <property name="PP_OCEAN_CHUNK"   value="5yr"/> 
-  <property name="PP_OCEAN_CHUNK_B" value="20yr"/> 
+<!-- GFDL Model Development Team (MDT) documentation: http://wiki.gfdl.noaa.gov/index.php/MDT_Coupled -->
+<!-- GFDL MDT Atmosphere Working Group (AWG) documentation: http://cobweb.gfdl.noaa.gov/~cjg/awg/ -->
+
+<!-- QUICK START GUIDE:
+
+# Change the occcurances of YOURGROUPLETTER in this file to your group letter (small), such as f, w, o, g+,...
+
+# To check out codes and compile:
+     
+module load fre/bronx-9
+fremake -x CM4_am4p3_SIS2.xml -p ncrc2.intel -t prod-openmp cm4p3_sis2_compile
+
+# To run regression test : 
+frerun -r basic -x CM4_am4p3_SIS2.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4a3_2000_sis2
+
+# To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
+frerun -x CM4_am4p3_SIS2.xml -p ncrc2.intel -t prod-openmp CM4_c96L48_am4a3_2000_sis2
 
 
-<!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
+# To check what is the input data of this experiment:
+inputfiles -x CM4_am4p3_SIS2.xml -p ncrc2.intel
+-->
+
+<experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
+
+  <property name="RELEASE"      value="ulm"/>                <!-- CVS tag for source code -->
+  <property name="MOM6_DATE"    value="2015.06.03"/>                  <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
+
+  <property name="PROD_SIMTIME"     value="60"/>   <!--simulation length in years-->
+  <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
+  <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
+
+  <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
+      and are not needed for the run or post-processing -->   
+  <property name="EXP_CPLD_START"   value="0001"/> <!--simulation start year--> 
+  <property name="EXP_CPLD_END"     value="0060"/> <!--simulation end   year--> 
+
+  <!--The rest of the properties need not to be changed by the user unless to customize the run-->
+  <property name="FRE_STEM"     value="$(RELEASE)_awg_p3_mom6_$(MOM6_DATE)"/>   <!--  customize as needed -->
+
+  <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
    <property name="reference_tag"      value="ulm_answers"/>
 
+  <property name="FRE_VERSION" value="fre/bronx-9"/>             <!-- -->
+  <property name="ANALYSIS_SWITCH" value="on"/>
+  <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
+  <property name="ProjectID" value="MDT"/>                       <!-- database top level -->
+  <property name="DEBUGLEVEL" value=""/>
+
+
+  
+  <!--========================================-->
+  <!--Do not change the rest of the properties-->
+  <!--========================================-->
+
+  <property name="AWG_INPUT_HOME_GAEA" value="awg_include"/>
+  <property name="AWG_INPUT_HOME_ZEUS" value="awg_include"/>
+  <property name="AWG_INPUT_HOME_GFDL" value="/nbhome/$USER/$(FRE_STEM)/$(name)/mdt_xml/awg_include"/>
 
 <!--=================-->
 <!--= CHANGING NPES =-->
@@ -100,7 +99,7 @@ This xml includes a number of predefined options for the number of PEs.
 Changing the number of PEs can be accomplished by simply 
 modifying 'npes' and segment 'runTime' in the xml <production> block:
 
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="1728" runTime="16:00:00">
+      <production simTime="$(PROD_SIMTIME)" units="years" npes="1728" runTime="16:00:00">
         <segment simTime="12" units="months" runTime="3:00:00"/>
       </production>
 
@@ -117,23 +116,22 @@ the faster the model throughput, but also the lower the model efficiency
       <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-	<root>$HOME/$(stem)</root>
-	<exec>$CPERM/$USER/$(stem)/$(name)/$(platform)-$(target)/exec</exec>
-	<state>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
- 	<scripts>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
         <!--swept locations (including the staged archive location)-->
         <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
         <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
         <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
       <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
       <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)/$(name)"/>
       <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
       <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="REFERENCE_awg"     value="/lustre/f1/unswept/Niki.Zadeh/awg/tikal_201403_answers/$(name)/$(platform)-$(target)"/>
-      <property name="ARCHIVE_INPUT_NZ"     value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
+      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
      
       <csh><![CDATA[
         source $MODULESHOME/init/csh
@@ -142,7 +140,6 @@ the faster the model throughput, but also the lower the model efficiency
         module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
         module unload netcdf fre
         module load PrgEnv-intel/4.0.46
-        module swap intel intel/12.0.5.220
         module load $(FRE_VERSION)
         module load git
  
@@ -151,9 +148,6 @@ the faster the model throughput, but also the lower the model efficiency
         setenv F_UFMTENDIAN big
       ]]></csh>
 
-      <!--test new compiler options
-      <mkmfTemplate file="$HOME/fre/fre-commands/site/ncrc/intel.mk"/>
-      -->
     </platform>
 
     <platform name="ncrc2.default">
@@ -868,131 +862,133 @@ SIS_LAYOUT_EOF
 <!--================================-->
 <!--= TEMPLATES FOR POSTPROCESSING =-->
 <!--================================-->
-
   <experiment name="c96_climo_postprocess">
     <postProcess>
-      <component type="atmos" zInterp="era40" start="$(ANA_CLIMO_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
-        <timeSeries freq="3hr" source="atmos_8xdaily" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmos8xDailyTS/*)">
+
+      <component type="atmos" zInterp="era40" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+        <timeSeries freq="3hr" source="atmos_8xdaily" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos8xDailyTS/*)">
             <xi:fallback/>
           </xi:include>
 <!-- MDBI, this switch must be on to trigger "fredb" automatically -->
           <analysis switch="$(MDBIswitch)" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
 <!-- /MDBI -->
         </timeSeries>
-        <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmos4xDailyTS/*)">
+        <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos4xDailyTS/*)">
             <xi:fallback/>
           </xi:include>
         </timeSeries>
-        <timeSeries freq="daily" source="atmos_daily" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosDailyTS/*)">
+        <timeSeries freq="daily" source="atmos_daily" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosDailyTS/*)">
             <xi:fallback/>
           </xi:include>
         </timeSeries>
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosMonthTS/*)">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTS/*)">
             <xi:fallback/>
           </xi:include>
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/a1r/analysis/agu/Krasting/pywavelet_jpk_a1r.py -varname t_surf -comp atmos"/>
         </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)">
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)">
 	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh"/>
 	</timeAverage>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK_B)">
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
 	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh"/>
-	</timeAverage>	
-        <timeAverage source="monthly" interval="$(ANA_CLIMO_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosMonthAve/*)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAve/*)">
             <xi:fallback/>
           </xi:include>
         </timeAverage>
-        <timeAverage source="annual" interval="$(PP_CLIMO_CHUNK)"   calcInterval="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="annual" interval="$(PP_CLIMO_CHUNK_B)" calcInterval="$(PP_CLIMO_CHUNK_B)"/>
-        <timeAverage source="annual" interval="$(ANA_CLIMO_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosAnnualAve/*)">
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosAnnualAve/*)">
             <xi:fallback/>
           </xi:include>
         </timeAverage>
       </component>
 
-      <component type="atmos_level" start="$(ANA_CLIMO_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="annual" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosLevelAnnualTS/*)">
+      <component type="atmos_level" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="annual"  chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosLevelAnnualTS/*)">
             <xi:fallback/>
           </xi:include>
         </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_CLIMO_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosLevelMonthAve/*)">
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosLevelMonthAve/*)">
             <xi:fallback/>
           </xi:include>
         </timeAverage>
       </component>
 
-      <component type="atmos_month_aer" start="$(ANA_CLIMO_START)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_CLIMO_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/atmosMonthAerAve/*)">
+      <component type="atmos_month_aer" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAerAve/*)">
             <xi:fallback/>
           </xi:include>
         </timeAverage>
       </component>
 
-      <component type="atmos_diurnal" start="$(ANA_CLIMO_START)" source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
+      <component type="atmos_diurnal" source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
-      <component type="atmos_scalar" start="$(ANA_CLIMO_START)" source="atmos_scalar">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
+      <component type="atmos_scalar" source="atmos_scalar">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
 <!-- FULL CHEMISTRY -->
-      <component type="tracer_level" start="$(ANA_CLIMO_START)" source="atmos_tracer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="annual" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/tracerAnnualTS/*)">
+      <component type="tracer_level" source="atmos_tracer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/tracerAnnualTS/*)">
             <xi:fallback/>
           </xi:include>
         </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_CLIMO_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/tracerMonthAve/*)">
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/tracerMonthAve/*)">
             <xi:fallback/>
           </xi:include>
         </timeAverage>
       </component>
 
 <!-- LAND -->
-      <component type="land" start="$(ANA_CLIMO_START)" source="land_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/landMonthTS/*)" >
+      <component type="land" source="land_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthTS/*)" >
             <xi:fallback/>
 	  </xi:include>
         </timeSeries>
-        <timeAverage source="annual" interval="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="annual" interval="$(PP_CLIMO_CHUNK_B)"/>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(ANA_CLIMO_LEN)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/landMonthAve/*)" >
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthAve/*)" >
             <xi:fallback/>
 	  </xi:include>
         </timeAverage>
       </component>
 
-      <component type="land_cubic" start="$(ANA_CLIMO_START)" source="land_month" cubicToLatLon="none">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)" >
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/landMonthTSNative/*)" >
+      <component type="land_cubic" source="land_month" cubicToLatLon="none">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" >
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthTSNative/*)" >
             <xi:fallback/>
 	  </xi:include>
         </timeSeries>
-        <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_climo.xml" xpointer="xpointer(*/landDailyTSNative/*)">
+        <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landDailyTSNative/*)">
             <xi:fallback/>
 	  </xi:include>
         </timeSeries>
+      </component>
+
+      <component type="land_instant_cubic" source="land_month_inst" cubicToLatLon="none">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
       </component>
 
     </postProcess>
@@ -1019,8 +1015,8 @@ communityExperimentName="$(name)">
     </communityComment>
     <scenario 
       communityForcing="N/A"
-      startTime="$(EXP_CLIMO_START)"
-      endTime="$(EXP_CLIMO_END)" 
+      startTime="$(EXP_CPLD_START)"
+      endTime="$(EXP_CPLD_END)" 
       parentExperimentID="N/A" 
       parentExperimentRIP="N/A" 
       branch_time="0.0">
@@ -1086,7 +1082,7 @@ communityExperimentName="$(name)">
     </input>
 
     <runtime>
-      <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="3584" runTime="12:00:00">
+      <production simTime="$(PROD_SIMTIME)" units="years" npes="3584" runTime="12:00:00">
         <segment simTime="12" units="months" runTime="12:00:00"/>
       </production>
       <regression name="basic">
@@ -1297,6 +1293,24 @@ OVERRIDE_EOF
          restart_output_dir = 'RESTART/',
          parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
      </namelist>
+      <namelist name="icebergs_nml">
+        really_debug=.FALSE.
+        debug=.FALSE.
+        verbose=.FALSE.
+        verbose_hrs=7200
+        use_operator_splitting=.TRUE.
+        bergy_bit_erosion_fraction=0.0
+        sicn_shift=0.1
+        parallel_reprod=.TRUE.
+        traj_sample_hrs=0
+        add_weight_to_ocean=.false.
+      </namelist>
+      <namelist name="ocean_albedo_nml">
+            ocean_albedo_option = 5
+      </namelist>
+      <namelist name="ocean_rough_nml">
+            rough_scheme = 'beljaars'
+      </namelist>
 
      </input>
   </experiment>
@@ -1326,54 +1340,55 @@ OVERRIDE_EOF
       <!--By default a refineDiag script causes the annual history files to be unpacked and saved in /ptmp/$USER-->
       <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh /home/fms/local/opt/fre-analysis/test/eem/code/cm4_web_analysis/refineDiagScript/refineDiag_data_stager_globalAve.csh"/>
 
-      <component type="ocean_monthly"   start="$(ANA_CLIMO_START)" source="ocean_month">
-        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)" source="ocean_month">
+      <component type="ocean_monthly"   source="ocean_month" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_monthly.frepp"/>
         </timeSeries>
 
-        <timeAverage source="monthly" interval="$(PP_OCEAN_CHUNK)" >
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)" >
 	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
 	</timeAverage>
-        <timeAverage source="monthly" interval="$(PP_OCEAN_CHUNK_B)" >
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)" >
 	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
 	</timeAverage>
       </component>
 
-      <component type="ocean_annual"    start="$(ANA_CLIMO_START)"  source="ocean_annual">
-        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK)">
+      <component type="ocean_annual"    source="ocean_annual" sourceGrid="ocean-tripolar">
+        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual.frepp"/>
         </timeAverage>
-        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK_B)">
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual.frepp"/>
         </timeAverage>
       </component>
 
-      <component type="ocean_annual_z" start="$(ANA_CLIMO_START)" source="ocean_annual_z">
-        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK)">
+      <component type="ocean_annual_z" source="ocean_annual_z" sourceGrid="ocean-tripolar">
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual_z.frepp"/>
         </timeAverage>
-        <timeAverage source="annual" interval="$(PP_OCEAN_CHUNK_B)">
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual_z.frepp"/>
         </timeAverage>
 
-        <timeSeries freq="annual"   chunkLength="$(PP_OCEAN_CHUNK_B)" source="ocean_annual_z"/>
+        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_annual_z"/>
 	
       </component>
 
       
-      <component type="ice"  start="$(ANA_CLIMO_START)"  source="ice_month">
-        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK)"  source="ice_month">
-	   <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+      <component type="ice"  source="ice_month" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"  source="ice_month">
+	   <analysis switch="$(ANALYSIS_SWITCH)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
 	</timeSeries>   
-        <timeSeries freq="monthly" chunkLength="$(PP_OCEAN_CHUNK_B)"  source="ice_month">
-	   <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_B)"  source="ice_month">
+	   <analysis switch="$(ANALYSIS_SWITCH)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
 	</timeSeries>   
-        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK)"/>
-        <timeAverage source="annual"  interval="$(PP_OCEAN_CHUNK_B)"/>
+        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_B)"/>
       </component>     
 
     </postProcess>
   </experiment> 
+
 
 <experiment name="CM4_c96L48_am4a3_2000_sis2_serial" inherit="CM4_c96L48_am4a3_2000_sis2">
   <description communityProject="$(ProjectID)" communityModel="CM4_AM4c3_SIS2  $(MOM6_GIT_TAG)" communityModelID="CM4_AM4c3_SIS2" communityExperimentName="$(name)">
