@@ -32,6 +32,8 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
    <property name="CHUNK_LENGTH_A" value="5yr"/>
    <property name="CHUNK_LENGTH_B" value="20yr"/>
    <property name="ANALYSIS_SWITCH" value="on"/>
+   <property name="MDBIswitch"      value="on"/>  <!-- on/off switch for MDBI database -->
+
 
    <property name="PROD_RUNTIME"         value="16:00:00"/><!--zeus value="08:00:00"-->
    <property name="PROD_SEGTIME"         value="04:10:00"/><!--zeus value="02:10:00"-->
@@ -863,6 +865,8 @@ touch $work/INPUT/SIS_override
       <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_monthly.frepp"/>
+          <!-- MDBIswitch, this switch must be on to trigger "fredb" automatically -->
+          <analysis switch="$(MDBIswitch)" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
         </timeSeries>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_monthly.frepp"/>
