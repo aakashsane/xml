@@ -38,7 +38,7 @@ from integrations with these models.
 # Change the occcurances of YOURGROUPLETTER in this file to your group letter (small), such as f, w, o, g+,...
 
 # To check out codes and compile:
-module load fre/bronx-9
+module load fre/bronx-10
 fremake -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp cm4_libs_compile -nolink
 SIS:
 fremake -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp cm4_compile
@@ -72,10 +72,10 @@ NOTES:
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <!--User shoould set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"      value="ulm"/>              <!-- Release tag for the shared source code -->
+  <property name="RELEASE"      value="ulm_201505"/>              <!-- Release tag for the shared source code -->
   <property name="MOM6_DATE"    value="2015.06.03"/>      <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
-  <property name="AWG_GIT_TAG"  value="awg_p5_20150511"/> <!-- git tag for AWG  source code -->
+  <property name="AWG_GIT_TAG"  value="p5-devMergeCandidate-0"/> <!-- git tag for AWG  source code -->
   <property name="ProjectID"    value="MDT"/>             <!-- database top level -->
 
   <property name="PROD_SIMTIME"     value="60"/>   <!--simulation length in years-->
@@ -90,7 +90,7 @@ NOTES:
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
 
   <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
-  <property name="FRE_VERSION" value="fre/bronx-9"/>             <!-- fre version to be used -->
+  <property name="FRE_VERSION" value="fre/bronx-10"/>             <!-- fre version to be used -->
   <property name="ANALYSIS_SWITCH" value="on"/>                  <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
 
@@ -424,6 +424,9 @@ Experiment to build executable.
           # AWG updates
           ( cd atmos_param  && git checkout $(AWG_GIT_TAG) )
           ( cd atmos_shared && git checkout $(AWG_GIT_TAG) )
+
+          ( cd atmos_param  && git checkout p5-devMergeCandidate-1 )
+
           ]]>
         </csh>
       </source>
@@ -470,7 +473,8 @@ Experiment to build executable.
         <codeBase version="$(RELEASE)"> land_lad2 </codeBase>
 	<csh>
           #==For JPD Drag Tests==
-          cvs up -r merged_drag_updates_jpk_20141104_nnz land_lad2/land_model.F90
+	  #Did this go in?
+          #cvs up -r merged_drag_updates_jpk_20141104_nnz land_lad2/land_model.F90
           # Protection from negative soil water divergence situations
           cvs up -r ulm_neg_water_div_20150321_slm_pcm land_lad2/soil/soil.F90
         </csh>
@@ -478,24 +482,28 @@ Experiment to build executable.
       <compile>
         <cppDefs>$(F2003_FLAGS)</cppDefs>
 
-<!--The following csh block is needed for compiler pre-processors that are not ANSI-compliant, such as pathscale-->
-<csh> <![CDATA[
-cat >Makefile.cpp <<EOF
-CPPDEFS =
+         <!--The following csh block is needed for compiler pre-processors that are not ANSI-compliant, such as pathscale-->
+         <csh> <![CDATA[
+sed -e 's/<TAB>/\t/' >land/Makefile-cpp <<EOF
+CPPDEFS =  $(F2003_FLAGS)
 FRETARGET = $(target)
+
 ifneq (\$(findstring hdf5,\${FRETARGET}),)
 else
   CPPDEFS += -Duse_LARGEFILE
 endif
+
+vpath %.F90 \$(shell find ${src_dir}/land_lad2 -type d)
+
+land/%.f90: %.F90
+<TAB>cpp \${CPPDEFS} -C -v -I ${src_dir}/shared/include -o \$@ \$<
+
 EOF
-echo vpath %.F90 `find $cwd/land_lad2 -type d` >> Makefile.cpp
-echo cpp_land/%.f90: %.F90 >> Makefile.cpp
-/bin/echo -e '\tcpp ${CPPDEFS} -C -v -I shared/include -o $@ $<' >> Makefile.cpp
-mkdir -p cpp_land
-foreach foo ( `find land_lad2 -type f -name \*.F90` )
-  make -f Makefile.cpp cpp_land/$foo:t:r.f90
+
+foreach foo ( `find ${src_dir}/land_lad2 -type f -name \*.F90` )
+  make -f land/Makefile-cpp land/$foo:t:r.f90
 end
-find cpp_land -type f -name \*.f90 > pathnames_land_lad2
+find ${bld_dir}/land -type f -name \*.f90 > land/pathnames_land_lad2
         ]]></csh>
 
       </compile>
@@ -698,13 +706,17 @@ find cpp_land -type f -name \*.f90 > pathnames_land_lad2
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <!--<dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20150302/awg_C192L32_LM3_OM4_025_grid_southshifted_19810101.remapped.v20150302.tar</dataSource>-->
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/ic/awg_C192L32_LM3_OM4_025_grid_southshifted_19810101.remapped.v20150302.tar</dataSource>
+        <!--dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/ic/awg_C192L32_LM3_OM4_025_grid_southshifted_19810101.remapped.v20150302.tar</dataSource-->
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20150522/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
       </dataFile>
     </input>
   </experiment>
 
   <experiment name="common_data">
     <input>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)"> /lustre/f1/unswept/Bruce.Wyman/archive/mdt/awg/input/common/new_sea_esf_aug2013.cpio</dataSource>
+      </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/common/sea_esf_dec2014.cpio</dataSource> 
       </dataFile>
@@ -1193,7 +1205,8 @@ endif
   <experiment name="c192_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/19810101.static_veg.remapped_to_C192_OM4_025_southshifted.v20150302.tar</dataSource>
+        <!--dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/19810101.static_veg.remapped_to_C192_OM4_025_southshifted.v20150302.tar</dataSource-->
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/static_veg/static_veg_LM3p2sosn_C192_OM4_025_historical_HC1_1981.remapped.v20150521.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/c192_OM4_025_hydrography_v20140708.tar </dataSource>
@@ -1215,7 +1228,7 @@ set do_concurrent_radiation = ".false."
 if ( "$npes" == "864" ) then
   set atmos_npes = "432"
   set atmos_nthreads = "2"
-  set nxblocks = "2" ; set nyblocks = "4" 
+  set nxblocks = "2" ; set nyblocks = "2" 
   set fv_layout    =   "6,12";  set fv_io_layout    =  "1,4"
   set land_layout  =   "6,12";  set land_io_layout  =  "1,4"
   set ocean_layout =   "144,3"; set ocean_io_layout =  "1,3"
@@ -1225,7 +1238,7 @@ if ( "$npes" == "864" ) then
 else if ( "$npes" == "1152" ) then
   set atmos_npes = "576"
   set atmos_nthreads = "2"
-  set nxblocks = "3" ; set nyblocks = "8" 
+  set nxblocks = "2" ; set nyblocks = "2" 
   set fv_layout    =   "8,12";  set fv_io_layout    =  "1,4"
   set land_layout  =   "8,12";  set land_io_layout  =  "1,4"
   set ocean_layout =   "144,4"; set ocean_io_layout =  "1,4"
@@ -2582,6 +2595,105 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 </experiment>
 
 
+<experiment name="c192L32_am4g5" inherit="cm4_compile">
+    <description
+communityProject="$(ProjectID)" 
+communityModel="am4p5" 
+communityModelID="am4p5"
+communityExperimentName="$(name)" 
+     >
+AM4 prototype configuration "am4g5" from MDT Atmosphere Working Group.
+Derived from "am4f4", but with code modifications from Paul Ginoux, Ming Zhao, and John Wilson.
+
+- c96 horizontal grid with approximately 50km resolution and 32 vertical levels.
+- Convection based on "double-plume" from Ming Zhao.
+- Tiedtke cloud scheme
+
+For more information about AWG configurations, refer to
+http://cobweb.gfdl.noaa.gov/~cjg/awg
+
+    </description>
+
+
+    <input>
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20150522/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
+      </dataFile>
+      <namelist name="flux_exchange_nml">
+        nblocks=$atmos_nthreads
+      </namelist>
+      <namelist name="atmos_model_nml">
+         nxblocks = $nxblocks
+	 nyblocks = $nyblocks
+      </namelist>
+      <!-- Namelist -->
+      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>       
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_c192L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_amip.nml"/>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1980,1,1,0,0,0,
+        calendar = 'julian'
+        dt_atmos = 1200,
+        dt_cpld  = 7200,
+        use_lag_fluxes = .true.
+        concurrent = .false.
+        do_ocean = .false.
+        ocean_npes = 0
+        atmos_npes = $atmos_npes
+        atmos_nthreads = $atmos_nthreads
+      </namelist>
+      <!-- Input datasets -->
+      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c192_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c192_atmos_domain_decomp']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p5_faero</dataSource>
+      </dataFile>
+
+    </input>
+
+    <runtime>
+      <regression name="basic">
+        <run days="8" npes="864" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:00:00"/>
+      </regression>
+      <regression name="rts">
+        <run days="4 4" npes="864" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:00:00"/>
+        <run days="8" npes="1152" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:00:00"/>
+      </regression>
+
+      <regression name="restarts">
+        <run days="4 4" npes="864" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:00:00"/>
+      </regression>
+      <regression name="timing">
+        <run months="1"   npes="2304" runTimePerJob="02:30:00"/>
+        <run months="1"   npes="3456" runTimePerJob="03:00:00"/>
+        <run months="1"   npes="4608" runTimePerJob="03:00:00"/>
+      </regression>
+      <regression name="timings">
+        <run months="1"   npes="864"  runTimePerJob="03:30:00"/> 
+        <run months="1"   npes="1152" runTimePerJob="03:00:00"/> 
+        <run months="1"   npes="2304" runTimePerJob="02:30:00"/>
+        <run months="1"   npes="3456" runTimePerJob="03:00:00"/>
+        <run months="1"   npes="4608" runTimePerJob="03:00:00"/>
+        <run months="1"   npes="6144" runTimePerJob="02:30:00"/>
+        <run months="1"   npes="6912" runTimePerJob="02:00:00"/>
+        <run months="1"   npes="9216"  runTimePerJob="02:00:00"/>
+        <run months="1"   npes="9217"  runTimePerJob="02:00:00"/>
+      </regression>
+
+      <reference restart="$(REFERENCE)/archive/1x0m8d_864pe/restart/19800109.tar"/>
+
+    </runtime>
+
+</experiment>
    
 <!--=====================-->
 <!--= CPLD EXPERIMENTS =-->
@@ -3063,7 +3175,7 @@ For more information please refer to the
 <!--= CM4i EXPERIMENTS    =-->
 <!--=======================-->
 
- <experiment name="CM4i_c96L32_am4g5_2000" inherit="cm4_compile">
+ <experiment name="CM4i_c96L32_am4f5_2000" inherit="cm4_compile">
     <description
 communityProject="$(ProjectID)" 
 communityModel="CM4i_c96L32_am4g5_SIS  $(MOM6_GIT_TAG)" 
@@ -3137,10 +3249,10 @@ communityExperimentName="$(name)">
         critjump      = 0.10,
       </namelist>
       <!--AWG Input datasets -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_c96L32.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_2000climo.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/old/am4p5_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/old/am4g5_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/old/am4g5_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/old/am4g5_2000climo.nml"/>
       <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96_data']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
@@ -3216,7 +3328,7 @@ OVERRIDE_EOF
 
   </experiment>
 
- <experiment name="CM4i_c96L32_am4g5_1860forc" inherit="cm4_compile">
+ <experiment name="CM4i_c96L32_am4f5_1860forc" inherit="cm4_compile">
 
 <!-- MDBI -->
     <description
@@ -3333,10 +3445,10 @@ Ocean:
         radperturb    = 0.10, 
         critjump      = 0.10,
       </namelist>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a4_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4a4_c96L32.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p4_2000climo.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/old/am4p4_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/old/am4a4_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/old/am4a4_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/old/am4p4_2000climo.nml"/>
 
       <namelist name="aerosolrad_package_nml">
     force_to_repro_quebec = .true.
@@ -4186,6 +4298,9 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
   
   <experiment name="common_data_fullchem">
     <input>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)"> /lustre/f1/unswept/Bruce.Wyman/archive/mdt/awg/input/common/new_sea_esf_aug2013.cpio</dataSource>
+      </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/common/sea_esf_dec2014.cpio</dataSource>
       </dataFile>
