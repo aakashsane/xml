@@ -404,8 +404,12 @@ Experiment to build executable.
 
     <component name="fms" paths="shared">
      <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid=""/>
-      <source>
-        <codeBase version="$(RELEASE)"> shared </codeBase>
+      <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+            <codeBase version="$(RELEASE)"> shared.git </codeBase>
+            <csh><![CDATA[
+            ( cd shared && git checkout $(RELEASE) )
+            ]]>
+            </csh>
       </source>
       <compile>
         <cppDefs>$(F2003_FLAGS) -Duse_libMPI -Duse_netCDF </cppDefs>
@@ -472,11 +476,9 @@ Experiment to build executable.
       <source>
         <codeBase version="$(RELEASE)"> land_lad2 </codeBase>
 	<csh>
-          #==For JPD Drag Tests==
-	  #Did this go in?
-          #cvs up -r merged_drag_updates_jpk_20141104_nnz land_lad2/land_model.F90
           # Protection from negative soil water divergence situations
-          cvs up -r ulm_neg_water_div_20150321_slm_pcm land_lad2/soil/soil.F90
+          #Did this go in?
+          # cvs up -r ulm_neg_water_div_20150321_slm_pcm land_lad2/soil/soil.F90
         </csh>
       </source>
       <compile>
@@ -2505,6 +2507,12 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p5_faero</dataSource>
       </dataFile>
+      <fieldTable order="append">
+#Verona: land co2 tracer required in fieldTable
+"TRACER", "land_mod",     "co2"
+"longname",     "carbon dioxide"
+"units",        "kg/kg" /
+       </fieldTable>
 
     </input>
 
@@ -2657,6 +2665,13 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p5_faero</dataSource>
       </dataFile>
+      <fieldTable order="append">
+#Verona: land co2 tracer required in fieldTable
+"TRACER", "land_mod",     "co2"
+"longname",     "carbon dioxide"
+"units",        "kg/kg" /
+       </fieldTable>
+
 
     </input>
 
@@ -2781,6 +2796,13 @@ For more information please refer to the
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p5_faero</dataSource>
       </dataFile>
+      <fieldTable order="append">
+#Verona: land co2 tracer required in fieldTable
+"TRACER", "land_mod",     "co2"
+"longname",     "carbon dioxide"
+"units",        "kg/kg" /
+       </fieldTable>
+
       
       <!--MOM6 Input datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
@@ -2840,6 +2862,125 @@ For more information please refer to the
 
     <postProcess>
       <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
+    </postProcess>
+
+</experiment>
+
+<experiment name="CM4_c192L32_am4g5_2000" inherit="cm4_compile">
+    <description
+communityProject="$(ProjectID)" 
+communityModel="CM4_c192_am4p5_SIS  $(MOM6_GIT_TAG)" 
+communityModelID="CM4_c192_am4p5_SIS"
+communityExperimentName="$(name)">
+    </description>
+    <communityComment>
+For more information please refer to the
+&lt;a href="http://wiki.gfdl.noaa.gov/index.php/MDT_Coupled"&gt; Coupled Working Group Wiki.  &lt;/a&gt;
+    </communityComment>
+    <scenario 
+      communityForcing="N/A"
+      startTime="$(EXP_CPLD_START)"
+      endTime="$(EXP_CPLD_END)" 
+      parentExperimentID="N/A" 
+      parentExperimentRIP="N/A" 
+      branch_time="0.0">
+    </scenario>
+
+    <input>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1,1,1,0,0,0,
+        calendar = 'NOLEAP'
+        dt_atmos = 1200,
+        dt_cpld  = 3600,
+        use_lag_fluxes = .true.
+        concurrent = .true.
+        do_ocean = .true.
+        ocean_npes = $ocean_npes
+        atmos_npes = $atmos_npes
+        atmos_nthreads = $atmos_nthreads
+      </namelist>
+      <namelist name="flux_exchange_nml">
+            nblocks=$atmos_nthreads
+            debug_stocks = .FALSE.
+            divert_stocks_report = .TRUE.
+            do_area_weighted_flux = .FALSE.
+      </namelist>
+      <namelist name="fms_io_nml">
+            fms_netcdf_restart=.true.
+            threading_read='multi'
+            max_files_r = 200
+            max_files_w = 200
+      </namelist>
+      <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 5000000
+            stack_size =0
+      </namelist>
+      <namelist name="xgrid_nml">
+        make_exchange_reproduce = .true.
+        interp_method = 'second_order'
+      </namelist>
+
+      <namelist name="atmos_model_nml">
+         nxblocks = $nxblocks
+	 nyblocks = $nyblocks
+      </namelist>
+      <!--AWG Input datasets -->
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_c192L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_2000climo.nml"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c192_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c192_coupled_domain_decomp']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c192L32_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p5_faero</dataSource>
+      </dataFile>
+      <fieldTable order="append">
+#Verona: land co2 tracer required in fieldTable
+"TRACER", "land_mod",     "co2"
+"longname",     "carbon dioxide"
+"units",        "kg/kg" /
+       </fieldTable>
+
+      
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS_data']/input/node())"/>
+    </input>
+
+    <runtime>
+      <production simTime="$(PROD_SIMTIME)" units="years" npes="5888" runTime="12:00:00">
+        <segment simTime="12" units="months" runTime="12:00:00"/>
+      </production>
+      <regression name="basic">
+        <run days="10" npes="1728"  overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:20:00"/>
+      </regression>
+
+      <regression name="rts"> 
+        <run days="5 5" npes="1728" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:20:00"/>
+	<run days="10" npes="3456" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="00:30:00"/>
+	<run days="10" npes="3429" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="00:30:00"/>
+      </regression>
+
+      <regression name="timingL32">
+        <run months="1" npes="5888" runTimePerJob="01:00:00"/>
+      </regression>
+
+      <reference restart="$(REFERENCE)/archive/1x0m10d_1728pe/restart/00010111.tar"/>
+    </runtime>
+
+    <postProcess>
+      <xi:include xpointer="xpointer(//experiment[@name='c192_climo_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
     </postProcess>
 
@@ -4328,6 +4469,13 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p5_fullchem</dataSource>
       </dataFile>
+      <fieldTable order="append">
+#Verona: land co2 tracer required in fieldTable
+"TRACER", "land_mod",     "co2"
+"longname",     "carbon dioxide"
+"units",        "kg/kg" /
+       </fieldTable>
+
 
       <diagTable>
 $name
@@ -4922,6 +5070,13 @@ For more information please refer to the
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p5_faero</dataSource>
       </dataFile>
+      <fieldTable order="append">
+#Verona: land co2 tracer required in fieldTable
+"TRACER", "land_mod",     "co2"
+"longname",     "carbon dioxide"
+"units",        "kg/kg" /
+       </fieldTable>
+
     </input>
 
     <runtime>
