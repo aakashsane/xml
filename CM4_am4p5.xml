@@ -79,7 +79,7 @@ They reproduce answers provided by AWG:
 
   <!--User shoould set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="ulm_201505"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2015.07.09b"/>      <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2015.07.20"/>      <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20150702"/> <!-- git tag for AWG  source code -->
   <property name="ProjectID"    value="MDT"/>             <!-- database top level -->
@@ -563,6 +563,7 @@ find ${bld_dir}/land -type f -name \*.f90 > land/pathnames_land_lad2
         <codeBase version="$(RELEASE)"> ocean_shared.git </codeBase>
         <csh><![CDATA[
         ( cd ocean_shared && git checkout $(RELEASE) )
+        ( cd ocean_shared && git checkout user/nnz/verona_dev_merge )
         ]]>
         </csh>
       </source>
@@ -3215,7 +3216,7 @@ For more information please refer to the
 
 
 
-<experiment name="c96L32_am4g5_fullchem" inherit="c96L32_am4g5">
+<experiment name="c96L32_am4g5r1_fullchem" inherit="c96L32_am4g5r1">
     <description
 communityProject="$(ProjectID)" 
 communityModel="am4p5" 
@@ -3791,6 +3792,47 @@ Do not use it for science!!!
       </namelist>
      </input>
   </experiment>
+
+
+<experiment name="CM4_c96L32_am4g5r1_2000_sis2_low_mixing3" inherit="CM4_c96L32_am4g5r1_2000_sis2">
+								       
+   <input>
+      <csh type="always"><![CDATA[
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
+else
+   set restart_flag = 'r'
+endif
+
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+
+####COMMON ALWAYS CSH ENDS######
+
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_KPP = False
+#override ENERGETICS_SFC_PBL = True
+#override MSTAR = 0.3
+#override KD = 2.0E-6
+#override SMAG_LAP_CONST = 0.
+#override AH_VEL_SCALE = 0.
+#override FOX_KEMPER_ML_RESTRAT_COEF = 20.0
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
 
 <experiment name="CM4_c96L32_am4g5r1_2000_sis2_EPBL" inherit="CM4_c96L32_am4g5r1_2000_sis2">
 								       
