@@ -45,20 +45,20 @@ fremake -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp cm4_compile
 SIS2:
 fremake -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp cm4_sis2_compile
 
-# To run regression test (for the coupled experiment CM4_c96L32_am4g5r1_2000): 
+# To run regression test (for the coupled experiment CM4_c96L32_am4g5r2_2000): 
 SIS:
-frerun -r basic -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4g5r1_2000
+frerun -r basic -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4g5r2_2000
 SIS2:
-frerun -r basic -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4g5r1_2000_sis2
+frerun -r basic -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4g5r2_2000_sis2
 
 # To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
 SIS:
-frerun -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4g5r1_2000
+frerun -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4g5r2_2000
 SIS2
-frerun -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4g5r1_2000_sis2
+frerun -x CM4_am4p5.xml -p ncrc2.intel -t prod-openmp CM4_c96L32_am4g5r2_2000_sis2
 
 # To check what is the input data of this experiment:
-inputfiles -x CM4_am4p5.xml -p ncrc2.intel CM4_c96L32_am4g5r1_2000
+inputfiles -x CM4_am4p5.xml -p ncrc2.intel CM4_c96L32_am4g5r2_2000
 
 NOTES:
       If the experiment name + FRESTEM is too long the post-process initiated on gaea may fail.
@@ -70,9 +70,9 @@ NOTES:
 NOTE:
 The AMIP experiments in this xml are derived from and identical to the ones in awg.xml 
 They reproduce answers provided by AWG:
-/lustre/f1/unswept/Chris.Golaz/awg/ulm_201505/reference/c96L32_am4g5r1/ncrc2.intel-prod-openmp/1x0m8d_432pe/restart/19800109.tar 
-/lustre/f1/unswept/Chris.Golaz/awg/ulm_201505/reference/c192L32_am4g5r1/ncrc2.intel-prod-openmp/1x0m8d_864pe/restart/19800109.tar
-
+/lustre/f1/Huan.Guo/awg/ulm_201505/c96L32_am4g5r2/ncrc2.intel-prod-openmp/1x0m8d_432pe/restart/19800109.tar
+/lustre/f1/Huan.Guo/awg/ulm_201505/c192L32_am4g5r2/ncrc2.intel-prod-openmp/1x0m8d_864pe/restart/19800109.tar
+which are saved under /lustre/f1/unswept/Niki.Zadeh/ulm_201505_awg_v20150702_mom6sis2_2015.07.09b_answers
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
@@ -184,7 +184,7 @@ the faster the model throughput, but also the lower the model efficiency
         module load PrgEnv-intel/4.0.46
         module load $(FRE_VERSION)
         module load git
- 
+#for t1 module unload altd  
         setenv KMP_STACKSIZE 512m
         setenv NC_BLKSZ 1M
         setenv F_UFMTENDIAN big
@@ -2498,17 +2498,15 @@ SIS_LAYOUT_EOF
 <!--= AMIP EXPERIMENTS =-->
 <!--====================-->
 
-
-<experiment name="c96L32_am4g5r1" inherit="cm4_compile">
+<experiment name="c96L32_am4g5r2" inherit="cm4_compile">
     <description
 communityProject="$(ProjectID)" 
 communityModel="am4p5" 
 communityModelID="am4p5"
 communityExperimentName="$(name)" 
      >
-AM4 prototype configuration "am4g5r1" from MDT Atmosphere Working Group.
-Derived from "am4g5", but with flu_exchange bug fixes and revised settings
-for dynamics time stepping.
+AM4 prototype configuration "am4g5r2" from MDT Atmosphere Working Group.
+Derived from "am4g5r1". Improved hurricane simulation but higher climate sensitivity
 
 - c96 horizontal grid with approximately 100km resolution and 32 vertical levels.
 - Convection based on "double-plume" from Ming Zhao.
@@ -2534,8 +2532,8 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <!-- Namelist -->
       <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>       
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_c96L32.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_amip.nml"/>
       <namelist name="coupler_nml">
         months = $months,
@@ -2611,8 +2609,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 
 </experiment>
 
-
-<experiment name="c96L32_am4g5r1_conc_rad" inherit="c96L32_am4g5r1">
+<experiment name="c96L32_am4g5r2_conc_rad" inherit="c96L32_am4g5r2">
     <input>
       <namelist name="coupler_nml">
         months = $months,
@@ -2649,17 +2646,15 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
     </runtime>
 </experiment>
 
-
-<experiment name="c192L32_am4g5r1" inherit="cm4_compile">
+<experiment name="c192L32_am4g5r2" inherit="cm4_compile">
     <description
 communityProject="$(ProjectID)" 
 communityModel="am4p5" 
 communityModelID="am4p5"
 communityExperimentName="$(name)" 
      >
-AM4 prototype configuration "am4g5r1" from MDT Atmosphere Working Group.
-Derived from "am4g5", but with flu_exchange bug fixes and revised settings
-for dynamics time stepping.
+AM4 prototype configuration "am4g5r2" from MDT Atmosphere Working Group.
+Derived from "am4g5r1". Improved hurricane simulation but higher climate sensitivity
 
 - c192 horizontal grid with approximately 50km resolution and 32 vertical levels.
 - Convection based on "double-plume" from Ming Zhao.
@@ -2685,8 +2680,8 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <!-- Namelist -->
       <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>       
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_c192L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_c192L32.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_amip.nml"/>
       <namelist name="coupler_nml">
         months = $months,
@@ -2758,7 +2753,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 <!--= CM4 EXPERIMENTS     =-->
 <!--=======================-->
 
-<experiment name="CM4_c96L32_am4g5r1_2000" inherit="cm4_compile">
+<experiment name="CM4_c96L32_am4g5r2_2000" inherit="cm4_compile">
     <description
 communityProject="$(ProjectID)" 
 communityModel="CM4_c96_am4p5_SIS  $(MOM6_GIT_TAG)" 
@@ -2822,8 +2817,8 @@ For more information please refer to the
       </namelist>
       <!--AWG Input datasets -->
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_c96L32.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_2000climo.nml"/>
       <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
@@ -2897,7 +2892,7 @@ For more information please refer to the
 
 </experiment>
 
-<experiment name="CM4_c192L32_am4g5r1_2000" inherit="cm4_compile">
+<experiment name="CM4_c192L32_am4g5r2_2000" inherit="cm4_compile">
     <description
 communityProject="$(ProjectID)" 
 communityModel="CM4_c192_am4p5_SIS  $(MOM6_GIT_TAG)" 
@@ -2961,8 +2956,8 @@ For more information please refer to the
       </namelist>
       <!--AWG Input datasets -->
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_c192L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_c192L32.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_2000climo.nml"/>
       <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
@@ -3220,22 +3215,13 @@ For more information please refer to the
 
 
 
-<experiment name="c96L32_am4g5r1_fullchem" inherit="c96L32_am4g5r1">
+<experiment name="c96L32_am4g5r2_fullchem" inherit="c96L32_am4g5r2">
     <description
 communityProject="$(ProjectID)" 
 communityModel="am4p5" 
 communityModelID="am4p5"
 communityExperimentName="$(name)" 
     >
-AM4 prototype configuration "am4a1r1" from MDT Atmosphere Working Group,
-with full AM3 chemistry activated.
-
-c96 horizontal grid with approximately 100km resolution and 48 vertical levels.
-Convection based on "double-plume 3" from Ming Zhao.
-Configuration derived from "c96L48_awgp2d3".
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
     </description>
 
     <input>
@@ -3372,7 +3358,7 @@ $baseDate
     </input>
   </experiment>
 
-<experiment name="CM4_c96L32_am4g5r1_2000_COBALT" inherit="CM4_c96L32_am4g5r1_2000">
+<experiment name="CM4_c96L32_am4g5r2_2000_COBALT" inherit="CM4_c96L32_am4g5r2_2000">
    <input> 
 
       <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
@@ -3469,7 +3455,7 @@ OVERRIDE_EOF
 </experiment>
 
 
-<experiment name="CM4_c96L32_am4g5r1_fullchem_COBALT" inherit="CM4_c96L32_am4g5r1_2000">
+<experiment name="CM4_c96L32_am4g5r2_fullchem_COBALT" inherit="CM4_c96L32_am4g5r2_2000">
 
     <description>
 This model is for testing purposes only. It's an engineer's attempt towards building a ESM4 prototype.
@@ -3641,7 +3627,7 @@ OVERRIDE_EOF
   </experiment>
 
 
-<experiment name="CM4_c96L32_am4g5r1_fullchem" inherit="CM4_c96L32_am4g5r1_2000">
+<experiment name="CM4_c96L32_am4g5r2_fullchem" inherit="CM4_c96L32_am4g5r2_2000">
 
     <description>
 This model is for testing purposes only. 
@@ -3798,7 +3784,7 @@ Do not use it for science!!!
   </experiment>
 
 
-<experiment name="CM4_c96L32_am4g5r1_2000_sis2_low_mixing3" inherit="CM4_c96L32_am4g5r1_2000_sis2">
+<experiment name="CM4_c96L32_am4g5r2_2000_sis2_low_mixing3" inherit="CM4_c96L32_am4g5r2_2000_sis2">
 								       
    <input>
       <csh type="always"><![CDATA[
@@ -3838,42 +3824,7 @@ OVERRIDE_EOF
    </input>
 </experiment>
 
-<experiment name="CM4_c96L32_am4g5r1_2000_sis2_EPBL" inherit="CM4_c96L32_am4g5r1_2000_sis2">
-								       
-   <input>
-      <csh type="always"><![CDATA[
-####COMMON ALWAYS CSH BEGINS######
-# MOM6 restart switch
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-# adjustment of dry mass first time only
-set adjust_dry_mass = ".true."
-if (-e $work/INPUT/coupler.res) then
-   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   foreach i (1 2 3 4 5 6)
-      if ( $t1[$i] != $t2[$i] ) then
-         set adjust_dry_mass = ".false."
-         break   
-      endif      
-   end
-endif
-
-####COMMON ALWAYS CSH ENDS######
-
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_KPP = False
-#override ENERGETICS_SFC_PBL = True
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="CM4_c96L32_am4g5r1_2000_sis2" inherit="cm4_sis2_compile">
+<experiment name="CM4_c96L32_am4g5r2_2000_sis2" inherit="cm4_sis2_compile">
     <description
 communityProject="$(ProjectID)" 
 communityModel="CM4_c96_am4p5_SIS2  $(MOM6_GIT_TAG)" 
@@ -3937,8 +3888,8 @@ For more information please refer to the
       </namelist>
       <!--AWG Input datasets -->
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_c96L32.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_2000climo.nml"/>
       <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
@@ -4011,8 +3962,50 @@ For more information please refer to the
 
 </experiment>
 
+<experiment name="CM4_c96L32_am4g5r2_2000_sis2_low_mixing3_DT_THERM_7200" inherit="CM4_c96L32_am4g5r2_2000_sis2_low_mixing3">
+								       
+   <input>
+      <csh type="always"><![CDATA[
+####COMMON ALWAYS CSH BEGINS######
+# MOM6 restart switch
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
+else
+   set restart_flag = 'r'
+endif
 
-  <experiment name="faste2e" inherit="CM4_c96L32_am4g5r1_2000_sis2">
+# adjustment of dry mass first time only
+set adjust_dry_mass = ".true."
+if (-e $work/INPUT/coupler.res) then
+   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
+   foreach i (1 2 3 4 5 6)
+      if ( $t1[$i] != $t2[$i] ) then
+         set adjust_dry_mass = ".false."
+         break   
+      endif      
+   end
+endif
+
+####COMMON ALWAYS CSH ENDS######
+
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_KPP = False
+#override ENERGETICS_SFC_PBL = True
+#override MSTAR = 0.3
+#override KD = 2.0E-6
+#override SMAG_LAP_CONST = 0.
+#override AH_VEL_SCALE = 0.
+#override FOX_KEMPER_ML_RESTRAT_COEF = 20.0
+THERMO_SPANS_COUPLING = True
+#override DT_THERM = 7200
+#override DIABATIC_FIRST = False
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+  <experiment name="faste2e" inherit="CM4_c96L32_am4g5r2_2000_sis2">
     <description
 communityProject="GFDL-Niki.Zadeh" 
 communityModel="CM4_c96L32_am4g5_2000_sis2_meke_dEddParameters_1_ELASTIC_KPP10_BT_2 re-post-processed $(FRE_VERSION)" 
