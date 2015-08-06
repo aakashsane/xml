@@ -19,7 +19,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2015.07.20"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2015.08.06b"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="user/nnz/fix_trajectory_append_hang"/>
@@ -415,131 +415,6 @@ Make the executable for ocean-ice experiments.
    </experiment>
 
 
-<experiment name="OM4_SIS_baseline" inherit="MOM6_SIS_compile">
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z test case
-</description>  
-    <scenario 
-      communityForcing="CORE"
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      startTime="$(PP_START_YEAR)"
-      endTime="$(PP_END_YEAR)" 
-      branch_time="0.0">
-    </scenario>
-    <communityComment>
-    For more information please refer to the
-    &lt;a href="http://wiki.gfdl.noaa.gov/index.php/MOM6"&gt; MOM6 Wiki.  &lt;/a&gt;
-    </communityComment>
-
-     <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-      <!--MOM6 Input datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
-      <!--SIS Input datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='SIS_data']/input/node())"/>
-      <!--OM4 gridSpec mosaic datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_grid']/input/node())"/>
-      <!--CORE forcing datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='CORE_data']/input/node())"/>
-
-      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/input.nml</dataSource>
-      </dataFile>
-      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/field_table</dataSource>
-      </dataFile>
-
-
-      <diagTable>
-$name
-$baseDate
-      </diagTable>
-
-
-      <namelist name="coupler_nml">
-       months = $months,
-       days   = $days,
-       current_date = 1900,1,1,0,0,0,
-       hours = 0
-       minutes = 0
-       seconds = 0
-       calendar = 'NOLEAP',
-       dt_cpld  = 3600,
-       dt_atmos = 3600,
-       do_atmos = .false.,
-       do_land = .false.,
-       do_ice = .true.,
-       do_ocean = .true.,
-       atmos_npes = 0,
-       ocean_npes = 0,
-       concurrent = .false.
-       use_lag_fluxes=.false. 
-     </namelist>
-
-     <namelist name="fms_nml">
-            clock_grain='ROUTINE'
-            clock_flags='NONE'
-            domains_stack_size = $domains_stack_size
-            stack_size =0
-      </namelist>
-     <namelist name="fms_io_nml" >
-         fms_netcdf_restart=.true.
-         threading_read='multi'
-         max_files_r = 200
-         max_files_w = 200
-         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
-     </namelist>
-
-     <namelist name="atmos_model_nml" >
-       layout=$fv_layout
-       mask_table='INPUT/$ocn_mask_table'
-     </namelist>
-     <namelist name="land_model_nml" >
-       layout=$land_layout
-       mask_table='INPUT/$ocn_mask_table'
-     </namelist>
-
-   
-   </input>
-
-   <runtime>   
-       <regression name="basic">
-         <run days="10"   npes="$(PROD_NPES)"  runTimePerJob="01:30:00"/>
-       </regression>
-       <regression name="rts">
-         <run days="5 5"  npes="$(PROD_NPES)"  runTimePerJob="01:30:00"/>
-         <!--the following two should reproduce eachother but not the basic because basic uses mask_table-->
-         <run days="2"  npes="2304"  runTimePerJob="00:30:00"/>
-         <run days="1 1"  npes="2304"  runTimePerJob="00:30:00"/>
-         <run days="2"  npes="1152"  runTimePerJob="00:30:00"/>
-         <!--the following is for checking the timings or production run-->
-         <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
-       </regression>
-       <regression name="timing">
-         <run months="1"   npes="576"   runTimePerJob="01:50:00"/>
-         <run months="1"   npes="1152"  runTimePerJob="00:50:00"/>
-         <run months="1"   npes="2304"  runTimePerJob="00:50:00"/>
-         <run months="1"   npes="3240"  runTimePerJob="00:50:00"/>
-         <run months="1"   npes="2432"  runTimePerJob="00:50:00"/>
-       </regression>
-       <regression name="debug">
-         <run days="1"   npes="512"  runTimePerJob="03:30:00"/>
-       </regression>
-
-      <production simTime="$(PROD_SIMTIME)" units="years" npes="$(PROD_NPES)" runTime="$(PROD_RUNTIME)">
-           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
-       </production>
-
-      <reference restart="$(REFERENCE)/1x0m10d_2997pe/restart/19000111.tar"/>
-
-   </runtime>
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
 
   <experiment name="OM4_domain_decomp">
     <input>
@@ -675,33 +550,33 @@ endif
   <experiment name="OM4_grid">
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/grid_spec.nc</dataSource>
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/grid_spec.nc</dataSource>
         <dataSource site="gfdl">/archive/gold/datasets/OM4_025/mosaic.v20140610.unpacked/grid_spec.nc</dataSource> 
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/atmos_mosaic_tile1Xland_mosaic_tile1.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/atmos_mosaic_tile1Xland_mosaic_tile1.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/atmos_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/atmos_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/land_mask.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/land_mask.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/land_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/land_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/ocean_hgrid.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/ocean_hgrid.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/ocean_mask.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/ocean_mask.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/ocean_mosaic.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/ocean_mosaic.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/ocean_topog.nc</dataSource>
-       <!--hsmget cannot get this  <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/topog.nc</dataSource> -->
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/ocean_topog.nc</dataSource>
+       <!--hsmget cannot get this  <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/topog.nc</dataSource> -->
       </dataFile>
     </input>
   </experiment>
@@ -710,38 +585,38 @@ endif
   <experiment name="CORE_data">
     <input>
       <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/data_table</dataSource>
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/data_table</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/ncar_precip.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/ncar_precip.clim.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/ncar_rad.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/ncar_rad.clim.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/q_10_mod.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/q_10_mod.clim.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/runoff.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/runoff.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/salt_restore.v20140616.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/salt_restore.v20140616.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/slp.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/slp.clim.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/t_10_mod.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/t_10_mod.clim.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/u_10_mod.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/u_10_mod.clim.nc</dataSource>
       </dataFile>      
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/v_10_mod.clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/v_10_mod.clim.nc</dataSource>
       </dataFile>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/cfc.bc.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/GOLD_SIS/INPUT/cfc.bc.nc</dataSource>
       </dataFile>
 
     </input>
@@ -750,39 +625,39 @@ endif
   <experiment name="OM4_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/MOM_input</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_input</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/MOM_saltrestore</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_saltrestore</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/layer_coord.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/layer_coord.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/seawifs_1998-2006_smoothed_2X.v20140616.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/seawifs_1998-2006_smoothed_2X.v20140616.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/tidal_amplitude.v20140616.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/tidal_amplitude.v20140616.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/MOM_channels_global_025</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/MOM_channels_global_025</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/vgrid_75_2m.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/WOA05_pottemp_salt.nc </dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/WOA05_pottemp_salt.nc </dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.808.45x72</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.808.45x72</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/mask_table.1053.90x45</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1053.90x45</dataSource>
       </dataFile>      
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
-        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
       </dataFile>
 
      <namelist name="MOM_input_nml" >
@@ -811,45 +686,6 @@ touch $work/INPUT/SIS_override
 
   </experiment>
 
-  <experiment name="SIS_data">
-    <input>
-
-     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/diag_table.SIS</dataSource>
-     </dataFile>
-
-     <dataFile label="input" target="INPUT/ice_model.res.nc" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/.datasets/OM4_025/INPUT/ice_model.res.v20140620.nc</dataSource>
-     </dataFile>
-      
-     <namelist name="ice_model_nml">
-           layout = $ice_layout
-           io_layout = $ice_io_layout
-           mask_table='INPUT/$ocn_mask_table'
-           nsteps_dyn=144
-           nsteps_adv=2
-           num_part = 6
-           wd_turn = 0.0
-           spec_ice=.false.
-           ice_bulk_salin = 0.0
-           alb_sno = 0.85                    ! keep CM2 setting
-           alb_ice = 0.65                    ! keep CM2 setting
-           t_range_melt = 1.0                ! NOTE: CM2 uses 1.0
-           heat_rough_ice = 5.0e-4
-           cm2_bugs = .false.
-           do_icebergs = .false.
-           add_diurnal_sw = .true.
-           do_ice_limit=.false.
-           max_ice_limit=4.0
-           channel_viscosity=0.e5
-           h_lo_lim = 1.e-10
-      </namelist>
-
-     </input>
-  </experiment>
-
   <experiment name="SIS2_data">
     <input>
 
@@ -864,7 +700,7 @@ touch $work/INPUT/SIS_override
 
 <!-- No init ice yet
      <dataFile label="input" target="INPUT/ice_model.res.nc" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/OM4_025/INPUT/.datasets/OM4_025/INPUT/ice_model.res.v20140620.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/.datasets/OM4_025/INPUT/ice_model.res.v20140620.nc</dataSource>
      </dataFile>
 -->
      <namelist name="SIS_input_nml" >
@@ -921,19 +757,19 @@ touch $work/INPUT/SIS_override
       </component>
       <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_monthly.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_monthly.frepp"/>
         </timeSeries>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_month">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_monthly.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_monthly.frepp"/>
         </timeSeries>
       </component>
 
       <component type="ocean_annual_z" start="$(PP_START_YEAR)" source="ocean_annual_z"  sourceGrid="ocean-tripolar">
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual_z.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual_z.frepp"/>
         </timeAverage>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual_z.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual_z.frepp"/>
         </timeAverage>
 
         <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>
@@ -942,10 +778,10 @@ touch $work/INPUT/SIS_override
 
       <component type="ocean_annual" start="$(PP_START_YEAR)"  source="ocean_annual"  sourceGrid="ocean-tripolar"> 
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual.frepp"/>
         </timeAverage>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS/OM4_025/ocn_annual.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual.frepp"/>
         </timeAverage>
       </component>
 
@@ -1028,12 +864,6 @@ touch $work/INPUT/SIS_override
 
      </postProcess>
 
-</experiment>
-<experiment name="OM4_SIS_baseline_TEST" inherit="OM4_SIS_baseline">
-<!--The following description tags are needed to put the experiment in the MDBI-->
-<description communityProject="TEST" communityModel="OM4_SIS_baseline_TEST $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
-MOM6 wiki: http://wiki.gfdl.noaa.gov/index.php/MOM6
-</description>
 </experiment>
 
 <experiment name="OM4_SIS2_baseline" inherit="MOM6_SIS2_compile">
@@ -1138,7 +968,10 @@ $baseDate
          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
        </regression>
 
-       <regression name="debug">
+      <regression name="timing">
+          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
+       </regression>
+      <regression name="debug">
          <run days="1"   npes="288"  runTimePerJob="01:30:00"/>
        </regression>
        <regression name="restart">
@@ -1188,420 +1021,6 @@ cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 OVERRIDE_EOF
      ]]></csh>
    </input>
-</experiment>
-
-
-<experiment name="OM4_SIS2_EPBL" inherit="OM4_SIS2_baseline">
-   <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_KPP = False
-#override ENERGETICS_SFC_PBL = True
-#override BT_USE_VISC_REM_U_UH0 = False
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS2_EPBL_mstar_1.5" inherit="OM4_SIS2_baseline">
-   <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_KPP = False
-#override ENERGETICS_SFC_PBL = True
-#override MSTAR = 1.5
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS2_EPBL_mstar_10" inherit="OM4_SIS2_baseline">
-   <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_KPP = False
-#override ENERGETICS_SFC_PBL = True
-#override MSTAR = 10.
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS2_EPBL_nstar_0.1" inherit="OM4_SIS2_baseline">
-   <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_KPP = False
-#override ENERGETICS_SFC_PBL = True
-#override NSTAR = 0.1
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS2_EPBL_nstar_0.3" inherit="OM4_SIS2_baseline">
-   <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_KPP = False
-#override ENERGETICS_SFC_PBL = True
-#override NSTAR = 0.3
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS2_EPBL_MtoT_0.1" inherit="OM4_SIS2_baseline">
-   <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_KPP = False
-#override ENERGETICS_SFC_PBL = True
-#override MKE_TO_TKE_EFFIC = 0.1 
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS2_EPBL_TKEdecay_10" inherit="OM4_SIS2_baseline">
-   <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_KPP = False
-#override ENERGETICS_SFC_PBL = True
-#override TKE_DECAY = 10.0 
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS2_EPBL_use_omega" inherit="OM4_SIS2_baseline">
-   <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_KPP = False
-#override ENERGETICS_SFC_PBL = True
-#override ML_USE_OMEGA = True 
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-
-<experiment name="OM4_SIS_noBG" inherit="OM4_SIS_baseline">
-<!--The following description tags are needed to put the experiment in the MDBI-->
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)">
- global 1/4 degree z  no background mixing , as in the CM2.5 
-</description>
-<!-- MDBI -->
-   <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override HENYEY_IGW_BACKGROUND = False
-#override KD = 1.0E-07
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_gust_0p01" inherit="OM4_SIS_baseline">
-<!--The following description tags are needed to put the experiment in the MDBI-->
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z   GUST_CONST = 0.01
-</description>
-<!-- MDBI -->
-   <input>
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override GUST_CONST = 0.01
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_gust_0p03" inherit="OM4_SIS_baseline">
-<!--The following description tags are needed to put the experiment in the MDBI-->
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z   GUST_CONST = 0.03
-</description>
-<!-- MDBI -->
-   <input>
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override GUST_CONST = 0.03
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_gust_0p1" inherit="OM4_SIS_baseline">
-<!--The following description tags are needed to put the experiment in the MDBI-->
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z   GUST_CONST = 0.1  - really push the gustiness, 10x
-</description>
-<!-- MDBI -->
-   <input>
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override GUST_CONST = 0.1
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_KPP_linear" inherit="OM4_SIS_baseline">
-<!--The following description tags are needed to put the experiment in the MDBI-->
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z  KPP shape linear
-</description>
-<!-- MDBI -->
-   <input>
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override KPP%NLT_SHAPE = "LINEAR"
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_KHTH_200" inherit="OM4_SIS_baseline">
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z   KHTH_200, RES SCALED KHTH=F, res coef = default
-</description>
-
-   <input>
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_VARIABLE_MIXING = False
-#override RESOLN_SCALED_KHTH = False
-THICKNESSDIFFUSE = True
-THICKNESSDIFFUSE_FIRST = True
-KHTH = 200.
-#override KHTH_SLOPE_CFF = 0.
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_KHTH_res7_200" inherit="OM4_SIS_baseline">
-<!--The following description tags are needed to put the experiment in the MDBI-->
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z   KHTH_200, RES SCALED KHTH=F, res coef = 0.7101
-</description>
-<!-- MDBI -->
-   <input>
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_VARIABLE_MIXING = False
-THICKNESSDIFFUSE = True
-THICKNESSDIFFUSE_FIRST = True
-KHTH = 200.
-#override KHTH_SLOPE_CFF = 0.
-KH_RES_FN_POWER = 100
-KH_RES_SCALE_COEF = 0.7101
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_KHTH_res1_200" inherit="OM4_SIS_baseline">
-<!--The following description tags are needed to put the experiment in the MDBI-->
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z   KHTH_200, RES SCALED KHTH=F, res coef = 1.0
-</description>
-<!-- MDBI -->
-   <input>
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_VARIABLE_MIXING = False
-THICKNESSDIFFUSE = True
-THICKNESSDIFFUSE_FIRST = True
-KHTH = 200.
-#override KHTH_SLOPE_CFF = 0.
-KH_RES_FN_POWER = 100
-KH_RES_SCALE_COEF = 1.0
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-
-<experiment name="OM4_SIS_restrat_test" inherit="OM4_SIS_baseline">
-<!--The following description tags are needed to put the experiment in the MDBI-->
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
-MOM6 wiki: http://wiki.gfdl.noaa.gov/index.php/MOM6
-</description>
-
-   <input>
-     
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh type="always">
-        <![CDATA[
-#===Have to repeat whatever is in the parent experiment===
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc
-
-touch $work/INPUT/MOM_override
-
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-MIXEDLAYER_RESTRAT = True
-FOX_KEMPER_ML_RESTRAT_COEF = 20.
-OVERRIDE_EOF
-
-
-#=========================================================
-#Append to diag_table
-#=======================
-if ( $irun == 1 ) then
-cat >> $work/diag_table << DIAG_EOF
-#================
-# Additional DIAGNOSTICS
-#================
- "ocean_model", "MLD_restrat",      "MLD_restrat",      "ocean_month", "all", "mean", "none",2
- "ocean_model", "uml_restrat",      "uml_restrat",      "ocean_month", "all", "mean", "none",2
- "ocean_model", "vml_restrat",      "vml_restrat",      "ocean_month", "all", "mean", "none",2
- "ocean_model", "udml_restrat",     "udml_restrat",     "ocean_month", "all", "mean", "none",2
- "ocean_model", "vdml_restrat",     "vdml_restrat",     "ocean_month", "all", "mean", "none",2
- "ocean_model", "uhml",             "uhml",             "ocean_month", "all", "mean", "none",2
- "ocean_model", "vhml",             "vhml",             "ocean_month", "all", "mean", "none",2
- "ocean_model", "MLu_restrat_time", "MLu_restrat_time", "ocean_month", "all", "mean", "none",2
- "ocean_model", "MLv_restrat_time", "MLv_restrat_time", "ocean_month", "all", "mean", "none",2
-DIAG_EOF
-
-endif
-
-       ]]>
-      </csh>
-
-   </input>
-</experiment>
-
-<!--use the "append" method to append to the diag_table. Works only with bronx-9 and later-->
-<experiment name="OM4_SIS_restrat_test2" inherit="OM4_SIS_baseline">
-<!--The following description tags are needed to put the experiment in the MDBI-->
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
-MOM6 wiki: http://wiki.gfdl.noaa.gov/index.php/MOM6
-</description>
-
-   <input>
-     
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh type="always">
-        <![CDATA[
-#===Have to repeat whatever is in the parent experiment===
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc
-
-touch $work/INPUT/MOM_override
-
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-MIXEDLAYER_RESTRAT = True
-FOX_KEMPER_ML_RESTRAT_COEF = 20.
-OVERRIDE_EOF
-       ]]>
-      </csh>
-
-
-<diagTable order="append">
-#================
-# Additional DIAGNOSTICS
-#================
- "ocean_model", "MLD_restrat",      "MLD_restrat",      "ocean_month", "all", "mean", "none",2
- "ocean_model", "uml_restrat",      "uml_restrat",      "ocean_month", "all", "mean", "none",2
- "ocean_model", "vml_restrat",      "vml_restrat",      "ocean_month", "all", "mean", "none",2
- "ocean_model", "udml_restrat",     "udml_restrat",     "ocean_month", "all", "mean", "none",2
- "ocean_model", "vdml_restrat",     "vdml_restrat",     "ocean_month", "all", "mean", "none",2
- "ocean_model", "uhml",             "uhml",             "ocean_month", "all", "mean", "none",2
- "ocean_model", "vhml",             "vhml",             "ocean_month", "all", "mean", "none",2
- "ocean_model", "MLu_restrat_time", "MLu_restrat_time", "ocean_month", "all", "mean", "none",2
- "ocean_model", "MLv_restrat_time", "MLv_restrat_time", "ocean_month", "all", "mean", "none",2
-</diagTable>
-
-
-
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_baseline_kppbf" inherit="OM4_SIS_baseline">
-<!--The following description tags are needed to put the experiment in the MDBI-->
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
-Baseline with backscatter diagnostics and bugfix for KPP shear
-</description>
-
-   <input>
-     
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh type="always">
-        <![CDATA[
-#===Have to repeat whatever is in the parent experiment===
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc
-
-touch $work/INPUT/MOM_override
-
-#=========================================================
-#Append to diag_table
-#=======================
-if ( $irun == 1 ) then
-cat >> $work/diag_table << DIAG_EOF
-#================
-# Additional DIAGNOSTICS
-#================
- "ocean_model", "Res_fn",   "Res_fn",   "ocean_annual", "all", "mean", "none",2
-DIAG_EOF
-
-endif
-
-       ]]>
-      </csh>
-   </input>
-   <runtime>   
-      <production simTime="5" units="years" npes="$(PROD_NPES)" runTime="$(PROD_RUNTIME)">
-           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
-      </production>
-   </runtime>
 </experiment>
 
 
@@ -1952,90 +1371,8 @@ ncap -O --script 'cfc_11 = ptemp * 0.0 ; cfc_12 = ptemp * 0.0 ; sf6 = ptemp * 0.
 
 
 
-<experiment name="OM4_SIS_non_aggr" inherit="OM4_SIS_baseline">
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z    perturbation
-</description>
-   <input>
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-AGGREGATE_FW_FORCING = False
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_KPP_min12m" inherit="OM4_SIS_baseline">
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z  perturbation 
-</description>
-   <input>
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-AGGREGATE_FW_FORCING = False
-#override KPP%MINIMUM_OBL_DEPTH = 12.
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_KPP_min6m" inherit="OM4_SIS_baseline">
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z  perturbation 
-</description>
-   <input>
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-AGGREGATE_FW_FORCING = False
-#override KPP%MINIMUM_OBL_DEPTH = 6.
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_KPP_min6m_lowdiff" inherit="OM4_SIS_baseline">
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z  perturbation 
-</description>
-   <input>
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-AGGREGATE_FW_FORCING = False
-#override KPP%MINIMUM_OBL_DEPTH = 6.
-#override KD = 1.0E-05
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_KPP_min6m_lowdiff_strongMLE" inherit="OM4_SIS_baseline">
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)" >
- global 1/4 degree z perturbation
-</description>
-   <input>
-     <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-AGGREGATE_FW_FORCING = False
-#override KPP%MINIMUM_OBL_DEPTH = 6.
-#override KD = 1.0E-05
-#override FOX_KEMPER_ML_RESTRAT_COEF = 20.0
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS_DT_THERM_7200" inherit="OM4_SIS_baseline">
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)">
+<experiment name="OM4_SIS2_DT_THERM_7200" inherit="OM4_SIS2_baseline">
+<description communityProject="OWG" communityModel="OM4_SIS2 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)">
  global 1/4 degree z  with THERMO_SPANS_COUPLING
 </description>
 
@@ -2052,7 +1389,7 @@ OVERRIDE_EOF
    </input>
 </experiment>
 
-<experiment name="OM4_SIS_COBALT" inherit="OM4_SIS_baseline">
+<experiment name="OM4_SIS2_COBALT" inherit="OM4_SIS2_baseline">
    <input>
 
       <namelist name="coupler_nml">
@@ -2169,14 +1506,7 @@ cfc_12_src_var_gridspec = NONE
 
       <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
      
-     <csh type="always"><![CDATA[
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc
-
+     <csh><![CDATA[
 #The keywod _NULL_ in the name of GENERIC_TRACER_IC_FILE cause the initialization from file to bypass
 #hence there is no need to supply an artificial IC full of zeros. 
 #The generic tracer package is responsible to initialize the tracers with proper values
@@ -2193,22 +1523,15 @@ OVERRIDE_EOF
      
 </experiment>
 
-<experiment name="OM4_SIS_COBALT_DT_THERM_7200" inherit="OM4_SIS_COBALT">
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS" communityExperimentName="$(name)">
+<experiment name="OM4_SIS2_COBALT_DT_THERM_7200" inherit="OM4_SIS2_COBALT">
+<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)">
  global 1/4 degree z  with THERMO_SPANS_COUPLING
 </description>
 
     <input>
       <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
 
-       <csh type="always"><![CDATA[
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc
-
+     <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override USE_OCMIP2_CFC = False
 USE_generic_tracer = True
@@ -2222,7 +1545,6 @@ OVERRIDE_EOF
      ]]></csh>
    </input>
 </experiment>
-
 <experiment name="MOM6_GOLD_SIS2_bergs" inherit="MOM6_SIS2_compile">
 <description communityProject="OWG" communityModel="MOM6_GOLD_SIS2 $(FRE_STEM)" communityModelID="OWG_MOM6_GOLD_SIS2" communityExperimentName="$(name)" >
  global 1 degree i test case
@@ -2254,7 +1576,7 @@ OVERRIDE_EOF
         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/data_table</dataSource> 
      </dataFile>                                                                                     
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">                         
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS_icebergs/MOM_input</dataSource> 
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/GOLD_SIS_icebergs/MOM_input</dataSource> 
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/MOM_override</dataSource>
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/SIS_input</dataSource> 
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/SIS_override</dataSource>
@@ -2490,180 +1812,6 @@ endif
 
 </experiment>
 
-<experiment name="OM4_SIS2_DT_THERM_7200" inherit="OM4_SIS2_baseline">
-<description communityProject="OWG" communityModel="OM4_SIS2 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)">
- global 1/4 degree z  with THERMO_SPANS_COUPLING
-</description>
-
-    <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-THERMO_SPANS_COUPLING = True
-#override DT_THERM = 7200
-#override DIABATIC_FIRST = False
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-</experiment>
-
-<experiment name="OM4_SIS2_COBALT" inherit="OM4_SIS2_baseline">
-   <input>
-
-      <namelist name="coupler_nml">
-       months = $months,
-       days   = $days,
-       current_date = 1970,1,1,0,0,0,
-       hours = 0
-       minutes = 0
-       seconds = 0
-       calendar = 'NOLEAP',
-       dt_cpld  = 3600,
-       dt_atmos = 3600,
-       do_atmos = .false.,
-       do_land = .false.,
-       do_ice = .true.,
-       do_ocean = .true.,
-       atmos_npes = 0,
-       ocean_npes = 0,
-       concurrent = .false.
-       use_lag_fluxes=.true.
-     </namelist>
-       <namelist name="generic_tracer_nml">
-       do_generic_tracer=.true.
-       do_generic_CFC=.true.
-       do_generic_COBALT=.true.
-       do_generic_TOPAZ=.false.
-         </namelist>
-         <namelist name="diag_manager_nml">
-       max_axes = 100,
-       max_num_axis_sets = 100,
-       max_input_fields = 699
-       max_output_fields = 699
-       mix_snapshot_average_fields=.false.
-         </namelist>
-         <namelist name="fms_nml">
-            clock_grain='ROUTINE'
-            clock_flags='NONE'
-            domains_stack_size = 7000000
-            stack_size =0
-         </namelist>
-
-      <fieldTable>
-# specific humidity for moist runs
- "TRACER", "atmos_mod", "sphum" 
-           "longname",     "specific humidity"
-           "units",        "kg/kg" /
-##	   "profile_type", "fixed", "surface_value=3.e-6" /
-# prognostic cloud scheme tracers
-  "TRACER", "atmos_mod", "liq_wat"
-            "longname",     "cloud liquid specific humidity"
-            "units",        "kg/kg" /
-  "TRACER", "atmos_mod", "ice_wat"
-            "longname",     "cloud ice water specific humidity"
-            "units",        "kg/kg" /
-  "TRACER", "atmos_mod", "cld_amt"
-            "longname",     "cloud fraction"
-            "units",        "none" /
-# sphum must be present on land as well
- "TRACER", "land_mod",     "sphum"
-           "longname",     "specific humidity"
-           "units",        "kg/kg" /
-
-"namelists","ocean_mod","generic_cobalt/*global*"
-/
-
-"namelists","ocean_mod","generic_cobalt"
-init = f
-/
-
-#Currently generic_cfc package is set to use this mechanism as a prototype.
-#Currently the following lines are required but they do not do anything until MOM6 becomes ready to handle them.
-"namelists","ocean_mod","generic_cfc"
-cfc_11_src_file = INPUT/cfc.bc.nc
-cfc_11_src_var_name = CFC_11
-cfc_11_src_var_unit = ppt
-# ppt to mol/kg
-cfc_11_src_var_unit_conversion = 1.0e-12
-cfc_11_src_var_record = 1
-cfc_11_src_var_gridspec = NONE
-
-cfc_12_src_file = INPUT/cfc.bc.nc
-cfc_12_src_var_name = CFC_12
-cfc_12_src_var_unit = ppt
-# ppt to mol/kg
-cfc_12_src_var_unit_conversion = 1.0e-12
-cfc_12_src_var_record = 1
-cfc_12_src_var_gridspec = NONE
-/
-
-      </fieldTable>
-
-      <dataTable order="append">
-"ATM", "cfc_11_flux_pcair_atm","CFC_11","INPUT/cfc.bc.nc","bilinear", 1.0e-12
-"ATM", "cfc_12_flux_pcair_atm","CFC_12","INPUT/cfc.bc.nc","bilinear", 1.0e-12
-      </dataTable>
-
-      
-      <diagTable order="append">
-#================
-# Additional DIAGNOSTICS
-#================
-#
-#==================
-# GENERIC TRACERS
-#==================
-#
-## tracer quantities
-"generic_tracers",          1,  "days", 1, "days", "time",
-"generic_cfc","cfc_11",     "cfc_11",     "generic_tracers","all",.true.,"none",2
-"generic_cfc","cfc_12",     "cfc_12",     "generic_tracers","all",.true.,"none",2
-"generic_cfc","cfc_11_stf", "cfc_11_stf", "generic_tracers","all",.true.,"none",2
-"generic_cfc","cfc_12_stf", "cfc_12_stf", "generic_tracers","all",.true.,"none",2
-      </diagTable>
-
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-     
-     <csh><![CDATA[
-#The keywod _NULL_ in the name of GENERIC_TRACER_IC_FILE cause the initialization from file to bypass
-#hence there is no need to supply an artificial IC full of zeros. 
-#The generic tracer package is responsible to initialize the tracers with proper values
-
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_OCMIP2_CFC = False
-USE_generic_tracer = True
-GENERIC_TRACER_IC_FILE = "MOM_GENERICS_NULL_"
-OVERRIDE_EOF
-
-     ]]></csh>
-
-   </input>
-     
-</experiment>
-
-<experiment name="OM4_SIS2_COBALT_DT_THERM_7200" inherit="OM4_SIS2_COBALT">
-<description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)">
- global 1/4 degree z  with THERMO_SPANS_COUPLING
-</description>
-
-    <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_OCMIP2_CFC = False
-USE_generic_tracer = True
-GENERIC_TRACER_IC_FILE = "MOM_GENERICS_NULL_"
-THERMO_SPANS_COUPLING = True
-#override DT_THERM = 7200
-#override DIABATIC_FIRST = False
-OVERRIDE_EOF
-
-
-     ]]></csh>
-   </input>
-</experiment>
 
 
 </experimentSuite>
