@@ -259,15 +259,15 @@ Make the executable for ocean-ice experiments.
 
       <component name="mom6" requires="fms ocean_shared" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/">
          <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
-         <source versionControl="git" root="http://github.com">
+         <source versionControl="git" root="https://github.com">
         <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase>
         <csh>
-          git clone -b $(MOM6_GIT_TAG) http://github.com/NOAA-GFDL/MOM6-examples.git mom6
+          git clone -b $(MOM6_GIT_TAG) https://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
           git submodule init src/MOM6 src/SIS2 tools/python/025gridGeneration/MIDAS
-          git clone --recursive http://github.com/NOAA-GFDL/MOM6.git src/MOM6 
-          git clone             http://github.com/NOAA-GFDL/SIS2.git src/SIS2
+          git clone --recursive https://github.com/NOAA-GFDL/MOM6.git src/MOM6 
+          git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git submodule update #This gets the right version of submodules
           popd
 
@@ -792,7 +792,12 @@ touch $work/INPUT/SIS_override
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)"  source="ice_month">
            <analysis switch="$(ANALYSIS_SWITCH)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
         </timeSeries>
-        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)">
+          <!-- MDBI, this will trigger "fredb" to log the experiment to database if MDBIswitch is on -->
+          <analysis switch="$(MDBIswitch)" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
+
+        </timeAverage>
+	  
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_B)"/>
       </component>
 
@@ -1367,6 +1372,10 @@ ncap -O --script 'cfc_11 = ptemp * 0.0 ; cfc_12 = ptemp * 0.0 ; sf6 = ptemp * 0.
 
    </input>
 
+   <runtime>
+       <reference restart="$(REFERENCE)/1x0m20d_32pe/restart/19700121.tar"/>
+   </runtime>
+
 </experiment>
 
 
@@ -1520,6 +1529,10 @@ OVERRIDE_EOF
      ]]></csh>
 
    </input>
+
+   <runtime>
+       <reference restart="$(REFERENCE)/1x0m10d_2997pe/restart/19700111.tar"/>
+   </runtime>
      
 </experiment>
 
@@ -1544,6 +1557,11 @@ OVERRIDE_EOF
 
      ]]></csh>
    </input>
+
+   <runtime>
+       <reference restart="$(REFERENCE)/1x0m10d_2997pe/restart/19700111.tar"/>
+   </runtime>
+    
 </experiment>
 <experiment name="MOM6_GOLD_SIS2_bergs" inherit="MOM6_SIS2_compile">
 <description communityProject="OWG" communityModel="MOM6_GOLD_SIS2 $(FRE_STEM)" communityModelID="OWG_MOM6_GOLD_SIS2" communityExperimentName="$(name)" >
@@ -1577,9 +1595,7 @@ OVERRIDE_EOF
      </dataFile>                                                                                     
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">                         
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/MOM_input</dataSource> 
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/MOM_override</dataSource>
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/SIS_input</dataSource> 
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/SIS_override</dataSource>
      </dataFile>      
                                                                              
       <!--gridSpec mosaic datasets-->
@@ -1788,11 +1804,13 @@ endif
    </input>
    <runtime>
        <regression name="basic">
-         <run days="20"    npes="64" overrideParams="dummy_ocean_model_nml:ocean_layout=4,16;dummy_ocean_model_nml:ocean_io_layout=1,4;dummy_ice_model_nml:ice_layout=4,16;dummy_ice_model_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
+         <run days="20"    npes="128"  runTimePerJob="00:30:00"/>
        </regression>
        <regression name="rts">
-         <run days="10 10" npes="64" overrideParams="dummy_ocean_model_nml:ocean_layout=4,16;dummy_ocean_model_nml:ocean_io_layout=1,4;dummy_ice_model_nml:ice_layout=4,16;dummy_ice_model_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
+         <run days="10 10" npes="128"  runTimePerJob="00:30:00"/>
+         <run days="20" npes="64" overrideParams="dummy_ocean_model_nml:ocean_layout=4,16;dummy_ocean_model_nml:ocean_io_layout=1,4;dummy_ice_model_nml:ice_layout=4,16;dummy_ice_model_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
          <run days="20"    npes="32" overrideParams="dummy_ocean_model_nml:ocean_layout=4,8;dummy_ocean_model_nml:ocean_io_layout=1,4;dummy_ice_model_nml:ice_layout=4,8;dummy_ice_model_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
+         <run days="20"    npes="30" overrideParams="dummy_ocean_model_nml:ocean_layout=5,6;dummy_ocean_model_nml:ocean_io_layout=1,3;dummy_ice_model_nml:ice_layout=5,6;dummy_ice_model_nml:ice_io_layout=1,3" runTimePerJob="00:30:00"/>
        </regression>
 
        <regression name="debug">
