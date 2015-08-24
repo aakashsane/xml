@@ -433,98 +433,28 @@ fYear = "${oname}"
 # Test to see if sqlite databse exits, if not, then create it
 dbFile = "${localRoot}/db/.globalAveOcean.db"
 
-#Read in gridSpec files
-fgs = cdms2.open(fYear + '.ocean_static.nc')
+# Read in ocean scalar annual file
+fdata = cdms2.open(fYear + '.ocean_scalar_annual.nc')
 
-cellArea = fgs('area_t') 
-geoLat   = fgs('geolat') 
-geoLon   = fgs('geolon') 
+def extractScalarField(varName):
+  return fdata(varName)[0]
 
-#Read in data nc files
-fdata = cdms2.open(fYear + '.ocean_month.nc')
-
-def areaMean(varName,cellArea,geoLat,geoLon,region='global'):
-  var = fdata(varName)
-  var = cdutil.YEAR(var).squeeze()
-  if (region == 'tropics'):
-    var = MV2.masked_where(MV2.logical_or(geoLat < -30., geoLat > 30.),var)
-    cellArea = MV2.masked_where(MV2.logical_or(geoLat < -30., geoLat > 30.),cellArea)
-  elif (region == 'nh'):
-    var  = MV2.masked_where(MV2.less_equal(geoLat,30.),var)
-    cellArea  = MV2.masked_where(MV2.less_equal(geoLat,30.),cellArea)
-  elif (region == 'sh'):
-    var  = MV2.masked_where(MV2.greater_equal(geoLat,-30.),var)
-    cellArea  = MV2.masked_where(MV2.greater_equal(geoLat,-30.),cellArea)
-  elif (region == 'global'):
-    var  = var
-    cellArea = cellArea
-  res = MV2.array(var*cellArea).sum()/cellArea.sum()
-  return res
-
+ignoreList = ['time_bounds', 'average_T2', 'average_T1', 'average_DT']
 varDict = fdata.variables
+varDict = list(set(varDict) - set(ignoreList))
+
 globalMeanDic={}
-tropicsMeanDic={}
-nhMeanDic={}
-shMeanDic={}
 for varName in varDict:
-  if (len(varDict[varName].shape) == 3):
-    if (fdata(varName).getAxis(1).id == 'yh' and fdata(varName).getAxis(2).id == 'xh'):
-      
-      conn = sqlite3.connect("${localRoot}/db/.globalAveOcean.db")
-      c = conn.cursor()
-      globalMeanDic[varName] = areaMean(varName,cellArea,geoLat,geoLon,region='global')
-      sql = 'create table if not exists ' + varName + ' (year integer primary key, value float)'
-      sqlres = c.execute(sql)
-      sql = 'insert or replace into ' + varName + ' values(' + fYear[:4] + ',' + str(globalMeanDic[varName]) + ')'
-      try:
-        sqlres = c.execute(sql)
-        conn.commit()
-      except:
-  	pass
-      c.close()
-      conn.close()
-      
-      conn = sqlite3.connect("${localRoot}/db/.tropicsAveOcean.db")
-      c = conn.cursor()
-      globalMeanDic[varName] = areaMean(varName,cellArea,geoLat,geoLon,region='tropics')
-      sql = 'create table if not exists ' + varName + ' (year integer primary key, value float)'
-      sqlres = c.execute(sql)
-      sql = 'insert or replace into ' + varName + ' values(' + fYear[:4] + ',' + str(globalMeanDic[varName]) + ')'
-      try:
-        sqlres = c.execute(sql)
-        conn.commit()
-      except:
-  	 pass
-      c.close()
-      conn.close()
-      
-      conn = sqlite3.connect("${localRoot}/db/.nhAveOcean.db")
-      c = conn.cursor()
-      globalMeanDic[varName] = areaMean(varName,cellArea,geoLat,geoLon,region='nh')
-      sql = 'create table if not exists ' + varName + ' (year integer primary key, value float)'
-      sqlres = c.execute(sql)
-      sql = 'insert or replace into ' + varName + ' values(' + fYear[:4] + ',' + str(globalMeanDic[varName]) + ')'
-      try:
-        sqlres = c.execute(sql)
-        conn.commit()
-      except:
-	pass
-      c.close()
-      conn.close()
-      
-      conn = sqlite3.connect("${localRoot}/db/.shAveOcean.db")
-      c = conn.cursor()
-      globalMeanDic[varName] = areaMean(varName,cellArea,geoLat,geoLon,region='sh')
-      sql = 'create table if not exists ' + varName + ' (year integer primary key, value float)'
-      sqlres = c.execute(sql)
-      sql = 'insert or replace into ' + varName + ' values(' + fYear[:4] + ',' + str(globalMeanDic[varName]) + ')'
-      try:
-        sqlres = c.execute(sql)
-        conn.commit()
-      except:
-	pass
-      c.close()
-      conn.close()
+  conn = sqlite3.connect("${localRoot}/db/.globalAveOcean.db")
+  c = conn.cursor()
+  globalMeanDic[varName] = extractScalarField(varName)
+  sql = 'create table if not exists ' + varName + ' (year integer primary key, value float)'
+  sqlres = c.execute(sql)
+  sql = 'insert or replace into ' + varName + ' values(' + fYear[:4] + ',' + str(globalMeanDic[varName]) + ')'
+  sqlres = c.execute(sql)
+  conn.commit()
+  c.close()
+  conn.close()
 
 EOF
 
