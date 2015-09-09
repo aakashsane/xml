@@ -202,6 +202,7 @@ geoLat   = MV2.concatenate((MV2.array(fgs1('geolat_t')), MV2.array(fgs2('geolat_
 geoLon   = MV2.concatenate((MV2.array(fgs1('geolon_t')), MV2.array(fgs2('geolon_t')), MV2.array(fgs3('geolon_t')), MV2.array(fgs4('geolon_t')), MV2.array(fgs5('geolon_t')), MV2.array(fgs6('geolon_t'))),axis=0)
 cellArea = MV2.concatenate((MV2.array(fgs1('land_area')), MV2.array(fgs2('land_area')), MV2.array(fgs3('land_area')), MV2.array(fgs4('land_area')), MV2.array(fgs5('land_area')), MV2.array(fgs6('land_area'))),axis=0)
 cellFrac = MV2.concatenate((MV2.array(fgs1('land_frac')), MV2.array(fgs2('land_frac')), MV2.array(fgs3('land_frac')), MV2.array(fgs4('land_frac')), MV2.array(fgs5('land_frac')), MV2.array(fgs6('land_frac'))),axis=0)
+soilArea = MV2.concatenate((MV2.array(fgs1('soil_area')), MV2.array(fgs2('soil_area')), MV2.array(fgs3('soil_area')), MV2.array(fgs4('soil_area')), MV2.array(fgs5('soil_area')), MV2.array(fgs6('soil_area'))),axis=0)
 
 fdata1 = cdms2.open(fYear + '.land_month.tile1.nc')
 fdata2 = cdms2.open(fYear + '.land_month.tile2.nc')
@@ -209,7 +210,6 @@ fdata3 = cdms2.open(fYear + '.land_month.tile3.nc')
 fdata4 = cdms2.open(fYear + '.land_month.tile4.nc')
 fdata5 = cdms2.open(fYear + '.land_month.tile5.nc')
 fdata6 = cdms2.open(fYear + '.land_month.tile6.nc')
-soilArea = MV2.concatenate((MV2.array(fdata1('soil_area')), MV2.array(fdata2('soil_area')), MV2.array(fdata3('soil_area')), MV2.array(fdata4('soil_area')), MV2.array(fdata5('soil_area')), MV2.array(fdata6('soil_area'))),axis=1)
 
 depth = fdata1.axes['zhalf_soil'][:]
 cellDepth = []
@@ -243,7 +243,6 @@ def areaMean(varName,cellArea,cellFrac,soilFrac,geoLat,geoLon,region='global'):
   moduleDic = getWebsiteVariablesDic()
   var = MV2.concatenate((MV2.array(fdata1(varName)), MV2.array(fdata2(varName)), MV2.array(fdata3(varName)), MV2.array(fdata4(varName)), MV2.array(fdata5(varName)), MV2.array(fdata6(varName))),axis=1)
   var = cdutil.YEAR(var).squeeze()
-  soilFrac = soilFrac[0,:,:]
   try:
     module = moduleDic[varName]
   except:
@@ -281,7 +280,6 @@ def areaMean(varName,cellArea,cellFrac,soilFrac,geoLat,geoLon,region='global'):
 
 def areaMean3D(varName,cellArea,cellFrac,cellDepth,soilFrac,geoLat,geoLon,region='global'):
   var = MV2.concatenate((MV2.array(fdata1(varName)), MV2.array(fdata2(varName)), MV2.array(fdata3(varName)), MV2.array(fdata4(varName)), MV2.array(fdata5(varName)), MV2.array(fdata6(varName))),axis=2)
-  soilFrac = cdutil.YEAR(soilFrac).squeeze()
   moduleDic = getWebsiteVariablesDic()
   try:
     module = moduleDic[varName]
