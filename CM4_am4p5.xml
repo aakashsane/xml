@@ -316,6 +316,17 @@ the faster the model throughput, but also the lower the model efficiency
 	       dummy_ocean_nml:ocean_layout=36,72;dummy_ocean_nml:ocean_io_layout=1,4;
                dummy_ocean_nml:ocean_mask_table=mask_table.622.36x72"/>
 
+    <property name="domainparams_A216x2_O2432"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=2432;
+               coupler_nml:atmos_npes=216;coupler_nml:atmos_nthreads=2;	
+               fv_core_nml:layout=3,12;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=4;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=3,12;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=72,3;ice_model_nml:io_layout=1,3;
+	       dummy_ice_nml:ice_layout=72,3;dummy_ice_nml:ice_io_layout=1,3;
+	       dummy_ocean_nml:ocean_layout=45,72;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.808.45x72"/>
+  
    <property name="domainparams_A288x2_O1970"
              value="
                coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=1970;
@@ -338,6 +349,17 @@ the faster the model throughput, but also the lower the model efficiency
 	       dummy_ocean_nml:ocean_layout=36,72;dummy_ocean_nml:ocean_io_layout=1,4;
                dummy_ocean_nml:ocean_mask_table=mask_table.622.36x72"/>
 
+   <property name="domainparams_A576x2_O3782"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=3782;
+               coupler_nml:atmos_npes=576;coupler_nml:atmos_nthreads=2;	
+               fv_core_nml:layout=8,12;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=8,12;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=144,4;ice_model_nml:io_layout=1,4;
+	       dummy_ice_nml:ice_layout=144,4;dummy_ice_nml:ice_io_layout=1,4;
+	       dummy_ocean_nml:ocean_layout=72,72;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.1402.72x72"/>
+   
 
 <!--The following are needed till frerun supports overrideParams for production runs-->
   <property name="PROD_NPES"            value="2186"/>  
@@ -487,53 +509,6 @@ module unload altd
       <xi:include xpointer="xpointer(//setup/platform[@name='ncrc2.intel']/node())" />
     </platform>
 
-    <platform name="nescc.intel">
-      <project>gfdlport</project>
-      <directory stem="$(FRE_STEM)">
-        <root>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)</root>
-        <src>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/src</src>
-        <exec>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)/exec</exec>
-        <scripts>$HOME/$(stem)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <stdout>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <state>$HOME/$(stem)/$(name)/$(platform)-$(target)/state</state>
-        <work>/scratch2/portfolios/GFDL/gfdlscr/$USER/work/$FRE_JOBID</work>
-        <ptmp>/scratch2/portfolios/GFDL/gfdlscr/$USER/ptmp</ptmp>
-        <stmp>/scratch2/portfolios/GFDL/gfdlscr/$USER/stmp</stmp>
-        <archive>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)</archive>
-      </directory>
-      <property name="EXEC_ROOT"         value="$(rootDir)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_NESCC)"/>
-      <property name="AWG_ARCHIVE_ROOT"  value="/scratch2/portfolios/GFDL/gfdlscr/John.Krasting/awg/mdt"/>
-      <property name="LWH_ARCHIVE_ROOT"  value=""/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="CWG_HOME"          value="/scratch2/portfolios/GFDL/gfdlscr/John.Krasting/cwg"/>
-      <property name="REFERENCE"         value="/scratch2/portfolios/GFDL/gfdlscr/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="ARCHIVE_INPUT_NZ"  value="/scratch2/portfolios/GFDL/gfdlscr/Niki.Zadeh/archive/input"/>
-
-      <csh><![CDATA[
-        module use ~fms/local/modulefiles
-        #module load intel/12-12.0.4.191 #need more up-to-date compiler for ulm
-        module load intel/13.0.079
-        module load netcdf/4.1.1-intel-12
-        module load mpt/2.06
-        module load $(FRE_VERSION)
-        module load nco
-        setenv MPICH_CPUMASK_DISPLAY
-        setenv KMP_STACKSIZE 512m
-        setenv NC_BLKSZ 1M
-        setenv F_UFMTENDIAN big
-        setenv SMA_SHMALLOC_FORCE_EQUAL off
-        setenv MPI_BUFS_PER_PROC 512
-        setenv MPI_BUFS_PER_HOST 512
-      ]]></csh>
-    </platform>
-
-    
-    <platform name="nescc.default">
-      <xi:include xpointer="xpointer(//setup/platform[@name='nescc.intel']/node())" />
-    </platform>
-
     <platform name="theia.intel">
       <project>gfdlport</project>
       <directory stem="$(FRE_STEM)">
@@ -546,6 +521,7 @@ module unload altd
         <work>/scratch4/GFDL/gfdlscr/$USER/work/$FRE_JOBID</work>
         <ptmp>/scratch4/GFDL/gfdlscr/$USER/ptmp</ptmp>
         <stmp>/scratch4/GFDL/gfdlscr/$USER/stmp</stmp>
+        <tmp>/scratch4/GFDL/gfdlscr/$USER/stmp</tmp>
         <archive>/scratch4/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)</archive>
       </directory>
 
@@ -616,13 +592,6 @@ module unload altd
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
     <platform name="gfdl.ncrc2-intel15">
-      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
-    </platform>
-
-    <platform name="gfdl.nescc-default">
-      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
-    </platform>
-    <platform name="gfdl.nescc-intel">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
 
@@ -946,7 +915,6 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Niki.Zadeh/archive/input/ulm/awg_C96L32_LM3_OM4_025_grid_lm3p2_19810101.remapped.topodrag.v20150507.minus_ice_model_restart.tar</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/awg_C96L32_LM3_OM4_025_grid_lm3p2_19810101.remapped.topodrag.v20150507.minus_ice_model_restart.tar</dataSource>
-        <dataSource site="nescc">/scratch2/portfolios/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/awg_C96L32_LM3_OM4_025_grid_lm3p2_19810101.remapped.topodrag.v20150507.minus_ice_model_restart.tar</dataSource>
       </dataFile>
     </input>
   </experiment>
@@ -1003,7 +971,6 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/awg/input/lm3/lm3_data_20150322.tar</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/awg/mdt/awg/input/lm3/lm3_data_20150322.tar</dataSource>
-        <dataSource site="nescc">/scratch2/portfolios/GFDL/gfdlscr/Niki.Zadeh/awg/mdt/awg/input/lm3/lm3_data_20150322.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/common/aerosol_inputs.dec2009.cpio</dataSource>
@@ -1128,7 +1095,6 @@ $baseDate
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fre/tikal/LM3/LM3p2_C96_CM2G_historical_HC1_quick/ncrc2.default-prod/static_veg/19810101.static_veg.lm3p2.remapped_to_c96_OM4_025.v20150322.tar</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/awg/mdt/awg/input/lm3/19810101.static_veg.lm3p2.remapped_to_c96_OM4_025.v20150322.tar</dataSource>
-        <dataSource site="nescc">/scratch2/portfolios/GFDL/gfdlscr/Niki.Zadeh/awg/mdt/awg/input/lm3/19810101.static_veg.lm3p2.remapped_to_c96_OM4_025.v20150322.tar</dataSource>
        </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/c96_OM4_025_hydrography_v20140620.tar</dataSource>
@@ -1416,10 +1382,10 @@ endif
 
   <experiment name="common_init_csh_blocks">
     <input>
-      <csh><![CDATA[
+      <csh type="always"><![CDATA[
 
 # Copy AWG and OWG ascii input files to GFDL (waiting for FRE to do this for us)
-if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
+if ( $?flagOutputXferOn && $?flagOutputPostProcessOn && $currentSeg == 1 ) then
   #gcp --batch does not understand some variations of home filesystem like /autofs/mnt/ncrc-svm1_home1 so we need to massage rtsxml to comply
   set xmldirlocal = `dirname $rtsxml | sed -r "s/^\/(autofs|ncrc)\/.+\/$USER\//\~$USER\//"`
   set xmldirRemote = `echo $xmldirlocal | sed -r "$patternSedHome"`
@@ -1447,6 +1413,7 @@ endif
 # create dummy MOM6 parameter file for do_ocean=.false.
 touch $work/INPUT/MOM_input
 touch $work/INPUT/MOM_override
+touch $work/INPUT/MOM_layout
 touch $work/INPUT/SIS_override
 touch $work/INPUT/SIS_layout
 ln -s $work/INPUT/topog.nc $work/INPUT/ocean_topog.nc 
@@ -1456,90 +1423,7 @@ cat >> $HOME/frejobs_stdout <<EOF_frejobs
 $stdoutDir/$FRE_JOBID
 EOF_frejobs
 
-      ]]></csh>
-     </input>
-  </experiment>
 
-  <experiment name="common_csh_blocks">
-    <input>
-      <csh><![CDATA[
-
-# runCommand:
-set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
-if ("${platform_domain}" == "ncrc.gov") then
-
-  set place = $atmos_nthreads
-  if ( $do_concurrent_radiation == ".true." ) then
-     @ place += $radiation_nthreads
-     setenv MALLOC_CHECK_ 5
-     setenv MPICH_GNI_NDREG_LAZYMEM disabled	
-  endif
-
-  if ( $do_ocean == "true" ) then
-    alias runCommand "aprun -d $place -n $atmos_npes ./$executable:t : -n $ocean_npes -d 1 ./$executable:t"
-   else
-    alias runCommand "aprun -d $place -n $atmos_npes ./$executable:t"
-  endif
-else if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov" ) then
-  if ( $do_ocean == "true" ) then
-    alias runCommand "mpiexec_mpt -np $atmos_npes -v omplace -nt $atmos_nthreads ./$executable:t : -np $ocean_npes -v omplace -nt 1 ./$executable:t"
-   else
-     alias runCommand "mpiexec_mpt -np $atmos_npes -v omplace -nt $atmos_nthreads ./$executable:t"
-  endif
-else if ("${platform_domain}" == "theia.fairmont.rdhpcs.noaa.gov" ) then
-  if ( $do_ocean == "true" ) then
-    alias runCommand "mpirun -n $atmos_npes  -env I_MPI_PIN_PROCESSOR_LIST allcores:grain=1,shift=$atmos_nthreads ./$executable:t : -n $ocean_npes -env I_MPI_PIN_PROCESSOR_LIST allcores:grain=1,shift=1 ./$executable:t"
-   else
-     alias runCommand "mpirun -n $atmos_npes -env I_MPI_PIN_PROCESSOR_LIST allcores:grain=1,shift=$atmos_nthreads ./$executable:t"
-  endif
-else
-  echo "FATAL: Invalid platform ... unsure how to structure mpirun command"
-  exit 53
-endif
-
-# Copy AWG and OWG ascii input files to GFDL (waiting for FRE to do this for us)
-if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
-#  module switch gcp/2.2 gcp/2.3
-  #gcp --batch does not understand some variations of home filesystem like /autofs/mnt/ncrc-svm1_home1 so we need to massage rtsxml to comply
-  set xmldirlocal = `dirname $rtsxml | sed -r "s/^\/(autofs|ncrc)\/.+\/$USER\//\~$USER\//"`
-  set xmldirRemote = `echo $xmldirlocal | sed -r "$patternSedHome"`
-  if ("${platform_domain}" == "ncrc.gov") then
-    set xmldirRemote = `echo $xmldirlocal | sed -r "$patternSedHome;$patternSedCTMP;$patternSedCPERM"`
-    gcp --batch -cd -r --sync $xmldirlocal/awg_include gfdl:$(AWG_INPUT_HOME_GFDL)/..
-    gcp --batch -cd -r --sync $xmldirlocal/awg_include gfdl:$xmldirRemote/
-  else if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
-    gcp -cd -r --sync $xmldirlocal/awg_include gfdl:$(AWG_INPUT_HOME_GFDL)/..
-    gcp -cd -r --sync $xmldirlocal/awg_include gfdl:$xmldirRemote/
-  endif
-  #trick to copy MOM6 directory but avoid traversing the .datasets links
-  tar cvf mom6.tar --exclude='.datasets' -C $(MOM6_EXAMPLES) . > /dev/null
-  #tar cvf mom6.tar  --exclude='.datasets' --exclude='src' --exclude='INPUT'  -C $(MOM6_EXAMPLES) . > /dev/null
-  mkdir mom6
-  tar xvf mom6.tar -C ./mom6 > /dev/null
-  if ("${platform_domain}" == "ncrc.gov") then
-    gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  else if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
-    gcp -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  endif
-endif
-
-# create dummy MOM6 parameter file for do_ocean=.false.
-touch $work/INPUT/MOM_input
-touch $work/INPUT/MOM_override
-touch $work/INPUT/SIS_override
-touch $work/INPUT/SIS_layout
-ln -s $work/INPUT/topog.nc $work/INPUT/ocean_topog.nc 
-
-# Record the job stdout location for later use timings database
-
-cat >> $HOME/frejobs_stdout <<EOF_frejobs
-$stdoutDir/$FRE_JOBID
-EOF_frejobs
-
-
-      ]]></csh>
-
-      <csh type="always"><![CDATA[
 ####COMMON ALWAYS CSH BEGINS######
 # MOM6 restart switch
 if ( $currentSeg == 1 ) then
@@ -1607,14 +1491,13 @@ set nxblocks = $dummy
 set dummy  = `awk '/nyblocks/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
 set nyblocks = $dummy
 
-
 ####COMMON ALWAYS CSH ENDS######
-
       ]]></csh>
-      
+           
      </input>
   </experiment>
- 
+
+
   <experiment name="c192_data_lm3p2">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -2898,21 +2781,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c96L32/topo_v20150507/awg_C96L32_LM3_OM4_025_grid_lm3p2_19810101.remapped.topodrag.v20150507.tar</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/awg/mdt/awg/input/ic/awg_C96L32_LM3_OM4_025_grid_lm3p2_19810101.remapped.topodrag.v20150507.tar</dataSource>
-        <dataSource site="nescc">/scratch2/portfolios/GFDL/gfdlscr/Niki.Zadeh/awg/mdt/awg/input/ic/awg_C96L32_LM3_OM4_025_grid_lm3p2_19810101.remapped.topodrag.v20150507.tar</dataSource>
       </dataFile>
-      <namelist name="flux_exchange_nml">
-        nblocks=$atmos_nthreads
-      </namelist>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-	 nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>       
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_c96L32.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_amip.nml"/>
       <namelist name="coupler_nml">
         months = $months,
         days   = $days,
@@ -2924,9 +2793,51 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         concurrent = .false.
         do_ocean = .false.
         ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
+        atmos_npes = $(ATM_PROD_NPES)
+        atmos_nthreads = $(ATM_PROD_NTHREADS)
       </namelist>
+      <namelist name="fv_core_nml">
+        layout = $(FV_PROD_LAYOUT)
+        io_layout = $(FV_PROD_IO_LAYOUT)
+        npx      = 97,
+        npy      = 97,
+        ntiles   = 6,
+        npz      = 32,
+        k_split  = 1,
+        n_split  = 15,
+        a2b_ord  = 4,
+        hord_dp = 13,
+        adjust_dry_mass = $adjust_dry_mass,
+        consv_te = 0.7,
+        fill = .true.
+        print_freq = 0,
+        grid_type = 0,
+        nord = 2,
+        dddmp = 0.0,
+        d2_bg = 0.0,
+        d4_bg = 0.16,
+        tau = 0.
+        z_tracer=.false.
+      </namelist>
+      <namelist name="land_model_nml">
+        layout = $(LND_PROD_LAYOUT)
+        io_layout = $(LND_PROD_IO_LAYOUT)
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+      </namelist>
+       <namelist name="flux_exchange_nml">
+        nblocks=$(ATM_PROD_NTHREADS)
+      </namelist>
+      <namelist name="atmos_model_nml">
+         nxblocks = $(ATM_PROD_NXBLOCKS)
+         nyblocks = $(ATM_PROD_NYBLOCKS)
+      </namelist>
+      <!-- Namelist -->
+      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>       
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_amip.nml"/>
       <!-- Input datasets -->
       <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
@@ -2935,13 +2846,13 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96_atmos_domain_decomp']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
 
     </input>
 
     <runtime>
       <regression name="basic">
-        <run days="8"   npes="432" overrideParams="xgrid_nml:make_exchange_reproduce=.true."  runTimePerJob="02:30:00"/>
+        <run days="8" npes="216"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A216x2)"/>
       </regression>
       <regression name="rts">
         <run days="4 4"  npes="432" overrideParams="xgrid_nml:make_exchange_reproduce=.true."  runTimePerJob="02:30:00"/>
@@ -2980,7 +2891,26 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <regression name="timingFRE">
         <run months="1" npes="216"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A216x2)"/>
         <run months="1" npes="432"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A432x2)"/>
-      </regression>
+        <run months="1" npes="288"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2)"/>
+        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2)"/>
+        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_1)"/>
+        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_2)"/>
+        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_3)"/>
+        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_4)"/>
+        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_5)"/>
+        <run months="1" npes="768"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A768x4)"/>
+        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x4)"/>
+        <run months="1" npes="1152"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2)"/>
+        <run months="1" npes="1152"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2_1)"/>
+        <run months="1" npes="1152"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2_2)"/>
+        <run months="1" npes="1152"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2_3)"/>
+        <run months="1" npes="576"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x4)"/>
+        <run months="1" npes="288"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x8)"/>
+        <run months="1" npes="432"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x8)"/>
+        <run months="1" npes="1056"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A1056x4)"/>
+        <run months="1" npes="1152"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x4)"/>
+        <run months="1" npes="960"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A960x4)"/>
+    </regression>
 
       <reference restart="$(REFERENCE)/archive/1x0m8d_432pe/restart/19800109.tar"/>
 
@@ -3084,7 +3014,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <xi:include xpointer="xpointer(//experiment[@name='c192_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c192_atmos_domain_decomp']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
 
     </input>
 
@@ -3163,12 +3093,12 @@ For more information please refer to the
         use_lag_fluxes = .true.
         concurrent = .true.
         do_ocean = .true.
-        ocean_npes = $ocean_npes
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
+        ocean_npes = $(OCN_PROD_NPES)
+        atmos_npes = $(ATM_PROD_NPES)
+        atmos_nthreads = $(ATM_PROD_NTHREADS)
       </namelist>
       <namelist name="flux_exchange_nml">
-            nblocks=$atmos_nthreads
+            nblocks=$(ATM_PROD_NTHREADS)
             debug_stocks = .FALSE.
             divert_stocks_report = .TRUE.
             do_area_weighted_flux = .FALSE.
@@ -3191,9 +3121,49 @@ For more information please refer to the
       </namelist>
 
       <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-	 nyblocks = $nyblocks
+         nxblocks = $(ATM_PROD_NXBLOCKS)
+         nyblocks = $(ATM_PROD_NYBLOCKS)
       </namelist>
+      <namelist name="fv_core_nml">
+        layout = $(FV_PROD_LAYOUT)
+        io_layout = $(FV_PROD_IO_LAYOUT)
+        npx      = 97,
+        npy      = 97,
+        ntiles   = 6,
+        npz      = 32,
+        k_split  = 1,
+        n_split  = 15,
+        a2b_ord  = 4,
+        hord_dp = 13,
+        adjust_dry_mass = $adjust_dry_mass,
+        consv_te = 0.7,
+        fill = .true.
+        print_freq = 0,
+        grid_type = 0,
+        nord = 2,
+        dddmp = 0.0,
+        d2_bg = 0.0,
+        d4_bg = 0.16,
+        tau = 0.
+        z_tracer=.false.
+      </namelist>
+      <namelist name="land_model_nml">
+        layout = $(LND_PROD_LAYOUT)
+        io_layout = $(LND_PROD_IO_LAYOUT)
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+      </namelist>
+
+      <namelist name="dummy_ocean_nml">
+        ocean_layout = $(OCN_PROD_LAYOUT)
+        ocean_io_layout = $(OCN_PROD_IO_LAYOUT)
+	ocean_mask_table= $(OCN_PROD_MASK_TABLE)
+      </namelist>
+      <namelist name="dummy_ice_nml">
+        ice_layout = $(ICE_PROD_LAYOUT)
+        ice_io_layout = $(ICE_PROD_IO_LAYOUT)
+      </namelist>
+
       <!--AWG Input datasets -->
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4g5r2_physics.nml"/>
@@ -3206,11 +3176,12 @@ For more information please refer to the
       <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p5_faero']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
       <!--MOM6 Input datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
       <!--SIS Input datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
+
 
     </input>
 
@@ -3219,7 +3190,7 @@ For more information please refer to the
           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
         </production>
       <regression name="basic">
-        <run days="10" npes="2432" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:20:00"/>
+        <run days="10" npes="$(PROD_NPES)" runTimePerJob="01:00:00"/>
       </regression>
 
       <regression name="rts">
@@ -3233,38 +3204,14 @@ For more information please refer to the
         <run days="10"  npes="2561" overrideParams="xgrid_nml:make_exchange_reproduce=.true." runTimePerJob="01:20:00"/>
       </regression>
 
-      <regression name="test">
-        <run days="10"  npes="2431" overrideParams="xgrid_nml:make_exchange_reproduce=.true.;coupler_nml:ice_npes=216" runTimePerJob="01:20:00"/>
-      </regression>
-      
-
-      <regression name="debug">
-        <run days="1" npes="1584" runTimePerJob="02:00:00"/>
-      </regression>
-
-      <regression name="timing">
-        <run months="1" npes="2432" runTimePerJob="01:00:00"/>
-      </regression>
-
-      <regression name="timingsL32">
-        <run months="1" npes="2432" runTimePerJob="01:00:00"/>
-        <run months="1" npes="2560" runTimePerJob="01:00:00"/>
-      </regression>
-     
-      <regression name="timingL48">
-        <run months="1" npes="3296" runTimePerJob="01:00:00"/>
-      </regression>
-     
-      <regression name="timingsL48">
-        <run months="1" npes="1376" runTimePerJob="01:00:00"/>
-        <run months="1" npes="1454" runTimePerJob="01:00:00"/>
-        <run months="1" npes="2620" runTimePerJob="01:00:00"/>
-        <run months="1" npes="3584" runTimePerJob="01:00:00"/>
-	<run months="1" npes="5279" runTimePerJob="01:00:00"/>
-        <run months="1" npes="6975" runTimePerJob="01:00:00"/>
-        <run months="1" npes="4704" runTimePerJob="01:00:00"/>
-        <run months="1" npes="3296" runTimePerJob="01:00:00"/>
-      </regression>
+	<regression name="timingFRE">
+          <run months="1" npes="$(PROD_NPES)" runTimePerJob="01:00:00"/>
+          <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1970)"/>
+          <run months="1" npes="2648" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O2432)"/>
+          <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x4_O1970)"/>
+          <run months="1" npes="2258" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1970)"/>
+          <run months="1" npes="4358" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O3782)"/>
+      	</regression>
 
       <reference restart="$(REFERENCE)/archive/1x0m10d_1584pe/restart/00010111.tar"/>
 
@@ -3353,7 +3300,7 @@ For more information please refer to the
       <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c192L32_initCond']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c192_coupled_domain_decomp']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
 
       <!--MOM6 Input datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
@@ -3439,7 +3386,6 @@ For more information please refer to the
 -->
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
-        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
      </dataFile>
@@ -3494,7 +3440,7 @@ For more information please refer to the
         <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_5daily"/>
       </component>
       
-      <component type="ocean_monthly"   source="ocean_month" sourceGrid="ocean-tripolar">
+      <component type="ocean_month"   source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_monthly.frepp"/>
         </timeSeries>
@@ -3614,7 +3560,7 @@ communityExperimentName="$(name)"
       <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96_atmos_domain_decomp']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
 
     </input>
 
@@ -3772,7 +3718,7 @@ Do not use it for science!!!
       <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p5_faero']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
       <!--MOM6 Input datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
       <!--SIS Input datasets-->
@@ -3802,29 +3748,7 @@ init = f
 /
        </fieldTable>
 
-        <csh type="always"><![CDATA[
-####COMMON ALWAYS CSH BEGINS######
-# MOM6 restart switch
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-# adjustment of dry mass first time only
-set adjust_dry_mass = ".true."
-if (-e $work/INPUT/coupler.res) then
-   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   foreach i (1 2 3 4 5 6)
-      if ( $t1[$i] != $t2[$i] ) then
-         set adjust_dry_mass = ".false."
-         break   
-      endif      
-   end
-endif
-####COMMON ALWAYS CSH ENDS######
-
+        <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override ENERGYSAVEDAYS = 73.0
 #override USE_OCMIP2_CFC = False
@@ -3942,7 +3866,7 @@ Do not use it for science!!!
       <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96_coupled_domain_decomp']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='common_csh_blocks']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
       <!--MOM6 Input datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
       <!--SIS Input datasets-->
@@ -4122,80 +4046,7 @@ Do not use it for science!!!
       <!--SIS Input datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
      
-      <csh type="always"><![CDATA[
-####COMMON ALWAYS CSH BEGINS######
-
-#Scan auxiliary_nml for setting MOM6/SIS2 layouts
-#The strange use of dummy variable below has to do with post run scanning of stdout by timing database ingestion tool. Please do not simplify!
-set dummy     = `awk '/ocean_mask_table/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-set ocn_mask_table  =  $dummy
-set dummy     = `awk '/ocean_layout/     {gsub(/=/," ");           print $2,$3}' $work/input.nml`
-set OCN_LAYOUT    = $dummy
-set dummy     = `awk '/ocean_io_layout/  {gsub(/=/," ");           print $2,$3}' $work/input.nml`
-set OCN_IO_LAYOUT = $dummy
-set dummy     = `awk '/ice_layout/       {gsub(/=/," ");           print $2,$3}' $work/input.nml`
-set ICE_LAYOUT    = $dummy
-set dummy     = `awk '/ice_io_layout/    {gsub(/=/," ");           print $2,$3}' $work/input.nml`
-set ICE_IO_LAYOUT = $dummy
-
-cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
-#override undef NIPROC_IO
-#override undef NJPROC_IO
-#override undef NIPROC
-#override undef NJPROC
-#override IO_LAYOUT = $OCN_IO_LAYOUT
-#override LAYOUT    = $OCN_LAYOUT
-#override MASKTABLE = $ocn_mask_table
-MOM_LAYOUT_EOF
-
-cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
-#override undef NIPROC_IO
-#override undef NJPROC_IO
-#override undef NIPROC
-#override undef NJPROC
-#override IO_LAYOUT = $ICE_IO_LAYOUT
-#override LAYOUT    = $ICE_LAYOUT
-SIS_LAYOUT_EOF
-
-# MOM6 restart switch
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-# adjustment of dry mass first time only
-set adjust_dry_mass = ".true."
-if (-e $work/INPUT/coupler.res) then
-   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   foreach i (1 2 3 4 5 6)
-      if ( $t1[$i] != $t2[$i] ) then
-         set adjust_dry_mass = ".false."
-         break   
-      endif      
-   end
-endif
-
-###The following vars are set for the timing database ingestion tool only and are not necessary for a successful run
-set dummy     = `awk '/fv_core_nml/,/\// {print}' $work/input.nml | awk '/\<layout\>/ {gsub(/=/," ");print $2,$3}'`
-set fv_layout = $dummy
-set dummy  = `awk '/fv_core_nml/,/\// {print}' $work/input.nml | awk '/\<io_layout\>/ {gsub(/=/," ");print $2,$3}'`
-set fv_io_layout  = $dummy
-set dummy  = `awk '/land_model_nml/,/\// {print}' $work/input.nml | awk '/\<layout\>/ {gsub(/=/," ");print $2,$3}'`
-set land_layout   = $dummy
-set dummy  = `awk '/land_model_nml/,/\// {print}' $work/input.nml | awk '/\<io_layout\>/ {gsub(/=/," ");print $2,$3}'`
-set land_io_layout = $dummy
-set dummy  = `awk '/nxblocks/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-set nxblocks = $dummy
-set dummy  = `awk '/nyblocks/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-set nyblocks = $dummy
-
-
-###
-
-####COMMON ALWAYS CSH ENDS######
-
+      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override USE_KPP = False
 #override ENERGETICS_SFC_PBL = True
@@ -4212,36 +4063,22 @@ OVERRIDE_EOF
         <production simTime="$(PROD_SIMTIME)" units="years" npes="$(PROD_NPES)" runTime="04:00:00">
           <segment simTime="12" units="months" runTime="4:00:00"/>
         </production>
-    </runtime> 
+
+	<regression name="timingFRE">
+          <run months="1" npes="$(PROD_NPES)" runTimePerJob="01:00:00"/>
+          <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1970)"/>
+          <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x4_O1970)"/>
+          <run months="1" npes="2258" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1970)"/>
+          <run months="1" npes="4384" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O3782)"/>
+      	</regression>
+
+  </runtime> 
 </experiment>
 
 <experiment name="CM4_c96L32_am4g5r2_2000_sis2_low_mixing3" inherit="CM4_c96L32_am4g5r2_2000_sis2">
 								       
    <input>
-      <csh type="always"><![CDATA[
-####COMMON ALWAYS CSH BEGINS######
-# MOM6 restart switch
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-# adjustment of dry mass first time only
-set adjust_dry_mass = ".true."
-if (-e $work/INPUT/coupler.res) then
-   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   foreach i (1 2 3 4 5 6)
-      if ( $t1[$i] != $t2[$i] ) then
-         set adjust_dry_mass = ".false."
-         break   
-      endif      
-   end
-endif
-
-####COMMON ALWAYS CSH ENDS######
-
+      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override USE_KPP = False
 #override ENERGETICS_SFC_PBL = True
@@ -4259,30 +4096,7 @@ OVERRIDE_EOF
 <experiment name="CM4_c96L32_am4g5r2_2000_sis2_low_mixing3_DT_THERM_7200" inherit="CM4_c96L32_am4g5r2_2000_sis2_low_mixing3">
 								       
    <input>
-      <csh type="always"><![CDATA[
-####COMMON ALWAYS CSH BEGINS######
-# MOM6 restart switch
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-# adjustment of dry mass first time only
-set adjust_dry_mass = ".true."
-if (-e $work/INPUT/coupler.res) then
-   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   foreach i (1 2 3 4 5 6)
-      if ( $t1[$i] != $t2[$i] ) then
-         set adjust_dry_mass = ".false."
-         break   
-      endif      
-   end
-endif
-
-####COMMON ALWAYS CSH ENDS######
-
+      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override USE_KPP = False
 #override ENERGETICS_SFC_PBL = True
@@ -4327,30 +4141,7 @@ init = f
 /
        </fieldTable>
 
-      <csh type="always"><![CDATA[
-####COMMON ALWAYS CSH BEGINS######
-# MOM6 restart switch
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-# adjustment of dry mass first time only
-set adjust_dry_mass = ".true."
-if (-e $work/INPUT/coupler.res) then
-   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   foreach i (1 2 3 4 5 6)
-      if ( $t1[$i] != $t2[$i] ) then
-         set adjust_dry_mass = ".false."
-         break   
-      endif      
-   end
-endif
-
-####COMMON ALWAYS CSH ENDS######
-
+      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override USE_KPP = False
 #override ENERGETICS_SFC_PBL = True
@@ -4397,30 +4188,7 @@ init = f
 /
        </fieldTable>
 
-      <csh type="always"><![CDATA[
-####COMMON ALWAYS CSH BEGINS######
-# MOM6 restart switch
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-# adjustment of dry mass first time only
-set adjust_dry_mass = ".true."
-if (-e $work/INPUT/coupler.res) then
-   set t1 = (`grep "Model start time"   $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   set t2 = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1,$2,$3,$4,$5,$6}'`)
-   foreach i (1 2 3 4 5 6)
-      if ( $t1[$i] != $t2[$i] ) then
-         set adjust_dry_mass = ".false."
-         break   
-      endif      
-   end
-endif
-
-####COMMON ALWAYS CSH ENDS######
-
+      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override USE_KPP = False
 #override ENERGETICS_SFC_PBL = True

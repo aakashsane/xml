@@ -19,10 +19,10 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2015.08.06b"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2015.08.17"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
-   <property name="BERGS_GIT_TAG" value="user/nnz/fix_trajectory_append_hang"/>
+   <property name="BERGS_GIT_TAG" value="dev/master"/>
    <property name="FRE_VERSION"  value="fre/bronx-10"/>
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
@@ -42,15 +42,13 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
    <property name="PROD_RUNTIME"         value="16:00:00"/><!--zeus value="08:00:00"-->
    <property name="PROD_SEGTIME"         value="04:10:00"/><!--zeus value="02:10:00"-->
    <property name="PROD_NPES"            value="2997"/> 
-<!-- Not used anymore
-   <property name="MASK_TABLE"           value="mask_table.1053.90x45"/>
+   <property name="PROD_MASK_TABLE"      value="mask_table.1053.90x45"/>
    <property name="OCN_PROD_LAYOUT"      value="90,45"/>
    <property name="OCN_PROD_IO_LAYOUT"   value="9,5"/>
    <property name="ICE_PROD_LAYOUT"      value="90,45"/>
    <property name="ICE_PROD_IO_LAYOUT"   value="9,5"/>
    <property name="LND_PROD_LAYOUT"      value="90,45"/>
    <property name="FV_PROD_LAYOUT"       value="90,45"/>
--->  
 
 
    <!--Users need not change the following properties -->
@@ -62,6 +60,49 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
    <property name="DEBUGLEVEL"   value=""/>
+   <property name="STATIC"       value=""/>  
+
+   <property name="domainparams_O512"
+	     value="coupler_nml:ocean_npes=512;
+	            dummy_ice_nml:ice_layout=32,16;dummy_ice_nml:ice_io_layout=1,4;
+		    dummy_ice_nml:ice_mask_table=MOM_mask_table;
+	            dummy_ocean_nml:ocean_layout=0,0;dummy_ocean_nml:ocean_io_layout=1,1;
+                    dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
+
+   <property name="domainparams_O1152"
+	     value="coupler_nml:ocean_npes=1152;
+	            dummy_ice_nml:ice_layout=32,36;dummy_ice_nml:ice_io_layout=1,4;
+		    dummy_ice_nml:ice_mask_table=MOM_mask_table;
+	            dummy_ocean_nml:ocean_layout=32,36;dummy_ocean_nml:ocean_io_layout=1,4;
+                    dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
+
+   <property name="domainparams_O2304"
+	     value="coupler_nml:ocean_npes=2304;
+	            dummy_ice_nml:ice_layout=32,72;dummy_ice_nml:ice_io_layout=1,4;
+		    dummy_ice_nml:ice_mask_table=MOM_mask_table;
+	            dummy_ocean_nml:ocean_layout=32,72;dummy_ocean_nml:ocean_io_layout=1,4;
+                    dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
+
+   <property name="domainparams_O2432"
+	     value="coupler_nml:ocean_npes=2432;
+	            dummy_ice_nml:ice_layout=45,72;dummy_ice_nml:ice_io_layout=1,4;
+		    dummy_ice_nml:ice_mask_table=mask_table.808.45x72;
+	            dummy_ocean_nml:ocean_layout=45,72;dummy_ocean_nml:ocean_io_layout=1,4;
+                    dummy_ocean_nml:ocean_mask_table=mask_table.808.45x72"/>
+
+   <property name="domainparams_O2997"
+	     value="coupler_nml:ocean_npes=2997;
+	            dummy_ice_nml:ice_layout=90,45;dummy_ice_nml:ice_io_layout=9,5;
+		    dummy_ice_nml:ice_mask_table=mask_table.1053.90x45;
+	            dummy_ocean_nml:ocean_layout=90,45;dummy_ocean_nml:ocean_io_layout=9,5;
+                    dummy_ocean_nml:ocean_mask_table=mask_table.1053.90x45"/>
+
+   <property name="domainparams_O3240"
+	     value="coupler_nml:ocean_npes=3240;
+	            dummy_ice_nml:ice_layout=45,72;dummy_ice_nml:ice_io_layout=1,4;
+	            dummy_ocean_nml:ocean_layout=45,72;dummy_ocean_nml:ocean_io_layout=1,4;
+                    dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
+
 
    <setup>
     <platform name="ncrc2.intel">
@@ -132,48 +173,49 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
      <property name="NB_ROOT"          value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
  
     </platform>
-    <platform name="nescc.intel">
+
+    <platform name="theia.intel">
       <project>gfdlport</project>
       <directory stem="$(FRE_STEM)">
-        <root>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)</root>
-        <src>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/src</src>
-        <exec>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)/exec</exec>
+        <root>/scratch4/GFDL/gfdlscr/$USER/$(stem)</root>
+        <src>/scratch4/GFDL/gfdlscr/$USER/$(stem)/$(name)/src</src>
+        <exec>/scratch4/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)/exec</exec>
         <scripts>$HOME/$(stem)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <stdout>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <stdout>/scratch4/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)/stdout</stdout>
         <state>$HOME/$(stem)/$(name)/$(platform)-$(target)/state</state>
-        <work>/scratch2/portfolios/GFDL/gfdlscr/$USER/work/$FRE_JOBID</work>
-        <ptmp>/scratch2/portfolios/GFDL/gfdlscr/$USER/ptmp</ptmp>
-        <stmp>/scratch2/portfolios/GFDL/gfdlscr/$USER/stmp</stmp>
-        <archive>/scratch2/portfolios/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)</archive>
+        <work>/scratch4/GFDL/gfdlscr/$USER/work/$FRE_JOBID</work>
+        <ptmp>/scratch4/GFDL/gfdlscr/$USER/ptmp</ptmp>
+        <stmp>/scratch4/GFDL/gfdlscr/$USER/stmp</stmp>
+        <tmp>/scratch4/GFDL/gfdlscr/$USER/tmp</tmp>
+        <archive>/scratch4/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)</archive>
       </directory>
-      <mkmfTemplate file="/home/Niki.Zadeh/fre/fre-commands/site/nescc/intel.mk"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML"/>
-      <property name="MY_ROOT"          value="$(rootDir)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
-      <property name="REFERENCE"         value=""/>
-      <property name="ARCHIVE_INPUT_NZ"  value="/scratch2/portfolios/GFDL/gfdlscr/Niki.Zadeh/archive/input"/>
 
-      <csh><![CDATA[
-        module use ~fms/local/modulefiles
-        #module load intel/12-12.0.4.191 #need more up-to-date compiler for ulm
-        module load intel/13.0.079
-        module load netcdf/4.1.1-intel-12
-        module load mpt/2.06
-        module load $(FRE_VERSION)
+     <csh><![CDATA[
+        module use -a /home/fms/local/modulefiles
+        module use -a /contrib/gfdl/modulefiles
+        module load intel/15.1.133
+        module load netcdf/4.3.0
+        module load hdf5/1.8.14
+        module load impi/5.0.1.035
         module load nco
-        setenv MPICH_CPUMASK_DISPLAY
+        module load $(FRE_VERSION)
+
         setenv KMP_STACKSIZE 512m
         setenv NC_BLKSZ 1M
         setenv F_UFMTENDIAN big
-        setenv SMA_SHMALLOC_FORCE_EQUAL off
-        setenv MPI_BUFS_PER_PROC 512
-        setenv MPI_BUFS_PER_HOST 512
-        setenv MPI_IB_TIMEOUT 20
-      ]]></csh>
+        ]]>
+      </csh>
+
+     <property name="MY_ROOT"          value="$(rootDir)"/>
+     <property name="FMS_ARCHIVE_ROOT" value="$CDATA/fms"/>
+     <property name="F2003_FLAGS"      value="-DINTERNAL_FILE_NML -g -traceback"/> <!-- -g -traceback -->
+     <property name="REFERENCE"        value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+     <property name="NB_ROOT"          value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
+     
     </platform>
 
-    <platform name="nescc.default">
-      <xi:include xpointer="xpointer(//setup/platform[@name='nescc.intel']/node())" />
+    <platform name="theia.default">
+      <xi:include xpointer="xpointer(//setup/platform[@name='theia.intel']/node())" />
     </platform>
 
 <!-- gfdl platforms -->
@@ -212,10 +254,10 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
 
-    <platform name="gfdl.nescc-default">
+    <platform name="gfdl.theia-default">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
-    <platform name="gfdl.nescc-intel">
+    <platform name="gfdl.theia-intel">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
 
@@ -261,7 +303,7 @@ Make the executable for ocean-ice experiments.
          <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
          <source versionControl="git" root="https://github.com">
         <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase>
-        <csh>
+        <csh><![CDATA[
           git clone -b $(MOM6_GIT_TAG) https://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
@@ -273,8 +315,8 @@ Make the executable for ocean-ice experiments.
 
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
-          if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
-            ln -s /scratch2/portfolios/GFDL/gfdlscr/John.Krasting/pdata/gfdl_O/datasets/ .datasets
+          if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
+            ln -s /scratch4/GFDL/gfdlscr/pdata/gfdl_O/datasets/ .datasets
           else
             ln -s /lustre/f1/pdata/gfdl_O/datasets/ .datasets
           endif
@@ -284,15 +326,31 @@ Make the executable for ocean-ice experiments.
           if ($status != 0) then
             echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
           endif
-            </csh>
+           ]]>  </csh>
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
          </compile>
       </component>
 
+      <component name="mom6_static_90x45" requires="fms ocean_shared" paths="mom6/ice_ocean_SIS2/OM4_025 mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/">
+         <source versionControl="git" root="https://github.com">
+           <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase><!--Do not checkout any code-->
+           <csh><![CDATA[
+          echo "No need to checkout any new source code for this component!" 
+          /bin/cp  mom6/ice_ocean_SIS2/OM4_025/MOM_memory.h mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
+          /bin/sed "s/NIPROC_ 32/NIPROC_ 90/g" -i mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
+          /bin/sed "s/NJPROC_ 18/NJPROC_ 45/g" -i mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
+        ]]></csh>
+         </source>
+         <compile>
+            <cppDefs><![CDATA[ $(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+         </compile>
+      </component>
+
+      
       <component name="icebergs" paths="icebergs" requires="fms">
-         <source versionControl="git" root="http://github.com/NOAA-GFDL">
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
             <codeBase version="$(BERGS_GIT_TAG)"> icebergs.git </codeBase>
          </source>
          <compile>
@@ -415,116 +473,68 @@ Make the executable for ocean-ice experiments.
    </experiment>
 
 
-
-  <experiment name="OM4_domain_decomp">
+  <experiment name="OM4_common">
     <input>
-      <csh><![CDATA[
-set domains_stack_size = "3097152"
-
-if ( "$npes" == "288" ) then
-  set fv_layout    =   "24,12"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "24,12"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "24,12"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "24,12"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set ocean_npes = "288"
-
-else if ( "$npes" == "512" ) then
-  set fv_layout    =   "32,16"; set fv_io_layout    =  "8,4"
-  set land_layout  =   "32,16"; set land_io_layout  =  "8,4"
-  set ice_layout   =   "32,16"; set ice_io_layout   =  "8,4"
-  set ocn_layout   =   "0,0"  ; set ocn_io_layout   =  "1,1"; set ocn_mask_table = "MOM_mask_table"
-  set ocean_npes = "512"
-
-else if ( "$npes" == "576" ) then
-  set fv_layout    =   "24,24"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "24,24"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "24,24"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "0,0"  ; set ocn_io_layout   =  "1,1"; set ocn_mask_table = "MOM_mask_table"
-  set ocean_npes = "576"
-
-else if ( "$npes" == "1152" ) then
-  set fv_layout    =   "32,36"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "32,36"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "32,36"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,36"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set do_ocean = "true"
-  set ocean_npes = "1152"
-#npes= 1152  main_loop= 1085.141626  ATM= 47.583859  OCN= 1036.583676  SYPD= 2.1814
-
-else if ( "$npes" == "2304" ) then
-  set fv_layout    =   "32,72"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "32,72"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "32,72"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "32,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set do_ocean = "true"
-  set ocean_npes = "2304"
-#npes= 2304  main_loop= 603.878142  ATM= 37.217106  OCN= 565.590432  SYPD= 3.91987
+      <namelist name="dummy_ocean_nml">
+       ocean_layout = $(OCN_PROD_LAYOUT)
+       ocean_io_layout = $(OCN_PROD_IO_LAYOUT)
+       ocean_mask_table= $(PROD_MASK_TABLE)
+     </namelist>
+     <namelist name="dummy_ice_nml">
+       ice_layout = $(ICE_PROD_LAYOUT)
+       ice_io_layout = $(ICE_PROD_IO_LAYOUT)
+       ice_mask_table=$(PROD_MASK_TABLE)
+     </namelist>
 
 
-else if ( "$npes" == "3240" ) then
-  set fv_layout    =   "45,72"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "45,72"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "45,72"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "45,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "MOM_mask_table"
-  set do_ocean = "true"
-  set ocean_npes   = "3240"
-#npes= 3240  main_loop= 464.708698  ATM= 39.759137  OCN= 423.801078  SYPD= 5.09378
+     <csh type="always">
+        <![CDATA[
+#------------------------------------------
+## Find out whether to restart.
 
-else if ( "$npes" == "2432" ) then
-  set fv_layout    =   "45,72"; set fv_io_layout    =  "1,4"
-  set land_layout  =   "45,72"; set land_io_layout  =  "1,4"
-  set ice_layout   =   "45,72"; set ice_io_layout   =  "1,4"
-  set ocn_layout   =   "45,72"; set ocn_io_layout   =  "1,4"; set ocn_mask_table = "mask_table.808.45x72"
-  set do_ocean = "true"
-  set ocean_npes   = "2432"
-#npes= 2432  main_loop= 458.382556  ATM= 33.484085  OCN= 423.827549  SYPD= 5.16408
-
-else if ( "$npes" == "4050" ) then
-  set fv_layout    =   "90,45"; set fv_io_layout    =  "9,5"
-  set land_layout  =   "90,45"; set land_io_layout  =  "9,5"
-  set ice_layout   =   "90,45"; set ice_io_layout   =  "9,5"
-  set ocn_layout   =   "90,45"; set ocn_io_layout   =  "9,5"; set ocn_mask_table = "MOM_mask_table"
-  set do_ocean = "true"
-  set ocean_npes   = "4050"
-
-else if ( "$npes" == "2997" ) then
-  set fv_layout    =   "90,45"; set fv_io_layout    =  "9,5"
-  set land_layout  =   "90,45"; set land_io_layout  =  "9,5"
-  set ice_layout   =   "90,45"; set ice_io_layout   =  "9,5"
-  set ocn_layout   =   "90,45"; set ocn_io_layout   =  "9,5"; set ocn_mask_table = "mask_table.1053.90x45"
-  set do_ocean = "true"
-  set ocean_npes   = "2997"
-#npes= 2997  main_loop= 395.756260  ATM= 33.947977  OCN= 361.032958  SYPD= 5.98127
-
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
 else
-  if ( $echoOn ) unset echo
-  echo "*ERROR*: npes == '$npes' is not supported in this xml."
-  if ( $echoOn ) set echo
-  exit 1
+   set restart_flag = 'r'
 endif
 
-cat > $work/INPUT/MOM_layout << LAYOUT_EOF
-#override undef NIPROC
-#override undef NJPROC
+ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc 
+
+touch $work/INPUT/MOM_override
+touch $work/INPUT/SIS_override
+touch $work/INPUT/MOM_layout
+touch $work/INPUT/SIS_layout
+
+#scan auxiliary_nml
+set OCN_MASK_TABLE = `awk '/ocean_mask_table/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
+set OCN_LAYOUT     = `awk '/ocean_layout/     {gsub(/=/," ");           print $2,$3}' $work/input.nml`
+set OCN_IO_LAYOUT  = `awk '/ocean_io_layout/  {gsub(/=/," ");           print $2,$3}' $work/input.nml`
+
+cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
 #override undef NIPROC_IO
 #override undef NJPROC_IO
-#override LAYOUT = $ocn_layout
-#override IO_LAYOUT = $ocn_io_layout
-MASKTABLE = $ocn_mask_table
-LAYOUT_EOF
-
-cat > $work/INPUT/SIS_layout << LAYOUT_EOF
 #override undef NIPROC
 #override undef NJPROC
+#override IO_LAYOUT = $OCN_IO_LAYOUT
+#override LAYOUT    = $OCN_LAYOUT
+#override MASKTABLE = $OCN_MASK_TABLE
+MOM_LAYOUT_EOF
+
+#scan auxiliary_nml
+set ICE_MASK_TABLE = `awk '/ice_mask_table/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
+set ICE_LAYOUT     = `awk '/ice_layout/     {gsub(/=/," ");           print $2,$3}' $work/input.nml`
+set ICE_IO_LAYOUT  = `awk '/ice_io_layout/  {gsub(/=/," ");           print $2,$3}' $work/input.nml`
+
+cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
 #override undef NIPROC_IO
 #override undef NJPROC_IO
-#override LAYOUT = $ice_layout
-#override IO_LAYOUT = $ice_io_layout
-MASKTABLE = $ocn_mask_table
-LAYOUT_EOF
+#override undef NIPROC
+#override undef NJPROC
+#override IO_LAYOUT = $ICE_IO_LAYOUT
+#override LAYOUT    = $ICE_LAYOUT
+#override MASKTABLE = $ICE_MASK_TABLE
+SIS_LAYOUT_EOF
 
-# runCommand:
-  alias runCommand "aprun -n $ocean_npes -d 1 ./$executable:t"
 #
 # Copy MOM6 input files needed for postprocessing  to GFDL (waiting for FRE to do this for us)
 #
@@ -537,20 +547,20 @@ if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
   tar xvf mom6.tar -C ./mom6 > /dev/null
   if ("${platform_domain}" == "ncrc.gov") then
     gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  else if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
+  else if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
     gcp -cd -r --sync mom6 gfdl:$(NB_ROOT)/
   endif
 endif
-
       ]]></csh>
-
     </input>
   </experiment>
+
 
   <experiment name="OM4_grid">
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/grid_spec.nc</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/grid_spec.nc</dataSource>
         <dataSource site="gfdl">/archive/gold/datasets/OM4_025/mosaic.v20140610.unpacked/grid_spec.nc</dataSource> 
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -581,11 +591,11 @@ endif
     </input>
   </experiment>
 
-      <!--OM4 CORE forcing datasets-->
+  <!--OM4 CORE forcing datasets-->
   <experiment name="CORE_data">
     <input>
       <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/data_table</dataSource>
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/data_table</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/ncar_precip.clim.nc</dataSource>
@@ -621,6 +631,23 @@ endif
 
     </input>
   </experiment>
+
+  <!--OM4 COBALT source datasets-->
+  <experiment name="COBALT_source_data">
+    <input>
+     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/mom4p1_restart_to_latlon_360x180/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/woa13/woa13_all_p_monthly_01.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/woa13/woa13_all_o_monthly_01.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/woa13/woa13_all_n_monthly_01.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/woa13/woa13_all_i_monthly_01.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/glodap/Preind_DIC.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/glodap/Alk.nc</dataSource>
+      </dataFile>
+
+    </input>
+  </experiment>
+
   
   <experiment name="OM4_data">
     <input>
@@ -656,7 +683,7 @@ endif
       </dataFile>      
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
-        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
       </dataFile>
 
@@ -691,7 +718,7 @@ touch $work/INPUT/SIS_override
 
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -755,7 +782,7 @@ touch $work/INPUT/SIS_override
         <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_5daily"/>
         <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_5daily"/>
       </component>
-      <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
+      <component type="ocean_month"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_monthly.frepp"/>
         </timeSeries>
@@ -841,7 +868,7 @@ touch $work/INPUT/SIS_override
       <!--MOM6_refineDiag.csh is currently empty and is here only to cause the unpack annual history files in /ptmp-->
       <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh"/>
       <!--PostProcessing component models-->
-      <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
+      <component type="ocean_month"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
         </timeSeries>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_month">
@@ -871,7 +898,7 @@ touch $work/INPUT/SIS_override
 
 </experiment>
 
-<experiment name="OM4_SIS2_baseline" inherit="MOM6_SIS2_compile">
+<experiment name="OM4_SIS2_baseline$(STATIC)" inherit="MOM6_SIS2_compile$(STATIC)">
     <description communityProject="OWG" communityModel="OM4_SIS2 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)" >
  global 1/4 degree z test case
     </description>  
@@ -890,8 +917,8 @@ touch $work/INPUT/SIS_override
 
      <input>
 
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
 
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_common']/input/node())"/>
       <!--MOM6 Input datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
       <!--SIS2 Input datasets-->
@@ -903,10 +930,10 @@ touch $work/INPUT/SIS_override
 
      
      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
      </dataFile>
      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
      </dataFile>
       
       <diagTable>
@@ -949,6 +976,7 @@ $baseDate
          checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
      </namelist>
 
+<!--not needed
      <namelist name="atmos_model_nml" >
        layout=$fv_layout
        mask_table='INPUT/$ocn_mask_table'
@@ -957,6 +985,7 @@ $baseDate
        layout=$land_layout
        mask_table='INPUT/$ocn_mask_table'
      </namelist>
+-->
 
    </input>
 
@@ -967,21 +996,19 @@ $baseDate
        <regression name="rts">
          <run days="5 5"  npes="$(PROD_NPES)"  runTimePerJob="01:30:00"/>
          <!--the following two should reproduce eachother but not the basic because basic uses mask_table-->
-         <run days="2"  npes="2304"  runTimePerJob="00:30:00"/>
-         <run days="2"  npes="1152"  runTimePerJob="00:30:00"/>
+         <run days="2"  npes="2304" overrideParams="$(domainparams_O2304)" runTimePerJob="00:30:00"/>
+         <run days="2"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
          <!--the following is for checking the timings or production run-->
          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
        </regression>
 
       <regression name="timing">
           <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
+          <run months="1"  npes="2432"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O2432)"/>
+          <run months="1"  npes="1152"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1152)"/>
        </regression>
       <regression name="debug">
-         <run days="1"   npes="288"  runTimePerJob="01:30:00"/>
-       </regression>
-       <regression name="restart">
-         <run days="10"   npes="4050"  runTimePerJob="01:30:00"/>
-         <run days="5 5"   npes="4050"  runTimePerJob="01:30:00"/>
+         <run days="1"   npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
        </regression>
 
       <production simTime="$(PROD_SIMTIME)" units="years" npes="$(PROD_NPES)" runTime="$(PROD_RUNTIME)">
@@ -1001,7 +1028,6 @@ $baseDate
 
 <experiment name="OM4_SIS2_DT1200" inherit="OM4_SIS2_baseline">
    <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
      <csh><![CDATA[
 cat > $work/INPUT/SIS_override << OVERRIDE_EOF
 #override DT_ICE_DYNAMICS = 1200.0
@@ -1013,7 +1039,6 @@ OVERRIDE_EOF
 
 <experiment name="OM4_SIS2_low_mixing3" inherit="OM4_SIS2_baseline">
    <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override USE_KPP = False
@@ -1048,17 +1073,15 @@ OVERRIDE_EOF
 </communityComment>
      <input>                                                 
      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/input.nml</dataSource>
-        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/input.nml</dataSource>
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/input.nml</dataSource>
      </dataFile>                                                                                   
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">                   
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/diag_table</dataSource>
-        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/diag_table</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/diag_table</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/diag_table</dataSource>
      </dataFile>                                                                                    
      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">                   
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/field_table</dataSource>
-        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/field_table</dataSource>
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/field_table</dataSource>
      </dataFile>                                                                                     
      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">                     
         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/data_table</dataSource> 
@@ -1070,7 +1093,7 @@ OVERRIDE_EOF
       <!--gridSpec mosaic datasets-->
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/grid_spec.nc</dataSource>
-        <dataSource site="nescc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/grid_spec.nc</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/grid_spec.nc</dataSource>
         <dataSource site="gfdl">/archive/gold/datasets/GOLD_SIS/riga/mosaic.unpacked/grid_spec.nc</dataSource> 
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -1156,12 +1179,12 @@ OVERRIDE_EOF
          threading_read='multi'
          checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
      </namelist>
-     <namelist name="dummy_ocean_model_nml">
+     <namelist name="dummy_ocean_nml">
        ocean_layout = 0,0
        ocean_io_layout = 1,1
        ocean_mask_table='MOM_mask_table'
      </namelist>
-     <namelist name="dummy_ice_model_nml">
+     <namelist name="dummy_ice_nml">
        ice_layout = 0,0
        ice_io_layout = 1,1
        ice_mask_table='MOM_mask_table'
@@ -1218,7 +1241,7 @@ if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
   tar xvf mom6.tar -C ./mom6 > /dev/null
   if ("${platform_domain}" == "ncrc.gov") then
     gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  else if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
+  else if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
     gcp -cd -r --sync mom6 gfdl:$(NB_ROOT)/
   endif
 endif
@@ -1350,7 +1373,7 @@ if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
   tar xvf mom6.tar -C ./mom6 > /dev/null
   if ("${platform_domain}" == "ncrc.gov") then
     gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  else if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
+  else if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
     gcp -cd -r --sync mom6 gfdl:$(NB_ROOT)/
   endif
 endif
@@ -1386,7 +1409,6 @@ ncap -O --script 'cfc_11 = ptemp * 0.0 ; cfc_12 = ptemp * 0.0 ; sf6 = ptemp * 0.
 </description>
 
     <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
 
      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
@@ -1466,21 +1488,390 @@ OVERRIDE_EOF
 
 "namelists","ocean_mod","generic_cobalt"
 init = f
+#
+# JGJ 2015/07/28
+# field table entries for initialization of cobalt tracers
+# use January entries to match T/S initialization
+#
+# NO3 from WOA2013  (/archive/mdteam/obs/NOAA-NODC/WOA13/v1.00a/woa13_all_n_monthly_01.nc)
+# divide by 1035e3 to convert from umol/l to mol/kg
+no3_src_file = INPUT/woa13_all_n_monthly_01.nc
+no3_src_var_name = n_an
+no3_src_var_unit = micromoles_per_liter
+no3_dest_var_name =  no3
+no3_dest_var_unit = mol kg-1
+no3_src_var_record = 1
+no3_src_var_gridspec = NONE
+
+# O2 from WOA2013  (/archive/mdteam/obs/NOAA-NODC/WOA13/v1.00a/woa13_all_o_monthly_01.nc)
+# multiply by (1000/22391.6)/1035 to convert from ml/l to mol/kg
+o2_src_file = INPUT/woa13_all_o_monthly_01.nc
+o2_src_var_name = o_an
+o2_src_var_unit = milliliters_per_liter
+o2_dest_var_name =  o2
+o2_dest_var_unit = mol kg-1
+o2_src_var_record = 1
+o2_src_var_gridspec = NONE
+
+# PO4 from WOA2013  (/archive/mdteam/obs/NOAA-NODC/WOA13/v1.00a/woa13_all_p_monthly_01.nc)
+# divide by 1035e3 to convert from umol/l to mol/kg
+po4_src_file = INPUT/woa13_all_p_monthly_01.nc
+po4_src_var_name = p_an
+po4_src_var_unit = micromoles_per_liter
+po4_dest_var_name =  po4
+po4_dest_var_unit = mol kg-1
+po4_src_var_record = 1
+po4_src_var_gridspec = NONE
+
+# SIO4 from WOA2013  (/archive/mdteam/obs/NOAA-NODC/WOA13/v1.00a/woa13_all_i_monthly_01.nc)
+# divide by 1035e3 to convert from umol/l to mol/kg
+sio4_src_file = INPUT/woa13_all_i_monthly_01.nc
+sio4_src_var_name = i_an
+sio4_src_var_unit = micromoles_per_liter
+sio4_dest_var_name =  sio4
+sio4_dest_var_unit = mol kg-1
+sio4_src_var_record = 1
+sio4_src_var_gridspec = NONE
+
+# Alkalinity from GLODAP  (/archive/jgj/datasets/input/GLODAP/Alk.nc)
+# divide by 1e6 to convert from umol/kg to mol/kg
+alk_src_file = INPUT/Alk.nc
+alk_src_var_name = Alk
+alk_src_var_unit = micromoles_per_kg
+alk_dest_var_name =  alk
+alk_dest_var_unit = mol kg-1
+alk_src_var_record = 1
+alk_src_var_gridspec = NONE
+
+# Preindustrial DIC from GLODAP  (/archive/jgj/datasets/INPUT/GLODAP/Preind_DIC.nc)
+# divide by 1e6 to convert from umol/kg to mol/kg
+dic_src_file = INPUT/Preind_DIC.nc
+dic_src_var_name = Preind_DIC
+dic_src_var_unit = micromoles_per_kg
+dic_dest_var_name =  dic
+dic_dest_var_unit = mol kg-1
+dic_src_var_record = 1
+dic_src_var_gridspec = NONE
+
+# additional tracers from ESM2M-COBALT Preindustrial Control restart (/archive/jgj/datasets/retrospective/mom4p1_restart_to_latlon_360x180/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc)
+# no unit conversion necessary
+cadet_arag_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+cadet_arag_src_var_name = cadet_arag
+cadet_arag_src_var_unit = none
+cadet_arag_dest_var_name =  cadet_arag
+cadet_arag_dest_var_unit = mol kg-1
+cadet_arag_src_var_record = 1
+cadet_arag_src_var_gridspec = NONE
+
+cadet_calc_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+cadet_calc_src_var_name = cadet_calc
+cadet_calc_src_var_unit = none
+cadet_calc_dest_var_name =  cadet_calc
+cadet_calc_dest_var_unit = mol kg-1
+cadet_calc_src_var_record = 1
+cadet_calc_src_var_gridspec = NONE
+
+cased_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+cased_src_var_name = cased
+cased_src_var_unit = none
+cased_dest_var_name =  cased
+cased_dest_var_unit = mol kg-1
+cased_src_var_record = 1
+cased_src_var_gridspec = NONE
+
+chl_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+chl_src_var_name = chl
+chl_src_var_unit = none
+chl_dest_var_name =  chl
+chl_dest_var_unit = mol kg-1
+chl_src_var_record = 1
+chl_src_var_gridspec = NONE
+
+co3_ion_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+co3_ion_src_var_name = co3_ion
+co3_ion_src_var_unit = none
+co3_ion_dest_var_name =  co3_ion
+co3_ion_dest_var_unit = mol kg-1
+co3_ion_src_var_record = 1
+co3_ion_src_var_gridspec = NONE
+
+fed_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+fed_src_var_name = fed
+fed_src_var_unit = none
+fed_dest_var_name =  fed
+fed_dest_var_unit = mol kg-1
+fed_src_var_record = 1
+fed_src_var_gridspec = NONE
+
+fedi_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+fedi_src_var_name = fedi
+fedi_src_var_unit = none
+fedi_dest_var_name =  fedi
+fedi_dest_var_unit = mol kg-1
+fedi_src_var_record = 1
+fedi_src_var_gridspec = NONE
+
+felg_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+felg_src_var_name = felg
+felg_src_var_unit = none
+felg_dest_var_name =  felg
+felg_dest_var_unit = mol kg-1
+felg_src_var_record = 1
+felg_src_var_gridspec = NONE
+
+fesm_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+fesm_src_var_name = fesm
+fesm_src_var_unit = none
+fesm_dest_var_name =  fesm
+fesm_dest_var_unit = mol kg-1
+fesm_src_var_record = 1
+fesm_src_var_gridspec = NONE
+
+htotal_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+htotal_src_var_name = htotal
+htotal_src_var_unit = none
+htotal_dest_var_name =  htotal
+htotal_dest_var_unit = mol kg-1
+htotal_src_var_record = 1
+htotal_src_var_gridspec = NONE
+
+irr_mem_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+irr_mem_src_var_name = irr_mem
+irr_mem_src_var_unit = none
+irr_mem_dest_var_name =  irr_mem
+irr_mem_dest_var_unit = mol kg-1
+irr_mem_src_var_record = 1
+irr_mem_src_var_gridspec = NONE
+
+ldon_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+ldon_src_var_name = ldon
+ldon_src_var_unit = none
+ldon_dest_var_name =  ldon
+ldon_dest_var_unit = mol kg-1
+ldon_src_var_record = 1
+ldon_src_var_gridspec = NONE
+
+ldop_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+ldop_src_var_name = ldop
+ldop_src_var_unit = none
+ldop_dest_var_name =  ldop
+ldop_dest_var_unit = mol kg-1
+ldop_src_var_record = 1
+ldop_src_var_gridspec = NONE
+
+lith_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+lith_src_var_name = lith
+lith_src_var_unit = none
+lith_dest_var_name =  lith
+lith_dest_var_unit = mol kg-1
+lith_src_var_record = 1
+lith_src_var_gridspec = NONE
+
+nh4_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+nh4_src_var_name = nh4
+nh4_src_var_unit = none
+nh4_dest_var_name =  nh4
+nh4_dest_var_unit = mol kg-1
+nh4_src_var_record = 1
+nh4_src_var_gridspec = NONE
+
+nbact_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+nbact_src_var_name = nbact
+nbact_src_var_unit = none
+nbact_dest_var_name =  nbact
+nbact_dest_var_unit = mol kg-1
+nbact_src_var_record = 1
+nbact_src_var_gridspec = NONE
+
+ndi_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+ndi_src_var_name = ndi
+ndi_src_var_unit = none
+ndi_dest_var_name =  ndi
+ndi_dest_var_unit = mol kg-1
+ndi_src_var_record = 1
+ndi_src_var_gridspec = NONE
+
+nlg_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+nlg_src_var_name = nlg
+nlg_src_var_unit = none
+nlg_dest_var_name =  nlg
+nlg_dest_var_unit = mol kg-1
+nlg_src_var_record = 1
+nlg_src_var_gridspec = NONE
+
+nsm_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+nsm_src_var_name = nsm
+nsm_src_var_unit = none
+nsm_dest_var_name =  nsm
+nsm_dest_var_unit = mol kg-1
+nsm_src_var_record = 1
+nsm_src_var_gridspec = NONE
+
+nlgz_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+nlgz_src_var_name = nlgz
+nlgz_src_var_unit = none
+nlgz_dest_var_name =  nlgz
+nlgz_dest_var_unit = mol kg-1
+nlgz_src_var_record = 1
+nlgz_src_var_gridspec = NONE
+
+nmdz_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+nmdz_src_var_name = nmdz
+nmdz_src_var_unit = none
+nmdz_dest_var_name =  nmdz
+nmdz_dest_var_unit = mol kg-1
+nmdz_src_var_record = 1
+nmdz_src_var_gridspec = NONE
+
+nsmz_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+nsmz_src_var_name = nsmz
+nsmz_src_var_unit = none
+nsmz_dest_var_name =  nsmz
+nsmz_dest_var_unit = mol kg-1
+nsmz_src_var_record = 1
+nsmz_src_var_gridspec = NONE
+
+fedet_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+fedet_src_var_name = fedet
+fedet_src_var_unit = none
+fedet_dest_var_name =  fedet
+fedet_dest_var_unit = mol kg-1
+fedet_src_var_record = 1
+fedet_src_var_gridspec = NONE
+
+lithdet_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+lithdet_src_var_name = lithdet
+lithdet_src_var_unit = none
+lithdet_dest_var_name =  lithdet
+lithdet_dest_var_unit = mol kg-1
+lithdet_src_var_record = 1
+lithdet_src_var_gridspec = NONE
+
+ndet_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+ndet_src_var_name = ndet
+ndet_src_var_unit = none
+ndet_dest_var_name =  ndet
+ndet_dest_var_unit = mol kg-1
+ndet_src_var_record = 1
+ndet_src_var_gridspec = NONE
+
+pdet_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+pdet_src_var_name = pdet
+pdet_src_var_unit = none
+pdet_dest_var_name =  pdet
+pdet_dest_var_unit = mol kg-1
+pdet_src_var_record = 1
+pdet_src_var_gridspec = NONE
+
+sidet_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+sidet_src_var_name = sidet
+sidet_src_var_unit = none
+sidet_dest_var_name =  sidet
+sidet_dest_var_unit = mol kg-1
+sidet_src_var_record = 1
+sidet_src_var_gridspec = NONE
+
+silg_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+silg_src_var_name = silg
+silg_src_var_unit = none
+silg_dest_var_name =  silg
+silg_dest_var_unit = mol kg-1
+silg_src_var_record = 1
+silg_src_var_gridspec = NONE
+
+sldon_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+sldon_src_var_name = sldon
+sldon_src_var_unit = none
+sldon_dest_var_name =  sldon
+sldon_dest_var_unit = mol kg-1
+sldon_src_var_record = 1
+sldon_src_var_gridspec = NONE
+
+sldop_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+sldop_src_var_name = sldop
+sldop_src_var_unit = none
+sldop_dest_var_name =  sldop
+sldop_dest_var_unit = mol kg-1
+sldop_src_var_record = 1
+sldop_src_var_gridspec = NONE
+
+srdon_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+srdon_src_var_name = srdon
+srdon_src_var_unit = none
+srdon_dest_var_name =  srdon
+srdon_dest_var_unit = mol kg-1
+srdon_src_var_record = 1
+srdon_src_var_gridspec = NONE
+
+srdop_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+srdop_src_var_name = srdop
+srdop_src_var_unit = none
+srdop_dest_var_name =  srdop
+srdop_dest_var_unit = mol kg-1
+srdop_src_var_record = 1
+srdop_src_var_gridspec = NONE
+
+cadet_arag_btf_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+cadet_arag_btf_src_var_name = cadet_arag_btf
+cadet_arag_btf_src_var_unit = none
+cadet_arag_btf_dest_var_name =  cadet_arag_btf
+cadet_arag_btf_dest_var_unit = mol kg-1
+cadet_arag_btf_src_var_record = 1
+cadet_arag_btf_src_var_gridspec = NONE
+
+cadet_calc_btf_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+cadet_calc_btf_src_var_name = cadet_calc_btf
+cadet_calc_btf_src_var_unit = none
+cadet_calc_btf_dest_var_name =  cadet_calc_btf
+cadet_calc_btf_dest_var_unit = mol kg-1
+cadet_calc_btf_src_var_record = 1
+cadet_calc_btf_src_var_gridspec = NONE
+
+lithdet_btf_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+lithdet_btf_src_var_name = lithdet_btf
+lithdet_btf_src_var_unit = none
+lithdet_btf_dest_var_name =  lithdet_btf
+lithdet_btf_dest_var_unit = mol kg-1
+lithdet_btf_src_var_record = 1
+lithdet_btf_src_var_gridspec = NONE
+
+ndet_btf_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+ndet_btf_src_var_name = ndet_btf
+ndet_btf_src_var_unit = none
+ndet_btf_dest_var_name =  ndet_btf
+ndet_btf_dest_var_unit = mol kg-1
+ndet_btf_src_var_record = 1
+ndet_btf_src_var_gridspec = NONE
+
+pdet_btf_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+pdet_btf_src_var_name = pdet_btf
+pdet_btf_src_var_unit = none
+pdet_btf_dest_var_name =  pdet_btf
+pdet_btf_dest_var_unit = mol kg-1
+pdet_btf_src_var_record = 1
+pdet_btf_src_var_gridspec = NONE
+
+sidet_btf_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+sidet_btf_src_var_name = sidet_btf
+sidet_btf_src_var_unit = none
+sidet_btf_dest_var_name =  sidet_btf
+sidet_btf_dest_var_unit = mol kg-1
+sidet_btf_src_var_record = 1
+sidet_btf_src_var_gridspec = NONE
+
 /
 
-#Currently generic_cfc package is set to use this mechanism as a prototype.
-#Currently the following lines are required but they do not do anything until MOM6 becomes ready to handle them.
+#Read chl as cfc11 and cfc12 just for testing
 "namelists","ocean_mod","generic_cfc"
-cfc_11_src_file = INPUT/cfc.bc.nc
-cfc_11_src_var_name = CFC_11
+cfc_11_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+cfc_11_src_var_name = chl
 cfc_11_src_var_unit = ppt
 # ppt to mol/kg
 cfc_11_src_var_unit_conversion = 1.0e-12
 cfc_11_src_var_record = 1
 cfc_11_src_var_gridspec = NONE
-
-cfc_12_src_file = INPUT/cfc.bc.nc
-cfc_12_src_var_name = CFC_12
+cfc_12_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
+cfc_12_src_var_name = chl
 cfc_12_src_var_unit = ppt
 # ppt to mol/kg
 cfc_12_src_var_unit_conversion = 1.0e-12
@@ -1495,6 +1886,10 @@ cfc_12_src_var_gridspec = NONE
 "ATM", "cfc_12_flux_pcair_atm","CFC_12","INPUT/cfc.bc.nc","bilinear", 1.0e-12
       </dataTable>
 
+      <diagTable>
+$name
+$baseDate
+      </diagTable>
       
       <diagTable order="append">
 #================
@@ -1511,15 +1906,32 @@ cfc_12_src_var_gridspec = NONE
 "generic_cfc","cfc_12",     "cfc_12",     "generic_tracers","all",.true.,"none",2
 "generic_cfc","cfc_11_stf", "cfc_11_stf", "generic_tracers","all",.true.,"none",2
 "generic_cfc","cfc_12_stf", "cfc_12_stf", "generic_tracers","all",.true.,"none",2
+
+"cobalt_tracers",          1,  "days", 1, "days", "time",
+"generic_cobalt","alk",     "alk",     "cobalt_tracers","all",.true.,"none",2
+"generic_cobalt","dic",     "dic",     "cobalt_tracers","all",.true.,"none",2
+"generic_cobalt","no3",     "no3",     "cobalt_tracers","all",.true.,"none",2
+"generic_cobalt","o2",      "o2",      "cobalt_tracers","all",.true.,"none",2
+"generic_cobalt","po4",     "po4",     "cobalt_tracers","all",.true.,"none",2
+"generic_cobalt","sio4",    "sio4",    "cobalt_tracers","all",.true.,"none",2
+"generic_cobalt","chl",     "chl",     "cobalt_tracers","all",.true.,"none",2
+"generic_cobalt","fed",     "fed",     "cobalt_tracers","all",.true.,"none",2
+
       </diagTable>
 
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_common']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
+      <!--SIS2 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
+      <!--OM4 gridSpec mosaic datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_grid']/input/node())"/>
+      <!--CORE forcing datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='CORE_data']/input/node())"/>
+      <!--COBALT source datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='COBALT_source_data']/input/node())"/>
      
      <csh><![CDATA[
-#The keywod _NULL_ in the name of GENERIC_TRACER_IC_FILE cause the initialization from file to bypass
-#hence there is no need to supply an artificial IC full of zeros. 
-#The generic tracer package is responsible to initialize the tracers with proper values
-
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override USE_OCMIP2_CFC = False
 USE_generic_tracer = True
@@ -1542,7 +1954,6 @@ OVERRIDE_EOF
 </description>
 
     <input>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_domain_decomp']/input/node())"/>
 
      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
@@ -1581,14 +1992,15 @@ OVERRIDE_EOF
 </communityComment>
      <input>                                                 
      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/input.nml</dataSource>
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/input.nml</dataSource>
      </dataFile>                                                                                   
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">                   
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/diag_table</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/diag_table</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/SIS2_icebergs/diag_table</dataSource>
      </dataFile>                                                                                    
      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">                   
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/field_table</dataSource>
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/field_table</dataSource>
      </dataFile>                                                                                     
      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">                     
         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/data_table</dataSource> 
@@ -1712,12 +2124,12 @@ OVERRIDE_EOF
 force_all_pes_traj = .true.
      </namelist>
 
-     <namelist name="dummy_ocean_model_nml">
+     <namelist name="dummy_ocean_nml">
        ocean_layout = 8,16
        ocean_io_layout = 4,4
        ocean_mask_table='MOM_mask_table'
      </namelist>
-     <namelist name="dummy_ice_model_nml">
+     <namelist name="dummy_ice_nml">
        ice_layout = 8,16
        ice_io_layout = 4,4
        ice_mask_table='MOM_mask_table'
@@ -1795,7 +2207,7 @@ if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
   tar xvf mom6.tar -C ./mom6 > /dev/null
   if ("${platform_domain}" == "ncrc.gov") then
     gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  else if ("${platform_domain}" == "zeus.fairmont.rdhpcs.noaa.gov") then
+  else if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
     gcp -cd -r --sync mom6 gfdl:$(NB_ROOT)/
   endif
 endif
@@ -1808,13 +2220,13 @@ endif
        </regression>
        <regression name="rts">
          <run days="10 10" npes="128"  runTimePerJob="00:30:00"/>
-         <run days="20" npes="64" overrideParams="dummy_ocean_model_nml:ocean_layout=4,16;dummy_ocean_model_nml:ocean_io_layout=1,4;dummy_ice_model_nml:ice_layout=4,16;dummy_ice_model_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
-         <run days="20"    npes="32" overrideParams="dummy_ocean_model_nml:ocean_layout=4,8;dummy_ocean_model_nml:ocean_io_layout=1,4;dummy_ice_model_nml:ice_layout=4,8;dummy_ice_model_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
-         <run days="20"    npes="30" overrideParams="dummy_ocean_model_nml:ocean_layout=5,6;dummy_ocean_model_nml:ocean_io_layout=1,3;dummy_ice_model_nml:ice_layout=5,6;dummy_ice_model_nml:ice_io_layout=1,3" runTimePerJob="00:30:00"/>
+         <run days="20" npes="64" overrideParams="dummy_ocean_nml:ocean_layout=4,16;dummy_ocean_nml:ocean_io_layout=1,4;dummy_ice_nml:ice_layout=4,16;dummy_ice_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
+         <run days="20"    npes="32" overrideParams="dummy_ocean_nml:ocean_layout=4,8;dummy_ocean_nml:ocean_io_layout=1,4;dummy_ice_nml:ice_layout=4,8;dummy_ice_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
+         <run days="20"    npes="30" overrideParams="dummy_ocean_nml:ocean_layout=5,6;dummy_ocean_nml:ocean_io_layout=1,3;dummy_ice_nml:ice_layout=5,6;dummy_ice_nml:ice_io_layout=1,3" runTimePerJob="00:30:00"/>
        </regression>
 
        <regression name="debug">
-         <run days="2"    npes="64" overrideParams="dummy_ocean_model_nml:ocean_layout=4,16;dummy_ocean_model_nml:ocean_io_layout=1,4;dummy_ice_model_nml:ice_layout=4,16;dummy_ice_model_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
+         <run days="2"    npes="64" overrideParams="dummy_ocean_nml:ocean_layout=4,16;dummy_ocean_nml:ocean_io_layout=1,4;dummy_ice_nml:ice_layout=4,16;dummy_ice_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
        </regression>
 
        <production simTime="$(PROD_SIMTIME)" units="years" npes="128" runTime="$(PROD_RUNTIME)">
@@ -1823,12 +2235,44 @@ endif
 
        <reference restart="$(REFERENCE)/1x0m20d_64pe/restart/00010121.tar"/>
    </runtime>
-
     <postProcess>
       <xi:include xpointer="xpointer(//experiment[@name='OM4i_postprocess']/postProcess/node())"/>
     </postProcess>
 
 </experiment>
+
+    <experiment name="MOM6_SIS2_compile_static_90x45" inherit="MOM6_SIS_libs_compile">
+      <component paths="shared" name="fms" includeDir="$root/$(LIBS_ROOT)/src/shared/include">
+         <library path="$(MY_LIBS)/fms/libfms.a" headerDir="$(MY_LIBS)/fms"/>
+      </component>
+      <component name="land_null" paths="land_null" requires="fms">
+         <library path="$(MY_LIBS)/land_null/libland_null.a" headerDir="$(MY_LIBS)/land_null"/>
+      </component>
+      <component name="atmos_null" paths="atmos_null atmos_param" requires="fms">
+          <library path="$(MY_LIBS)/atmos_null/libatmos_null.a" headerDir="$(MY_LIBS)/atmos_null"/>
+      </component>
+      <component paths="ocean_shared" requires="fms" name="ocean_shared">
+         <library path="$(MY_LIBS)/ocean_shared/libocean_shared.a" headerDir="$(MY_LIBS)/ocean_shared"/>
+      </component> 
+      <component paths="mom6" requires="fms ocean_shared" name="mom6_static_90x45">
+         <library path="$(MY_LIBS)/mom6_static_90x45/libmom6_static_90x45.a" headerDir="$(MY_LIBS)/mom6_static_90x45"/>
+      </component> 
+      <component paths="icebergs" requires="fms" name="icebergs">
+         <library path="$(MY_LIBS)/icebergs/libicebergs.a" headerDir="$(MY_LIBS)/icebergs"/>
+      </component> 
+      <component paths="sis2" requires="fms icebergs" name="sis2">
+         <library path="$(MY_LIBS)/sis2/libsis2.a" headerDir="$(MY_LIBS)/sis2"/>
+      </component> 
+      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6_static_90x45 ocean_shared icebergs">
+         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
+         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+            <codeBase version="$(RELEASE)"> coupler.git </codeBase>
+         </source>
+         <compile>
+            <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+         </compile>
+      </component>
+   </experiment>
 
 
 
