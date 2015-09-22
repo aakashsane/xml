@@ -76,6 +76,13 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 	            dummy_ocean_nml:ocean_layout=32,36;dummy_ocean_nml:ocean_io_layout=1,4;
                     dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
 
+   <property name="domainparams_O1970"
+             value="coupler_nml:ocean_npes=1970;
+                    dummy_ice_nml:ice_layout=36,72;dummy_ice_nml:ice_io_layout=1,4;
+                    dummy_ice_nml:ice_mask_table=mask_table.622.36x72;
+                    dummy_ocean_nml:ocean_layout=36,72;dummy_ocean_nml:ocean_io_layout=1,4;
+                    dummy_ocean_nml:ocean_mask_table=mask_table.622.36x72"/>
+
    <property name="domainparams_O2304"
 	     value="coupler_nml:ocean_npes=2304;
 	            dummy_ice_nml:ice_layout=32,72;dummy_ice_nml:ice_io_layout=1,4;
@@ -106,7 +113,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
    <setup>
     <platform name="ncrc2.intel">
-      <project>gfdl_o</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -505,6 +512,11 @@ touch $work/INPUT/SIS_override
 touch $work/INPUT/MOM_layout
 touch $work/INPUT/SIS_layout
 
+# Record the job stdout location for later use timings database
+cat >> $HOME/frejobs_stdout <<EOF_frejobs
+$stdoutDir/$FRE_JOBID
+EOF_frejobs
+
 #scan auxiliary_nml
 set OCN_MASK_TABLE = `awk '/ocean_mask_table/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
 set OCN_LAYOUT     = `awk '/ocean_layout/     {gsub(/=/," ");           print $2,$3}' $work/input.nml`
@@ -676,11 +688,20 @@ endif
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/WOA05_pottemp_salt.nc </dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.808.45x72</dataSource>
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.33.16x18     
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.96.32x18     
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.242.32x36     
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.274.36x36     
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.315.32x45    
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.548.32x72
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.622.36x72
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.808.45x72
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1053.90x45
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1809.90x72
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1309.90x54     
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1402.72x72
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.3785.90x144
       </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1053.90x45</dataSource>
-      </dataFile>      
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
@@ -1002,10 +1023,12 @@ $baseDate
          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
        </regression>
 
-      <regression name="timing">
+      <regression name="timings">
           <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
           <run months="1"  npes="2432"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O2432)"/>
           <run months="1"  npes="1152"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1152)"/>
+          <run months="1"  npes="2304"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O2304)"/>
+          <run months="1"  npes="1970"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1970)"/>
        </regression>
       <regression name="debug">
          <run days="1"   npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
