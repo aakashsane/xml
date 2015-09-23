@@ -5,7 +5,7 @@
 <!--
 Quick start guide
 
-module load fre/bronx-9
+module load fre/bronx-10
 fremake -x OM4.xml -p ncrc2.intel -t prod MOM6_SIS_libs_compile -no-link
    To run with SIS
 fremake -x OM4.xml -p ncrc2.intel -t prod MOM6_SIS_compile
@@ -18,8 +18,8 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <property name="RELEASE"      value="ulm"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2015.08.17"/>     <!-- git tag date for MOM6 source code -->
+   <property name="RELEASE"      value="testing_20150904"/> <!-- CVS tag for shared source code -->
+   <property name="MOM6_DATE"    value="2015.09.21"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -398,8 +398,8 @@ Make the executable for ocean-ice experiments.
 
       <component name="land_null" paths="land_null" requires="fms">
          <description domainName="NA" communityName="NA" communityVersion="NA" communityGrid="NA"/>
-         <source>
-            <codeBase version="$(RELEASE)"> land_null </codeBase>
+         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+            <codeBase version="$(RELEASE)"> land_null.git </codeBase>
          </source>
       </component>
 
@@ -685,6 +685,15 @@ endif
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m_575m.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_edits.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_GS_edits.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/WOA05_pottemp_salt.nc </dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -951,10 +960,14 @@ touch $work/INPUT/SIS_override
 
      
      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
      </dataFile>
      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/field_table</dataSource>
      </dataFile>
       
       <diagTable>
@@ -1064,19 +1077,32 @@ OVERRIDE_EOF
    <input>
      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_KPP = False
-#override ENERGETICS_SFC_PBL = True
 #override MSTAR = 0.3
 #override KD = 2.0E-6
-#override FOX_KEMPER_ML_RESTRAT_COEF = 20.0
-#override SMAG_LAP_CONST = 0.
-#override AH_VEL_SCALE = 0.
 OVERRIDE_EOF
      ]]></csh>
    </input>
 </experiment>
 
+<experiment name="OM4_SIS2_FBC" inherit="OM4_SIS2_baseline">
+   <input>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+TOPO_EDITS_FILE = "Faroe_edits.nc"
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
 
+<experiment name="OM4_SIS2_FBC_GS" inherit="OM4_SIS2_baseline">
+   <input>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+TOPO_EDITS_FILE = "Faroe_GS_edits.nc"
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
 
 <experiment name="MOM6_GOLD_SIS" inherit="MOM6_SIS_compile">
 <description communityProject="OWG" communityModel="MOM6_GOLD_SIS $(FRE_STEM)" communityModelID="OWG_MOM6_GOLD_SIS" communityExperimentName="$(name)" >
@@ -1096,7 +1122,9 @@ OVERRIDE_EOF
 </communityComment>
      <input>                                                 
      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/input.nml</dataSource>
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/input.nml</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/input.nml</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/input.nml</dataSource>
      </dataFile>                                                                                   
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">                   
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/diag_table</dataSource>
@@ -2015,8 +2043,10 @@ OVERRIDE_EOF
 </communityComment>
      <input>                                                 
      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/input.nml</dataSource>
-     </dataFile>                                                                                   
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/input.nml</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/input.nml</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/SIS2_icebergs/input.nml</dataSource>
+    </dataFile>                                                                                   
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">                   
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/diag_table</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/diag_table</dataSource>

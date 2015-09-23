@@ -79,7 +79,7 @@ which are saved under /lustre/f1/unswept/Niki.Zadeh/ulm_201505_awg_v20150702_mom
 
   <!--User shoould set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="ulm_201505"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2015.08.06b"/>      <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2015.09.21"/>      <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20150702"/> <!-- git tag for AWG  source code -->
   <property name="ProjectID"    value="MDT"/>             <!-- database top level -->
@@ -97,7 +97,7 @@ which are saved under /lustre/f1/unswept/Niki.Zadeh/ulm_201505_awg_v20150702_mom
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
 
-  <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
+  <property name="FRE_STEM"  value="$(RELEASE)_4dUpdates_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
   <property name="FRE_VERSION" value="fre/bronx-10"/>             <!-- fre version to be used -->
   <property name="ANALYSIS_SWITCH" value="on"/>                  <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
@@ -713,8 +713,8 @@ Experiment to build executable.
             <codeBase version="$(RELEASE)"> shared.git </codeBase>
             <csh><![CDATA[
             ( cd shared && git checkout $(RELEASE) )
-# AWG updates
-            ( cd shared && git checkout $(AWG_GIT_TAG) )
+            # AWG updates + Zhi's 4d restart update
+            ( cd shared && git checkout user/nnz/awg_v20150702_merged_z1l_4d_routines )
             ]]>
             </csh>
       </source>
@@ -733,7 +733,6 @@ Experiment to build executable.
           # AWG updates
           ( cd atmos_param  && git checkout $(AWG_GIT_TAG) )
           ( cd atmos_shared && git checkout $(AWG_GIT_TAG) )
-
           ]]>
         </csh>
       </source>
@@ -846,8 +845,8 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
     </component>
 
     <component name="sis2" paths="mom6/src/SIS2 ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
-         <source>
-	   <codeBase version="$(RELEASE)"> ice_param </codeBase> 
+         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
@@ -1003,7 +1002,8 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
   <experiment name="c192L32_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20150522/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
+        <dataSource site="ncrc">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20150522/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
+        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
       </dataFile>
     </input>
   </experiment>
@@ -1312,7 +1312,8 @@ set nyblocks = $dummy
   <experiment name="c192_data_lm3p2">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/static_veg/static_veg_LM3p2sosn_C192_OM4_025_historical_HC1_1981.remapped.v20150521.tar</dataSource>
+        <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/DATA/static_veg/static_veg_LM3p2sosn_C192_OM4_025_historical_HC1_1981.remapped.v20150521.tar</dataSource>
+        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/static_veg_LM3p2sosn_C192_OM4_025_historical_HC1_1981.remapped.v20150521.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/c192_OM4_025_hydrography_v20140708.tar </dataSource>
@@ -1763,7 +1764,8 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20150522/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
+        <dataSource site="ncrc">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20150522/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
+        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
       </dataFile>
       <namelist name="coupler_nml">
         months = $months,
@@ -2211,6 +2213,15 @@ For more information please refer to the
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m.nc
      </dataFile>      
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m_575m.nc
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_edits.nc
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_GS_edits.nc
+      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/WOA05_pottemp_salt.nc 
      </dataFile>      
