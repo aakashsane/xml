@@ -488,6 +488,47 @@ the faster the model throughput, but also the lower the model efficiency
 
     </platform>
 
+    <platform name="ncrc2.intel14">
+<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
+      <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
+      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
+     
+      <csh><![CDATA[
+        source $MODULESHOME/init/csh
+ 
+        module use -a /ncrc/home2/fms/local/modulefiles
+        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+        module unload netcdf fre
+        module load PrgEnv-intel/5.2.40
+        module load intel/14.0.2.144
+
+        module load $(FRE_VERSION)
+        module load git
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+      ]]></csh>
+
+    </platform>
+    
     <platform name="ncrc2.intel15">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
       <project>gfdl_f</project>
@@ -518,7 +559,7 @@ the faster the model throughput, but also the lower the model efficiency
         module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
         module unload netcdf fre
         module load PrgEnv-intel/4.0.46
-module swap intel intel/15.0.2.164
+        module swap intel intel/15.0.2.164
 
         module load $(FRE_VERSION)
         module load git
@@ -530,6 +571,7 @@ module unload altd
       ]]></csh>
 
     </platform>
+
     <platform name="ncrc2.gnu">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
       <project>gfdl_YOURGROUPLETTER</project>
@@ -2581,7 +2623,7 @@ For more information please refer to the
         <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_5daily"/>
       </component>
       
-      <component type="ocean_month"   source="ocean_month" sourceGrid="ocean-tripolar">
+      <component type="ocean_monthly"   source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_monthly.frepp"/>
         </timeSeries>
