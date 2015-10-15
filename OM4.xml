@@ -6,10 +6,7 @@
 Quick start guide
 
 module load fre/bronx-10
-fremake -x OM4.xml -p ncrc2.intel -t prod MOM6_SIS_libs_compile -no-link
-   To run with SIS
-fremake -x OM4.xml -p ncrc2.intel -t prod MOM6_SIS_compile
-frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS_baseline -r basic 
+fremake -x OM4.xml -p ncrc2.intel -t prod OM4_libs_compile -no-link
    To run with SIS2
 fremake -x OM4.xml -p ncrc2.intel -t prod MOM6_SIS2_compile
 frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic 
@@ -18,8 +15,8 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <property name="RELEASE"      value="testing_20150904"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2015.09.21"/>     <!-- git tag date for MOM6 source code -->
+   <property name="RELEASE"      value="testing_20151009"/> <!-- CVS tag for shared source code -->
+   <property name="MOM6_DATE"    value="2015.10.13"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -54,7 +51,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
    <!--Users need not change the following properties -->
    <property name="reference_tag"  value="ulm_answers"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
    <property name="PROG_MAIN"   value="coupler/coupler_main.o"/>
-   <property name="LIBS_ROOT"   value="MOM6_SIS_libs_compile"/>
+   <property name="LIBS_ROOT"   value="OM4_libs_compile"/>
    <property name="FMS_LIB_DIR" value="./$(LIBS_ROOT)/$(platform)-$(target)/exec"/>
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
@@ -138,7 +135,42 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
           setenv KMP_STACKSIZE 512m
           setenv NC_BLKSZ 1M
           alias cpget 'cp \!^ \!^.copy ; \rm -f \!^ ; mv \!^.copy \!^ ; chmod +w \!^ '
-#for t1 module unload altd
+     ]]></csh>
+
+     <property name="MY_ROOT"          value="$(rootDir)"/>
+     <property name="FMS_ARCHIVE_ROOT" value="$CDATA/fms"/>
+     <property name="F2003_FLAGS"      value="-DINTERNAL_FILE_NML -g -traceback"/> <!-- -g -traceback -->
+     <property name="REFERENCE"        value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+     <property name="NB_ROOT"          value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
+ 
+    </platform>
+
+    <platform name="ncrc2.intel14">
+      <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)"/>
+         <directory>
+            <!--unswept locations-->
+            <root>$CPERM/$USER/$(FRE_STEM)</root>
+            <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+            <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+            <!--swept locations (including the staged archive location)-->
+            <archive>$CTMP/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)</archive>
+            <stdout>$CTMP/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+            <work>$CTMP/$USER/work/$(FRE_STEM)/$FRE_JOBID</work>
+         </directory>
+ 
+      <csh><![CDATA[
+          source $MODULESHOME/init/csh
+          module use -a /ncrc/home2/fms/local/modulefiles
+          module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+          module unload netcdf fre fre-commands
+          module load PrgEnv-intel/5.2.40
+          module load intel/14.0.2.144
+          module load git
+          module load $(FRE_VERSION)
+          setenv KMP_STACKSIZE 512m
+          setenv NC_BLKSZ 1M
+          alias cpget 'cp \!^ \!^.copy ; \rm -f \!^ ; mv \!^.copy \!^ ; chmod +w \!^ '
      ]]></csh>
 
      <property name="MY_ROOT"          value="$(rootDir)"/>
@@ -273,7 +305,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
    <property name="MOM6_EXAMPLES"  value="$root/$(LIBS_ROOT)/src/mom6"/>
    <property name="MY_LIBS"        value="$(MY_ROOT)/$(FMS_LIB_DIR)"/>
 
-   <experiment name="MOM6_SIS_libs_compile">
+   <experiment name="OM4_libs_compile">
       <description>
 Make the executable for ocean-ice experiments.
       </description>
@@ -282,7 +314,7 @@ Make the executable for ocean-ice experiments.
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
             <codeBase version="$(RELEASE)"> shared.git </codeBase>
             <csh><![CDATA[
-            ( cd shared && git checkout $(RELEASE) )
+(cd shared && /bin/sed "s/define MAXFIELDMETHODS_ 150/define MAXFIELDMETHODS_ 400/g" -i field_manager/field_manager.F90 )
              ]]>
             </csh>
          </source>
@@ -339,22 +371,6 @@ Make the executable for ocean-ice experiments.
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
          </compile>
       </component>
-
-      <component name="mom6_static_90x45" requires="fms ocean_shared" paths="mom6/ice_ocean_SIS2/OM4_025 mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/">
-         <source versionControl="git" root="https://github.com">
-           <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase><!--Do not checkout any code-->
-           <csh><![CDATA[
-          echo "No need to checkout any new source code for this component!" 
-          /bin/cp  mom6/ice_ocean_SIS2/OM4_025/MOM_memory.h mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
-          /bin/sed "s/NIPROC_ 32/NIPROC_ 90/g" -i mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
-          /bin/sed "s/NJPROC_ 18/NJPROC_ 45/g" -i mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
-        ]]></csh>
-         </source>
-         <compile>
-            <cppDefs><![CDATA[ $(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-         </compile>
-      </component>
-
       
       <component name="icebergs" paths="icebergs" requires="fms">
          <source versionControl="git" root="https://github.com/NOAA-GFDL">
@@ -366,28 +382,11 @@ Make the executable for ocean-ice experiments.
          <description domainName="N/A" communityName="N/A" communityVersion="$(RELEASE)" communityGrid="N/A"/>
       </component>
 
-      <component name="ice_sis" paths="ice_param ice_sis" requires="fms icebergs">
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-            <codeBase version="$(RELEASE)"> ice_sis.git ice_param.git </codeBase>
-            <csh><![CDATA[
-             ( cd ice_sis && git checkout user/nnz/use_gitlabbergs )
-             ( \rm ice_sis/ice_bergs.F90 )
-              ]]>
-            </csh>
-        </source>
-         <compile>
-            <cppDefs>$(F2003_FLAGS)</cppDefs>
-         </compile>
-         <!-- MDBI -->
-         <description domainName="Sea Ice SIS" communityName="GFDL-SIS" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
-      </component>
 
-      <!--Since SIS2 needs ice_param there is a dependency that may damage the compile if both ice_sis and sis2 try to cvs co ice_params at the same time. We should put ice_param files under sis2 git 
--->
       <component name="sis2" paths="mom6/src/SIS2 ice_param" requires="fms mom6 icebergs" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
          <description domainName="Sea Ice SIS2" communityName="GFDL-SIS2" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
-         <source>
-	   <codeBase version="$(RELEASE)"> ice_param </codeBase> 
+         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
             <csh> \rm mom6/src/SIS2/ice_bergs.F90 </csh> 
          </source>
          <compile>
@@ -413,40 +412,7 @@ Make the executable for ocean-ice experiments.
       </component>
    </experiment>
 
-   <experiment name="MOM6_SIS_compile" inherit="MOM6_SIS_libs_compile">
-      <component paths="shared" name="fms" includeDir="$root/$(LIBS_ROOT)/src/shared/include">
-         <library path="$(MY_LIBS)/fms/libfms.a" headerDir="$(MY_LIBS)/fms"/>
-      </component>
-      <component name="land_null" paths="land_null" requires="fms">
-         <library path="$(MY_LIBS)/land_null/libland_null.a" headerDir="$(MY_LIBS)/land_null"/>
-      </component>
-      <component name="atmos_null" paths="atmos_null atmos_param" requires="fms">
-          <library path="$(MY_LIBS)/atmos_null/libatmos_null.a" headerDir="$(MY_LIBS)/atmos_null"/>
-      </component>
-      <component paths="ocean_shared" requires="fms" name="ocean_shared">
-         <library path="$(MY_LIBS)/ocean_shared/libocean_shared.a" headerDir="$(MY_LIBS)/ocean_shared"/>
-      </component> 
-      <component paths="mom6" requires="fms ocean_shared" name="mom6">
-         <library path="$(MY_LIBS)/mom6/libmom6.a" headerDir="$(MY_LIBS)/mom6"/>
-      </component> 
-      <component paths="icebergs" requires="fms" name="icebergs">
-         <library path="$(MY_LIBS)/icebergs/libicebergs.a" headerDir="$(MY_LIBS)/icebergs"/>
-      </component> 
-      <component paths="ice_sis" requires="fms icebergs" name="ice_sis">
-         <library path="$(MY_LIBS)/ice_sis/libice_sis.a" headerDir="$(MY_LIBS)/ice_sis"/>
-      </component> 
-      <component name="coupler" paths="coupler" requires="fms land_null atmos_null ice_sis mom6 ocean_shared icebergs">
-         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-            <codeBase version="$(RELEASE)"> coupler.git </codeBase>
-         </source>
-         <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-         </compile>
-      </component>
-   </experiment>
-
-    <experiment name="MOM6_SIS2_compile" inherit="MOM6_SIS_libs_compile">
+    <experiment name="MOM6_SIS2_compile" inherit="OM4_libs_compile">
       <component paths="shared" name="fms" includeDir="$root/$(LIBS_ROOT)/src/shared/include">
          <library path="$(MY_LIBS)/fms/libfms.a" headerDir="$(MY_LIBS)/fms"/>
       </component>
@@ -644,23 +610,6 @@ endif
     </input>
   </experiment>
 
-  <!--OM4 COBALT source datasets-->
-  <experiment name="COBALT_source_data">
-    <input>
-     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/mom4p1_restart_to_latlon_360x180/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc</dataSource>
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/woa13/woa13_all_p_monthly_01.nc</dataSource>
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/woa13/woa13_all_o_monthly_01.nc</dataSource>
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/woa13/woa13_all_n_monthly_01.nc</dataSource>
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/woa13/woa13_all_i_monthly_01.nc</dataSource>
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/glodap/Preind_DIC.nc</dataSource>
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/retrospective/glodap/Alk.nc</dataSource>
-      </dataFile>
-
-    </input>
-  </experiment>
-
-  
   <experiment name="OM4_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -1107,229 +1056,8 @@ OVERRIDE_EOF
    </input>
 </experiment>
 
-<experiment name="MOM6_GOLD_SIS" inherit="MOM6_SIS_compile">
-<description communityProject="OWG" communityModel="MOM6_GOLD_SIS $(FRE_STEM)" communityModelID="OWG_MOM6_GOLD_SIS" communityExperimentName="$(name)" >
- global 1 degree i test case
-</description>                                               
-<scenario 
-      communityForcing="CORE"
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      startTime="$(PP_START_YEAR)"
-      endTime="$(PP_END_YEAR)" 
-      branch_time="0.0">
-</scenario>
-<communityComment>
-    For more information please refer to the
-    &lt;a href="http://wiki.gfdl.noaa.gov/index.php/MOM6"&gt; MOM6 Wiki.  &lt;/a&gt;
-</communityComment>
-     <input>                                                 
-     <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/input.nml</dataSource>
-        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/input.nml</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/input.nml</dataSource>
-     </dataFile>                                                                                   
-     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">                   
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/diag_table</dataSource>
-        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/diag_table</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS/GOLD_SIS/diag_table</dataSource>
-     </dataFile>                                                                                    
-     <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">                   
-        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/field_table</dataSource>
-     </dataFile>                                                                                     
-     <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">                     
-        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/data_table</dataSource> 
-     </dataFile>                                                                                     
-     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">                         
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/MOM_input</dataSource> 
-     </dataFile>                                                                                       
 
-      <!--gridSpec mosaic datasets-->
-      <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/grid_spec.nc</dataSource>
-        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/grid_spec.nc</dataSource>
-        <dataSource site="gfdl">/archive/gold/datasets/GOLD_SIS/riga/mosaic.unpacked/grid_spec.nc</dataSource> 
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/mosaic.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/atmos_hgrid.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/atmos_mosaic.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/atmos_mosaic_tile1Xland_mosaic_tile1.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/atmos_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/land_hgrid.nc</dataSource>                           
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/land_mask.nc</dataSource>                            
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/land_mosaic.nc</dataSource>                          
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/land_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource> 
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/ocean_hgrid.nc</dataSource>                          
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/ocean_mask.nc</dataSource>                           
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/ocean_mosaic.nc</dataSource>                         
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/ocean_vgrid.nc</dataSource>                          
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/README</dataSource>                                  
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/topog.nc</dataSource>                                
-      </dataFile>                                                                                                                        
-
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/31Layer_zgrid.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/cfc.bc.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/geothermal_heating_cm2g.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/gustiness_qscat.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/OM3_zgrid.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/seawifs_1998-2006_GOLD_smoothed_2X.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/sgs_h2.nc</dataSource>                            
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/tideamp.nc</dataSource>                           
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/tke_tidal_cm2p2.nc</dataSource>                   
-      </dataFile>                                                                                                                     
-
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/ncar_precip_clim.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/ncar_rad_clim.nc</dataSource>   
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/q_10_mod.clim.nc</dataSource>   
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/runoff.nc</dataSource>          
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/salt_restore.nc</dataSource>    
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/slp.clim.nc</dataSource>        
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/sst_ice_clim.nc</dataSource>    
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/t_10_mod.clim.nc</dataSource>   
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/temp_restore.nc</dataSource>    
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/u_10_mod.clim.nc</dataSource>   
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/v_10_mod.clim.nc</dataSource>   
-      </dataFile>                                                                                                   
-
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-	 <!--Are the following two IC files both needed?--> 
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/GOLD_IC.2010.11.15.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/GOLD_SIS_IC.nc</dataSource>
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS/GOLD_SIS/INPUT/ocmip2_cfc.res.nc</dataSource>
-      </dataFile>                                                                                              
-
-      <namelist name="coupler_nml">
-       months = $months,           
-       days   = $days,             
-       current_date = 1900,1,1,0,0,0,
-       hours = 0                     
-       minutes = 0                   
-       seconds = 0                   
-       calendar = 'NOLEAP',          
-       dt_cpld  = 7200,              
-       dt_atmos = 7200,              
-       do_atmos = .false.,           
-       do_land = .false.,            
-       do_ice = .true.,              
-       do_ocean = .true.,            
-       atmos_npes = 0,            
-       ocean_npes = 0,               
-       concurrent = .false.          
-       use_lag_fluxes=.true.         
-     </namelist>                     
-
-     <namelist name="MOM_input_nml" >
-         output_directory = './',
-         input_filename = '$restart_flag'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_override'
-     </namelist>
-     <namelist name="fms_io_nml" >
-         fms_netcdf_restart=.true.
-         threading_read='multi'
-         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
-     </namelist>
-     <namelist name="dummy_ocean_nml">
-       ocean_layout = 0,0
-       ocean_io_layout = 1,1
-       ocean_mask_table='MOM_mask_table'
-     </namelist>
-     <namelist name="dummy_ice_nml">
-       ice_layout = 0,0
-       ice_io_layout = 1,1
-       ice_mask_table='MOM_mask_table'
-     </namelist>
-
-
-     <csh type="always">
-        <![CDATA[
-#------------------------------------------
-## Find out whether to restart.
-
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc 
-
-touch $work/INPUT/MOM_override
-touch $work/INPUT/SIS_override
-
-#scan auxiliary_nml
-set OCN_MASK_TABLE = `awk '/ocean_mask_table/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-set OCN_LAYOUT     = `awk '/ocean_layout/     {gsub(/=/," ");           print $2,$3}' $work/input.nml`
-set OCN_IO_LAYOUT  = `awk '/ocean_io_layout/  {gsub(/=/," ");           print $2,$3}' $work/input.nml`
-
-cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
-#override undef NIPROC_IO
-#override undef NJPROC_IO
-#override undef NIPROC
-#override undef NJPROC
-#override IO_LAYOUT = $OCN_IO_LAYOUT
-#override LAYOUT    = $OCN_LAYOUT
-#override MASKTABLE = $OCN_MASK_TABLE
-MOM_LAYOUT_EOF
-
-cd $work
-## Run the model
-#------------------------------------------
-       ]]>
-      </csh>
-
-     <csh><![CDATA[
-#
-# Copy MOM6 input files needed for postprocessing  to GFDL (waiting for FRE to do this for us)
-#
-set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
-if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
-  #trick to copy MOM6 directory but avoid traversing the .datasets links
-  tar cvf mom6.tar --exclude='.datasets' -C $(MOM6_EXAMPLES) . > /dev/null
-  #tar cvf mom6.tar  --exclude='.datasets' --exclude='src' --exclude='INPUT'  -C $(MOM6_EXAMPLES) . > /dev/null
-  mkdir mom6
-  tar xvf mom6.tar -C ./mom6 > /dev/null
-  if ("${platform_domain}" == "ncrc.gov") then
-    gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  else if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
-    gcp -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  endif
-endif
-      ]]></csh>
-
-   </input>
-   <runtime>
-       <regression name="basic">
-         <run days="20"    npes="32" overrideParams="ice_model_nml:layout=8,4"  runTimePerJob="00:30:00"/>
-       </regression>
-       <regression name="rts">
-         <run days="10 10" npes="32" overrideParams="ice_model_nml:layout=8,4"  runTimePerJob="00:30:00"/>
-         <run days="20"    npes="64" overrideParams="ice_model_nml:layout=16,4;ice_model_nml:io_layout=1,4" runTimePerJob="00:30:00"/>
-         <run days="20"    npes="32" overrideParams="ice_model_nml:layout=2,16;ice_model_nml:io_layout=1,1" runTimePerJob="00:30:00"/>
-         <run months="1"    npes="64" overrideParams="ice_model_nml:layout=16,4;ice_model_nml:io_layout=1,4" runTimePerJob="00:30:00"/>
-       </regression>
-       <regression name="debug">
-         <run days="2"    npes="32" overrideParams="ice_model_nml:layout=8,4"  runTimePerJob="00:30:00"/>
-       </regression>
-
-       <production simTime="$(PROD_SIMTIME)" units="years" npes="128" runTime="$(PROD_RUNTIME)">
-           <segment simTime="12" units="months" runTime="02:00:00"/>
-       </production>
-
-       <reference restart="$(REFERENCE)/1x0m20d_32pe/restart/00010121.tar"/>
-   </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4i_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-</experiment>
-
-<experiment name="MOM6_GOLD_SIS_generics" inherit="MOM6_GOLD_SIS">
+<experiment name="MOM6_GOLD_SIS2_generics" inherit="MOM6_GOLD_SIS2_bergs">
    <input>
       <namelist name="coupler_nml">
        months = $months,
@@ -1474,9 +1202,8 @@ OVERRIDE_EOF
    </input>
 </experiment>
 
-<experiment name="OM4_SIS2_COBALT" inherit="OM4_SIS2_baseline">
+<experiment name="OM4_SIS2_COBALT_proto" inherit="OM4_SIS2_baseline">
    <input>
-
       <namelist name="coupler_nml">
        months = $months,
        days   = $days,
@@ -1537,402 +1264,20 @@ OVERRIDE_EOF
            "longname",     "specific humidity"
            "units",        "kg/kg" /
 
+      </fieldTable>
+
+      <fieldTable order="append">
+### COBALT field table for initializing tracers
+## jgj 2013/01/23 updated for COBALT
+
 "namelists","ocean_mod","generic_cobalt/*global*"
 /
 
 "namelists","ocean_mod","generic_cobalt"
-init = f
-#
-# JGJ 2015/07/28
-# field table entries for initialization of cobalt tracers
-# use January entries to match T/S initialization
-#
-# NO3 from WOA2013  (/archive/mdteam/obs/NOAA-NODC/WOA13/v1.00a/woa13_all_n_monthly_01.nc)
-# divide by 1035e3 to convert from umol/l to mol/kg
-no3_src_file = INPUT/woa13_all_n_monthly_01.nc
-no3_src_var_name = n_an
-no3_src_var_unit = micromoles_per_liter
-no3_dest_var_name =  no3
-no3_dest_var_unit = mol kg-1
-no3_src_var_record = 1
-no3_src_var_gridspec = NONE
 
-# O2 from WOA2013  (/archive/mdteam/obs/NOAA-NODC/WOA13/v1.00a/woa13_all_o_monthly_01.nc)
-# multiply by (1000/22391.6)/1035 to convert from ml/l to mol/kg
-o2_src_file = INPUT/woa13_all_o_monthly_01.nc
-o2_src_var_name = o_an
-o2_src_var_unit = milliliters_per_liter
-o2_dest_var_name =  o2
-o2_dest_var_unit = mol kg-1
-o2_src_var_record = 1
-o2_src_var_gridspec = NONE
-
-# PO4 from WOA2013  (/archive/mdteam/obs/NOAA-NODC/WOA13/v1.00a/woa13_all_p_monthly_01.nc)
-# divide by 1035e3 to convert from umol/l to mol/kg
-po4_src_file = INPUT/woa13_all_p_monthly_01.nc
-po4_src_var_name = p_an
-po4_src_var_unit = micromoles_per_liter
-po4_dest_var_name =  po4
-po4_dest_var_unit = mol kg-1
-po4_src_var_record = 1
-po4_src_var_gridspec = NONE
-
-# SIO4 from WOA2013  (/archive/mdteam/obs/NOAA-NODC/WOA13/v1.00a/woa13_all_i_monthly_01.nc)
-# divide by 1035e3 to convert from umol/l to mol/kg
-sio4_src_file = INPUT/woa13_all_i_monthly_01.nc
-sio4_src_var_name = i_an
-sio4_src_var_unit = micromoles_per_liter
-sio4_dest_var_name =  sio4
-sio4_dest_var_unit = mol kg-1
-sio4_src_var_record = 1
-sio4_src_var_gridspec = NONE
-
-# Alkalinity from GLODAP  (/archive/jgj/datasets/input/GLODAP/Alk.nc)
-# divide by 1e6 to convert from umol/kg to mol/kg
-alk_src_file = INPUT/Alk.nc
-alk_src_var_name = Alk
-alk_src_var_unit = micromoles_per_kg
-alk_dest_var_name =  alk
-alk_dest_var_unit = mol kg-1
-alk_src_var_record = 1
-alk_src_var_gridspec = NONE
-
-# Preindustrial DIC from GLODAP  (/archive/jgj/datasets/INPUT/GLODAP/Preind_DIC.nc)
-# divide by 1e6 to convert from umol/kg to mol/kg
-dic_src_file = INPUT/Preind_DIC.nc
-dic_src_var_name = Preind_DIC
-dic_src_var_unit = micromoles_per_kg
-dic_dest_var_name =  dic
-dic_dest_var_unit = mol kg-1
-dic_src_var_record = 1
-dic_src_var_gridspec = NONE
-
-# additional tracers from ESM2M-COBALT Preindustrial Control restart (/archive/jgj/datasets/retrospective/mom4p1_restart_to_latlon_360x180/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc)
-# no unit conversion necessary
-cadet_arag_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-cadet_arag_src_var_name = cadet_arag
-cadet_arag_src_var_unit = none
-cadet_arag_dest_var_name =  cadet_arag
-cadet_arag_dest_var_unit = mol kg-1
-cadet_arag_src_var_record = 1
-cadet_arag_src_var_gridspec = NONE
-
-cadet_calc_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-cadet_calc_src_var_name = cadet_calc
-cadet_calc_src_var_unit = none
-cadet_calc_dest_var_name =  cadet_calc
-cadet_calc_dest_var_unit = mol kg-1
-cadet_calc_src_var_record = 1
-cadet_calc_src_var_gridspec = NONE
-
-cased_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-cased_src_var_name = cased
-cased_src_var_unit = none
-cased_dest_var_name =  cased
-cased_dest_var_unit = mol kg-1
-cased_src_var_record = 1
-cased_src_var_gridspec = NONE
-
-chl_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-chl_src_var_name = chl
-chl_src_var_unit = none
-chl_dest_var_name =  chl
-chl_dest_var_unit = mol kg-1
-chl_src_var_record = 1
-chl_src_var_gridspec = NONE
-
-co3_ion_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-co3_ion_src_var_name = co3_ion
-co3_ion_src_var_unit = none
-co3_ion_dest_var_name =  co3_ion
-co3_ion_dest_var_unit = mol kg-1
-co3_ion_src_var_record = 1
-co3_ion_src_var_gridspec = NONE
-
-fed_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-fed_src_var_name = fed
-fed_src_var_unit = none
-fed_dest_var_name =  fed
-fed_dest_var_unit = mol kg-1
-fed_src_var_record = 1
-fed_src_var_gridspec = NONE
-
-fedi_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-fedi_src_var_name = fedi
-fedi_src_var_unit = none
-fedi_dest_var_name =  fedi
-fedi_dest_var_unit = mol kg-1
-fedi_src_var_record = 1
-fedi_src_var_gridspec = NONE
-
-felg_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-felg_src_var_name = felg
-felg_src_var_unit = none
-felg_dest_var_name =  felg
-felg_dest_var_unit = mol kg-1
-felg_src_var_record = 1
-felg_src_var_gridspec = NONE
-
-fesm_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-fesm_src_var_name = fesm
-fesm_src_var_unit = none
-fesm_dest_var_name =  fesm
-fesm_dest_var_unit = mol kg-1
-fesm_src_var_record = 1
-fesm_src_var_gridspec = NONE
-
-htotal_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-htotal_src_var_name = htotal
-htotal_src_var_unit = none
-htotal_dest_var_name =  htotal
-htotal_dest_var_unit = mol kg-1
-htotal_src_var_record = 1
-htotal_src_var_gridspec = NONE
-
-irr_mem_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-irr_mem_src_var_name = irr_mem
-irr_mem_src_var_unit = none
-irr_mem_dest_var_name =  irr_mem
-irr_mem_dest_var_unit = mol kg-1
-irr_mem_src_var_record = 1
-irr_mem_src_var_gridspec = NONE
-
-ldon_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-ldon_src_var_name = ldon
-ldon_src_var_unit = none
-ldon_dest_var_name =  ldon
-ldon_dest_var_unit = mol kg-1
-ldon_src_var_record = 1
-ldon_src_var_gridspec = NONE
-
-ldop_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-ldop_src_var_name = ldop
-ldop_src_var_unit = none
-ldop_dest_var_name =  ldop
-ldop_dest_var_unit = mol kg-1
-ldop_src_var_record = 1
-ldop_src_var_gridspec = NONE
-
-lith_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-lith_src_var_name = lith
-lith_src_var_unit = none
-lith_dest_var_name =  lith
-lith_dest_var_unit = mol kg-1
-lith_src_var_record = 1
-lith_src_var_gridspec = NONE
-
-nh4_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-nh4_src_var_name = nh4
-nh4_src_var_unit = none
-nh4_dest_var_name =  nh4
-nh4_dest_var_unit = mol kg-1
-nh4_src_var_record = 1
-nh4_src_var_gridspec = NONE
-
-nbact_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-nbact_src_var_name = nbact
-nbact_src_var_unit = none
-nbact_dest_var_name =  nbact
-nbact_dest_var_unit = mol kg-1
-nbact_src_var_record = 1
-nbact_src_var_gridspec = NONE
-
-ndi_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-ndi_src_var_name = ndi
-ndi_src_var_unit = none
-ndi_dest_var_name =  ndi
-ndi_dest_var_unit = mol kg-1
-ndi_src_var_record = 1
-ndi_src_var_gridspec = NONE
-
-nlg_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-nlg_src_var_name = nlg
-nlg_src_var_unit = none
-nlg_dest_var_name =  nlg
-nlg_dest_var_unit = mol kg-1
-nlg_src_var_record = 1
-nlg_src_var_gridspec = NONE
-
-nsm_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-nsm_src_var_name = nsm
-nsm_src_var_unit = none
-nsm_dest_var_name =  nsm
-nsm_dest_var_unit = mol kg-1
-nsm_src_var_record = 1
-nsm_src_var_gridspec = NONE
-
-nlgz_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-nlgz_src_var_name = nlgz
-nlgz_src_var_unit = none
-nlgz_dest_var_name =  nlgz
-nlgz_dest_var_unit = mol kg-1
-nlgz_src_var_record = 1
-nlgz_src_var_gridspec = NONE
-
-nmdz_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-nmdz_src_var_name = nmdz
-nmdz_src_var_unit = none
-nmdz_dest_var_name =  nmdz
-nmdz_dest_var_unit = mol kg-1
-nmdz_src_var_record = 1
-nmdz_src_var_gridspec = NONE
-
-nsmz_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-nsmz_src_var_name = nsmz
-nsmz_src_var_unit = none
-nsmz_dest_var_name =  nsmz
-nsmz_dest_var_unit = mol kg-1
-nsmz_src_var_record = 1
-nsmz_src_var_gridspec = NONE
-
-fedet_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-fedet_src_var_name = fedet
-fedet_src_var_unit = none
-fedet_dest_var_name =  fedet
-fedet_dest_var_unit = mol kg-1
-fedet_src_var_record = 1
-fedet_src_var_gridspec = NONE
-
-lithdet_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-lithdet_src_var_name = lithdet
-lithdet_src_var_unit = none
-lithdet_dest_var_name =  lithdet
-lithdet_dest_var_unit = mol kg-1
-lithdet_src_var_record = 1
-lithdet_src_var_gridspec = NONE
-
-ndet_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-ndet_src_var_name = ndet
-ndet_src_var_unit = none
-ndet_dest_var_name =  ndet
-ndet_dest_var_unit = mol kg-1
-ndet_src_var_record = 1
-ndet_src_var_gridspec = NONE
-
-pdet_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-pdet_src_var_name = pdet
-pdet_src_var_unit = none
-pdet_dest_var_name =  pdet
-pdet_dest_var_unit = mol kg-1
-pdet_src_var_record = 1
-pdet_src_var_gridspec = NONE
-
-sidet_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-sidet_src_var_name = sidet
-sidet_src_var_unit = none
-sidet_dest_var_name =  sidet
-sidet_dest_var_unit = mol kg-1
-sidet_src_var_record = 1
-sidet_src_var_gridspec = NONE
-
-silg_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-silg_src_var_name = silg
-silg_src_var_unit = none
-silg_dest_var_name =  silg
-silg_dest_var_unit = mol kg-1
-silg_src_var_record = 1
-silg_src_var_gridspec = NONE
-
-sldon_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-sldon_src_var_name = sldon
-sldon_src_var_unit = none
-sldon_dest_var_name =  sldon
-sldon_dest_var_unit = mol kg-1
-sldon_src_var_record = 1
-sldon_src_var_gridspec = NONE
-
-sldop_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-sldop_src_var_name = sldop
-sldop_src_var_unit = none
-sldop_dest_var_name =  sldop
-sldop_dest_var_unit = mol kg-1
-sldop_src_var_record = 1
-sldop_src_var_gridspec = NONE
-
-srdon_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-srdon_src_var_name = srdon
-srdon_src_var_unit = none
-srdon_dest_var_name =  srdon
-srdon_dest_var_unit = mol kg-1
-srdon_src_var_record = 1
-srdon_src_var_gridspec = NONE
-
-srdop_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-srdop_src_var_name = srdop
-srdop_src_var_unit = none
-srdop_dest_var_name =  srdop
-srdop_dest_var_unit = mol kg-1
-srdop_src_var_record = 1
-srdop_src_var_gridspec = NONE
-
-cadet_arag_btf_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-cadet_arag_btf_src_var_name = cadet_arag_btf
-cadet_arag_btf_src_var_unit = none
-cadet_arag_btf_dest_var_name =  cadet_arag_btf
-cadet_arag_btf_dest_var_unit = mol kg-1
-cadet_arag_btf_src_var_record = 1
-cadet_arag_btf_src_var_gridspec = NONE
-
-cadet_calc_btf_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-cadet_calc_btf_src_var_name = cadet_calc_btf
-cadet_calc_btf_src_var_unit = none
-cadet_calc_btf_dest_var_name =  cadet_calc_btf
-cadet_calc_btf_dest_var_unit = mol kg-1
-cadet_calc_btf_src_var_record = 1
-cadet_calc_btf_src_var_gridspec = NONE
-
-lithdet_btf_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-lithdet_btf_src_var_name = lithdet_btf
-lithdet_btf_src_var_unit = none
-lithdet_btf_dest_var_name =  lithdet_btf
-lithdet_btf_dest_var_unit = mol kg-1
-lithdet_btf_src_var_record = 1
-lithdet_btf_src_var_gridspec = NONE
-
-ndet_btf_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-ndet_btf_src_var_name = ndet_btf
-ndet_btf_src_var_unit = none
-ndet_btf_dest_var_name =  ndet_btf
-ndet_btf_dest_var_unit = mol kg-1
-ndet_btf_src_var_record = 1
-ndet_btf_src_var_gridspec = NONE
-
-pdet_btf_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-pdet_btf_src_var_name = pdet_btf
-pdet_btf_src_var_unit = none
-pdet_btf_dest_var_name =  pdet_btf
-pdet_btf_dest_var_unit = mol kg-1
-pdet_btf_src_var_record = 1
-pdet_btf_src_var_gridspec = NONE
-
-sidet_btf_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-sidet_btf_src_var_name = sidet_btf
-sidet_btf_src_var_unit = none
-sidet_btf_dest_var_name =  sidet_btf
-sidet_btf_dest_var_unit = mol kg-1
-sidet_btf_src_var_record = 1
-sidet_btf_src_var_gridspec = NONE
-
+init=f
+enforce_src_info=f
 /
-
-#Read chl as cfc11 and cfc12 just for testing
-"namelists","ocean_mod","generic_cfc"
-cfc_11_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-cfc_11_src_var_name = chl
-cfc_11_src_var_unit = ppt
-# ppt to mol/kg
-cfc_11_src_var_unit_conversion = 1.0e-12
-cfc_11_src_var_record = 1
-cfc_11_src_var_gridspec = NONE
-cfc_12_src_file = INPUT/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds.ocean_cobalt.res.nc
-cfc_12_src_var_name = chl
-cfc_12_src_var_unit = ppt
-# ppt to mol/kg
-cfc_12_src_var_unit_conversion = 1.0e-12
-cfc_12_src_var_record = 1
-cfc_12_src_var_gridspec = NONE
-/
-
       </fieldTable>
 
       <dataTable order="append">
@@ -1982,8 +1327,6 @@ $baseDate
       <xi:include xpointer="xpointer(//experiment[@name='OM4_grid']/input/node())"/>
       <!--CORE forcing datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='CORE_data']/input/node())"/>
-      <!--COBALT source datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='COBALT_source_data']/input/node())"/>
      
      <csh><![CDATA[
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
@@ -2002,7 +1345,7 @@ OVERRIDE_EOF
      
 </experiment>
 
-<experiment name="OM4_SIS2_COBALT_DT_THERM_7200" inherit="OM4_SIS2_COBALT">
+<experiment name="OM4_SIS2_COBALT_proto_DT_THERM_7200" inherit="OM4_SIS2_COBALT_proto">
 <description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)">
  global 1/4 degree z  with THERMO_SPANS_COUPLING
 </description>
@@ -2018,16 +1361,14 @@ THERMO_SPANS_COUPLING = True
 #override DT_THERM = 7200
 #override DIABATIC_FIRST = False
 OVERRIDE_EOF
-
-
      ]]></csh>
    </input>
 
    <runtime>
        <reference restart="$(REFERENCE)/1x0m10d_2997pe/restart/19700111.tar"/>
-   </runtime>
-    
+   </runtime>  
 </experiment>
+
 <experiment name="MOM6_GOLD_SIS2_bergs" inherit="MOM6_SIS2_compile">
 <description communityProject="OWG" communityModel="MOM6_GOLD_SIS2 $(FRE_STEM)" communityModelID="OWG_MOM6_GOLD_SIS2" communityExperimentName="$(name)" >
  global 1 degree i test case
@@ -2297,7 +1638,7 @@ endif
 
 </experiment>
 
-    <experiment name="MOM6_SIS2_compile_static_90x45" inherit="MOM6_SIS_libs_compile">
+    <experiment name="MOM6_SIS2_compile_static_90x45" inherit="OM4_libs_compile">
       <component paths="shared" name="fms" includeDir="$root/$(LIBS_ROOT)/src/shared/include">
          <library path="$(MY_LIBS)/fms/libfms.a" headerDir="$(MY_LIBS)/fms"/>
       </component>
@@ -2310,15 +1651,28 @@ endif
       <component paths="ocean_shared" requires="fms" name="ocean_shared">
          <library path="$(MY_LIBS)/ocean_shared/libocean_shared.a" headerDir="$(MY_LIBS)/ocean_shared"/>
       </component> 
-      <component paths="mom6" requires="fms ocean_shared" name="mom6_static_90x45">
-         <library path="$(MY_LIBS)/mom6_static_90x45/libmom6_static_90x45.a" headerDir="$(MY_LIBS)/mom6_static_90x45"/>
-      </component> 
       <component paths="icebergs" requires="fms" name="icebergs">
          <library path="$(MY_LIBS)/icebergs/libicebergs.a" headerDir="$(MY_LIBS)/icebergs"/>
       </component> 
       <component paths="sis2" requires="fms icebergs" name="sis2">
          <library path="$(MY_LIBS)/sis2/libsis2.a" headerDir="$(MY_LIBS)/sis2"/>
-      </component> 
+      </component>
+      <component name="mom6_static_90x45" requires="fms ocean_shared" paths="$root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h $root/$(LIBS_ROOT)/src/mom6/src/MOM6/config_src/coupled_driver $root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/*/ $root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/*/*/">
+         <source versionControl="git" root="https://github.com">
+           <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase><!--Do not checkout any code-->
+           <csh><![CDATA[
+          echo "No need to checkout any new source code for this component!" 
+          /bin/cp  $root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory.h $root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
+          /bin/sed "s/NIPROC_ 32/NIPROC_ 90/g" -i $root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
+          /bin/sed "s/NJPROC_ 18/NJPROC_ 45/g" -i $root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
+        ]]></csh>
+         </source>
+         <compile>
+            <cppDefs><![CDATA[ $(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+         </compile>
+      </component>
+
+      
       <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6_static_90x45 ocean_shared icebergs">
          <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
