@@ -15,7 +15,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <property name="RELEASE"      value="testing_20151009"/> <!-- CVS tag for shared source code -->
+   <property name="RELEASE"      value="ulm_201510"/> <!-- CVS tag for shared source code -->
    <property name="MOM6_DATE"    value="2015.10.13"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
@@ -255,6 +255,53 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
     <platform name="theia.default">
       <xi:include xpointer="xpointer(//setup/platform[@name='theia.intel']/node())" />
+    </platform>
+
+    <platform name="olcf.intel15">
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(stem)</root>
+        <exec>$CPERM/$USER/$(stem)/$(name)/$(platform)-$(target)/exec</exec>
+        <state>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <scripts>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CPERM/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="MY_ROOT"          value="$(rootDir)"/>
+
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"    value="/ncrc/home2/Chris.Golaz/awg/tikal_201403/input"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
+      <property name="LWH_ARCHIVE_ROOT"  value="/scratch4/GFDL/gfdlscr/Garrett.Wright/pdata/gfdl_M"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)/$(name)"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+
+      <property name="FMS_ARCHIVE_ROOT" value="/lustre/atlas/proj-shared/cli061/pdata/fms" />
+
+      <project>cli061</project>
+      <csh><![CDATA[
+        module use -a /ccs/proj/cli061/local/modulefiles
+#        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray #if unload and reload PrgEnv-intel it cannot find some modules
+        module unload netcdf fre
+#        module load PrgEnv-intel
+        module swap intel intel/15.0.2.164 #does not find some system libraries
+        module load $(FRE_VERSION)
+        module load cray-netcdf/4.3.3.1
+        module load gcp
+
+#        module use /lustre/atlas/proj-shared/cli061/underwoo/hsm/modulefiles
+        module load hsm
+        setenv NC_BLKSZ 1M
+        setenv KMP_STACKSIZE 512m
+        setenv F_UFMTENDIAN big
+        ]]>
+     </csh>
+    </platform>
+    <platform name="olcf.default">
+      <xi:include xpointer="xpointer(//setup/platform[@name='olcf.intel15']/node())" />
     </platform>
 
 <!-- gfdl platforms -->
