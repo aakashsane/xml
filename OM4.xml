@@ -784,7 +784,7 @@ touch $work/INPUT/SIS_override
          foreach file ( `ls icebergs.res.nc.????` )
             if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
          end
-         ncrcat $non_empty_restarts icebergs.res.nc
+         if( "x$non_empty_restarts" != "x" ) ncrcat $non_empty_restarts icebergs.res.nc
          mkdir hide_from_fre
          mv icebergs.res.nc.* hide_from_fre/
          cd $work
@@ -874,7 +874,7 @@ touch $work/INPUT/SIS_override
          foreach file ( `ls icebergs.res.nc.????` )
             if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
          end
-         ncrcat $non_empty_restarts icebergs.res.nc
+         if( "x$non_empty_restarts" != "x" ) ncrcat $non_empty_restarts icebergs.res.nc
          mkdir hide_from_fre
          mv icebergs.res.nc.* hide_from_fre/
          cd $work
@@ -1102,134 +1102,6 @@ OVERRIDE_EOF
      ]]></csh>
    </input>
 </experiment>
-
-
-<experiment name="MOM6_GOLD_SIS2_generics" inherit="MOM6_GOLD_SIS2_bergs">
-   <input>
-      <namelist name="coupler_nml">
-       months = $months,
-       days   = $days,
-       current_date = 1970,1,1,0,0,0,
-       hours = 0
-       minutes = 0
-       seconds = 0
-       calendar = 'NOLEAP',
-       dt_cpld  = 7200,
-       dt_atmos = 7200,
-       do_atmos = .false.,
-       do_land = .false.,
-       do_ice = .true.,
-       do_ocean = .true.,
-       atmos_npes = 0,
-       ocean_npes = 0,
-       concurrent = .false.
-       use_lag_fluxes=.true.
-     </namelist>
-         <namelist name="generic_tracer_nml">
-       do_generic_tracer=.true.
-       do_generic_CFC=.true.
-       do_generic_SF6=.true.
-       do_generic_age=.true.
-       do_generic_argon=.true.
-       do_generic_COBALT=.false.
-       do_generic_TOPAZ=.false.
-         </namelist>
-
-<!--Once we have the surface forcing file we can use it this way	 
-      <dataTable order="append">
-"ATM", "sf6_flux_pcair_atm","SF6","INPUT/sf6.bc.nc",.false., 1.0
-	</dataTable>
--->
-
-      <diagTable order="append">
-#================
-# Additional DIAGNOSTICS
-#================
-#
-#==================
-# GENERIC TRACERS
-#==================
-#
-## tracer quantities
-"generic_tracers",          1,  "days", 1, "days", "time",
-"generic_cfc","cfc_11",     "cfc_11",     "generic_tracers","all",.true.,"none",2
-"generic_cfc","cfc_12",     "cfc_12",     "generic_tracers","all",.true.,"none",2
-"generic_cfc","cfc_11_stf", "cfc_11_stf", "generic_tracers","all",.true.,"none",2
-"generic_cfc","cfc_12_stf", "cfc_12_stf", "generic_tracers","all",.true.,"none",2
-"generic_sf6","sf6",        "sf6",        "generic_tracers","all",.true.,"none",2
-"generic_sf6","sf6_stf",    "sf6_stf",    "generic_tracers","all",.true.,"none",2
-"generic_age","age",        "age",        "generic_tracers","all",.true.,"none",2
-"generic_age","age_stf",    "age_stf",    "generic_tracers","all",.true.,"none",2
-"generic_argon","argon",    "argon",        "generic_tracers","all",.true.,"none",2
-"generic_argon","argon_stf","argon_stf",    "generic_tracers","all",.true.,"none",2
-
-      </diagTable>
-
-      <fieldTable order="append">
-#Source information for individual generic tracers
-#Currently generic_cfc package is set to use this mechanism as a prototype.
-#Currently the following lines are required but they do not do anything until MOM6 becomes ready to handle them.
-"namelists","ocean_mod","generic_cfc"
-cfc_11_src_file = INPUT/cfc.bc.nc
-cfc_11_src_var_name = CFC_11
-cfc_11_src_var_unit = ppt
-# ppt to mol/kg
-cfc_11_src_var_unit_conversion = 1.0e-12
-cfc_11_src_var_record = 1
-cfc_11_src_var_gridspec = NONE
-
-cfc_12_src_file = INPUT/cfc.bc.nc
-cfc_12_src_var_name = CFC_12
-cfc_12_src_var_unit = ppt
-# ppt to mol/kg
-cfc_12_src_var_unit_conversion = 1.0e-12
-cfc_12_src_var_record = 1
-cfc_12_src_var_gridspec = NONE
-/
-      </fieldTable>
-
-     <csh>
-        <![CDATA[
-#
-# Copy MOM6 input files needed for postprocessing  to GFDL (waiting for FRE to do this for us)
-#
-set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
-if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
-  #trick to copy MOM6 directory but avoid traversing the .datasets links
-  tar cvf mom6.tar --exclude='.datasets' -C $(MOM6_EXAMPLES) . > /dev/null
-  #tar cvf mom6.tar  --exclude='.datasets' --exclude='src' --exclude='INPUT'  -C $(MOM6_EXAMPLES) . > /dev/null
-  mkdir mom6
-  tar xvf mom6.tar -C ./mom6 > /dev/null
-  if ("${platform_domain}" == "ncrc.gov") then
-    gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  else if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
-    gcp -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  endif
-endif
-
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_OCMIP2_CFC = False
-#override USE_IDEAL_AGE_TRACER = False
-USE_generic_tracer = True
-GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
-OVERRIDE_EOF
-
-#Add null CFC's to a restart file
-cd $work/INPUT
-ncap -O --script 'cfc_11 = ptemp * 0.0 ; cfc_12 = ptemp * 0.0 ; sf6 = ptemp * 0.0 ; age  = ptemp * 0.0 ; argon = ptemp * 0.0 ' GOLD_IC.2010.11.15.nc MOM_GENERICS.res.nc
-#CFC is constant_init_tracer so the ice fluxes are not needed.
-\rm ice_ocmip2_cfc.res.nc
-
-     ]]></csh>
-
-   </input>
-
-   <runtime>
-       <reference restart="$(REFERENCE)/1x0m20d_32pe/restart/19700121.tar"/>
-   </runtime>
-
-</experiment>
-
 
 
 <experiment name="OM4_SIS2_DT_THERM_7200" inherit="OM4_SIS2_baseline">
@@ -1626,11 +1498,6 @@ cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
 #override MASKTABLE = $ICE_MASK_TABLE
 SIS_LAYOUT_EOF
 
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override MSTAR = 0.3
-OVERRIDE_EOF
-
-
 
 cd $work
 ## Run the model
@@ -1670,7 +1537,7 @@ endif
        </regression>
 
        <regression name="debug">
-         <run days="2"    npes="64" overrideParams="dummy_ocean_nml:ocean_layout=4,16;dummy_ocean_nml:ocean_io_layout=1,4;dummy_ice_nml:ice_layout=4,16;dummy_ice_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
+         <run days="1"    npes="64" overrideParams="dummy_ocean_nml:ocean_layout=4,16;dummy_ocean_nml:ocean_io_layout=1,4;dummy_ice_nml:ice_layout=4,16;dummy_ice_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
        </regression>
 
        <production simTime="$(PROD_SIMTIME)" units="years" npes="128" runTime="$(PROD_RUNTIME)">
@@ -1684,6 +1551,117 @@ endif
     </postProcess>
 
 </experiment>
+<experiment name="MOM6_GOLD_SIS2_generics" inherit="MOM6_GOLD_SIS2_bergs">
+   <input>
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1970,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'NOLEAP',
+       dt_cpld  = 7200,
+       dt_atmos = 7200,
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.true.
+     </namelist>
+         <namelist name="generic_tracer_nml">
+       do_generic_tracer=.true.
+       do_generic_CFC=.true.
+       do_generic_SF6=.true.
+       do_generic_age=.true.
+       do_generic_argon=.true.
+       do_generic_COBALT=.false.
+       do_generic_TOPAZ=.false.
+         </namelist>
+
+<!--Once we have the surface forcing file we can use it this way	 
+      <dataTable order="append">
+"ATM", "sf6_flux_pcair_atm","SF6","INPUT/sf6.bc.nc",.false., 1.0
+	</dataTable>
+-->
+
+      <diagTable order="append">
+#================
+# Additional DIAGNOSTICS
+#================
+#
+#==================
+# GENERIC TRACERS
+#==================
+#
+## tracer quantities
+"generic_tracers",          1,  "days", 1, "days", "time",
+"generic_cfc","cfc_11",     "cfc_11",     "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc_12",     "cfc_12",     "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc_11_stf", "cfc_11_stf", "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc_12_stf", "cfc_12_stf", "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc_11_stf_gas", "cfc_11_stf_gas", "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc_12_stf_gas", "cfc_12_stf_gas", "generic_tracers","all",.true.,"none",2
+"generic_sf6","sf6",        "sf6",        "generic_tracers","all",.true.,"none",2
+"generic_sf6","sf6_stf",    "sf6_stf",    "generic_tracers","all",.true.,"none",2
+"generic_age","age",        "age",        "generic_tracers","all",.true.,"none",2
+"generic_age","age_stf",    "age_stf",    "generic_tracers","all",.true.,"none",2
+"generic_argon","argon",    "argon",        "generic_tracers","all",.true.,"none",2
+"generic_argon","argon_stf","argon_stf",    "generic_tracers","all",.true.,"none",2
+
+      </diagTable>
+
+      <fieldTable order="append">
+#Source information for individual generic tracers
+#Currently generic_cfc package is set to use this mechanism as a prototype.
+#Currently the following lines are required but they do not do anything until MOM6 becomes ready to handle them.
+"namelists","ocean_mod","generic_cfc"
+cfc_11_src_file = INPUT/cfc.bc.nc
+cfc_11_src_var_name = CFC_11
+cfc_11_src_var_unit = ppt
+# ppt to mol/kg
+cfc_11_src_var_unit_conversion = 1.0e-12
+cfc_11_src_var_record = 1
+cfc_11_src_var_gridspec = NONE
+
+cfc_12_src_file = INPUT/cfc.bc.nc
+cfc_12_src_var_name = CFC_12
+cfc_12_src_var_unit = ppt
+# ppt to mol/kg
+cfc_12_src_var_unit_conversion = 1.0e-12
+cfc_12_src_var_record = 1
+cfc_12_src_var_gridspec = NONE
+/
+      </fieldTable>
+
+     <csh>
+        <![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override USE_OCMIP2_CFC = False
+#override USE_IDEAL_AGE_TRACER = False
+USE_generic_tracer = True
+GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+OVERRIDE_EOF
+
+#Add null CFC's to a restart file
+cd $work/INPUT
+ncap -O --script 'cfc_11 = ptemp * 0.0 ; cfc_12 = ptemp * 0.0 ; sf6 = ptemp * 0.0 ; age  = ptemp * 0.0 ; argon = ptemp * 0.0 ' GOLD_IC.2010.11.15.nc MOM_GENERICS.res.nc
+#CFC is constant_init_tracer so the ice fluxes are not needed.
+\rm ice_ocmip2_cfc.res.nc
+
+     ]]></csh>
+
+   </input>
+
+   <runtime>
+       <reference restart="$(REFERENCE)/1x0m20d_32pe/restart/19700121.tar"/>
+   </runtime>
+
+</experiment>
+
 
     <experiment name="MOM6_SIS2_compile_static_90x45" inherit="OM4_libs_compile">
       <component paths="shared" name="fms" includeDir="$root/$(LIBS_ROOT)/src/shared/include">
