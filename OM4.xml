@@ -409,7 +409,8 @@ module load perftools/5.3.2
 
    </setup>
 
-   <property name="OM4_033_ARCHIVE"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input/verona/John.Dunne_OM4_033_20151023"/>
+   <property name="OM4_033_ARCHIVE"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input/verona/John.Dunne_OM4_033_20151028"/>
+   <property name="OM4_05_ARCHIVE"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input/verona/John.Dunne_OM4_05_20151028"/>
    
    
    <property name="MOM6_EXAMPLES"  value="$root/$(LIBS_ROOT)/src/mom6"/>
@@ -1979,7 +1980,7 @@ ncap -O --script 'cfc_11 = ptemp * 0.0 ; cfc_12 = ptemp * 0.0 ; sf6 = ptemp * 0.
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(OM4_033_ARCHIVE)/mosaic_ocean.1080x768/grid_spec.nc</dataSource>
         <dataSource site="theia">$(OM4_033_ARCHIVE)/mosaic_ocean.1080x768/grid_spec.nc</dataSource>
-        <dataSource site="gfdl">/home/jpd/OM4_033/MOM6-examples/ice_ocean_SIS2/OM4_033/preprocessing/grid_spec.nc</dataSource> 
+        <dataSource site="gfdl">/archive/jpd/OM4/OM4_033/MOM6-examples/ice_ocean_SIS2/OM4_033/preprocessing/mosaic_ocean.1080x768/grid_spec.nc</dataSource> 
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(OM4_033_ARCHIVE)/mosaic_ocean.1080x768/atmos_mosaic_tile1Xland_mosaic_tile1.nc</dataSource>
@@ -2113,6 +2114,241 @@ SIS_OVERRIDE_EOF
       <xi:include xpointer="xpointer(//experiment[@name='OM4_common']/input/node())"/>
       <!--MOM6 Input datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='OM4_033grid_data']/input/node())"/>
+      <!--SIS2 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
+      <!--CORE forcing datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='CORE_data']/input/node())"/>
+
+     
+     <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+     </dataFile>
+     <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+     </dataFile>
+      
+      <diagTable>
+$name
+$baseDate
+      </diagTable>
+
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1900,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'NOLEAP',
+       dt_cpld  = 3600,
+       dt_atmos = 3600,
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.false. 
+     </namelist>
+
+
+    <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 8000000
+            stack_size =0
+      </namelist>
+     <namelist name="fms_io_nml" >
+         fms_netcdf_restart=.true.
+         threading_read='multi'
+         max_files_r = 200
+         max_files_w = 200
+         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+     </namelist>
+
+   </input>
+
+   <runtime>   
+       <regression name="basic">
+         <run days="10"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
+       </regression>
+       <regression name="rts">
+         <run days="5 5" npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
+         <run days="10"  npes="2304" overrideParams="$(domainparams_O2304)" runTimePerJob="00:30:00"/>
+         <run days="10"  npes="512"  overrideParams="$(domainparams_O512)"  runTimePerJob="01:00:00"/>
+       </regression>
+       
+       <regression name="restarts">
+         <run days="2"    npes="512" overrideParams="$(domainparams_O512)" runTimePerJob="00:30:00"/>
+         <run days="1 1"  npes="512" overrideParams="$(domainparams_O512)" runTimePerJob="00:30:00"/>
+       </regression>
+
+      <regression name="debug">
+         <run days="1"   npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
+       </regression>
+
+      <production simTime="$(PROD_SIMTIME)" units="years" npes="$(PROD_NPES)" runTime="$(PROD_RUNTIME)">
+           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
+       </production>
+
+      <reference restart="$(REFERENCE)/1x0m10d_1152pe/restart/19000111.tar"/>
+
+   </runtime>
+
+    <postProcess>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
+    </postProcess>
+     
+   </experiment>
+   
+   <!--****************************************************************************************-->
+   <!--***************************** 1/2 degree experiments        ****************************-->
+   <!--****************************************************************************************-->
+											      
+   <experiment name="OM4_05grid_data">
+    <input>
+      <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/grid_spec.nc</dataSource>
+        <dataSource site="theia">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/grid_spec.nc</dataSource>
+        <dataSource site="gfdl">/archive/jpd/OM4/OM4_05/MOM6-examples/ice_ocean_SIS2/OM4_05/preprocessing/mosaic_ocean.720x576/grid_spec.nc</dataSource> 
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/atmos_mosaic_tile1Xland_mosaic_tile1.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/atmos_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/land_mask.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/land_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/ocean_hgrid.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/ocean_mask.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/ocean_mosaic.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/ocean_topog.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/seawifs_1998-2006_smoothed_2X.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/tidal_amplitude.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/WOA05_ptemp_salt_annual.nc </dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/salt_restore.nc </dataSource>
+      </dataFile>
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_input</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_saltrestore</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/layer_coord.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/MOM_channels_global_025</dataSource>
+      </dataFile>      
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m_575m.nc</dataSource>
+      </dataFile>
+
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+      </dataFile>
+
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = '$restart_flag'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_saltrestore','INPUT/MOM_override'
+     </namelist>
+
+     <csh type="always"><![CDATA[
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
+else
+   set restart_flag = 'r'
+endif
+
+ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc 
+
+touch $work/INPUT/MOM_override
+touch $work/INPUT/SIS_override
+
+      ]]></csh>
+     </input>
+   </experiment>
+
+   <experiment name="OM4_SIS2_05_baseline$(STATIC)" inherit="MOM6_SIS2_compile$(STATIC)">
+    <description communityProject="OWG" communityModel="OM4_SIS2_05 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2_05" communityExperimentName="$(name)" >
+ global 1/3 degree z test case
+    </description>  
+    <scenario 
+      communityForcing="CORE"
+      parentExperimentID="N/A" 
+      parentExperimentRIP="N/A" 
+      startTime="$(PP_START_YEAR)"
+      endTime="$(PP_END_YEAR)" 
+      branch_time="0.0">
+    </scenario>
+    <communityComment>
+    For more information please refer to the
+    &lt;a href="http://wiki.gfdl.noaa.gov/index.php/MOM6"&gt; MOM6 Wiki.  &lt;/a&gt;
+    </communityComment>
+
+
+    <input>
+  
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
+#override SALT_RESTORE_FILE     = "salt_restore.nc"
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
+
+
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_common']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_05grid_data']/input/node())"/>
       <!--SIS2 Input datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
       <!--CORE forcing datasets-->
