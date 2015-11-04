@@ -85,8 +85,8 @@ which are saved under /lustre/f1/unswept/Niki.Zadeh/ulm_201505_awg_v20150702_mom
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
 
-  <property name="PROD_RUNTIME"     value="15:00:00"/><!--zeus value="08:00:00"-->
-  <property name="PROD_SEGTIME"     value="07:20:00"/><!--zeus value=""-->
+  <property name="PROD_RUNTIME"     value="16:00:00"/>
+  <property name="PROD_SEGTIME"     value="08:00:00"/>
   <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->   
   <property name="EXP_CPLD_START"   value="0001"/> <!--simulation start year--> 
@@ -94,7 +94,7 @@ which are saved under /lustre/f1/unswept/Niki.Zadeh/ulm_201505_awg_v20150702_mom
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
 
-  <property name="FRE_STEM"  value="$(RELEASE)_4dUpdates_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
+  <property name="FRE_STEM"  value="$(RELEASE)_intel14land_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
   <property name="FRE_VERSION" value="fre/bronx-10"/>             <!-- fre version to be used -->
   <property name="ANALYSIS_SWITCH" value="on"/>                  <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
@@ -212,13 +212,6 @@ the faster the model throughput, but also the lower the model efficiency
                fv_core_nml:layout=6,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=2;
 	       land_model_nml:layout=6,24;land_model_nml:io_layout=1,4;
 	       ice_model_nml:layout=144,6;ice_model_nml:io_layout=1,3" />
-   <property name="domainparams_A1152x2"
-	     value="
-	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
-               coupler_nml:atmos_npes=1152;coupler_nml:atmos_nthreads=2;	
-               fv_core_nml:layout=12,16;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
-	       land_model_nml:layout=12,16;land_model_nml:io_layout=1,4;
-	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
    <property name="domainparams_A1152x2_2"
 	     value="
 	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
@@ -232,6 +225,13 @@ the faster the model throughput, but also the lower the model efficiency
                coupler_nml:atmos_npes=1152;coupler_nml:atmos_nthreads=2;	
                fv_core_nml:layout=8,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=2;
 	       land_model_nml:layout=8,24;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
+   <property name="domainparams_A1152x2"
+	     value="
+	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
+               coupler_nml:atmos_npes=1152;coupler_nml:atmos_nthreads=2;	
+               fv_core_nml:layout=12,16;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=12,16;land_model_nml:io_layout=1,4;
 	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
    <property name="domainparams_A1152x2_3"
 	     value="
@@ -705,6 +705,9 @@ module unload altd
     <platform name="gfdl.ncrc2-intel15">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
+    <platform name="gfdl.ncrc2-intel14">
+      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
+    </platform>
 
     <platform name="gfdl.theia-intel">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
@@ -808,20 +811,20 @@ Experiment to build executable.
 
     <component name="land_lad2" requires="fms" paths="land_lad2">
       <description domainName="LM3" communityName="land_lad2" communityVersion="$(RELEASE)" communityGrid=""/>
-      <source>
-        <codeBase version="$(RELEASE)"> land_lad2 </codeBase>
-	<csh>
-          # Protection from negative soil water divergence situations
-          cvs up -r ulm_merge_pjp land_lad2/soil/soil.F90
+      <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <codeBase version="$(RELEASE)"> land_lad2.git </codeBase>
+        <csh><![CDATA[
+          ( cd land_lad2 && git checkout user/nnz/add_cm4_required_nml )
+          ]]>
         </csh>
       </source>
       <compile>
-        <cppDefs>$(F2003_FLAGS)</cppDefs>
+        <cppDefs>$(F2003_FLAGS)  -Dintel14_bug</cppDefs>
 
          <!--The following csh block is needed for compiler pre-processors that are not ANSI-compliant, such as pathscale-->
          <csh> <![CDATA[
 sed -e 's/<TAB>/\t/' >${bld_dir}/land_lad2/Makefile-cpp <<EOF
-CPPDEFS =  $(F2003_FLAGS)
+CPPDEFS = $(F2003_FLAGS) -Dintel14_bug
 FRETARGET = $(target)
 
 ifneq (\$(findstring hdf5,\${FRETARGET}),)
@@ -1770,15 +1773,6 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <regression name="timings">
         <run months="1" npes="216"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A216x2)"/>
         <run months="1" npes="432"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A432x2)"/>
-        <run months="1" npes="288"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A288x2)"/>
-        <run months="1" npes="864"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A864x2)"/>
-        <run months="1" npes="768"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A768x4)"/>
-        <run months="1" npes="864"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A864x4)"/>
-        <run months="1" npes="1152" runTimePerJob="02:00:00" overrideParams="$(domainparams_A1152x2)"/>
-      </regression>
-      <regression name="timingsALL">
-        <run months="1" npes="216"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A216x2)"/>
-        <run months="1" npes="432"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A432x2)"/>
         <run months="1" npes="288"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2)"/>
         <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2)"/>
         <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_1)"/>
@@ -1821,147 +1815,6 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       </regression>
     </runtime>
 </experiment>
-
-<experiment name="c96L48_am4g5r1_fullchem" inherit="cm4_compile">
-    <description
-communityProject="$(ProjectID)"
-communityModel="am4p5"
-communityModelID="am4p5"
-communityExperimentName="$(name)"
-communityExperimentID="$(name)" >
-
-Derived from AM4 prototype configuration "am4g5r1" from MDT Atmosphere Working Group,
-but with "full chemistry" (as in AM3) and 48 levels.
-
-- c96 horizontal grid with approximately 100km resolution and 48 vertical levels.
-- Convection based on "double-plume" from Ming Zhao.
-- Tiedtke cloud scheme
-
-This is not bit-wise reproducable to what in awg_20150901 due to Ming Zhao's update in uw_conv.F90 
- (picking the max betwee 2 plumes).
-
-For more information about AWG configurations, refer to
-http://cobweb.gfdl.noaa.gov/~cjg/awg
-
-    </description>
-
-    <input>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
-        dt_atmos = 1800,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $(ATM_PROD_NPES)
-        atmos_nthreads = $(ATM_PROD_NTHREADS)
-      </namelist>
-      <namelist name="fv_core_nml"> 
-        layout = $(FV_PROD_LAYOUT)
-        io_layout = $(FV_PROD_IO_LAYOUT)
-        npx      = 97,
-        npy      = 97,
-        ntiles   = 6,
-        npz      = 48,
-        k_split  = 1,
-        n_split  = 14,
-        a2b_ord  = 4,
-        hord_dp = -8,
-        hord_tr = -8,
-        adjust_dry_mass = $adjust_dry_mass,
-        consv_te = 0.7,
-        fill = .true.
-        print_freq = 0,
-        grid_type = 0,
-        nord = 1,
-        dddmp = 0.0,
-        d2_bg = 0.0,
-        d4_bg = 0.15,
-        tau = 0.      
-        z_tracer=.false.
-      </namelist>
-      <namelist name="land_model_nml">
-        layout = $(LND_PROD_LAYOUT)
-        io_layout = $(LND_PROD_IO_LAYOUT)
-        tau_snow_T_adj = 604800.
-        prohibit_negative_canopy_water=.false.
-      </namelist>
-       <namelist name="flux_exchange_nml">
-        nblocks=$(ATM_PROD_NTHREADS)
-      </namelist>
-      <namelist name="atmos_model_nml">
-         nxblocks = $(ATM_PROD_NXBLOCKS)
-         nyblocks = $(ATM_PROD_NYBLOCKS)
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g5_c96L48.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_c96_amip_chem.nml"/>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullchem']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p5_fullchem']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
-    </input>
-    <runtime>
-      <regression name="basic">
-        <run days="8"   npes="216"  overrideParams="$(domainparams_A216x2)" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="rts">
-        <run days="4 4"  npes="216" overrideParams="$(domainparams_A216x2)"  runTimePerJob="01:00:00"/>
-        <run days="8"    npes="432" overrideParams="$(domainparams_A432x2)"  runTimePerJob="01:00:00"/>
-        <run months="1"  npes="216" overrideParams="$(domainparams_A216x2)" runTimePerJob="01:00:00"/>
-      </regression>
-
-      <regression name="timings">
-        <run months="1" npes="216"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A216x2)"/>
-        <run months="1" npes="432"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A432x2)"/>
-        <run months="1" npes="288"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A288x2)"/>
-        <run months="1" npes="864"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A864x2)"/>
-        <run months="1" npes="768"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A768x4)"/>
-        <run months="1" npes="864"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A864x4)"/>
-        <run months="1" npes="1152" runTimePerJob="02:00:00" overrideParams="$(domainparams_A1152x2)"/>
-      </regression>
-      <regression name="timingsALL">
-        <run months="1" npes="216"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A216x2)"/>
-        <run months="1" npes="432"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A432x2)"/>
-        <run months="1" npes="288"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2)"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2)"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_1)"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_2)"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_3)"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_4)"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_5)"/>
-        <run months="1" npes="768"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A768x4)"/>
-        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x4)"/>
-        <run months="1" npes="1152"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2)"/>
-        <run months="1" npes="1152"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2_1)"/>
-        <run months="1" npes="1152"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2_2)"/>
-        <run months="1" npes="1152"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2_3)"/>
-        <run months="1" npes="576"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x4)"/>
-        <run months="1" npes="288"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x8)"/>
-        <run months="1" npes="432"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x8)"/>
-        <run months="1" npes="1056"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A1056x4)"/>
-        <run months="1" npes="1152"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x4)"/>
-        <run months="1" npes="960"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A960x4)"/>
-    </regression>
-
-      <reference restart="$(REFERENCE)/archive/1x0m8d_432pe/restart/19800109.tar"/>
-
-    </runtime>
-
-</experiment>
-      
 
 <experiment name="c192L32_am4g6" inherit="cm4_compile">
     <description
@@ -2917,6 +2770,31 @@ OVERRIDE_EOF
      ]]></csh>
    </input>
 </experiment>
+
+<experiment name="CM4_c96L32_am4g6_2000_sis2_lowmix_intel14" inherit="CM4_c96L32_am4g6_2000_sis2">
+
+   <input>
+      <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.0E-6
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="CM4_c96L32_am4g6_2000_sis2_lowmix_neutral_diff" inherit="CM4_c96L32_am4g6_2000_sis2">
+
+   <input>
+      <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.0E-6
+#override USE_NEUTRAL_DIFFUSION = True
+#override KHTR = 300.0
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
 
 
 <experiment name="CM4_c96L32_am4g6_2000_sis2_low_mixing3_DT_THERM_7200" inherit="CM4_c96L32_am4g6_2000_sis2_low_mixing3">
