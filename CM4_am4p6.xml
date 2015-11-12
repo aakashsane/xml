@@ -75,7 +75,7 @@ which are saved under /lustre/f1/unswept/Niki.Zadeh/ulm_201505_awg_v20150702_mom
 
   <!--User shoould set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="ulm_201505"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2015.10.13"/>      <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2015.11.09"/>      <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20150923"/> <!-- git tag for AWG  source code -->
   <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -94,7 +94,7 @@ which are saved under /lustre/f1/unswept/Niki.Zadeh/ulm_201505_awg_v20150702_mom
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
 
-  <property name="FRE_STEM"  value="$(RELEASE)_4dUpdates_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
+  <property name="FRE_STEM"  value="$(RELEASE)_intel14land_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
   <property name="FRE_VERSION" value="fre/bronx-10"/>             <!-- fre version to be used -->
   <property name="ANALYSIS_SWITCH" value="on"/>                  <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
@@ -363,6 +363,17 @@ the faster the model throughput, but also the lower the model efficiency
                ice_model_nml:layout=144,6;ice_model_nml:io_layout=1,3" />
 
    <!--CM4 configurations-->
+   <property name="domainparams_A216x2_O1756"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=1756;
+               coupler_nml:atmos_npes=216;coupler_nml:atmos_nthreads=2;	
+               fv_core_nml:layout=3,12;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=3,12;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=72,3;ice_model_nml:io_layout=1,3;
+	       dummy_ice_nml:ice_layout=72,3;dummy_ice_nml:ice_io_layout=1,3;
+	       dummy_ocean_nml:ocean_layout=32,72;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.548.32x72"/>
+
    <property name="domainparams_A216x2_O1970"
 	     value="
 	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=1970;
@@ -447,7 +458,23 @@ the faster the model throughput, but also the lower the model efficiency
   <property name="OCN_PROD_LAYOUT"      value="36,72"/>
   <property name="OCN_PROD_IO_LAYOUT"   value="1,4"/>
   <property name="OCN_PROD_MASK_TABLE"  value="mask_table.622.36x72"/>
-
+<!-- For eos
+  <property name="PROD_NPES"            value="1972"/>  
+  <property name="OCN_PROD_NPES"        value="1756"/>
+  <property name="ATM_PROD_NPES"        value="216"/>
+  <property name="ATM_PROD_NTHREADS"    value="2"/>
+  <property name="ATM_PROD_NXBLOCKS"    value="1"/>
+  <property name="ATM_PROD_NYBLOCKS"    value="2"/>
+  <property name="FV_PROD_LAYOUT"       value="3,12"/>
+  <property name="FV_PROD_IO_LAYOUT"    value="1,4"/>
+  <property name="LND_PROD_LAYOUT"      value="3,12"/>
+  <property name="LND_PROD_IO_LAYOUT"   value="1,4"/>
+  <property name="ICE_PROD_LAYOUT"      value="72,3"/>
+  <property name="ICE_PROD_IO_LAYOUT"   value="1,3"/>
+  <property name="OCN_PROD_LAYOUT"      value="32,72"/>
+  <property name="OCN_PROD_IO_LAYOUT"   value="1,4"/>
+  <property name="OCN_PROD_MASK_TABLE"  value="mask_table.548.32x72"/>
+-->
   <setup>
 
     <platform name="ncrc2.intel">
@@ -573,6 +600,47 @@ module unload altd
 
     </platform>
 
+    <platform name="ncrc2.intel16">
+<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
+      <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
+      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
+     
+      <csh><![CDATA[
+        source $MODULESHOME/init/csh
+ 
+        module use -a /ncrc/home2/fms/local/modulefiles
+        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+        module unload netcdf fre
+        module load PrgEnv-intel/4.0.46
+        module swap intel intel/16.0.0.109
+
+        module load $(FRE_VERSION)
+        module load git
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+      ]]></csh>
+
+    </platform>
+
     <platform name="ncrc2.gnu">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
       <project>gfdl_YOURGROUPLETTER</project>
@@ -666,6 +734,100 @@ module unload altd
       <xi:include xpointer="xpointer(//setup/platform[@name='theia.intel']/node())" />
     </platform>
 
+    <platform name="olcf.eos_intel14">
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(stem)</root>
+        <exec>$CPERM/$USER/$(stem)/$(name)/$(platform)-$(target)/exec</exec>
+        <state>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <scripts>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CPERM/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_NESCC)"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/CM4/input"/>
+      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_M"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)/$(name)"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+
+      <property name="FMS_ARCHIVE_ROOT" value="/lustre/atlas/proj-shared/cli061/pdata/fms" />
+      
+      <project>cli061</project>
+      <csh><![CDATA[
+        module use -a /ccs/proj/cli061/local/modulefiles
+#        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray #if unload and reload PrgEnv-intel it cannot find some modules
+        module unload netcdf fre
+#        module load PrgEnv-intel
+#        module swap intel intel/13.1.3.192 #does not find some system libraries
+        module load $(FRE_VERSION)
+#        module load netcdf/4.3.0
+module load cray-netcdf/4.3.3.1
+        module load gcp
+
+#        module use /lustre/atlas/proj-shared/cli061/underwoo/hsm/modulefiles
+        module load hsm
+        setenv NC_BLKSZ 1M
+        setenv KMP_STACKSIZE 512m
+        setenv F_UFMTENDIAN big
+setenv MPICH_ENV_DISPLAY
+setenv MPICH_UNEX_BUFFER_SIZE 256m
+limit stacksize unlimited
+limit coredumpsize unlimited
+        ]]>
+      </csh>
+    </platform>
+    <platform name="olcf.eos_intel15">
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(stem)</root>
+        <exec>$CPERM/$USER/$(stem)/$(name)/$(platform)-$(target)/exec</exec>
+        <state>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <scripts>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CPERM/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_NESCC)"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/CM4/input"/>
+      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_M"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)/$(name)"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+
+      <property name="FMS_ARCHIVE_ROOT" value="/lustre/atlas/proj-shared/cli061/pdata/fms" />
+      
+      <project>cli061</project>
+      <csh><![CDATA[
+        module use -a /ccs/proj/cli061/local/modulefiles
+#        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray #if unload and reload PrgEnv-intel it cannot find some modules
+        module unload netcdf fre
+#        module load PrgEnv-intel
+        module swap intel intel/15.0.2.164 #does not find some system libraries
+        module load $(FRE_VERSION)
+#        module load netcdf/4.3.0
+        module load cray-netcdf/4.3.3.1
+        module load gcp
+#        module use /lustre/atlas/proj-shared/cli061/underwoo/hsm/modulefiles
+        module load hsm
+        setenv NC_BLKSZ 1M
+        setenv KMP_STACKSIZE 512m
+        setenv F_UFMTENDIAN big
+setenv MPICH_ENV_DISPLAY
+setenv MPICH_UNEX_BUFFER_SIZE 256m
+limit stacksize unlimited
+limit coredumpsize unlimited
+       ]]>
+      </csh>
+    </platform>
+    <platform name="olcf.default">
+      <xi:include xpointer="xpointer(//setup/platform[@name='olcf.eos_intel15']/node())" />
+    </platform>
     <platform name="gfdl.default">
       <property name="NB_ROOT"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/><!--Do not change this! Other platforms use  the same value. -->
       <directory stem="$(FRE_STEM)">
@@ -705,7 +867,9 @@ module unload altd
     <platform name="gfdl.ncrc2-intel15">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
-
+    <platform name="gfdl.olcf-eos_intel15">
+      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
+    </platform>
     <platform name="gfdl.theia-intel">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
@@ -808,20 +972,19 @@ Experiment to build executable.
 
     <component name="land_lad2" requires="fms" paths="land_lad2">
       <description domainName="LM3" communityName="land_lad2" communityVersion="$(RELEASE)" communityGrid=""/>
-      <source>
-        <codeBase version="$(RELEASE)"> land_lad2 </codeBase>
-	<csh>
-          # Protection from negative soil water divergence situations
-          cvs up -r ulm_merge_pjp land_lad2/soil/soil.F90
+      <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <codeBase version="$(RELEASE)"> land_lad2.git </codeBase>
+        <csh><![CDATA[
+          ( cd land_lad2 && git checkout user/nnz/add_cm4_required_nml )
+          ]]>
         </csh>
       </source>
       <compile>
         <cppDefs>$(F2003_FLAGS)</cppDefs>
 
-         <!--The following csh block is needed for compiler pre-processors that are not ANSI-compliant, such as pathscale-->
-         <csh> <![CDATA[
+<csh> <![CDATA[
 sed -e 's/<TAB>/\t/' >${bld_dir}/land_lad2/Makefile-cpp <<EOF
-CPPDEFS =  $(F2003_FLAGS)
+CPPDEFS = -DINTERNAL_FILE_NML -g -Dintel14_bug
 FRETARGET = $(target)
 
 ifneq (\$(findstring hdf5,\${FRETARGET}),)
@@ -840,6 +1003,7 @@ foreach foo ( `find ${src_dir}/land_lad2 -type f -name \*.F90` )
   make -f land_lad2/Makefile-cpp land_lad2/$foo:t:r.f90
 end
 find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
+
         ]]></csh>
 
       </compile>
@@ -863,6 +1027,8 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
           if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
             ln -s /scratch4/GFDL/gfdlscr/pdata/gfdl_O/datasets/ .datasets
+          else if ("${platform_domain}" =~ *"ccs.ornl.gov"* ) then
+            ln -s /lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/ .datasets
           else
             ln -s /lustre/f1/pdata/gfdl_O/datasets/ .datasets
           endif
@@ -1026,7 +1192,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
   <experiment name="c96L48_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Larry.Horowitz/awg/IC/awg_C96L48_LM3_OM4_025_grid_lm3p2_19810101.remapped.v20150604.tar</dataSource>
+        <dataSource site="ncrc">/lustre/f1/unswept/Larry.Horowitz/awg/IC/awg_C96L48_LM3_OM4_025_grid_lm3p2_19810101.remapped.v20150604.tar</dataSource>
       </dataFile>
     </input>
   </experiment>
@@ -1034,7 +1200,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
   <experiment name="c96L32_aero_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c96L32/topo_v20150507/awg_C96L32_LM3_OM4_025_grid_lm3p2_19810101.remapped.topodrag.v20150507.tar</dataSource>
+       <dataSource site="ncrc">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c96L32/topo_v20150507/awg_C96L32_LM3_OM4_025_grid_lm3p2_19810101.remapped.topodrag.v20150507.tar</dataSource>
       </dataFile>
     </input>
   </experiment>
@@ -1044,6 +1210,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Niki.Zadeh/archive/input/ulm/awg_C96L32_LM3_OM4_025_grid_lm3p2_v20150921.minus_ice_model_restart.tar</dataSource>
         <dataSource site="theia">copyOver/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/</dataSource>
+        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/awg_C96L32_LM3_OM4_025_grid_lm3p2_v20150921.minus_ice_model_restart.tar</dataSource>
       </dataFile>
     </input>
   </experiment>
@@ -1061,6 +1228,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20150522/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
+        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
       </dataFile>
     </input>
   </experiment>
@@ -1105,10 +1273,12 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Bruce.Wyman/archive/mdt/awg/input/common/new_sea_esf_aug2013.cpio</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Garrett.Wright/pdata/new_sea_esf_aug2013.cpio</dataSource>
+        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/awg/input/common/new_sea_esf_aug2013.cpio</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/awg/input/lm3/lm3_data_20150322.tar</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/awg/mdt/awg/input/lm3/lm3_data_20150322.tar</dataSource>
+        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/lm3_data_20150322.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/common/aerosol_inputs.dec2009.cpio</dataSource>
@@ -1202,6 +1372,7 @@ $baseDate
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Chris.Golaz/awg/input/sst/hadisst.186912-201502.tar</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Garrett.Wright/pdata/awg/input/sst/hadisst.186912-201502.tar</dataSource>
+        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/hadisst.186912-201502.tar</dataSource>
       </dataFile>
       <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/data_table/data_table_amip</dataSource>
@@ -1232,6 +1403,7 @@ $baseDate
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fre/tikal/LM3/LM3p2_C96_CM2G_historical_HC1_quick/ncrc2.default-prod/static_veg/19810101.static_veg.lm3p2.remapped_to_c96_OM4_025.v20150322.tar</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/awg/mdt/awg/input/lm3/19810101.static_veg.lm3p2.remapped_to_c96_OM4_025.v20150322.tar</dataSource>
+        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/19810101.static_veg.lm3p2.remapped_to_c96_OM4_025.v20150322.tar</dataSource>
        </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/c96_OM4_025_hydrography_v20140620.tar</dataSource>
@@ -1379,6 +1551,7 @@ set nyblocks = $dummy
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/DATA/static_veg/static_veg_LM3p2sosn_C192_OM4_025_historical_HC1_1981.remapped.v20150521.tar</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/static_veg_LM3p2sosn_C192_OM4_025_historical_HC1_1981.remapped.v20150521.tar</dataSource>
+        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/static_veg_LM3p2sosn_C192_OM4_025_historical_HC1_1981.remapped.v20150521.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/c192_OM4_025_hydrography_v20140708.tar </dataSource>
@@ -1688,6 +1861,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Ming.Zhao/archive/mdt/awgmiz/ic/awg_C96L32_LM3_OM4_025_grid_lm3p2_v20150921.tar</dataSource>
         <dataSource site="theia">copyOver/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/</dataSource>
+        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/awg_C96L32_LM3_OM4_025_grid_lm3p2_v20150921.tar</dataSource>
       </dataFile>
       <namelist name="coupler_nml">
         months = $months,
@@ -1767,14 +1941,18 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         <run months="1"  npes="216" overrideParams="$(domainparams_A216x2)" runTimePerJob="01:00:00"/>
       </regression>
 
+      <regression name="timing">
+        <run months="1" npes="216"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2)"/>
+      </regression>
+
       <regression name="timings">
-        <run months="1" npes="216"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A216x2)"/>
-        <run months="1" npes="432"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A432x2)"/>
-        <run months="1" npes="288"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A288x2)"/>
-        <run months="1" npes="864"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A864x2)"/>
-        <run months="1" npes="768"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A768x4)"/>
-        <run months="1" npes="864"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A864x4)"/>
-        <run months="1" npes="1152" runTimePerJob="02:00:00" overrideParams="$(domainparams_A1152x2)"/>
+        <run months="1" npes="216"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2)"/>
+        <run months="1" npes="432"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2)"/>
+        <run months="1" npes="288"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2)"/>
+        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2)"/>
+        <run months="1" npes="768"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A768x4)"/>
+        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x4)"/>
+        <run months="1" npes="1152" runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2)"/>
       </regression>
       <regression name="timingsALL">
         <run months="1" npes="216"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A216x2)"/>
@@ -1897,6 +2075,13 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
          nxblocks = $(ATM_PROD_NXBLOCKS)
          nyblocks = $(ATM_PROD_NYBLOCKS)
       </namelist>
+      <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 5000000
+            stack_size =0
+      </namelist>
+
       <!-- Namelist -->
       <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p5_common.nml"/>
@@ -1992,6 +2177,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20150522/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
+        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
       </dataFile>
       <namelist name="coupler_nml">
         months = $months,
@@ -2171,6 +2357,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Ming.Zhao/archive/mdt/awgmiz/ic/awg_C96L32_LM3_OM4_025_grid_lm3p2_v20150921.tar</dataSource>
         <dataSource site="theia">copyOver/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/</dataSource>
+        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/awg_C96L32_LM3_OM4_025_grid_lm3p2_v20150921.tar</dataSource>
       </dataFile>
       <namelist name="coupler_nml">
         months = $months,
@@ -2245,6 +2432,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 <!--=======================-->
 <!--= CM4 EXPERIMENTS     =-->
 <!--=======================-->
+<experiment name="CM4_c96L32_am4g6_2000_sis2.$(MOM6_DATE)" inherit="CM4_c96L32_am4g6_2000_sis2"/>
 <experiment name="CM4_c96L32_am4g6_2000_sis2" inherit="cm4_sis2_compile">
     <description
 communityProject="$(ProjectID)" 
@@ -2382,6 +2570,10 @@ For more information please refer to the
         <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1970)"/>
       </regression>
 
+	<regression name="timings_eos">
+          <run months="1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+          <run months="1" npes="2258" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1970)"/>
+      	</regression>
 	<regression name="timings">
           <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1970)"/>
           <run months="1" npes="2648" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O2432)"/>
@@ -2737,6 +2929,7 @@ For more information please refer to the
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
      </dataFile>
 
@@ -2900,6 +3093,31 @@ For more information please refer to the
       </namelist>
      </input>
   </experiment>
+
+<experiment name="CM4_c96L32_am4g6_2000_sis2_lowmix.$(MOM6_DATE)" inherit="CM4_c96L32_am4g6_2000_sis2_lowmix"/>
+<experiment name="CM4_c96L32_am4g6_2000_sis2_lowmix_intel15_eos" inherit="CM4_c96L32_am4g6_2000_sis2_lowmix"/>
+<experiment name="CM4_c96L32_am4g6_2000_sis2_lowmix" inherit="CM4_c96L32_am4g6_2000_sis2">
+   <input>
+      <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.0E-6
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="CM4_c96L32_am4g6_2000_sis2_lowmix_neutral_diff.$(MOM6_DATE)" inherit="CM4_c96L32_am4g6_2000_sis2_lowmix_neutral_diff"/>
+<experiment name="CM4_c96L32_am4g6_2000_sis2_lowmix_neutral_diff" inherit="CM4_c96L32_am4g6_2000_sis2">
+   <input>
+      <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.0E-6
+#override USE_NEUTRAL_DIFFUSION = True
+#override KHTR = 300.0
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
 
 <experiment name="CM4_c96L32_am4g6_2000_sis2_low_mixing3" inherit="CM4_c96L32_am4g6_2000_sis2">
 								       
