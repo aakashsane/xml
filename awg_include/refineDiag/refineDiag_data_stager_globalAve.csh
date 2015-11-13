@@ -464,16 +464,20 @@ fYear = "${oname}"
 
 #-- Attempt to read vmo and/or vh
 try:
-  vmo = netCDF4.Dataset(fYear+'.ocean_annual.nc').variables['vmo'][0]
+  vmoFile = fYear+'.ocean_annual.nc'
+  vmo = netCDF4.Dataset(vmoFile).variables['vmo'][0]
   vmo = vmo.filled(0)*1e-9
-  zl  = netCDF4.Dataset(fYear+'.ocean_annual.nc').variables['zl'][:]
+  zl  = netCDF4.Dataset(vmoFile).variables['zl'][:]
+  yq_vmo  = netCDF4.Dataset(vmoFile).variables['yq'][:]
   doVmo = True
 except: doVmo = False
 
 try:
-  vh  = netCDF4.Dataset(fYear+'.ocean_annual_z.nc').variables['vh'][0]
+  vhFile = fYear+'.ocean_annual_z.nc'
+  vh  = netCDF4.Dataset(vhFile).variables['vh'][0]
   vh  = vh.filled(0)*1e-9
-  zt  = netCDF4.Dataset(fYear+'.ocean_annual_z.nc').variables['zt'][:]
+  zt  = netCDF4.Dataset(vhFile).variables['zt'][:]
+  yq_vh  = netCDF4.Dataset(vhFile).variables['yq'][:]
   doVh = True
 except: doVh = False
 
@@ -654,13 +658,13 @@ varDict = {}
 
 if doVmo == True:
   psi = MOCpsi(vmo,vmsk=atlmask)
-  maxsfn = numpy.max(psi[numpy.logical_and(zl>500,zl<2500)])
+  maxsfn = numpy.max(psi[numpy.logical_and(zl>500,zl<2500)][:,numpy.greater_equal(yq_vmo,20)])
   print('AMOC vmo = %s' % maxsfn)
   varDict['amoc_vmo'] = maxsfn
 
 if doVh == True:
   psi = MOCpsi(vh,vmsk=atlmask)
-  maxsfn = numpy.max(psi[numpy.logical_and(zt>500,zt<2500)])
+  maxsfn = numpy.max(psi[numpy.logical_and(zt>500,zt<2500)][:,numpy.greater_equal(yq_vh,20)])
   print('AMOC vh = %s' % maxsfn)
   varDict['amoc_vh'] = maxsfn
 
