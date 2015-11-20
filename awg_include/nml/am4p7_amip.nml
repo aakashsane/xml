@@ -1,15 +1,15 @@
  &aerosol_nml
     family_names = "small_dust", "large_dust", "black_carbon","organic_carbon", "sea_salt", "sulfate", "aerosol", "pm2.5", "dust", "POA"
-    in_family1 = F,T,F,F,F,F,F,F,F,F,F,F,F,F,F,F,
-    in_family2 = F,F,T,T,T,T,F,F,F,F,F,F,F,F,F,F,
-    in_family3 = F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,F,
-    in_family4 = T,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,
-    in_family5 = F,F,F,F,F,F,F,T,T,T,T,T,F,F,F,F,
-    in_family6 = F,F,F,F,F,F,T,F,F,F,F,F,F,F,F,F,
-    in_family7 = T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,
-    in_family8 = T,T,F,F,F,F,T,T,T,F,F,F,T,T,T,T,
-    in_family9 = F,T,T,T,T,T,F,F,F,F,F,F,F,F,F,F,
-    in_family10= F,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,
+    in_family1 = T,F,F,F,F,F,F,F,F,F,
+    in_family2 = F,T,F,F,F,F,F,F,F,F,
+    in_family3 = F,F,F,F,F,F,T,T,F,F,
+    in_family4 = F,F,F,F,F,F,F,F,T,T,
+    in_family5 = F,F,F,T,T,T,F,F,F,F,
+    in_family6 = F,F,T,F,F,F,F,F,F,F,
+    in_family7 = T,T,T,T,T,T,T,T,T,T,
+    in_family8 = T,F,T,T,T,F,T,T,T,T,
+    in_family9 = T,T,F,F,F,F,F,F,F,F,
+    in_family10= F,F,F,F,F,F,F,F,T,T,
     aerosol_data_source = "predicted"
 /
 
@@ -369,6 +369,9 @@
         omna_input_name='omemisnat'
       omss_source = 'ODowd'
         omss_coef = 0.05
+      soa_source = 'add_soa'
+        gas_conc_name='C4H10',soa_filename ='gas_conc_3D_am3p9.nc',
+        soa_time_dependency_type='constant'
 /
 
  &ice_spec_nml
@@ -391,17 +394,9 @@
       all_step_diagnostics = .true.,
 /
 
- &radiation_driver_nml
-      rad_time_step= 10800,
-      rad_package = 'sea_esf',
-      do_clear_sky_pass=.true.,
-      !calc_hemi_integrals = .false.,
-      renormalize_sw_fluxes=.true.,
-      zenith_spec = 'diurnally_varying',
-      using_restart_file = .false.
-/
-
  &radiative_gases_nml
+      use_co2_10um = .true.
+
       verbose = 3
       gas_printout_freq = 240
 
