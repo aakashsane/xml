@@ -247,7 +247,7 @@ configuration.
 
     <platform name="ncrc2.intel">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_w</project>
       <directory stem="$(FRE_STEM)">
          <src>$HOME/$(stem)/$(name)/src</src>
          <scripts>$HOME/$(stem)/xml_$(AWG_VERSION)/scripts/$(platform)-$(target)</scripts>
@@ -1434,6 +1434,8 @@ Experiment name = $(name)
 <!--= am4g7 experiments =-->
 <!--=+=====================-->
 
+  <experiment name="c96L32_am4g7_repro_test" inherit="c96L32_am4g7"/>
+
   <experiment name="c96L32_am4g7" inherit="cm4p8_$(AWG_VERSION)">
 <!-- MDBI -->
     <description
@@ -1872,7 +1874,7 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
 
     <runtime>
       <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="1728" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="1:50:00"/>
+        <segment simTime="12" units="months" runTime="1:30:00"/>
       </production>
       <regression name="basic">
         <run days="8"   npes="216"  runTimePerJob="00:30:00"/>
@@ -2407,6 +2409,89 @@ configuration with present-day climatological SSTs, pre-industrial GHGs and pres
     </input>
   </experiment>
 
+ <experiment name="c96L32_am4g7_2000climo_2xCO2" inherit="c96L32_am4g7_2000climo">
+  <input>
+    <namelist name="radiative_gases_nml">
+      use_co2_10um = .true.
+      verbose = 3
+      gas_printout_freq = 240
+
+      time_varying_co2 = .false.,
+      co2_base_value=  7.362125E-04
+      co2_variation_type = 'linear',
+      co2_dataset_entry = 2000,1,1,0,0,
+      co2_specification_type = 'base_and_trend',
+      co2_floor = 100.0E-06,
+      co2_ceiling = 1600.0E-06,
+      co2_data_source = 'namelist'
+
+      time_varying_ch4 = .false.,
+      ch4_variation_type = 'linear'
+      ch4_dataset_entry = 2000,1,1,0,0,
+      ch4_specification_type = 'time_series'
+      ch4_data_source = 'input'
+
+      time_varying_n2o = .false.,
+      n2o_variation_type = 'linear'
+      n2o_dataset_entry = 2000,1,1,0,0,
+      n2o_specification_type = 'time_series'
+      n2o_data_source = 'input'
+
+      time_varying_f11 = .false.,
+      f11_variation_type = 'linear'
+      f11_dataset_entry = 2000,1,1,0,0,
+      f11_specification_type = 'time_series'
+      f11_data_source = 'input'
+
+      time_varying_f12 = .false.,
+      f12_variation_type = 'linear'
+      f12_dataset_entry = 2000,1,1,0,0,
+      f12_specification_type = 'time_series'
+      f12_data_source = 'input'
+
+      time_varying_f113 = .false.,
+      f113_variation_type = 'linear'
+      f113_dataset_entry = 2000,1,1,0,0,
+      f113_specification_type = 'time_series'
+      f113_data_source = 'input'
+
+      time_varying_f22 = .false.,
+      f22_variation_type = 'linear'
+      f22_dataset_entry = 2000,1,1,0,0,
+      f22_specification_type = 'time_series'
+      f22_data_source = 'input'
+
+      calc_co2_tfs_on_first_step = .false.,
+      calc_co2_tfs_monthly = .true.,
+      co2_tf_time_displacement = 360.0,
+
+      calc_ch4_tfs_on_first_step = .false.,
+      calc_ch4_tfs_monthly = .true.,
+      ch4_tf_time_displacement = 360.0,
+
+      calc_n2o_tfs_on_first_step = .false.,
+      calc_n2o_tfs_monthly = .true.,
+      n2o_tf_time_displacement = 360.0,
+    </namelist>
+   </input>
+ </experiment>
+
+
+
+  <experiment name="c96L32_am4g8_2000climo_p2K" inherit="c96L32_am4g8_2000climo">
+    <input>
+     <namelist name="ice_spec_nml">
+      mcm_ice = .false.
+      do_leads = .false.
+      minimum_ice_concentration = 0.5
+      minimum_ice_thickness = 0.1
+      sst_degk = .true.
+      sst_pert = 2.0
+     </namelist>
+    </input>
+  </experiment>
+
+
   <experiment name="c96L32_am4h7_1860climo" inherit="c96L32_am4h7_2000climo">
     <description>
 Same model as c96L32_am4h7_2000climo, but
@@ -2461,10 +2546,10 @@ configuration with present-day climatological SSTs + 2K, present-day GHGs and ae
     </input>
   </experiment>
 
-  <experiment name="c96L32_am4g7_2000climo_rad1h_2" inherit="c96L32_am4g7_2000climo">
+  <experiment name="c96L32_am4g7_2000climo_rad2h" inherit="c96L32_am4g7_2000climo">
     <input>
       <namelist name="radiation_driver_nml">
-        rad_time_step= 3600,
+        rad_time_step= 7200,
         rad_package = 'sea_esf',
         do_clear_sky_pass=.true.,
         !calc_hemi_integrals = .false.,
@@ -2473,8 +2558,108 @@ configuration with present-day climatological SSTs + 2K, present-day GHGs and ae
         using_restart_file = .false.
         do_conserve_energy = .true.
       </namelist>
+      <namelist name="cloud_generator_nml">
+        do_inhomogeneous_clouds = .true.
+        defaultOverlap = 4
+        overlapLengthScale = 2.
+      </namelist>
     </input>
   </experiment>
+
+  <experiment name="c96L32_am4g7_2000climo_nostime" inherit="c96L32_am4g7_2000climo">
+    <input>
+      <namelist name="uw_conv_nml">
+        use_online_aerosol = .true.,
+        rkm_sh1         = 6.0,
+        rkm_sh          = 3.0,
+        do_deep         = .true.,
+        idpchoice       = 2
+        do_rescale      = .true.
+        do_rescale_t    = .true.
+        use_sub_seasalt = .false.
+        use_new_let     = .true.
+        do_subcloud_flx = .false.
+        do_new_pevap    = .false.
+        plev_cin        = 60000.
+        plev_for        = 70000.
+        src_choice      = 1
+        wrel_min        = 1.
+        do_stime        = .false.
+        duration        = 10800
+        do_prog_gust    = .true.
+        tau_gust        = 10800
+        cgust0          = 2.
+        cgust_max       = 4.
+        tracer_check_type = 2
+        stop_at_let     = .true.
+        do_hlflx_zero   = .false.
+      </namelist>
+    </input>
+  </experiment>
+
+  <experiment name="c96L32_am4g7_2000climo_dmixing2" inherit="c96L32_am4g7_2000climo">
+    <input>
+      <namelist name="deep_conv_nml">
+        auto_th0_d = 0.5e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 5.0e-5
+        peff_i_d   = 12.e-5
+        rkm_dp1 = 2.
+        rkm_dp2 = 0.1
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        rpen_d     = 4.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.9
+        pblfac_d   = 0.2
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 0.5
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+      </namelist>
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.5e-3,
+        tcrit    = -25.15,
+        peff_l   = 5.0e-5
+        peff_i   = 12.e-5
+        frac_drs = 0.0
+        rpen     = 4.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 2
+        do_pevap = .true.
+        cfrac    = 0.15
+        hcevap   = 0.9
+        pblfac   = 0.2
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+/      </namelist>
+    </input>
+  </experiment>
+
+  <experiment name="c96L32_am4g7_2000climo_rekfre" inherit="c96L32_am4g7_2000climo">
+    <input>
+     <namelist name="uw_closure_nml">
+        do_old_cbmfmax = .true.,
+        rkfre    = 0.15
+        wcrit_min= 0.2
+      </namelist>
+    </input>
+  </experiment>
+
 
  <experiment name="c96L63_am4g7_2000climo" inherit="c96L32_am4g7_2000climo">
   <input>

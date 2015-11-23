@@ -1,0 +1,80 @@
+msub -q debug -I -X -l size=256,walltime=05:00:00
+
+msub -q debug -I -X -l size=2016,walltime=02:00:00
+
+msub -q debug -I -X -l size=1728,walltime=02:00:00
+
+msub -q debug -I -X -l size=1536,walltime=02:00:00
+
+msub -q debug -I -X -l size=1440,walltime=02:00:00
+
+msub -q debug -I -X -l size=864,walltime=02:00:00
+
+msub -q debug -I -X -l size=96,walltime=01:00:00
+
+msub -q debug -I -X -l size=96,walltime=03:00:00
+
+msub -q debug -I -X -l size=288,walltime=05:00:00
+
+msub -q debug -I -X -l size=280,walltime=05:00:00
+
+msub -q debug -I -X -l size=108,walltime=05:00:00
+
+msub -q debug -I -X -l size=216,walltime=05:00:00
+
+msub -q debug -I -X -l size=432,walltime=02:00:00
+
+msub -q debug -I -X -l size=496,walltime=02:00:00
+
+ source $MODULESHOME/init/csh
+ module use -a /ncrc/home2/fms/local/modulefiles
+ module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+ module unload netcdf fre fre-commands
+ module load PrgEnv-intel/4.0.46
+ module swap intel intel/12.0.5.220
+ module load fre/bronx-10
+ module unload totalview
+ module load totalview
+ module list
+ 
+cd $workmiz
+
+set mypath = /lustre/f1/unswept/Ming.Zhao/awgom2/ulm_201505/am4om2_v20150923/ncrc2.intel-debug
+cp $mypath/exec/fms_am4om2_v20150923.x .
+cp $mypath/exec/Make* .
+module load totalview
+totalview aprun -a -n 216 ./fms_am4om2_v20150923.x
+
+module load ddt
+ddt -n 246  ./fms_am4om2_v20151016.x
+
+
+
+
+
+
+set mypath = /lustre/f1/unswept/Ming.Zhao/debug_ulm/
+cp $mypath/exec/fms_cm4p3_v20141222.x .
+cp $mypath/exec/Make* .
+module load totalview
+totalview aprun -a -n 216 ./fms_cm4p3_v20141222.x
+
+
+
+ source $MODULESHOME/init/csh
+ module use -a /ncrc/home2/fms/local/modulefiles
+ module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+ module unload netcdf fre fre-commands
+ module load PrgEnv-intel
+ module swap intel intel/12.0.5.220
+ module load fre/bronx-3
+ module list
+ 
+cd $workmiz
+
+set mypath = /autofs/na2_home2/Ming.Zhao/debug
+cp $mypath/Make* .
+module load totalview
+totalview aprun -a -n 96 ./fms_hiramdp_base.x
+
+
