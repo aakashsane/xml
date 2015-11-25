@@ -15,7 +15,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm_201510"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2015.11.09"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="20151123"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -55,20 +55,38 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
-   <property name="DEBUGLEVEL"   value=""/>
+   <property name="DEBUGLEVEL"   value="_mkcalvrep"/>
    <property name="STATIC"       value=""/>  
 
    <property name="domainparams_O512"
 	     value="coupler_nml:ocean_npes=512;
 	            dummy_ice_nml:ice_layout=32,16;dummy_ice_nml:ice_io_layout=1,4;
 		    dummy_ice_nml:ice_mask_table=MOM_mask_table;
-	            dummy_ocean_nml:ocean_layout=0,0;dummy_ocean_nml:ocean_io_layout=1,1;
+                    icebergs_nml:make_calving_reproduce=.true.;
+	            dummy_ocean_nml:ocean_layout=32,16;dummy_ocean_nml:ocean_io_layout=1,1;
+                    dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
+
+   <property name="domainparams_O648"
+	     value="coupler_nml:ocean_npes=648;
+	            dummy_ice_nml:ice_layout=18,36;dummy_ice_nml:ice_io_layout=1,4;
+		    dummy_ice_nml:ice_mask_table=MOM_mask_table;
+                    icebergs_nml:make_calving_reproduce=.true.;
+	            dummy_ocean_nml:ocean_layout=18,36;dummy_ocean_nml:ocean_io_layout=1,4;
+                    dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
+
+   <property name="domainparams_O864"
+	     value="coupler_nml:ocean_npes=864;
+	            dummy_ice_nml:ice_layout=24,36;dummy_ice_nml:ice_io_layout=1,4;
+		    dummy_ice_nml:ice_mask_table=MOM_mask_table;
+                    icebergs_nml:make_calving_reproduce=.true.;
+	            dummy_ocean_nml:ocean_layout=24,36;dummy_ocean_nml:ocean_io_layout=1,4;
                     dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
 
    <property name="domainparams_O1152"
 	     value="coupler_nml:ocean_npes=1152;
 	            dummy_ice_nml:ice_layout=32,36;dummy_ice_nml:ice_io_layout=1,4;
 		    dummy_ice_nml:ice_mask_table=MOM_mask_table;
+                    icebergs_nml:make_calving_reproduce=.true.;
 	            dummy_ocean_nml:ocean_layout=32,36;dummy_ocean_nml:ocean_io_layout=1,4;
                     dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
 
@@ -1281,7 +1299,10 @@ $baseDate
          <!--the following two should reproduce eachother but not the basic because basic uses mask_table-->
          <run days="2"  npes="2304" overrideParams="$(domainparams_O2304)" runTimePerJob="00:30:00"/>
          <run days="2"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
-         <!--the following is for checking the timings or production run-->
+         <run days="2"  npes="512"  overrideParams="$(domainparams_O512)"  runTimePerJob="01:00:00"/>
+         <run days="2"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
+         <run days="2"  npes="864"  overrideParams="$(domainparams_O864)"  runTimePerJob="01:00:00"/>	 
+          <!--the following is for checking the timings or production run-->
          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
        </regression>
 
@@ -1403,6 +1424,7 @@ OVERRIDE_EOF
        do_generic_TOPAZ=.false.
          </namelist>
          <namelist name="diag_manager_nml">
+       max_files = 100,
        max_axes = 100,
        max_num_axis_sets = 100,
        max_input_fields = 699
@@ -1572,6 +1594,7 @@ OVERRIDE_EOF
          </namelist>
          <namelist name="diag_manager_nml">
        max_axes = 100,
+       max_files = 100,
        max_num_axis_sets = 100,
        max_input_fields = 699
        max_output_fields = 699
@@ -1639,6 +1662,7 @@ OVERRIDE_EOF
    </experiment>
 
 
+   <experiment name="OM4_SIS2_COBALT_initFromSrc_DT_THERM_7200.$(FRE_STEM)" inherit="OM4_SIS2_COBALT_initFromSrc_DT_THERM_7200"/>
    <experiment name="OM4_SIS2_COBALT_initFromSrc_DT_THERM_7200" inherit="OM4_SIS2_COBALT_initFromSrc">
     <description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)">
  global 1/4 degree z  with THERMO_SPANS_COUPLING
@@ -2150,6 +2174,7 @@ touch $work/INPUT/SIS_override
      </input>
    </experiment>
 
+   <experiment name="OM4_SIS2_033_baseline.$(FRE_STEM)" inherit="OM4_SIS2_033_baseline"/>
    <experiment name="OM4_SIS2_033_baseline$(STATIC)" inherit="MOM6_SIS2_compile$(STATIC)">
     <description communityProject="OWG" communityModel="OM4_SIS2_033 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2_033" communityExperimentName="$(name)" >
  global 1/3 degree z test case
@@ -2263,8 +2288,11 @@ $baseDate
        </regression>
        <regression name="rts">
          <run days="5 5" npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
+         <run days="10"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
          <run days="10"  npes="2304" overrideParams="$(domainparams_O2304)" runTimePerJob="00:30:00"/>
          <run days="10"  npes="512"  overrideParams="$(domainparams_O512)"  runTimePerJob="01:00:00"/>
+         <run days="10"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
+         <run days="10"  npes="864"  overrideParams="$(domainparams_O864)"  runTimePerJob="01:00:00"/>	 
        </regression>
        
        <regression name="restarts">
@@ -2398,6 +2426,7 @@ touch $work/INPUT/SIS_override
      </input>
    </experiment>
 
+   <experiment name="OM4_SIS2_05_baseline.$(FRE_STEM)" inherit="OM4_SIS2_05_baseline"/>
    <experiment name="OM4_SIS2_05_baseline$(STATIC)" inherit="MOM6_SIS2_compile$(STATIC)">
     <description communityProject="OWG" communityModel="OM4_SIS2_05 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2_05" communityExperimentName="$(name)" >
  global 1/3 degree z test case
@@ -2511,8 +2540,10 @@ $baseDate
        </regression>
        <regression name="rts">
          <run days="5 5" npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
-         <run days="10"  npes="2304" overrideParams="$(domainparams_O2304)" runTimePerJob="00:30:00"/>
+         <run days="10"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
          <run days="10"  npes="512"  overrideParams="$(domainparams_O512)"  runTimePerJob="01:00:00"/>
+         <run days="10"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
+         <run days="10"  npes="864"  overrideParams="$(domainparams_O864)"  runTimePerJob="01:00:00"/>	 
        </regression>
        
        <regression name="restarts">
@@ -2521,8 +2552,9 @@ $baseDate
        </regression>
 
       <regression name="debug">
-         <run days="1"   npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
-       </regression>
+         <run days="1"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
+         <run days="1"  npes="864"  overrideParams="$(domainparams_O864)"  runTimePerJob="01:00:00"/>	 
+      </regression>
 
       <production simTime="$(PROD_SIMTIME)" units="years" npes="$(PROD_NPES)" runTime="$(PROD_RUNTIME)">
            <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
@@ -2538,5 +2570,57 @@ $baseDate
      
    </experiment>
 
+   <experiment name="OM4_SIS2_05_DT2400_KHTHKHTR500_scatter$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
+
+     <input>
+  
+    <csh><![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
+#override SALT_RESTORE_FILE     = "salt_restore.nc"
+#override DT = 2400
+#override DT_THERM = 7200
+#override SMAG_LAP_CONST = 0.
+#override AH_VEL_SCALE = 0.
+#override RESOLN_SCALED_KH = False
+#override CORIOLIS_SCHEME = "ARAKAWA_HSU90"
+#override MEKE_BGSRC = 0.
+#override MEKE_FRCOEFF = 1.0
+#override MEKE_GMCOEFF = 0.0
+#override MEKE_ALPHA_RHINES = 0.0
+#override MEKE_ALPHA_EADY = 0.0
+#override MEKE_ALPHA_GRID = 1.0
+#override MEKE_VISCOSITY_COEFF = -0.4
+#override MEKE_KH = 600.
+#override MEKE_VISC_DRAG = False
+#override MEKE_CB = 0.
+#override MEKE_COLD_START = True
+#override MEKE_BACKSCAT_RO_C = 8.0
+#override MEKE_BACKSCAT_RO_POW = 2.0
+#override WRITE_GEOM = 1.0
+USE_NEUTRAL_DIFFUSION	 = True
+KHTR = 500.
+KHTH = 500.
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
+
+   </input>
+
+   </experiment>
     
 </experimentSuite>
