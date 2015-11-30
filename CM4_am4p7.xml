@@ -383,6 +383,18 @@ the faster the model throughput, but also the lower the model efficiency
 	       dummy_ocean_nml:ocean_layout=18,36;dummy_ocean_nml:ocean_io_layout=1,4;
                dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
 
+   <property name="domainparams_A432x2_O1296"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=1296;
+               coupler_nml:atmos_npes=432;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;	
+               fv_core_nml:layout=3,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=3,24;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=144,3;ice_model_nml:io_layout=1,3;
+	       dummy_ice_nml:ice_layout=144,3;dummy_ice_nml:ice_io_layout=1,3;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=36,36;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
+   
    <property name="domainparams_A216x2_O864"
 	     value="
 	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=864;
@@ -394,6 +406,7 @@ the faster the model throughput, but also the lower the model efficiency
 	       icebergs_nml:make_calving_reproduce=.true.;
 	       dummy_ocean_nml:ocean_layout=24,36;dummy_ocean_nml:ocean_io_layout=1,4;
                dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
+
 
    <property name="domainparams_A216x2_O1756"
 	     value="
@@ -3065,9 +3078,9 @@ For more information please refer to the
         use_lag_fluxes = .true.
         concurrent = .true.
         do_ocean = .true.
-        ocean_npes = 648   !$(OCN_PROD_NPES)
-        atmos_npes = 216   !$(ATM_PROD_NPES)
-        atmos_nthreads = 2 !$(ATM_PROD_NTHREADS)
+        ocean_npes = 1296   
+        atmos_npes = 432   
+        atmos_nthreads = 2 
       </namelist>
       <namelist name="flux_exchange_nml">
             nblocks=$(ATM_PROD_NTHREADS)
@@ -3093,12 +3106,12 @@ For more information please refer to the
       </namelist>
 
       <namelist name="atmos_model_nml">
-         nxblocks = 1 !$(ATM_PROD_NXBLOCKS)
-         nyblocks = 2 !$(ATM_PROD_NYBLOCKS)
+         nxblocks = 1 
+         nyblocks = 2 
       </namelist>
       <namelist name="fv_core_nml">
-        layout = 3,12   !$(FV_PROD_LAYOUT)
-        io_layout = 1,4 !$(FV_PROD_IO_LAYOUT)
+        layout = 3,24   
+        io_layout = 1,4 
         npx      = 97,
         npy      = 97,
         ntiles   = 6,
@@ -3121,20 +3134,20 @@ For more information please refer to the
         z_tracer=.false.
       </namelist>
       <namelist name="land_model_nml">
-        layout = 3,12 !$(LND_PROD_LAYOUT)
-        io_layout = 1,4 !$(LND_PROD_IO_LAYOUT)
+        layout = 3,24 
+        io_layout = 1,4 
         tau_snow_T_adj = 604800.
         prohibit_negative_canopy_water=.false.
       </namelist>
 
       <namelist name="dummy_ocean_nml">
-        ocean_layout = 18,36  !$(OCN_PROD_LAYOUT)
-        ocean_io_layout = 1,4 !$(OCN_PROD_IO_LAYOUT)
-	ocean_mask_table= MOM_mask_table !$(OCN_PROD_MASK_TABLE)
+        ocean_layout = 36,36  
+        ocean_io_layout = 1,4 
+	ocean_mask_table= MOM_mask_table 
       </namelist>
       <namelist name="dummy_ice_nml">
-        ice_layout = 72,3 !$(ICE_PROD_LAYOUT)
-        ice_io_layout = 1,3 !$(ICE_PROD_IO_LAYOUT)
+        ice_layout = 144,3 
+        ice_io_layout = 1,3 
       </namelist>
 
       <!--AWG Input datasets -->
@@ -3169,6 +3182,29 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
 #override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
+#override DT = 2400
+#override DT_THERM = 7200
+#override SMAG_LAP_CONST = 0.
+#override AH_VEL_SCALE = 0.
+#override RESOLN_SCALED_KH = False
+#override CORIOLIS_SCHEME = "ARAKAWA_HSU90"
+#override MEKE_BGSRC = 0.
+#override MEKE_FRCOEFF = 1.0
+#override MEKE_GMCOEFF = 0.0
+#override MEKE_ALPHA_RHINES = 0.0
+#override MEKE_ALPHA_EADY = 0.0
+#override MEKE_ALPHA_GRID = 1.0
+#override MEKE_VISCOSITY_COEFF = -0.4
+#override MEKE_KH = 600.
+#override MEKE_VISC_DRAG = False
+#override MEKE_CB = 0.
+#override MEKE_COLD_START = True
+#override MEKE_BACKSCAT_RO_C = 8.0
+#override MEKE_BACKSCAT_RO_POW = 2.0
+#override WRITE_GEOM = 1.0
+USE_NEUTRAL_DIFFUSION	 = True
+KHTR = 500.
+KHTH = 500.
 
 MOM_OVERRIDE_EOF
 
@@ -3182,7 +3218,7 @@ SIS_OVERRIDE_EOF
     </input>
 
     <runtime>
-        <production simTime="$(PROD_SIMTIME)" units="years" npes="864" runTime="$(PROD_RUNTIME)">
+        <production simTime="$(PROD_SIMTIME)" units="years" npes="1728" runTime="$(PROD_RUNTIME)">
           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
         </production>
       <regression name="basic">
@@ -3193,6 +3229,10 @@ SIS_OVERRIDE_EOF
   	<run days="5 5" npes="864" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O648)"/>
   	<run days="10"  npes="1368" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O1152)"/>
   	<run days="10"  npes="1080" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O864)"/>
+  	<run days="10"  npes="1728" runTimePerJob="00:30:00" overrideParams="$(domainparams_A432x2_O1296)"/>
+      </regression>
+      <regression name="basic2">
+  	<run days="10"  npes="1728" runTimePerJob="00:30:00"/>
       </regression>
 
 
