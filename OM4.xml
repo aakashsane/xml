@@ -15,7 +15,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm_201510"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="20151123"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2015.11.30"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -55,7 +55,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
-   <property name="DEBUGLEVEL"   value="_mkcalvrep"/>
+   <property name="DEBUGLEVEL"   value="_mattDebug"/>
    <property name="STATIC"       value=""/>  
 
    <property name="domainparams_O512"
@@ -2288,11 +2288,14 @@ $baseDate
        </regression>
        <regression name="rts">
          <run days="5 5" npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
-         <run days="10"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
-         <run days="10"  npes="2304" overrideParams="$(domainparams_O2304)" runTimePerJob="00:30:00"/>
-         <run days="10"  npes="512"  overrideParams="$(domainparams_O512)"  runTimePerJob="01:00:00"/>
-         <run days="10"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
-         <run days="10"  npes="864"  overrideParams="$(domainparams_O864)"  runTimePerJob="01:00:00"/>	 
+         <!--the following two should reproduce eachother but not the basic because basic uses mask_table-->
+         <run days="2"  npes="2304" overrideParams="$(domainparams_O2304)" runTimePerJob="00:30:00"/>
+         <run days="2"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
+         <run days="2"  npes="512"  overrideParams="$(domainparams_O512)"  runTimePerJob="01:00:00"/>
+         <run days="2"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
+         <run days="2"  npes="864"  overrideParams="$(domainparams_O864)"  runTimePerJob="01:00:00"/>	 
+          <!--the following is for checking the timings or production run-->
+         <run months="1" npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:50:00"/>
        </regression>
        
        <regression name="restarts">
@@ -2393,6 +2396,10 @@ $baseDate
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_GS_edits.nc</dataSource>
+      </dataFile>
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75.nc</dataSource>
       </dataFile>
 
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
@@ -2540,10 +2547,14 @@ $baseDate
        </regression>
        <regression name="rts">
          <run days="5 5" npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
-         <run days="10"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
-         <run days="10"  npes="512"  overrideParams="$(domainparams_O512)"  runTimePerJob="01:00:00"/>
-         <run days="10"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
-         <run days="10"  npes="864"  overrideParams="$(domainparams_O864)"  runTimePerJob="01:00:00"/>	 
+         <!--the following two should reproduce eachother but not the basic because basic uses mask_table-->
+         <run days="2"  npes="2304" overrideParams="$(domainparams_O2304)" runTimePerJob="00:30:00"/>
+         <run days="2"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
+         <run days="2"  npes="512"  overrideParams="$(domainparams_O512)"  runTimePerJob="01:00:00"/>
+         <run days="2"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
+         <run days="2"  npes="864"  overrideParams="$(domainparams_O864)"  runTimePerJob="01:00:00"/>	 
+          <!--the following is for checking the timings or production run-->
+         <run months="1" npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:50:00"/>
        </regression>
        
        <regression name="restarts">
@@ -2570,6 +2581,7 @@ $baseDate
      
    </experiment>
 
+   <experiment name="OM4_SIS2_05_DT2400_KHTHKHTR500_scatter.$(FRE_STEM)" inherit="OM4_SIS2_05_DT2400_KHTHKHTR500_scatter"/>
    <experiment name="OM4_SIS2_05_DT2400_KHTHKHTR500_scatter$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
 
      <input>
@@ -2622,5 +2634,45 @@ SIS_OVERRIDE_EOF
    </input>
 
    </experiment>
-    
+
+   
+   <experiment name="OM4_SIS2_05_hycomff_c.$(FRE_STEM)" inherit="OM4_SIS2_05_hycomff_c"/>
+   <experiment name="OM4_SIS2_05_hycomff_c$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
+
+     <input>
+  
+    <csh><![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
+#override SALT_RESTORE_FILE     = "salt_restore.nc"
+Z_INIT_REMAP_GENERAL = True
+Z_INIT_REMAP_FULL_COLUMN = True
+REMAP_AFTER_INITIALIZATION = False
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75.nc,sigma2,FNC1:2,6500,3,.01"
+REGRID_COMPRESSIBILITY_FRACTION = 0.01
+BOUNDARY_EXTRAPOLATION = True
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
+
+   </input>
+
+   </experiment>
+
+   
 </experimentSuite>
