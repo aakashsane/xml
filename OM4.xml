@@ -22,7 +22,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
    <property name="FRE_VERSION"  value="fre/bronx-10"/>
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-   <property name="PROD_SIMTIME"   value="4"/>
+   <property name="PROD_SIMTIME"   value="10"/>
    <!--Post-processing  chunk lengths -->
    <property name="CHUNK_LENGTH_A" value="5yr"/>
    <property name="CHUNK_LENGTH_B" value="20yr"/>
@@ -30,7 +30,12 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
    <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->
    <property name="PP_START_YEAR"  value="1900"/>
-   <property name="PP_END_YEAR"    value="1919"/>
+   <property name="PP_END_YEAR"    value="1910"/>
+   <!--Use these values for CORE2 dynamic forcing runs -->
+   <!--
+   <property name="PP_START_YEAR"  value="1948"/>
+   <property name="PP_END_YEAR"    value="1958"/>
+   -->
    <property name="ANALYSIS_SWITCH" value="on"/>
    <property name="MDBIswitch"      value="on"/>  <!-- on/off switch for MDBI database -->
 
@@ -827,6 +832,9 @@ endif
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/salt_restore.v20140616.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_saltrestore</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/slp.clim.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -846,13 +854,56 @@ endif
     </input>
    </experiment>
 
+   <!--OM4 CORE2 dynamic forcing datasets-->
+   <experiment name="CORE2_data">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/unswept/Amy.Langenhorst/CORE/IAF_v2.0/data_table_dyn</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/ncar_precip.1948-2007.nomads.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/ncar_rad.1948-2007.nomads.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/q_10_mod.1948-2007.nomads.nc</dataSource>
+      </dataFile>
+      <!-- runoff -->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/unswept/Amy.Langenhorst/CORE/IAF_v2.0/runoff.daitren.iaf.1948-2007.regridded.nc</dataSource>
+      </dataFile>
+      <!-- salt restore -->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/unswept/Amy.Langenhorst/CORE/IAF_v2.0/PHC2_salx.2015_06_15.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">/lustre/f1/unswept/Amy.Langenhorst/CORE/IAF_v2.0/MOM_saltrestore</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/slp.1948-2007.nomads.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/t_10_mod.1948-2007.nomads.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/u_10_mod.1948-2007.nomads.nc</dataSource>
+      </dataFile>      
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/v_10_mod.1948-2007.nomads.nc</dataSource>
+      </dataFile>
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/cfc.bc.nc</dataSource>
+      </dataFile>
+
+    </input>
+   </experiment>
+
    <experiment name="OM4_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_input</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_saltrestore</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/layer_coord.nc</dataSource>
@@ -1204,7 +1255,8 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
    <!--****************************************************************************************-->
 											      
    <experiment name="OM4_SIS2_baseline.$(FRE_STEM)" inherit="OM4_SIS2_baseline"/>
-   <experiment name="OM4_SIS2_baseline$(STATIC)" inherit="MOM6_SIS2_compile$(STATIC)">
+
+   <experiment name="OM4_SIS2_baseline_config" inherit="MOM6_SIS2_compile$(STATIC)">
     <description communityProject="OWG" communityModel="OM4_SIS2 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)" >
  global 1/4 degree z test case
     </description>  
@@ -1221,8 +1273,53 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
     &lt;a href="http://wiki.gfdl.noaa.gov/index.php/MOM6"&gt; MOM6 Wiki.  &lt;/a&gt;
     </communityComment>
 
-     <input>
 
+    <runtime>   
+       <regression name="basic">
+         <run days="10"   npes="$(PROD_NPES)"  runTimePerJob="01:30:00"/>
+       </regression>
+       <regression name="rts">
+         <run days="5 5"  npes="$(PROD_NPES)"  runTimePerJob="01:30:00"/>
+         <!--the following two should reproduce eachother but not the basic because basic uses mask_table-->
+         <run days="2"  npes="2304" overrideParams="$(domainparams_O2304)" runTimePerJob="00:30:00"/>
+         <run days="2"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
+         <!--the following is for checking the timings or production run-->
+         <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
+       </regression>
+
+      <regression name="timing">
+          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="01:50:00"/>
+       </regression>
+
+      <regression name="timings">
+          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
+          <run months="1"  npes="2432"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O2432)"/>
+          <run months="1"  npes="1756"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1756)"/>
+          <run months="1"  npes="1970"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1970)"/>
+       </regression>
+      <regression name="debug">
+         <run days="1"   npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
+       </regression>
+
+      <production simTime="$(PROD_SIMTIME)" units="years" npes="$(PROD_NPES)" runTime="$(PROD_RUNTIME)">
+           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
+       </production>
+
+      <reference restart="$(REFERENCE)/1x0m10d_2997pe/restart/19000111.tar"/>
+
+    </runtime>
+
+    <postProcess>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
+    </postProcess>
+
+   </experiment>
+
+   <experiment name="OM4_SIS2_baseline$(STATIC)" inherit="OM4_SIS2_baseline_config">
+    <description communityProject="OWG" communityModel="OM4_SIS2 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)" >
+ global 1/4 degree z test case
+    </description>  
+     <input>
 
       <xi:include xpointer="xpointer(//experiment[@name='OM4_common']/input/node())"/>
       <!--MOM6 Input datasets-->
@@ -1289,51 +1386,125 @@ $baseDate
      </namelist>
 
    </input>
-
-    <runtime>   
-       <regression name="basic">
-         <run days="10"   npes="$(PROD_NPES)"  runTimePerJob="01:30:00"/>
-       </regression>
-       <regression name="rts">
-         <run days="5 5"  npes="$(PROD_NPES)"  runTimePerJob="01:30:00"/>
-         <!--the following two should reproduce eachother but not the basic because basic uses mask_table-->
-         <run days="2"  npes="2304" overrideParams="$(domainparams_O2304)" runTimePerJob="00:30:00"/>
-         <run days="2"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
-         <run days="2"  npes="512"  overrideParams="$(domainparams_O512)"  runTimePerJob="01:00:00"/>
-         <run days="2"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
-         <run days="2"  npes="864"  overrideParams="$(domainparams_O864)"  runTimePerJob="01:00:00"/>	 
-          <!--the following is for checking the timings or production run-->
-         <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
-       </regression>
-
-      <regression name="timing">
-          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="01:50:00"/>
-       </regression>
-
-      <regression name="timings">
-          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
-          <run months="1"  npes="2432"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O2432)"/>
-          <run months="1"  npes="1756"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1756)"/>
-          <run months="1"  npes="1970"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1970)"/>
-       </regression>
-      <regression name="debug">
-         <run days="1"   npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
-       </regression>
-
-      <production simTime="$(PROD_SIMTIME)" units="years" npes="$(PROD_NPES)" runTime="$(PROD_RUNTIME)">
-           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
-       </production>
-
-      <reference restart="$(REFERENCE)/1x0m10d_2997pe/restart/19000111.tar"/>
-
-    </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-
    </experiment>
+
+   <experiment name="OM4_SIS2_CORE2_baseline" inherit="OM4_SIS2_baseline_config">
+    <description communityProject="OWG" communityModel="OM4_SIS2 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)" >
+global 1/4 degree z test case
+based off of the OM4_SIS2_baseline experiment
+regridded runoff and salinity
+CORE2 dynamic forcing data
+    </description>  
+     <input>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_common']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
+      <!--SIS2 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
+      <!--OM4 gridSpec mosaic datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_grid']/input/node())"/>
+      <!--CORE forcing datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='CORE2_data']/input/node())"/>
+
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/unswept/Amy.Langenhorst/CORE/IAF_v2.0/20080101.ice_model.res.tar</dataSource>
+        <dataSource site="gfdl">/archive/arl/CORE/IAF_v2.0/20080101.ice_model.res.tar</dataSource>
+     </dataFile>
+     
+     <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+     </dataFile>
+     <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+     </dataFile>
+      
+      <diagTable>
+$name
+$baseDate
+      </diagTable>
+
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1948,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'NOLEAP',
+       dt_cpld  = 3600,
+       dt_atmos = 3600,
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.false. 
+     </namelist>
+     <namelist name="fms_nml">
+       clock_grain='ROUTINE'
+       clock_flags='NONE'
+       domains_stack_size = 8000000
+       stack_size =0
+     </namelist>
+     <namelist name="fms_io_nml" >
+       fms_netcdf_restart=.true.
+       threading_read='multi'
+       max_files_r = 200
+       max_files_w = 200
+       checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+     </namelist>
+     <namelist name="xgrid_nml">
+       make_exchange_reproduce = .false.
+       interp_method = 'second_order'
+     </namelist>
+
+   </input>
+   </experiment>
+
+   <experiment name="OM4_SIS2_CORE2_scatter" inherit="OM4_SIS2_CORE2_baseline">
+     <input>
+      <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override ENERGYSAVEDAYS = 30
+#override CALCULATE_APE = False
+
+#override USE_KPP = False
+#override ENERGETICS_SFC_PBL = True
+#override MSTAR = 1.2
+#override KD = 2.0E-6
+#override FOX_KEMPER_ML_RESTRAT_COEF = 20.0
+#override SMAG_LAP_CONST = 0.
+#override AH_VEL_SCALE = 0.
+
+#override RESOLN_SCALED_KH = False
+#override CORIOLIS_SCHEME = "ARAKAWA_HSU90"
+#override MEKE_BGSRC = 0.
+#override MEKE_FRCOEFF = 1.0
+#override MEKE_GMCOEFF = 0.0
+#override MEKE_ALPHA_RHINES = 0.0
+#override MEKE_ALPHA_EADY = 0.0
+#override MEKE_ALPHA_GRID = 1.0
+#override MEKE_VISCOSITY_COEFF = -0.4
+#override MEKE_KH = 600.
+#override MEKE_VISC_DRAG = False
+#override MEKE_CB = 0.
+#override MEKE_COLD_START = True
+#override MEKE_BACKSCAT_RO_C = 8.0
+#override MEKE_BACKSCAT_RO_POW = 2.0
+OVERRIDE_EOF
+     ]]></csh>
+    </input>
+   </experiment>
+
+
 
     <experiment name="OM4_SIS2_DT1200" inherit="OM4_SIS2_baseline">
    <input>
