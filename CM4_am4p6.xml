@@ -75,7 +75,7 @@ which are saved under /lustre/f1/unswept/Niki.Zadeh/ulm_201505_awg_v20150702_mom
 
   <!--User shoould set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="ulm_201505"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2015.11.09"/>      <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2015.11.30"/>      <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20150923"/> <!-- git tag for AWG  source code -->
   <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -94,7 +94,7 @@ which are saved under /lustre/f1/unswept/Niki.Zadeh/ulm_201505_awg_v20150702_mom
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
 
-  <property name="FRE_STEM"  value="$(RELEASE)_intel14land_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
+  <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
   <property name="FRE_VERSION" value="fre/bronx-10"/>             <!-- fre version to be used -->
   <property name="ANALYSIS_SWITCH" value="on"/>                  <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
@@ -412,7 +412,7 @@ the faster the model throughput, but also the lower the model efficiency
              value="
                coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=1970;
                coupler_nml:atmos_npes=288;coupler_nml:atmos_nthreads=2;
-               fv_core_nml:layout=4,12;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=4;atmos_model_nml:nyblocks=2;
+               fv_core_nml:layout=4,12;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
                land_model_nml:layout=4,12;land_model_nml:io_layout=1,4;
                ice_model_nml:layout=72,4;ice_model_nml:io_layout=1,4;
                dummy_ice_nml:ice_layout=72,4;dummy_ice_nml:ice_io_layout=1,4;
@@ -479,18 +479,18 @@ the faster the model throughput, but also the lower the model efficiency
 
 
 <!--The following are needed till frerun supports overrideParams for production runs-->
-  <property name="PROD_NPES"            value="2186"/>  
+  <property name="PROD_NPES"            value="2258"/>  
   <property name="OCN_PROD_NPES"        value="1970"/>
-  <property name="ATM_PROD_NPES"        value="216"/>
+  <property name="ATM_PROD_NPES"        value="288"/>
   <property name="ATM_PROD_NTHREADS"    value="2"/>
-  <property name="ATM_PROD_NXBLOCKS"    value="4"/>
+  <property name="ATM_PROD_NXBLOCKS"    value="1"/>
   <property name="ATM_PROD_NYBLOCKS"    value="2"/>
-  <property name="FV_PROD_LAYOUT"       value="3,12"/>
+  <property name="FV_PROD_LAYOUT"       value="4,12"/>
   <property name="FV_PROD_IO_LAYOUT"    value="1,4"/>
-  <property name="LND_PROD_LAYOUT"      value="3,12"/>
+  <property name="LND_PROD_LAYOUT"      value="4,12"/>
   <property name="LND_PROD_IO_LAYOUT"   value="1,4"/>
-  <property name="ICE_PROD_LAYOUT"      value="72,3"/>
-  <property name="ICE_PROD_IO_LAYOUT"   value="1,3"/>
+  <property name="ICE_PROD_LAYOUT"      value="72,4"/>
+  <property name="ICE_PROD_IO_LAYOUT"   value="1,4"/>
   <property name="OCN_PROD_LAYOUT"      value="36,72"/>
   <property name="OCN_PROD_IO_LAYOUT"   value="1,4"/>
   <property name="OCN_PROD_MASK_TABLE"  value="mask_table.622.36x72"/>
@@ -2620,6 +2620,9 @@ For more information please refer to the
           <run months="1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
           <run months="1" npes="2258" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1970)"/>
       	</regression>
+	<regression name="timing">
+          <run months="1" npes="2258" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1970)"/>
+      	</regression>
 	<regression name="timings">
           <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1970)"/>
           <run months="1" npes="2648" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O2432)"/>
@@ -2949,7 +2952,10 @@ For more information please refer to the
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_GS_edits.nc
       </dataFile>
-     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75.nc
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/WOA05_pottemp_salt.nc 
      </dataFile>      
 
@@ -3070,8 +3076,78 @@ For more information please refer to the
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual_z.frepp"/>
         </timeAverage>
 
-        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_annual_z"/>
-	
+        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_annual_z"/>	
+      </component>
+
+      <component type="ocean_scalar_monthly"   source="ocean_scalar_month" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_scalar_month"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)"/>
+      </component>
+      
+      <component type="ocean_scalar_annual"    source="ocean_scalar_annual" sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_scalar_annual"/>
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)"/>
+      </component>
+
+      <!--ocean regions-->
+      <component type="ocean_Barents_opening" source="ocean_Barents_opening" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Barents_opening"/>
+      </component>
+      <component type="ocean_Bering_Strait" source="ocean_Bering_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Bering_Strait"/>
+      </component>
+      <component type="ocean_Canadian_Archipelago" source="ocean_Canadian_Archipelago" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Canadian_Archipelago"/>
+      </component>
+      <component type="ocean_Windward_Passage" source="ocean_Windward_Passage" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Windward_Passage"/>
+      </component>
+      <component type="ocean_Denmark_Strait" source="ocean_Denmark_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Denmark_Strait"/>
+      </component>
+      <component type="ocean_Drake_Passage" source="ocean_Drake_Passage" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Drake_Passage"/>
+      </component>
+      <component type="ocean_English_Channel" source="ocean_English_Channel" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_English_Channel"/>
+      </component>
+      <component type="ocean_Faroe_Scotland" source="ocean_Faroe_Scotland" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Faroe_Scotland"/>
+      </component>
+      <component type="ocean_Florida_Bahamas" source="ocean_Florida_Bahamas" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Florida_Bahamas"/>
+      </component>
+      <component type="ocean_Fram_Strait" source="ocean_Fram_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Fram_Strait"/>
+      </component>
+      <component type="ocean_Iceland_Faroe_V" source="ocean_Iceland_Faroe_V" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Iceland_Faroe_V"/>
+      </component>
+      <component type="ocean_Iceland_Faroe_U" source="ocean_Iceland_Faroe_U" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Iceland_Faroe_U"/>
+      </component>
+      <component type="ocean_Indonesian_Throughflow" source="ocean_Indonesian_Throughflow" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Indonesian_Throughflow"/>
+      </component>
+      <component type="ocean_Mozambique_Channel" source="ocean_Mozambique_Channel" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Mozambique_Channel"/>
+      </component>
+      <component type="ocean_Pacific_undercurrent" source="ocean_Pacific_undercurrent" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Pacific_undercurrent"/>
+      </component>
+      <component type="ocean_Taiwan_Luzon" source="ocean_Taiwan_Luzon" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Taiwan_Luzon"/>
+      </component>
+      <component type="ocean_Agulhas_section" source="ocean_Agulhas_section" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Agulhas_section"/>
+      </component>
+      <component type="ocean_Gibraltar_Strait" source="ocean_Gibraltar_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Gibraltar_Strait"/>
+      </component>
+      <component type="ocean_Iceland_Norway" source="ocean_Iceland_Norway" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Iceland_Norway"/>
       </component>
 
       
@@ -3164,6 +3240,53 @@ OVERRIDE_EOF
      ]]></csh>
    </input>
 </experiment>
+
+<experiment name="CM4_c96L32_am4g6_2000_sis2_lowmix_hycom1" inherit="CM4_c96L32_am4g6_2000_sis2">
+   <input>
+      <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.0E-6
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75.nc,sigma2,FNC1:2,6500,3,.01"
+REGRID_COMPRESSIBILITY_FRACTION = 0.01
+BOUNDARY_EXTRAPOLATION = True
+Z_INIT_REMAP_GENERAL = True
+Z_INIT_REMAP_FULL_COLUMN = True
+REMAP_AFTER_INITIALIZATION = False
+
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="CM4_c96L32_am4g6_2000_sis2_lowmix_ndiff_MEKE_hycom1" inherit="CM4_c96L32_am4g6_2000_sis2">
+   <input>
+      <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.0E-6
+USE_NEUTRAL_DIFFUSION = True
+KHTR = 300
+MEKE_KHTH_FAC = 1.0
+KH_RES_FN_POWER = 100
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75.nc,sigma2,FNC1:2,6500,3,.01"
+REGRID_COMPRESSIBILITY_FRACTION = 0.01
+BOUNDARY_EXTRAPOLATION = True
+Z_INIT_REMAP_GENERAL = True
+Z_INIT_REMAP_FULL_COLUMN = True
+REMAP_AFTER_INITIALIZATION = False
+
+OVERRIDE_EOF
+     ]]></csh>
+
+      <diagTable order="append">
+ "ocean_model", "KHTH_t1",          "KHTH_t1",              "ocean_annual",        "all", "mean", "none",2
+ "ocean_model", "KHTH_h",           "KHTH_h",               "ocean_annual",        "all", "mean", "none",2
+      </diagTable>
+	
+   </input>
+</experiment>
+
 
 <experiment name="CM4_c96L32_am4g6_2000_sis2_low_mixing3" inherit="CM4_c96L32_am4g6_2000_sis2">
 								       

@@ -137,6 +137,52 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 	            dummy_ocean_nml:ocean_layout=45,72;dummy_ocean_nml:ocean_io_layout=1,4;
                     dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
 
+   <!--1/2 degree ocean grid Only-->
+   <property name="domainparams_O951p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=951;
+	       dummy_ice_nml:ice_layout=32,36;dummy_ice_nml:ice_io_layout=1,4;
+               dummy_ice_nml:ice_mask_table=mask_table.201.32x36;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=32,36;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.201.32x36"/><!--1/2 degree ocean grid Only-->
+
+   <property name="domainparams_O1057p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=1057;
+	       dummy_ice_nml:ice_layout=36,36;dummy_ice_nml:ice_io_layout=1,4;
+               dummy_ice_nml:ice_mask_table=mask_table.239.36x36;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=36,36;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.239.36x36"/><!--1/2 degree ocean grid Only-->
+
+   <property name="domainparams_O1300p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=1300;
+	       dummy_ice_nml:ice_layout=36,45;dummy_ice_nml:ice_io_layout=1,5;
+               dummy_ice_nml:ice_mask_table=mask_table.320.36x45;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=36,45;dummy_ocean_nml:ocean_io_layout=1,5;
+               dummy_ocean_nml:ocean_mask_table=mask_table.320.36x45"/><!--1/2 degree ocean grid Only-->
+
+   <property name="domainparams_O1441p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=1441;
+	       dummy_ice_nml:ice_layout=36,50;dummy_ice_nml:ice_io_layout=1,5;
+               dummy_ice_nml:ice_mask_table=mask_table.359.36x50;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=36,50;dummy_ocean_nml:ocean_io_layout=1,5;
+               dummy_ocean_nml:ocean_mask_table=mask_table.359.36x50"/><!--1/2 degree ocean grid Only-->
+
+    <property name="domainparams_O1608p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=1608;
+	       dummy_ice_nml:ice_layout=45,45;dummy_ice_nml:ice_io_layout=1,5;
+               dummy_ice_nml:ice_mask_table=mask_table.417.45x45;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=45,45;dummy_ocean_nml:ocean_io_layout=1,5;
+               dummy_ocean_nml:ocean_mask_table=mask_table.417.45x45"/><!--1/2 degree ocean grid Only-->
+ 
    <setup>
     <platform name="ncrc2.intel">
       <project>gfdl_f</project>
@@ -1151,8 +1197,7 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual_z.frepp"/>
         </timeAverage>
 
-        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>
-	
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>	
       </component>
 
       <component type="ocean_annual" start="$(PP_START_YEAR)"  source="ocean_annual"  sourceGrid="ocean-tripolar"> 
@@ -1164,6 +1209,79 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
         </timeAverage>
       </component>
 
+      <!--Ocean scalars-->
+      <component type="ocean_scalar_monthly"   source="ocean_scalar_month" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_scalar_month"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+      
+      <component type="ocean_scalar_annual"    source="ocean_scalar_annual" sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_B)" source="ocean_scalar_annual"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+
+      <!--Ocean regions-->
+      <component type="ocean_Barents_opening" source="ocean_Barents_opening" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Barents_opening"/>
+      </component>
+      <component type="ocean_Bering_Strait" source="ocean_Bering_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Bering_Strait"/>
+      </component>
+      <component type="ocean_Canadian_Archipelago" source="ocean_Canadian_Archipelago" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Canadian_Archipelago"/>
+      </component>
+      <component type="ocean_Windward_Passage" source="ocean_Windward_Passage" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Windward_Passage"/>
+      </component>
+      <component type="ocean_Denmark_Strait" source="ocean_Denmark_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Denmark_Strait"/>
+      </component>
+      <component type="ocean_Drake_Passage" source="ocean_Drake_Passage" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Drake_Passage"/>
+      </component>
+      <component type="ocean_English_Channel" source="ocean_English_Channel" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_English_Channel"/>
+      </component>
+      <component type="ocean_Faroe_Scotland" source="ocean_Faroe_Scotland" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Faroe_Scotland"/>
+      </component>
+      <component type="ocean_Florida_Bahamas" source="ocean_Florida_Bahamas" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Florida_Bahamas"/>
+      </component>
+      <component type="ocean_Fram_Strait" source="ocean_Fram_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Fram_Strait"/>
+      </component>
+      <component type="ocean_Iceland_Faroe_V" source="ocean_Iceland_Faroe_V" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Iceland_Faroe_V"/>
+      </component>
+      <component type="ocean_Iceland_Faroe_U" source="ocean_Iceland_Faroe_U" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Iceland_Faroe_U"/>
+      </component>
+      <component type="ocean_Indonesian_Throughflow" source="ocean_Indonesian_Throughflow" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Indonesian_Throughflow"/>
+      </component>
+      <component type="ocean_Mozambique_Channel" source="ocean_Mozambique_Channel" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Mozambique_Channel"/>
+      </component>
+      <component type="ocean_Pacific_undercurrent" source="ocean_Pacific_undercurrent" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Pacific_undercurrent"/>
+      </component>
+      <component type="ocean_Taiwan_Luzon" source="ocean_Taiwan_Luzon" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Taiwan_Luzon"/>
+      </component>
+      <component type="ocean_Agulhas_section" source="ocean_Agulhas_section" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Agulhas_section"/>
+      </component>
+      <component type="ocean_Gibraltar_Strait" source="ocean_Gibraltar_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Gibraltar_Strait"/>
+      </component>
+      <component type="ocean_Iceland_Norway" source="ocean_Iceland_Norway" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_Iceland_Norway"/>
+      </component>
+
+      <!--ICE-->      
       <component type="ice"  start="$(PP_START_YEAR)"  source="ice_month"  sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"  source="ice_month">
 	   <analysis switch="$(ANALYSIS_SWITCH)" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
@@ -2360,6 +2478,14 @@ $baseDate
        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/tidal_amplitude.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.239.36x36
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.320.36x45
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.201.32x36
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.548.36x72
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.417.45x45
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.359.36x50
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/WOA05_ptemp_salt_annual.nc </dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -2550,8 +2676,12 @@ $baseDate
          <run months="1" npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:50:00"/>
        </regression>
        
-       <regression name="timing">
-         <run months="1" npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:50:00"/>
+       <regression name="timings">
+         <run months="1" npes="951"  overrideParams="$(domainparams_O951p5)" runTimePerJob="00:50:00"/>
+         <run months="1" npes="1057" overrideParams="$(domainparams_O1057p5)" runTimePerJob="00:50:00"/>
+         <run months="1" npes="1300" overrideParams="$(domainparams_O1300p5)" runTimePerJob="00:50:00"/>
+         <run months="1" npes="1441" overrideParams="$(domainparams_O1441p5)" runTimePerJob="00:50:00"/>
+         <run months="1" npes="1608" overrideParams="$(domainparams_O1608p5)" runTimePerJob="00:50:00"/>
        </regression>
 
       <regression name="debug">
