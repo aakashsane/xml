@@ -182,7 +182,43 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 	       icebergs_nml:make_calving_reproduce=.true.;
 	       dummy_ocean_nml:ocean_layout=45,45;dummy_ocean_nml:ocean_io_layout=1,5;
                dummy_ocean_nml:ocean_mask_table=mask_table.417.45x45"/><!--1/2 degree ocean grid Only-->
- 
+
+    <property name="domainparams_O2119p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=2119;
+	       dummy_ice_nml:ice_layout=45,60;dummy_ice_nml:ice_io_layout=1,5;
+               dummy_ice_nml:ice_mask_table=mask_table.581.45x60;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=45,60;dummy_ocean_nml:ocean_io_layout=1,5;
+               dummy_ocean_nml:ocean_mask_table=mask_table.581.45x60"/><!--1/2 degree ocean grid Only-->
+
+    <property name="domainparams_O2783p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=2783;
+	       dummy_ice_nml:ice_layout=60,60;dummy_ice_nml:ice_io_layout=1,5;
+               dummy_ice_nml:ice_mask_table=mask_table.817.60x60;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=60,60;dummy_ocean_nml:ocean_io_layout=1,5;
+               dummy_ocean_nml:ocean_mask_table=mask_table.817.60x60"/><!--1/2 degree ocean grid Only-->
+
+    <property name="domainparams_O3314p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=3314;
+	       dummy_ice_nml:ice_layout=60,72;dummy_ice_nml:ice_io_layout=1,4;
+               dummy_ice_nml:ice_mask_table=mask_table.1006.60x72;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=60,72;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.1006.60x72"/><!--1/2 degree ocean grid Only-->
+
+   <property name="domainparams_O3925p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=3925;
+	       dummy_ice_nml:ice_layout=72,72;dummy_ice_nml:ice_io_layout=1,4;
+               dummy_ice_nml:ice_mask_table=mask_table.1259.72x72;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=72,72;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.1259.72x72"/><!--1/2 degree ocean grid Only-->
+    
    <setup>
     <platform name="ncrc2.intel">
       <project>gfdl_f</project>
@@ -494,7 +530,7 @@ limit coredumpsize unlimited
       <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML"/>
       <property name="MY_ROOT"          value="$(rootDir)"/>
       <property name="REFERENCE"         value=""/>
-      <property name="ARCHIVE_INPUT_NZ"  value=""/>
+      <property name="ARCHIVE_INPUT_NZ"  value="/archive/Niki.Zadeh/input"/>
       <property name="FMS_ESM_ARCHIVE_ROOT" value=""/>
       <property name="OBGC_ARCHIVE_ROOT"    value=""/> 
       <property name="OBGC_MODEL_UPDATES"   value="/home/Jasmin.John"/>
@@ -1093,16 +1129,67 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/Mineral_Fe_Flux_moxim11_climatology.nc</dataSource>
       </dataFile>
+
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/diag_table.COBALT_20141212</dataSource>
+        <dataSource site="olcf">$(OBGC_MODEL_UPDATES)/diag_table.COBALT_20141212</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/diag_table.COBALT_20141212</dataSource>
+      </dataFile>
+
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/field_table.COBALT_init_tracers_latlon_dic1990_20151014</dataSource>
+        <dataSource site="olcf">$(OBGC_MODEL_UPDATES)/field_table.COBALT_init_tracers_latlon_dic1990_20151014</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/field_table.COBALT_init_tracers_latlon_dic1990_20151014</dataSource>
+      </dataFile>
+
       <!-- grid specific -->
       <dataFile label="input" target="INPUT/news_nutrients_quarterdeg.nc" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/news_nutrients_quarterdeg_20150918_v2.nc</dataSource>
       </dataFile>
 
-
       <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/data_table.COBALT_20150915</dataSource>
         <dataSource site="olcf">$(OBGC_MODEL_UPDATES)/data_table.COBALT_20150915</dataSource>
         <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/data_table.COBALT_20150915</dataSource>
+      </dataFile>
+
+     </input>
+
+   </experiment>
+   <experiment name="OBGC_COBALT_data_p5">
+    <input>
+       <!-- IC files -->
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/woa13/woa13_all_n_annual_01.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/woa13/woa13_all_p_annual_01.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/woa13/woa13_all_i_annual_01.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/woa13/woa13_all_o_annual_01.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/glodap/20151013/Alk.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/glodap/20151013/TCO2.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/init_ocean_cobalt.res.nc" chksum="" size="" timestamp="">
+         <dataSource
+platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds_mumem_htotalbounds.ocean_cobalt.res.nc</dataSource>
+      </dataFile>
+
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(FMS_ESM_ARCHIVE_ROOT)/TOPAZ/deposition_horowitz/depflux_total.mean.1990.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/Soluble_Fe_Flux_moxim11_climatology.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/Mineral_Fe_Flux_moxim11_climatology.nc</dataSource>
       </dataFile>
 
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
@@ -1117,18 +1204,45 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
         <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/field_table.COBALT_init_tracers_latlon_dic1990_20151014</dataSource>
       </dataFile>
 
-      <!--
-      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">                   
-	<dataSource platform="$(platform)">$(XML_INCLUDE_DIR)/data_table/COBALT_data_table</dataSource>
-      </dataFile>                                                                                   	
-      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">                   
-	<dataSource platform="$(platform)">$(XML_INCLUDE_DIR)/diag_table/COBALT_diag_table</dataSource>
-      </dataFile>                                                                                   	
-      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">                   
-	<dataSource platform="$(platform)">$(XML_INCLUDE_DIR)/field_table/field_table.COBALT_init_tracers_latlon_dic1990_20150928</dataSource>
-      </dataFile>                                                                                   	
--->
+      <!-- grid specific -->
+      <dataFile label="input" target="INPUT/news_nutrients_halfdeg.nc" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/unswept/Jasmin.John/datasets/ESM4/news_nutrients_halfdeg_20151207.nc</dataSource>
+      </dataFile>
 
+      <dataTable>
+# jgj 2013/01/23 updated for COBALT
+#nnz: chanaged news_nutrients_quarterdeg to news_nutrients_halfdeg
+#
+"OCN", "runoff_no3_flux_ice_ocn",   "NO3_CONC",   "./INPUT/news_nutrients_halfdeg.nc","none",1.0e-3
+"OCN", "runoff_ldon_flux_ice_ocn",  "LDON_CONC",  "./INPUT/news_nutrients_halfdeg.nc","none",1.0e-3
+"OCN", "runoff_sldon_flux_ice_ocn", "SLDON_CONC", "./INPUT/news_nutrients_halfdeg.nc","none",1.0e-3
+"OCN", "runoff_srdon_flux_ice_ocn", "SRDON_CONC", "./INPUT/news_nutrients_halfdeg.nc","none",1.0e-3
+"OCN", "runoff_ndet_flux_ice_ocn",  "NDET_CONC",  "./INPUT/news_nutrients_halfdeg.nc","none",1.0e-3
+"OCN", "runoff_po4_flux_ice_ocn",   "PO4_CONC",   "./INPUT/news_nutrients_halfdeg.nc","none",1.0e-3
+"OCN", "runoff_ldop_flux_ice_ocn",  "LDOP_CONC",  "./INPUT/news_nutrients_halfdeg.nc","none",1.0e-3
+"OCN", "runoff_sldop_flux_ice_ocn", "SLDOP_CONC", "./INPUT/news_nutrients_halfdeg.nc","none",1.0e-3
+"OCN", "runoff_srdop_flux_ice_ocn", "SRDOP_CONC", "./INPUT/news_nutrients_halfdeg.nc","none",1.0e-3
+"OCN", "runoff_fed_flux_ice_ocn", ""   , ""                             , "none" ,  0.0
+"OCN", "runoff_alk_flux_ice_ocn", ""   , ""                             , "none" ,  0.48e-3
+"OCN", "runoff_dic_flux_ice_ocn", ""   , ""                             , "none" ,  0.24e-3
+"OCN", "runoff_lith_flux_ice_ocn", ""  , ""                             , "none" , 13.0e-3
+"OCN", "dry_dep_fed_flux_ice_ocn", "FLUX",         "./INPUT/Soluble_Fe_Flux_moxim11_climatology.nc", "bilinear" , -1.0
+"OCN", "dry_dep_lith_flux_ice_ocn", "FLUX",        "./INPUT/Mineral_Fe_Flux_moxim11_climatology.nc", "bilinear" , -1594.0
+"OCN", "dry_dep_po4_flux_ice_ocn", "FLUX",         "./INPUT/Mineral_Fe_Flux_moxim11_climatology.nc", "bilinear" , -0.035
+"OCN", "wet_dep_no3_flux_ice_ocn",  "NO3_WET_DEP", "./INPUT/depflux_total.mean.1990.nc", "bilinear" , -1.0
+"OCN", "dry_dep_no3_flux_ice_ocn",  "NO3_DRY_DEP", "./INPUT/depflux_total.mean.1990.nc", "bilinear" , -1.0
+"OCN", "wet_dep_nh4_flux_ice_ocn",  "NH4_WET_DEP", "./INPUT/depflux_total.mean.1990.nc", "bilinear" , -1.0
+"OCN", "dry_dep_nh4_flux_ice_ocn",  "NH4_DRY_DEP", "./INPUT/depflux_total.mean.1990.nc", "bilinear" , -1.0
+#
+"ATM", "o2_flux_pcair_atm", ""         , ""                             , "none" , 0.21
+"ATM", "co2_flux_pcair_atm", ""        , ""                             , "none" ,350.0e-6
+"ATM", "co2_bot"       , ""        , ""                    , "none"     , 350.0e-6
+#
+## JGJ: add cfcs later - check scale factor
+# "ATM", "cfc_11_flux_pcair_atm","CFC_11","INPUT/cfc.bc.nc","bilinear", 1.0e-12
+# "ATM", "cfc_12_flux_pcair_atm","CFC_12","INPUT/cfc.bc.nc","bilinear", 1.0e-12
+#      </dataTable>
+	
      </input>
 
    </experiment>
@@ -2484,6 +2598,10 @@ $baseDate
 	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.548.36x72
 	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.417.45x45
 	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.359.36x50
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.581.45x60
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.817.60x60
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.1006.60x72
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.1259.72x72
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/WOA05_ptemp_salt_annual.nc </dataSource>
@@ -2677,11 +2795,16 @@ $baseDate
        </regression>
        
        <regression name="timings">
-         <run months="1" npes="951"  overrideParams="$(domainparams_O951p5)" runTimePerJob="00:50:00"/>
          <run months="1" npes="1057" overrideParams="$(domainparams_O1057p5)" runTimePerJob="00:50:00"/>
          <run months="1" npes="1300" overrideParams="$(domainparams_O1300p5)" runTimePerJob="00:50:00"/>
          <run months="1" npes="1441" overrideParams="$(domainparams_O1441p5)" runTimePerJob="00:50:00"/>
          <run months="1" npes="1608" overrideParams="$(domainparams_O1608p5)" runTimePerJob="00:50:00"/>
+       </regression>
+       <regression name="timings2">
+         <run months="1" npes="2119" overrideParams="$(domainparams_O2119p5)" runTimePerJob="00:40:00"/>
+         <run months="1" npes="2783" overrideParams="$(domainparams_O2783p5)" runTimePerJob="00:40:00"/>
+         <run months="1" npes="3314" overrideParams="$(domainparams_O3314p5)" runTimePerJob="00:40:00"/>
+         <run months="1" npes="3925" overrideParams="$(domainparams_O3925p5)" runTimePerJob="00:40:00"/>
        </regression>
 
       <regression name="debug">
@@ -2798,6 +2921,7 @@ SIS_OVERRIDE_EOF
 
    </experiment>
 
+   <experiment name="OM4_SIS2_05_DT1800_KHTHKHTR500_scatter_COBALT.$(FRE_STEM)" inherit="OM4_SIS2_05_DT1800_KHTHKHTR500_scatter_COBALT"/>
    <experiment name="OM4_SIS2_05_DT1800_KHTHKHTR500_scatter_COBALT$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
 
      <input>
@@ -2855,7 +2979,7 @@ $baseDate
       <!--CORE forcing datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='CORE_data']/input/node())"/>
       <!--COBALT source datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='OBGC_COBALT_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='OBGC_COBALT_data_p5']/input/node())"/>
   
     <csh><![CDATA[
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
