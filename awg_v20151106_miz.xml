@@ -142,8 +142,8 @@ properties below.
   <property name="EXP_AMIP_END"   value="2010"/>
   <property name="EXP_AMIP_LEN"   value="31"/>
   <property name="ANA_AMIP_START" value="1981"/>
-  <property name="ANA_AMIP_END"   value="2000"/>
-  <property name="ANA_AMIP_LEN"   value="20yr"/>
+  <property name="ANA_AMIP_END"   value="2010"/>
+  <property name="ANA_AMIP_LEN"   value="30yr"/>
 
   <!-- Post-processing chunk length -->
   <!-- ANA_AMIP_LEN must be an integer multiple of PP_AMIP_CHUNK -->
@@ -202,6 +202,7 @@ the faster the model throughput, but also the lower the model efficiency
 (i.e. the overall simulation will cost more in terms of core hours).
 
 Available options for c96L32:
+"""""""""""""""""""""""""""""
 
   +========+======================+======================+
   |        |  Suggested run time for 12 month segment    |
@@ -246,7 +247,7 @@ configuration.
 
     <platform name="ncrc2.intel">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_w</project>
+      <project>gfdl_m</project>
       <directory stem="$(FRE_STEM)">
          <src>$HOME/$(stem)/$(name)/src</src>
          <scripts>$HOME/$(stem)/xml_$(AWG_VERSION)/scripts/$(platform)-$(target)</scripts>
@@ -342,7 +343,7 @@ Experiment to build executable. See git log for source code provenance.
       <compile>
         <cppDefs>$(F2003_FLAGS) -DCLUBB</cppDefs>
       </compile>
-    </component> 
+    </component>
 
     <component name="atmos_dyn" paths="atmos_drivers/coupled
                                        atmos_cubed_sphere/driver/coupled
@@ -1433,6 +1434,113 @@ Experiment name = $(name)
 <!--= am4g7 experiments =-->
 <!--=+=====================-->
 
+  <experiment name="c96_debug" inherit="c96L32_am4g7">
+    <input>
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/David.Paynter/awg/ulm_201505/c96L32_am4g7_1950_2010/ncrc2.intel-prod-openmp/restart/19590101.tar</dataSource>
+      </dataFile>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1950,1,1,0,0,0,
+        calendar = 'julian'
+        dt_atmos = 1800,
+        dt_cpld  = 7200,
+        use_lag_fluxes = .true.
+        concurrent = .false.
+        do_ocean = .false.
+        ocean_npes = 0
+        atmos_npes = $atmos_npes
+        atmos_nthreads = $atmos_nthreads
+      </namelist>
+      <namelist name="fv_core_nml">
+        layout   = $fv_layout
+        io_layout = $fv_io_layout
+        npx      = 97,
+        npy      = 97,
+        ntiles   = 6,
+        npz      = 32,
+        k_split  = 1,
+        n_split  = 14,
+        a2b_ord  = 4,
+        hord_dp = -8,
+        hord_tr = -8,
+        adjust_dry_mass = $adjust_dry_mass,
+        consv_te = 0.7,
+        fill = .true.
+        print_freq = 24,
+        grid_type = 0,
+        nord = 2,
+        dddmp = 0.0,
+        d2_bg = 0.0,
+        d4_bg = 0.15,
+        tau = 0.      
+        z_tracer=.false.
+      </namelist>
+    </input>
+    <runtime>
+      <production simTime="1yr" units="years" npes="1728" runTime="16:00:00">
+        <segment simTime="12" units="months" runTime="1:20:00"/>
+      </production>
+      <regression name="basic">
+        <run months="1 1 1 1 1 1"   npes="1728"  runTimePerJob="02:00:00"/>
+      </regression>
+    </runtime>
+  </experiment>
+
+
+  <experiment name="c96_debug_test2" inherit="c96L32_am4g7">
+    <input>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1959,5,5,0,0,0,
+        calendar = 'julian'
+        dt_atmos = 1800,
+        dt_cpld  = 7200,
+        use_lag_fluxes = .true.
+        concurrent = .false.
+        do_ocean = .false.
+        ocean_npes = 0
+        atmos_npes = $atmos_npes
+        atmos_nthreads = $atmos_nthreads
+      </namelist>
+      <namelist name="fv_core_nml">
+        layout   = $fv_layout
+        io_layout = $fv_io_layout
+        npx      = 97,
+        npy      = 97,
+        ntiles   = 6,
+        npz      = 32,
+        k_split  = 1,
+        n_split  = 14,
+        a2b_ord  = 4,
+        hord_dp = -8,
+        hord_tr = -8,
+        adjust_dry_mass = $adjust_dry_mass,
+        consv_te = 0.7,
+        fill = .true.
+        print_freq = -1,
+        grid_type = 0,
+        nord = 2,
+        dddmp = 0.0,
+        d2_bg = 0.0,
+        d4_bg = 0.15,
+        tau = 0.      
+        z_tracer=.false.
+      </namelist>
+    </input>
+    <runtime>
+      <production simTime="1yr" units="years" npes="1728" runTime="16:00:00">
+        <segment simTime="12" units="months" runTime="1:20:00"/>
+      </production>
+      <regression name="basic">
+        <run days="5 1 1 1 1 1 1 1 1 1 1 1"   npes="1728"  runTimePerJob="02:00:00"/>
+      </regression>
+    </runtime>
+  </experiment>
+
+
   <experiment name="c96L32_am4g7" inherit="cm4p8_$(AWG_VERSION)">
 <!-- MDBI -->
     <description
@@ -1748,94 +1856,6 @@ Experiment name = $(name)
 
   </experiment>
 
-
-  <experiment name="c192L32_am4g7" inherit="cm4p8_$(AWG_VERSION)">
-<!-- MDBI -->
-    <description
-communityProject="$(ProjectID)"
-communityModel="am4p7"
-communityModelID="am4p7"
-communityExperimentName="$(name)"
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
-Same as c96L32_am4g7 except for higher spatial resolution c192 horizontal grid with
-approximately 50km resolution and 32 vertical levels.
-    </description>
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)"
-      parentExperimentID="N/A"
-      parentExperimentRIP="N/A"
-      branch_time="0.0">
-    </scenario>
-<!-- /MDBI -->
-
-    <input>
-      <namelist name="atmos_model_nml">
-         nxblocks = $nxblocks
-         nyblocks = $nyblocks
-      </namelist>
-      <!-- Namelist -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_c192L32.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_amip.nml"/>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
-        dt_atmos = 1200,
-        dt_cpld  = 7200,
-        use_lag_fluxes = .true.
-        concurrent = .false.
-        do_ocean = .false.
-        ocean_npes = 0
-        atmos_npes = $atmos_npes
-        atmos_nthreads = $atmos_nthreads
-      </namelist>
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p7_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c192_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c192L32_initCond']/input/node())"/>
-    </input>
-    <runtime>
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="4608" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="3:00:00"/>
-      </production>
-      <regression name="basic">
-        <run days="8" npes="864" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="restart">
-        <run days="4 4" npes="1152" runTimePerJob="01:00:00"/>
-      </regression>
-      <regression name="timing">
-        <run months="1"   npes="864"  runTimePerJob="02:30:00"/>
-        <run months="1"   npes="1152" runTimePerJob="02:00:00"/>
-        <run months="1"   npes="2304" runTimePerJob="01:30:00"/>
-        <run months="1"   npes="3456" runTimePerJob="01:00:00"/>
-        <run months="1"   npes="4608" runTimePerJob="01:00:00"/>
-        <run months="1"   npes="6912" runTimePerJob="01:00:00"/>
-      </regression>
-    </runtime>
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c192_amip_postprocess']/postProcess/node())"/>
-    </postProcess>
-
-  </experiment>
-
-
 <!--====================-->
 <!--= AMIP-CLIMO EXPERIMENTS =-->
 <!--====================-->
@@ -1959,7 +1979,7 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
 
     <runtime>
       <production simTime="$(EXP_CLIMO_LEN)" units="years" npes="1728" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="1:50:00"/>
+        <segment simTime="12" units="months" runTime="1:30:00"/>
       </production>
       <regression name="basic">
         <run days="8"   npes="216"  runTimePerJob="00:30:00"/>
@@ -2494,6 +2514,89 @@ configuration with present-day climatological SSTs, pre-industrial GHGs and pres
     </input>
   </experiment>
 
+ <experiment name="c96L32_am4g7_2000climo_2xCO2" inherit="c96L32_am4g7_2000climo">
+  <input>
+    <namelist name="radiative_gases_nml">
+      use_co2_10um = .true.
+      verbose = 3
+      gas_printout_freq = 240
+
+      time_varying_co2 = .false.,
+      co2_base_value=  7.362125E-04
+      co2_variation_type = 'linear',
+      co2_dataset_entry = 2000,1,1,0,0,
+      co2_specification_type = 'base_and_trend',
+      co2_floor = 100.0E-06,
+      co2_ceiling = 1600.0E-06,
+      co2_data_source = 'namelist'
+
+      time_varying_ch4 = .false.,
+      ch4_variation_type = 'linear'
+      ch4_dataset_entry = 2000,1,1,0,0,
+      ch4_specification_type = 'time_series'
+      ch4_data_source = 'input'
+
+      time_varying_n2o = .false.,
+      n2o_variation_type = 'linear'
+      n2o_dataset_entry = 2000,1,1,0,0,
+      n2o_specification_type = 'time_series'
+      n2o_data_source = 'input'
+
+      time_varying_f11 = .false.,
+      f11_variation_type = 'linear'
+      f11_dataset_entry = 2000,1,1,0,0,
+      f11_specification_type = 'time_series'
+      f11_data_source = 'input'
+
+      time_varying_f12 = .false.,
+      f12_variation_type = 'linear'
+      f12_dataset_entry = 2000,1,1,0,0,
+      f12_specification_type = 'time_series'
+      f12_data_source = 'input'
+
+      time_varying_f113 = .false.,
+      f113_variation_type = 'linear'
+      f113_dataset_entry = 2000,1,1,0,0,
+      f113_specification_type = 'time_series'
+      f113_data_source = 'input'
+
+      time_varying_f22 = .false.,
+      f22_variation_type = 'linear'
+      f22_dataset_entry = 2000,1,1,0,0,
+      f22_specification_type = 'time_series'
+      f22_data_source = 'input'
+
+      calc_co2_tfs_on_first_step = .false.,
+      calc_co2_tfs_monthly = .true.,
+      co2_tf_time_displacement = 360.0,
+
+      calc_ch4_tfs_on_first_step = .false.,
+      calc_ch4_tfs_monthly = .true.,
+      ch4_tf_time_displacement = 360.0,
+
+      calc_n2o_tfs_on_first_step = .false.,
+      calc_n2o_tfs_monthly = .true.,
+      n2o_tf_time_displacement = 360.0,
+    </namelist>
+   </input>
+ </experiment>
+
+
+
+  <experiment name="c96L32_am4g8_2000climo_p2K" inherit="c96L32_am4g8_2000climo">
+    <input>
+     <namelist name="ice_spec_nml">
+      mcm_ice = .false.
+      do_leads = .false.
+      minimum_ice_concentration = 0.5
+      minimum_ice_thickness = 0.1
+      sst_degk = .true.
+      sst_pert = 2.0
+     </namelist>
+    </input>
+  </experiment>
+
+
   <experiment name="c96L32_am4h7_1860climo" inherit="c96L32_am4h7_2000climo">
     <description>
 Same model as c96L32_am4h7_2000climo, but
@@ -2548,10 +2651,10 @@ configuration with present-day climatological SSTs + 2K, present-day GHGs and ae
     </input>
   </experiment>
 
-  <experiment name="c96L32_am4g7_2000climo_rad1h_2" inherit="c96L32_am4g7_2000climo">
+  <experiment name="c96L32_am4g7_2000climo_rad2h" inherit="c96L32_am4g7_2000climo">
     <input>
       <namelist name="radiation_driver_nml">
-        rad_time_step= 3600,
+        rad_time_step= 7200,
         rad_package = 'sea_esf',
         do_clear_sky_pass=.true.,
         !calc_hemi_integrals = .false.,
@@ -2560,8 +2663,255 @@ configuration with present-day climatological SSTs + 2K, present-day GHGs and ae
         using_restart_file = .false.
         do_conserve_energy = .true.
       </namelist>
+      <namelist name="cloud_generator_nml">
+        do_inhomogeneous_clouds = .true.
+        defaultOverlap = 4
+        overlapLengthScale = 2.
+      </namelist>
     </input>
   </experiment>
+
+  <experiment name="c96L32_am4g7_2000climo_nostime" inherit="c96L32_am4g7_2000climo">
+    <input>
+      <namelist name="uw_conv_nml">
+        use_online_aerosol = .true.,
+        rkm_sh1         = 6.0,
+        rkm_sh          = 3.0,
+        do_deep         = .true.,
+        idpchoice       = 2
+        do_rescale      = .true.
+        do_rescale_t    = .true.
+        use_sub_seasalt = .false.
+        use_new_let     = .true.
+        do_subcloud_flx = .false.
+        do_new_pevap    = .false.
+        plev_cin        = 60000.
+        plev_for        = 70000.
+        src_choice      = 1
+        wrel_min        = 1.
+        do_stime        = .false.
+        duration        = 10800
+        do_prog_gust    = .true.
+        tau_gust        = 10800
+        cgust0          = 2.
+        cgust_max       = 4.
+        tracer_check_type = 2
+        stop_at_let     = .true.
+        do_hlflx_zero   = .false.
+      </namelist>
+    </input>
+  </experiment>
+
+  <experiment name="c96L32_am4g7_pevap0" inherit="c96L32_am4g7">
+    <input>
+      <namelist name="deep_conv_nml">
+        auto_th0_d = 0.5e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 5.0e-5
+        peff_i_d   = 12.e-5
+        rkm_dp1 = 2.
+        rkm_dp2 = 0.1
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        rpen_d     = 4.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.0
+        hcevap_d   = 0.9
+        pblfac_d   = 0.25
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 0.5
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+      </namelist>
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.5e-3,
+        tcrit    = -25.15,
+        peff_l   = 5.0e-5
+        peff_i   = 12.e-5
+        frac_drs = 0.0
+        rpen     = 4.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 2
+        do_pevap = .true.
+        cfrac    = 0.0
+        hcevap   = 0.9
+        pblfac   = 0.25
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+      </namelist>
+    </input>
+  </experiment>
+
+  <experiment name="c96L32_am4g7_pevap1" inherit="c96L32_am4g7">
+    <input>
+      <namelist name="deep_conv_nml">
+        auto_th0_d = 0.5e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 5.0e-5
+        peff_i_d   = 12.e-5
+        rkm_dp1 = 2.
+        rkm_dp2 = 0.1
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        rpen_d     = 4.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.05
+        hcevap_d   = 0.9
+        pblfac_d   = 0.25
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 0.5
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+      </namelist>
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.5e-3,
+        tcrit    = -25.15,
+        peff_l   = 5.0e-5
+        peff_i   = 12.e-5
+        frac_drs = 0.0
+        rpen     = 4.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 2
+        do_pevap = .true.
+        cfrac    = 0.05
+        hcevap   = 0.9
+        pblfac   = 0.25
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+      </namelist>
+    </input>
+  </experiment>
+
+  <experiment name="test" inherit="c96L32_am4g7_pevap2">
+   <input>
+    <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <dataSource platform="$(platform)">/lustre/f1/Ming.Zhao/awg/ulm_201505/c96L32_am4g7_pevap2/ncrc2.intel-prod-openmp/restart/20020101.tar</dataSource>
+    </dataFile>
+      <namelist name="land_debug_nml">
+        watch_point =  85, 21, 5, 4
+        start_watching = 2002, 1, 10, 0,0,0
+      </namelist>
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.5e-3,
+        tcrit    = -25.15,
+        peff_l   = 5.0e-5
+        peff_i   = 12.e-5
+        frac_drs = 0.0
+        rpen     = 4.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 2
+        do_pevap = .true.
+        cfrac    = 0.1
+        hcevap   = 0.9
+        pblfac   = 0.25
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .true.
+        tten_max = 500
+      </namelist>
+   </input>
+  </experiment>
+
+  <experiment name="c96L32_am4g7_pevap2" inherit="c96L32_am4g7">
+    <input>
+      <namelist name="deep_conv_nml">
+        auto_th0_d = 0.5e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 5.0e-5
+        peff_i_d   = 12.e-5
+        rkm_dp1 = 2.
+        rkm_dp2 = 0.1
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        rpen_d     = 4.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.1
+        hcevap_d   = 0.9
+        pblfac_d   = 0.25
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 0.5
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+      </namelist>
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.5e-3,
+        tcrit    = -25.15,
+        peff_l   = 5.0e-5
+        peff_i   = 12.e-5
+        frac_drs = 0.0
+        rpen     = 4.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 2
+        do_pevap = .true.
+        cfrac    = 0.1
+        hcevap   = 0.9
+        pblfac   = 0.25
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+      </namelist>
+    </input>
+  </experiment>
+
+
+
+
+  <experiment name="c96L32_am4g7_2000climo_rekfre" inherit="c96L32_am4g7_2000climo">
+    <input>
+     <namelist name="uw_closure_nml">
+        do_old_cbmfmax = .true.,
+        rkfre    = 0.15
+        wcrit_min= 0.2
+      </namelist>
+    </input>
+  </experiment>
+
 
  <experiment name="c96L63_am4g7_2000climo" inherit="c96L32_am4g7_2000climo">
   <input>
