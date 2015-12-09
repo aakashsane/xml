@@ -183,9 +183,19 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 	       dummy_ocean_nml:ocean_layout=45,45;dummy_ocean_nml:ocean_io_layout=1,5;
                dummy_ocean_nml:ocean_mask_table=mask_table.417.45x45"/><!--1/2 degree ocean grid Only-->
 
+    <property name="domainparams_O2700p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=2700;
+	       dummy_ice_nml:ice_layout=45,60;dummy_ice_nml:ice_io_layout=1,5;
+               dummy_ice_nml:ice_mask_table=MOM_mask_table;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=45,60;dummy_ocean_nml:ocean_io_layout=1,5;
+               dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/><!--1/2 degree ocean grid Only-->
     <property name="domainparams_O2119p5"
 	     value="
 	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=2119;
+	       atmos_model_nml:layout=45,60;atmos_model_nml:mask_table=mask_table.581.45x60;
+	       land_model_nml:layout=45,60;land_model_nml:mask_table=mask_table.581.45x60;
 	       dummy_ice_nml:ice_layout=45,60;dummy_ice_nml:ice_io_layout=1,5;
                dummy_ice_nml:ice_mask_table=mask_table.581.45x60;
 	       icebergs_nml:make_calving_reproduce=.true.;
@@ -195,6 +205,8 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
     <property name="domainparams_O2783p5"
 	     value="
 	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=2783;
+	       atmos_model_nml:layout=60,60;atmos_model_nml:mask_table=mask_table.817.60x60;
+	       land_model_nml:layout=60,60;land_model_nml:mask_table=mask_table.817.60x60;
 	       dummy_ice_nml:ice_layout=60,60;dummy_ice_nml:ice_io_layout=1,5;
                dummy_ice_nml:ice_mask_table=mask_table.817.60x60;
 	       icebergs_nml:make_calving_reproduce=.true.;
@@ -204,6 +216,8 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
     <property name="domainparams_O3314p5"
 	     value="
 	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=3314;
+	       atmos_model_nml:layout=60,72;atmos_model_nml:mask_table=mask_table.1006.60x72;
+	       land_model_nml:layout=60,72;land_model_nml:mask_table=mask_table.1006.60x72;
 	       dummy_ice_nml:ice_layout=60,72;dummy_ice_nml:ice_io_layout=1,4;
                dummy_ice_nml:ice_mask_table=mask_table.1006.60x72;
 	       icebergs_nml:make_calving_reproduce=.true.;
@@ -1294,7 +1308,7 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
         <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_5daily"/>
         <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_5daily"/>
       </component>
-      <component type="ocean_month"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
+      <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_monthly.frepp"/>
         </timeSeries>
@@ -1452,7 +1466,7 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
       <!--MOM6_refineDiag.csh is currently empty and is here only to cause the unpack annual history files in /ptmp-->
       <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh"/>
       <!--PostProcessing component models-->
-      <component type="ocean_month"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
+      <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
         </timeSeries>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_month">
@@ -1522,9 +1536,10 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
        </regression>
 
       <regression name="timings">
-          <run months="1"  npes="2432"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O2432)"/>
-          <run months="1"  npes="1756"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1756)"/>
-          <run months="1"  npes="1970"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1970)"/>
+          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="01:50:00"/>
+          <run months="1"  npes="2432"          runTimePerJob="01:50:00" overrideParams="$(domainparams_O2432)"/>
+          <run months="1"  npes="1756"          runTimePerJob="01:50:00" overrideParams="$(domainparams_O1756)"/>
+          <run months="1"  npes="1970"          runTimePerJob="01:50:00" overrideParams="$(domainparams_O1970)"/>
        </regression>
       <regression name="debug">
          <run days="1"   npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
@@ -2814,6 +2829,9 @@ $baseDate
          <run months="1" npes="2119" overrideParams="$(domainparams_O2119p5)" runTimePerJob="00:40:00"/>
          <run months="1" npes="2783" overrideParams="$(domainparams_O2783p5)" runTimePerJob="00:40:00"/>
          <run months="1" npes="3314" overrideParams="$(domainparams_O3314p5)" runTimePerJob="00:40:00"/>
+       </regression>
+       <regression name="timings3">
+         <run months="1" npes="2700" overrideParams="$(domainparams_O2700p5)" runTimePerJob="00:40:00"/>
          <run months="1" npes="3925" overrideParams="$(domainparams_O3925p5)" runTimePerJob="00:40:00"/>
        </regression>
 
