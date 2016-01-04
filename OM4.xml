@@ -15,7 +15,7 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm_201510"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2015.11.30"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2015.12.17"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -311,6 +311,92 @@ frerun  -x OM4.xml -p ncrc2.intel -t prod OM4_SIS2_baseline -r basic
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
  
     </platform>
+    
+    <platform name="ncrc2.intel15">
+      <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)"/>
+         <directory>
+            <!--unswept locations-->
+            <root>$CPERM/$USER/$(FRE_STEM)</root>
+            <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+            <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+            <!--swept locations (including the staged archive location)-->
+            <archive>$CTMP/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)</archive>
+            <stdout>$CTMP/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+            <work>$CTMP/$USER/work/$(FRE_STEM)/$FRE_JOBID</work>
+         </directory>
+ 
+      <csh><![CDATA[
+          source $MODULESHOME/init/csh
+          module use -a /ncrc/home2/fms/local/modulefiles
+          module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+          module unload netcdf fre fre-commands
+          module load PrgEnv-intel/5.2.40
+          module load intel/15.0.2.164
+          module load git
+          module load $(FRE_VERSION)
+          setenv KMP_STACKSIZE 512m
+          setenv NC_BLKSZ 1M
+          alias cpget 'cp \!^ \!^.copy ; \rm -f \!^ ; mv \!^.copy \!^ ; chmod +w \!^ '
+     ]]></csh>
+
+     <property name="MY_ROOT"          value="$(rootDir)"/>
+     <property name="FMS_ARCHIVE_ROOT" value="$CDATA/fms"/>
+     <property name="F2003_FLAGS"      value="-DINTERNAL_FILE_NML -g -traceback"/> <!-- -g -traceback -->
+     <property name="REFERENCE"        value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+     <property name="NB_ROOT"          value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
+     <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+     <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+     <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+ 
+    </platform>
+
+    <platform name="ncrc3.intel15">
+      <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)"/>
+         <directory>
+            <!--unswept locations-->
+            <root>$CPERM/$USER/$(FRE_STEM)</root>
+            <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+            <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+            <!--swept locations (including the staged archive location)-->
+            <archive>$CTMP/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)</archive>
+            <stdout>$CTMP/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+            <work>$CTMP/$USER/work/$(FRE_STEM)/$FRE_JOBID</work>
+         </directory>
+ 
+      <csh><![CDATA[
+module use -a /sw/eslogin-c2/modulefiles
+module use -a /lustre/f1/Seth.Underwood/usw/eslogin/modulefiles-c2
+module load moab
+module load torque
+          source $MODULESHOME/init/csh
+          module use -a /ncrc/home2/fms/local/modulefiles
+          module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+          module unload netcdf fre fre-commands
+          module load PrgEnv-intel/5.2.82
+          module load intel/15.0.2.164
+          module load git
+          module load $(FRE_VERSION)
+          setenv KMP_STACKSIZE 512m
+          setenv NC_BLKSZ 1M
+          alias cpget 'cp \!^ \!^.copy ; \rm -f \!^ ; mv \!^.copy \!^ ; chmod +w \!^ '
+     ]]></csh>
+
+     <property name="MY_ROOT"          value="$(rootDir)"/>
+     <property name="FMS_ARCHIVE_ROOT" value="$CDATA/fms"/>
+     <property name="F2003_FLAGS"      value="-DINTERNAL_FILE_NML -g -traceback"/> <!-- -g -traceback -->
+     <property name="REFERENCE"        value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+     <property name="NB_ROOT"          value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
+     <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+     <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+     <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+ 
+    </platform>
+    
+    <platform name="ncrc3.default">
+      <xi:include xpointer="xpointer(//setup/platform[@name='ncrc3.intel15']/node())" />
+    </platform>
 
     <platform name="ncrc2.intel16">
       <project>gfdl_f</project>
@@ -400,7 +486,7 @@ module load perftools/5.3.2
     </platform>
 
     <platform name="ncrc2.gnu">
-      <project>gfdl_o</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)"/>
  
       <csh><![CDATA[
@@ -430,6 +516,70 @@ module load perftools/5.3.2
  
     </platform>
 
+    <platform name="ncrc2.gnu_O3">
+      <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)"/>
+
+      <mkmfTemplate file="/ncrc/home2/Niki.Zadeh/fre/fre-commands/site/ncrc/gnu.mk"/>
+ 
+      <csh><![CDATA[
+          source $MODULESHOME/init/csh
+          module use -a /ncrc/home2/fms/local/modulefiles
+          module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+          module unload netcdf fre fre-commands
+          module load PrgEnv-gnu
+          module load git
+          module load $(FRE_VERSION)
+          setenv KMP_STACKSIZE 512m
+          setenv NC_BLKSZ 1M
+          alias cpget 'cp \!^ \!^.copy ; \rm -f \!^ ; mv \!^.copy \!^ ; chmod +w \!^ '
+          # MAIN_PROGRAM env is needed by the GNU compiler
+          setenv MAIN_PROGRAM $(PROG_MAIN)
+          module load git
+     ]]></csh>
+
+     <property name="MY_ROOT"          value="$(rootDir)"/>
+     <property name="FMS_ARCHIVE_ROOT" value="$CDATA/fms"/>
+     <property name="F2003_FLAGS"      value="-DINTERNAL_FILE_NML -fbacktrace "/> <!-- -g -traceback -->
+     <property name="REFERENCE"        value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+     <property name="NB_ROOT"          value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
+     <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+     <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+     <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+ 
+    </platform>
+    
+    <platform name="ncrc2.pgi14">
+      <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)"/>
+ 
+      <csh><![CDATA[
+          source $MODULESHOME/init/csh
+          module use -a /ncrc/home2/fms/local/modulefiles
+          module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+          module unload netcdf fre fre-commands
+          module load PrgEnv-pgi/5.2.40
+          module load git
+          module load $(FRE_VERSION)
+          setenv KMP_STACKSIZE 512m
+          setenv NC_BLKSZ 1M
+          alias cpget 'cp \!^ \!^.copy ; \rm -f \!^ ; mv \!^.copy \!^ ; chmod +w \!^ '
+          # MAIN_PROGRAM env is needed by the GNU compiler
+          setenv MAIN_PROGRAM $(PROG_MAIN)
+          module load git
+     ]]></csh>
+
+     <property name="MY_ROOT"          value="$(rootDir)"/>
+     <property name="FMS_ARCHIVE_ROOT" value="$CDATA/fms"/>
+     <property name="F2003_FLAGS"      value="-DINTERNAL_FILE_NML -g -traceback"/> <!-- -g -traceback -->
+     <property name="REFERENCE"        value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+     <property name="NB_ROOT"          value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
+     <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+     <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+     <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+ 
+    </platform>
+    
     <platform name="theia.intel">
       <project>gfdlport</project>
       <directory stem="$(FRE_STEM)">
@@ -441,7 +591,6 @@ module load perftools/5.3.2
         <state>$HOME/$(stem)/$(name)/$(platform)-$(target)/state</state>
         <work>/scratch4/GFDL/gfdlscr/$USER/work/$FRE_JOBID</work>
         <ptmp>/scratch4/GFDL/gfdlscr/$USER/ptmp</ptmp>
-        <stmp>/scratch4/GFDL/gfdlscr/$USER/stmp</stmp>
         <tmp>/scratch4/GFDL/gfdlscr/$USER/tmp</tmp>
         <archive>/scratch4/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)</archive>
       </directory>
@@ -1270,17 +1419,31 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
          #Find non-empty iceberg restarts and combine them AND then remove uncombined restarts
 	 #This should be handled properly by FRE
          #ncrcat icebergs.res.nc.* icebergs.res.nc
-	 set non_empty_restarts = ""
+      ls icebergs.res.nc.*
+      if( ! $status ) then
+         which ncdump
+         if( $status ) then
+           echo ncdump not available! We need to stop the run or the model restarts incorrectly!
+           exit 1
+         endif
+
+         set non_empty_restarts = ""
          foreach file ( `ls icebergs.res.nc.????` )
             if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
          end
-         if( "x$non_empty_restarts" != "x" ) ncrcat $non_empty_restarts icebergs.res.nc
+         ~Rusty.Benson/ncrcat $non_empty_restarts icebergs.res.nc
+         if( ! -e icebergs.res.nc ) then
+           echo ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
+           exit 1
+         endif
+
          mkdir hide_from_fre
          mv icebergs.res.nc.* hide_from_fre/
          cd $work
          mkdir hide_from_fre
-         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
+         ~Rusty.Benson/ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
          mv iceberg_trajectories.nc.* hide_from_fre/
+      endif
          #Save the last line of timestats without the first (step number) column as a signature of MOM6 answers
          tail -1 timestats | cut -c8- > RESTART/$enddate.timestats.res
          #Save the whole timestats under ascii/
@@ -1438,17 +1601,32 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
          #Find non-empty iceberg restarts and combine them AND then remove uncombined restarts
          #This should be handled properly by FRE
          #ncrcat icebergs.res.nc.* icebergs.res.nc
+      ls icebergs.res.nc.*
+      if( ! $status ) then
+         which ncdump
+         if( $status ) then
+           echo ncdump not available! We need to stop the run or the model restarts incorrectly!
+           exit 1
+         endif
+
          set non_empty_restarts = ""
          foreach file ( `ls icebergs.res.nc.????` )
             if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
          end
-         if( "x$non_empty_restarts" != "x" ) ncrcat $non_empty_restarts icebergs.res.nc
+         ~Rusty.Benson/ncrcat $non_empty_restarts icebergs.res.nc
+         if( ! -e icebergs.res.nc ) then
+           echo ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
+           exit 1
+         endif
+
          mkdir hide_from_fre
          mv icebergs.res.nc.* hide_from_fre/
          cd $work
          mkdir hide_from_fre
-         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
+         ~Rusty.Benson/ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
          mv iceberg_trajectories.nc.* hide_from_fre/
+      endif
+
          #Save the last line of timestats without the first (step number) column as a signature of MOM6 answers
          tail -1 timestats | cut -c8- > RESTART/$enddate.timestats.res
          #Save the whole timestats under ascii/
@@ -1532,14 +1710,14 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
        </regression>
 
       <regression name="timing">
-          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="01:50:00"/>
+          <run months="1"  npes="1756"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1756)"/>
        </regression>
 
       <regression name="timings">
-          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="01:50:00"/>
-          <run months="1"  npes="2432"          runTimePerJob="01:50:00" overrideParams="$(domainparams_O2432)"/>
-          <run months="1"  npes="1756"          runTimePerJob="01:50:00" overrideParams="$(domainparams_O1756)"/>
-          <run months="1"  npes="1970"          runTimePerJob="01:50:00" overrideParams="$(domainparams_O1970)"/>
+          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
+          <run months="1"  npes="2432"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O2432)"/>
+          <run months="1"  npes="1756"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1756)"/>
+          <run months="1"  npes="1970"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1970)"/>
        </regression>
       <regression name="debug">
          <run days="1"   npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
@@ -1627,7 +1805,7 @@ $baseDate
          threading_read='multi'
          max_files_r = 200
          max_files_w = 200
-         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+!         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
      </namelist>
 
    </input>
@@ -1704,7 +1882,7 @@ $baseDate
        threading_read='multi'
        max_files_r = 200
        max_files_w = 200
-       checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+!       checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
      </namelist>
      <namelist name="xgrid_nml">
        make_exchange_reproduce = .false.
@@ -2083,7 +2261,7 @@ OVERRIDE_EOF
      <namelist name="fms_io_nml" >
          fms_netcdf_restart=.true.
          threading_read='multi'
-         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+!         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
      </namelist>
  
      <namelist name="icebergs_nml">
@@ -2207,7 +2385,8 @@ endif
        </regression>
 
        <regression name="debug">
-         <run days="1"    npes="64" overrideParams="dummy_ocean_nml:ocean_layout=4,16;dummy_ocean_nml:ocean_io_layout=1,4;dummy_ice_nml:ice_layout=4,16;dummy_ice_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
+         <run days="1 1"    npes="64" overrideParams="dummy_ocean_nml:ocean_layout=4,16;dummy_ocean_nml:ocean_io_layout=1,4;dummy_ice_nml:ice_layout=4,16;dummy_ice_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
+
        </regression>
 
        <production simTime="$(PROD_SIMTIME)" units="years" npes="128" runTime="$(PROD_RUNTIME)">
@@ -2221,6 +2400,19 @@ endif
     </postProcess>
 
    </experiment>
+
+   <experiment name="MOM6_GOLD_SIS2_nobergs" inherit="MOM6_GOLD_SIS2_bergs">
+    <input>
+      
+     <csh><![CDATA[
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override DO_ICEBERGS = False
+SIS_OVERRIDE_EOF
+     ]]></csh>
+     
+    </input>
+   </experiment>
+
    <experiment name="MOM6_GOLD_SIS2_generics" inherit="MOM6_GOLD_SIS2_bergs">
     <input>
       <namelist name="coupler_nml">
@@ -2520,7 +2712,7 @@ $baseDate
          threading_read='multi'
          max_files_r = 200
          max_files_w = 200
-         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+!         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
      </namelist>
 
    </input>
@@ -2798,7 +2990,7 @@ $baseDate
          threading_read='multi'
          max_files_r = 200
          max_files_w = 200
-         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+!         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
      </namelist>
 
    </input>
@@ -2829,10 +3021,11 @@ $baseDate
          <run months="1" npes="2119" overrideParams="$(domainparams_O2119p5)" runTimePerJob="00:40:00"/>
          <run months="1" npes="2783" overrideParams="$(domainparams_O2783p5)" runTimePerJob="00:40:00"/>
          <run months="1" npes="3314" overrideParams="$(domainparams_O3314p5)" runTimePerJob="00:40:00"/>
+         <run months="1" npes="3925" overrideParams="$(domainparams_O3925p5)" runTimePerJob="00:40:00"/>
        </regression>
        <regression name="timings3">
-         <run months="1" npes="2700" overrideParams="$(domainparams_O2700p5)" runTimePerJob="00:40:00"/>
-         <run months="1" npes="3925" overrideParams="$(domainparams_O3925p5)" runTimePerJob="00:40:00"/>
+         <run months="1" npes="2119" overrideParams="$(domainparams_O2119p5)" runTimePerJob="01:40:00"/>
+         <run months="1" npes="2700" overrideParams="$(domainparams_O2700p5)" runTimePerJob="01:40:00"/>
        </regression>
 
       <regression name="debug">
