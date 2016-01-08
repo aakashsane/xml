@@ -378,6 +378,7 @@ module load torque
           module load intel/15.0.2.164
           module load git
           module load $(FRE_VERSION)
+module swap gcp gcp/test
           setenv KMP_STACKSIZE 512m
           setenv NC_BLKSZ 1M
           alias cpget 'cp \!^ \!^.copy ; \rm -f \!^ ; mv \!^.copy \!^ ; chmod +w \!^ '
@@ -716,6 +717,9 @@ limit coredumpsize unlimited
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
     <platform name="gfdl.ncrc2-intel">
+      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
+    </platform>
+    <platform name="gfdl.ncrc3-intel15">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
 
@@ -1431,15 +1435,17 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
          foreach file ( `ls icebergs.res.nc.????` )
             if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
          end
-         ~Rusty.Benson/ncrcat $non_empty_restarts icebergs.res.nc
-         if( ! -e icebergs.res.nc ) then
-           echo ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
-           exit 1
+         if( "$non_empty_restarts" != "" ) then
+          ~Rusty.Benson/ncrcat $non_empty_restarts icebergs.res.nc
+          if( ! -e icebergs.res.nc ) then
+            echo ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
+            exit 1
+          endif
          endif
-
          mkdir hide_from_fre
          mv icebergs.res.nc.* hide_from_fre/
-         cd $work
+         
+         cd $work         
          mkdir hide_from_fre
          ~Rusty.Benson/ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
          mv iceberg_trajectories.nc.* hide_from_fre/
@@ -1613,12 +1619,13 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
          foreach file ( `ls icebergs.res.nc.????` )
             if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
          end
-         ~Rusty.Benson/ncrcat $non_empty_restarts icebergs.res.nc
-         if( ! -e icebergs.res.nc ) then
-           echo ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
-           exit 1
+         if( "$non_empty_restarts" != "" ) then
+          ~Rusty.Benson/ncrcat $non_empty_restarts icebergs.res.nc
+          if( ! -e icebergs.res.nc ) then
+            echo ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
+            exit 1
+          endif
          endif
-
          mkdir hide_from_fre
          mv icebergs.res.nc.* hide_from_fre/
          cd $work
@@ -1720,7 +1727,7 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
           <run months="1"  npes="1970"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1970)"/>
        </regression>
       <regression name="debug">
-         <run days="1"   npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="01:30:00"/>
+         <run days="1"   npes="512" overrideParams="$(domainparams_O512)" runTimePerJob="01:30:00"/>
        </regression>
 
       <production simTime="$(PROD_SIMTIME)" units="years" npes="$(PROD_NPES)" runTime="$(PROD_RUNTIME)">
@@ -2385,7 +2392,7 @@ endif
        </regression>
 
        <regression name="debug">
-         <run days="1 1"    npes="64" overrideParams="dummy_ocean_nml:ocean_layout=4,16;dummy_ocean_nml:ocean_io_layout=1,4;dummy_ice_nml:ice_layout=4,16;dummy_ice_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
+         <run days="1 1"    npes="64" overrideParams="dummy_ocean_nml:ocean_layout=4,16;dummy_ocean_nml:ocean_io_layout=1,2;dummy_ice_nml:ice_layout=4,16;dummy_ice_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
 
        </regression>
 
