@@ -657,6 +657,18 @@ the faster the model throughput, but also the lower the model efficiency
                dummy_ocean_nml:ocean_mask_table=mask_table.622.36x72"/>
 
    <!--Only  1/2 degree ocean grid configs-->
+   <property name="domainparams_A216x2_O442p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=442;
+               coupler_nml:atmos_npes=216;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;	
+               fv_core_nml:layout=3,12;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=3,12;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=72,3;ice_model_nml:io_layout=1,3;
+	       dummy_ice_nml:ice_layout=72,3;dummy_ice_nml:ice_io_layout=1,3;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=16,32;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.70.16x32"/><!--1/2 degree ocean grid Only-->
+
    <property name="domainparams_A216x2_O951p5"
 	     value="
 	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=951;
@@ -680,6 +692,18 @@ the faster the model throughput, but also the lower the model efficiency
 	       icebergs_nml:make_calving_reproduce=.true.;
 	       dummy_ocean_nml:ocean_layout=32,36;dummy_ocean_nml:ocean_io_layout=1,4;
                dummy_ocean_nml:ocean_mask_table=mask_table.201.32x36"/><!--1/2 degree ocean grid Only-->
+
+   <property name="domainparams_A432x2_O842p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=842;
+               coupler_nml:atmos_npes=432;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;	
+               fv_core_nml:layout=3,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=3,24;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=144,3;ice_model_nml:io_layout=1,3;
+	       dummy_ice_nml:ice_layout=144,3;dummy_ice_nml:ice_io_layout=1,3;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=32,32;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.182.32x32"/><!--1/2 degree ocean grid Only-->
 
    <property name="domainparams_A432x2_O1057p5"
 	     value="
@@ -1223,57 +1247,6 @@ module load torque
         module swap intel intel/15.0.2.164
 
         module load $(FRE_VERSION)
-module swap gcp gcp/test
-        module load git
-        setenv KMP_STACKSIZE 512m
-        setenv NC_BLKSZ 1M
-        setenv F_UFMTENDIAN big
-      ]]></csh>
-
-    </platform>
-    <platform name="ncrc3.intel15_sis2omp">
-<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_f</project>
-      <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
-      </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
-      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
-      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Ming.Zhao/archive/mdt"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
-      <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20151028"/>
-      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
-      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
-      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
-     
-      <csh><![CDATA[
-module use -a /sw/eslogin-c2/modulefiles
-module use -a /lustre/f1/Seth.Underwood/usw/eslogin/modulefiles-c2
-module load moab
-module load torque
-
-        source $MODULESHOME/init/csh
- 
-        module use -a /ncrc/home2/fms/local/modulefiles
-        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
-        module unload netcdf fre
-        module load PrgEnv-intel/5.2.82
-        module swap intel intel/15.0.2.164
-
-        module load $(FRE_VERSION)
         module load git
         setenv KMP_STACKSIZE 512m
         setenv NC_BLKSZ 1M
@@ -1375,7 +1348,6 @@ module load torque
         module swap intel intel/14.0.2.144
 
         module load $(FRE_VERSION)
-module swap gcp gcp/test
         module load git
         setenv KMP_STACKSIZE 512m
         setenv NC_BLKSZ 1M
@@ -1426,7 +1398,6 @@ module load torque
         module swap pgi pgi/15.3.0 
 
         module load $(FRE_VERSION)
-module swap gcp gcp/test
         module load git
         setenv KMP_STACKSIZE 512m
         setenv NC_BLKSZ 1M
@@ -2248,6 +2219,7 @@ $baseDate
 # Copy AWG and OWG ascii input files to GFDL (waiting for FRE to do this for us)
 if ( $?flagOutputXferOn && $?flagOutputPostProcessOn && $currentSeg == 1 ) then
   #gcp --batch does not understand some variations of home filesystem like /autofs/mnt/ncrc-svm1_home1 so we need to massage rtsxml to comply
+module swap gcp gcp/test
   set xmldirlocal = `dirname $rtsxml | sed -r "s/^\/(autofs|ncrc)\/.+\/$USER\//\~$USER\//"`
   set xmldirRemote = `echo $xmldirlocal | sed -r "$patternSedHome"`
   set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
@@ -3539,6 +3511,9 @@ endif
        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/tidal_amplitude.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.66.32x16
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.70.16x32
+	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.182.32x32
 	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.239.36x36
 	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.320.36x45
 	$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/mask_table.201.32x36
@@ -4431,8 +4406,22 @@ SIS_OVERRIDE_EOF
       </regression>
 
 	<regression name="timing">
-       	   <run months="1" npes="1167" runTimePerJob="01:30:00" overrideParams="$(domainparams_A216x2_O951p5)"/>
+          <run months="1" npes="658" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O442p5)"/>
       	</regression>
+	<regression name="timings_c3">
+          <run months="1" npes="1633" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
+          <run months="1" npes="1274" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O842p5)"/>
+      	</regression>
+	<regression name="timings_t1">
+          <run months="1" npes="658"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O442p5)"/>
+          <run months="1" npes="1274" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O842p5)"/>
+          <run months="1" npes="1489" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O1057p5)"/>
+          <run months="1" npes="1633" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
+          <run months="1" npes="1876" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1300p5)"/>
+          <run months="1" npes="2164" runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O1300p5)"/>
+          <run months="1" npes="2472" runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O1608p5)"/>
+          <run months="1" npes="2305" runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O1441p5)"/>
+       	</regression>
 
 	<regression name="timings">
           <run months="1" npes="1728" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O1296)"/>
@@ -4701,6 +4690,7 @@ ln -s  /archive/Bill.Hurlin/$(FRE_STEM)/CM4_c96L32_am4g5_2000_sis2_meke_dEddPara
 link_hist_EOF
 
 chmod +x $work/additional_setup
+module swap gcp gcp/test
 gcp $work/additional_setup gfdl:$(NB_ROOT)/mom6/
 
 

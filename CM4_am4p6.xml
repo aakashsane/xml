@@ -558,46 +558,6 @@ the faster the model throughput, but also the lower the model efficiency
       ]]></csh>
 
     </platform>
-    <platform name="ncrc2.intel_sis2omp">
-<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_f</project>
-      <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
-      </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
-      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
-     
-      <csh><![CDATA[
-        source $MODULESHOME/init/csh
- 
-        module use -a /ncrc/home2/fms/local/modulefiles
-        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
-        module unload netcdf fre
-        module load PrgEnv-intel/4.0.46
-        module swap intel intel/12.1.3.293
-        module load $(FRE_VERSION)
-        module load git
-        setenv KMP_STACKSIZE 512m
-        setenv NC_BLKSZ 1M
-        setenv F_UFMTENDIAN big
-      ]]></csh>
-
-    </platform>
-
     <platform name="ncrc2.intel14">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
       <project>gfdl_f</project>
@@ -639,7 +599,7 @@ the faster the model throughput, but also the lower the model efficiency
 
     </platform>
     
-    <platform name="ncrc2.intel15_sis2omp">
+    <platform name="ncrc2.intel15">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
       <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)">
@@ -783,107 +743,6 @@ the faster the model throughput, but also the lower the model efficiency
       </directory>
       <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
       <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
-      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
-      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Ming.Zhao/archive/mdt"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
-      <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20151028"/>
-      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
-      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
-      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
-     
-      <csh><![CDATA[
-module use -a /sw/eslogin-c2/modulefiles
-module use -a /lustre/f1/Seth.Underwood/usw/eslogin/modulefiles-c2
-module load moab
-module load torque
-
-        source $MODULESHOME/init/csh
- 
-        module use -a /ncrc/home2/fms/local/modulefiles
-        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
-        module unload netcdf fre
-        module load PrgEnv-intel/5.2.82
-        module swap intel intel/15.0.2.164
-
-        module load $(FRE_VERSION)
-module swap gcp gcp/test
-        module load git
-        setenv KMP_STACKSIZE 512m
-        setenv NC_BLKSZ 1M
-        setenv F_UFMTENDIAN big
-      ]]></csh>
-
-    </platform>
-    <platform name="ncrc3.intel15_msse2">
-<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_f</project>
-      <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
-      </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback -msse2"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
-      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
-      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Ming.Zhao/archive/mdt"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
-      <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20151028"/>
-      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
-      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
-      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
-     
-      <csh><![CDATA[
-module use -a /sw/eslogin-c2/modulefiles
-module use -a /lustre/f1/Seth.Underwood/usw/eslogin/modulefiles-c2
-module load moab
-module load torque
-
-        source $MODULESHOME/init/csh
- 
-        module use -a /ncrc/home2/fms/local/modulefiles
-        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
-        module unload netcdf fre
-        module load PrgEnv-intel/5.2.82
-        module swap intel intel/15.0.2.164
-
-        module load $(FRE_VERSION)
-        module load git
-        setenv KMP_STACKSIZE 512m
-        setenv NC_BLKSZ 1M
-        setenv F_UFMTENDIAN big
-      ]]></csh>
-
-    </platform>
-    <platform name="ncrc3.intel15_msse2_sis2omp">
-<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_f</project>
-      <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
-      </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback -msse2"/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
@@ -1105,9 +964,6 @@ limit coredumpsize unlimited
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
     <platform name="gfdl.ncrc3-intel15">
-      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
-    </platform>
-    <platform name="gfdl.ncrc3-intel15_msse2">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
     <platform name="gfdl.olcf-eos_intel15">
@@ -1665,6 +1521,7 @@ $baseDate
 # Copy AWG and OWG ascii input files to GFDL (waiting for FRE to do this for us)
 if ( $?flagOutputXferOn && $?flagOutputPostProcessOn && $currentSeg == 1 ) then
   #gcp --batch does not understand some variations of home filesystem like /autofs/mnt/ncrc-svm1_home1 so we need to massage rtsxml to comply
+module swap gcp gcp/test
   set xmldirlocal = `dirname $rtsxml | sed -r "s/^\/(autofs|ncrc)\/.+\/$USER\//\~$USER\//"`
   set xmldirRemote = `echo $xmldirlocal | sed -r "$patternSedHome"`
   set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
@@ -3716,6 +3573,7 @@ ln -s  /archive/Bill.Hurlin/$(FRE_STEM)/CM4_c96L32_am4g5_2000_sis2_meke_dEddPara
 link_hist_EOF
 
 chmod +x $work/additional_setup
+module swap gcp gcp/test
 gcp $work/additional_setup gfdl:$(NB_ROOT)/mom6/
 
 

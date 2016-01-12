@@ -378,7 +378,6 @@ module load torque
           module load intel/15.0.2.164
           module load git
           module load $(FRE_VERSION)
-module swap gcp gcp/test
           setenv KMP_STACKSIZE 512m
           setenv NC_BLKSZ 1M
           alias cpget 'cp \!^ \!^.copy ; \rm -f \!^ ; mv \!^.copy \!^ ; chmod +w \!^ '
@@ -823,7 +822,6 @@ Make the executable for ocean-ice experiments.
          <description domainName="Sea Ice SIS2" communityName="GFDL-SIS2" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
 	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
-            <csh> \rm mom6/src/SIS2/ice_bergs.F90 </csh> 
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]>
@@ -1007,6 +1005,8 @@ SIS_LAYOUT_EOF
 #
 set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
 if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
+ 
+module swap gcp gcp/test
   #trick to copy MOM6 directory but avoid traversing the .datasets links
   tar cvf mom6.tar --exclude='.datasets' -C $(MOM6_EXAMPLES) . > /dev/null
   #tar cvf mom6.tar  --exclude='.datasets' --exclude='src' --exclude='INPUT'  -C $(MOM6_EXAMPLES) . > /dev/null
@@ -2366,6 +2366,9 @@ cd $work
 #
 set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
 if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
+
+module swap gcp gcp/test
+
   #trick to copy MOM6 directory but avoid traversing the .datasets links
   tar cvf mom6.tar --exclude='.datasets' -C $(MOM6_EXAMPLES) . > /dev/null
   #tar cvf mom6.tar  --exclude='.datasets' --exclude='src' --exclude='INPUT'  -C $(MOM6_EXAMPLES) . > /dev/null
