@@ -75,7 +75,7 @@ They reproduce answers provided by AWG:
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <!--User shoould set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"      value="ulm_201505"/>              <!-- Release tag for the shared source code -->
+  <property name="RELEASE"      value="ulm_201510"/>              <!-- Release tag for the shared source code -->
   <property name="MOM6_DATE"    value="2016.01.16"/>      <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20151106"/> <!-- git tag for AWG  source code -->
@@ -1642,21 +1642,7 @@ limit coredumpsize unlimited
 
   <experiment name="cm4_libs_compile">
     <description>
-
 Experiment to build executable.
-* ulm code base
-* MOM6 ocean code (updated to dev/master/2015.04.24)
-* Code updates from John Dunne for new surface fluxes options (drag_min_jpd_20141030)
-* Code changes from Ming Zhao for low sensitivity configuration. Changes answers for all! (lowsen20141106_miz)
-* Chris Golaz total activation bug fix (ulm_total_act_fix_cjg)
-* Chris Golaz bug fix to enable do_gust_cv and convect_shutoff options. May change answer.
-* David Paynter radiation bug fix for debug mode
-* Ming Zhao code changes for am4f3 (am4f3_20150225_miz and git tags user/cjg/am4f3_20150225_miz). Changes answers.
-* Code update from Huan Guo to merge moist_processes.F90 changes (am4f3_convect_fix_20150303_h1g)
-* Huan Guo code changes to scale aerosol wet deposition using namelist parameter (wetDep_scale_20150311_h1g)
-* Changes from Paul Ginoux to enable fast aerosols.
-* Changes from Ming Zhao to decrease climate sensitivity
-* Changes from John Wilson for cg drag and topo drag
     </description>
 
     <component name="fms" paths="shared">
@@ -1666,10 +1652,10 @@ Experiment to build executable.
             <csh><![CDATA[
 #Record mods needed and bug fixes on a dev branch:
 #            cd shared
-#            git checkout $(AWG_GIT_TAG) 
+###            git checkout $(AWG_GIT_TAG) #same as RELEASE
 #            git checkout -b user/nnz/CM4p7_dev4verona 
-#            git merge --no-ff user/nnz/fix_landio_hang_issue -m "merge fix for hang issue"
-#            git merge --no-ff user/z1l/bugfix -m "merge fix for stdlog in OMP region"
+#            git merge --no-ff user/nnz/fix_landio_hang_issue -m "merge fix for hang issue on c3" 
+#            git merge --no-ff user/z1l/bugfix -m "merge fix for stdlog in OMP region "
 #            /bin/sed "s/define MAXFIELDMETHDS_ 150/define MAXFIELDMETHODS_ 400/g" -i field_manager/field_manager.F90 
 #            git commit -a -m "Increase MAXFIELDMETHODS_ for ESM4"
             ( cd shared && git checkout user/nnz/CM4p7_dev4verona )
@@ -1691,12 +1677,12 @@ Experiment to build executable.
           # AWG updates
           ( cd atmos_param  && git checkout $(AWG_GIT_TAG) )
           ( cd atmos_shared && git checkout $(AWG_GIT_TAG) )
+          ( cd atmos_shared && git checkout chem_v20151106_lwh )
           ]]>
         </csh>
       </source>
       <compile>
-<!--        <cppDefs>$(F2003_FLAGS) -DCLUBB</cppDefs> -->
-        <cppDefs>$(F2003_FLAGS)</cppDefs>
+        <cppDefs>$(F2003_FLAGS) -DCLUBB -DAM3_CHEM</cppDefs>
       </compile>
     </component>
 
@@ -1834,7 +1820,6 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)"> ocean_shared.git </codeBase>
         <csh><![CDATA[
-        ( cd ocean_shared && git checkout $(RELEASE) )
         ( cd ocean_shared && git checkout user/nnz/verona_dev_merge )
         ]]>
         </csh>
@@ -1955,9 +1940,9 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
   <experiment name="c96L48_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">/lustre/f1/unswept/Larry.Horowitz/awg/IC/awg_C96L48_LM3_OM4_025_grid_lm3p2_19810101.remapped.v20150604.tar</dataSource>
-        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/awg_C96L48_LM3_OM4_025_grid_lm3p2_19810101.remapped.v20150604.tar</dataSource>
-        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/awg_C96L48_LM3_OM4_025_grid_lm3p2_19810101.remapped.v20150604.tar</dataSource>
+        <dataSource site="ncrc">/lustre/f1/unswept/Larry.Horowitz/awg/IC/awg_C96L48_LM3_OM4_025_grid_lm3p2_topo_v20151101.tar</dataSource>
+        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/awg_C96L48_LM3_OM4_025_grid_lm3p2_topo_v20151101.tar</dataSource>
+        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/awg_C96L48_LM3_OM4_025_grid_lm3p2_topo_v20151101.tar</dataSource>
       </dataFile>
     </input>
   </experiment>
@@ -2042,15 +2027,26 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
       </dataFile>
     </input>
   </experiment>
+  <experiment name="field_table_am4p6_fullchem_2000climo">
+    <input>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p6_fullchem_2000climo</dataSource>
+      </dataFile>
+    </input>
+  </experiment>
 
   <experiment name="common_data_lm3p2">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-<!--        <dataSource site="ncrc">/lustre/f1/unswept/David.Paynter/sea_esf_CM4_V4_AUG2015.cpio</dataSource>-->
-        <dataSource site="ncrc">/lustre/f1/unswept/Niki.Zadeh/archive/input/verona/sea_esf_CM4_V4_AUG2015_corrected.tar</dataSource>
-        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/sea_esf_CM4_V4_AUG2015.cpio</dataSource>
-        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/awg/input/common/sea_esf_CM4_V4_AUG2015.cpio</dataSource>
+        <dataSource site="ncrc">/lustre/f1/unswept/David.Paynter/sea_esf_CM4_V5_AUG2015.cpio</dataSource>
+        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/sea_esf_CM4_V5_AUG2015.cpio</dataSource>
+        <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/awg/input/common/sea_esf_CM4_V5_AUG2015.cpio</dataSource>
       </dataFile>
+
+      <dataFile label="input" target="INPUT/soil_type.nc" chksum="" size="" timestamp="">
+         <dataSource site="ncrc">/lustre/f1/unswept/Krista.A.Dunne/mod_input_files/any_grid/soil_type_hwsd_5minute.nc</dataSource>
+      </dataFile>
+      
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/awg/input/lm3/lm3_data_20150322.tar</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/awg/mdt/awg/input/lm3/lm3_data_20150322.tar</dataSource>
@@ -2063,7 +2059,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/RCP/cmip5_rcp45.cpio</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/common/tropchem_dec2014.cpio</dataSource>
+        <dataSource platform="$(platform)">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/common/tropchem_dec2015.cpio</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/historical/emissions.1x1.1859_2020.tar</dataSource>
@@ -2904,25 +2900,28 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
     </runtime>
 </experiment>
 
-<experiment name="c96L48_am4g6_fullchem" inherit="cm4_compile">
+<experiment name="c96L48_am4g7_fullchem" inherit="cm4_compile">
     <description
 communityProject="$(ProjectID)"
-communityModel="am4p8"
-communityModelID="am4p8"
+communityModel="am4p7"
+communityModelID="am4p7"
 communityExperimentName="$(name)"
 communityExperimentID="$(name)" >
 
-Derived from AM4 prototype configuration "am4g5r1" from MDT Atmosphere Working Group,
-but with "full chemistry" (as in AM3) and 48 levels.
+Derived from AM4 prototype configuration "am4g7" from MDT Atmosphere Working Group.
+Includes updates from David Paynter for radiaiton and 
+from Ming Zhao to improve wind stress and fix negative precipitation from UW convection.   
+Adds "full chemistry" (as in AM3) and 48 levels.
 
 - c96 horizontal grid with approximately 100km resolution and 48 vertical levels.
 - Convection based on "double-plume" from Ming Zhao.
 - Tiedtke cloud scheme
 
-Changes from am4g5r5:
-- the fix of sea salt and dust for aerosol activation (in large-scale and UW convection) 
-- pick the max of 2 plumes in uw_conv.F90 from Ming Zhao
-- donner deep updates from Will
+Changes from am4g6:
+- radiation updates
+- improve wind stress 
+- fix negative precipitation from UW
+- do_liq_num = .true. when using new strat cloud
 
 For more information about AWG configurations, refer to
 http://cobweb.gfdl.noaa.gov/~cjg/awg
@@ -2961,7 +2960,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         fill = .true.
         print_freq = 0,
         grid_type = 0,
-        nord = 1,
+        nord = 2,
         dddmp = 0.0,
         d2_bg = 0.0,
         d4_bg = 0.15,
@@ -2997,10 +2996,10 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 
       <!-- Namelist -->
       <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p6_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g6_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g6_c96L48.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p6_amip_chem.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_c96L48.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_amip_chem.nml"/>
       <!-- Input datasets -->
       <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullchem']/input/node())"/>
@@ -4145,7 +4144,7 @@ endif
          if( "$non_empty_restarts" != "" ) then
           ~Rusty.Benson/ncrcat $non_empty_restarts icebergs.res.nc
           if( ! -e icebergs.res.nc ) then
-            echo ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
+            echo ERROR: ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
             exit 1
           endif
          endif
@@ -4513,11 +4512,11 @@ OVERRIDE_EOF
 </experiment>
 
 
-<experiment name="CM4_c96L48_am4g6_fullchem_2000_lowmix.$(MOM6_DATE)" inherit="CM4_c96L48_am4g6_fullchem_2000_lowmix"/>
-<experiment name="CM4_c96L48_am4g6_fullchem_2000_lowmix" inherit="cm4_sis2_compile">
+<experiment name="CM4_c96L48_am4g7_fullchem_2000_lowmix.$(MOM6_DATE)" inherit="CM4_c96L48_am4g7_fullchem_2000_lowmix"/>
+<experiment name="CM4_c96L48_am4g7_fullchem_2000_lowmix" inherit="cm4_sis2_compile">
     <description
 communityProject="$(ProjectID)" 
-communityModel="CM4_c96_am4p6_fullchem  $(MOM6_GIT_TAG)" 
+communityModel="CM4_c96_am4p7_fullchem  $(MOM6_GIT_TAG)" 
 communityModelID="CM4_c96_am4p7_fullchem"
 communityExperimentName="$(name)">
     </description>
@@ -4539,8 +4538,8 @@ For more information please refer to the
       <namelist name="coupler_nml">
         months = $months,
         days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'NOLEAP'
+        current_date = 1,1,1,0,0,0,
+        calendar = 'noleap'
         dt_atmos = 1800,
         dt_cpld  = 3600,
         use_lag_fluxes = .true.
@@ -4595,7 +4594,7 @@ For more information please refer to the
         fill = .true.
         print_freq = 0,
         grid_type = 0,
-        nord = 1,
+        nord = 2,
         dddmp = 0.0,
         d2_bg = 0.0,
         d4_bg = 0.15,
@@ -4618,18 +4617,46 @@ For more information please refer to the
         ice_layout = $(ICE_PROD_LAYOUT)
         ice_io_layout = $(ICE_PROD_IO_LAYOUT)
       </namelist>
+      
+     <namelist name="strat_cloud_nml">
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 8.0,
+        Dmin = 1.0e-07,
+        n_land = 150.e6,
+        n_ocean = 50.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 5.e-6, !energy-balance tuning guess by Huan
+        eros_choice = .true.,
+        eros_scale_c = 3.e-5,
+        eros_scale_t = 3.e-5,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 0.8
+        U_evap_snow = 0.8
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 0.3
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
+        aerosol_activation_scheme = "total"
+     </namelist>
 
       <!--AWG Input datasets -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p6_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g6_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g6_c96L48.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p6_amip_chem.nml"/> <!--Please doublecheck this -->
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_c96L48.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_chem_2000climo.nml"/> <!--Please doublecheck this -->
       <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullchem']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p6_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p6_fullchem_2000climo']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
       <!--MOM6 Input datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
@@ -4704,15 +4731,210 @@ OVERRIDE_EOF
 
 </experiment>
 
-<experiment name="CM4_c96L48_am4g6_fullchem_2000_lowmix_COBALT.$(MOM6_DATE)" inherit="CM4_c96L48_am4g6_fullchem_2000_lowmix_COBALT"/>
-<experiment name="CM4_c96L48_am4g6_fullchem_2000_lowmix_COBALT" inherit="CM4_c96L48_am4g6_fullchem_2000_lowmix">
+<experiment name="CM4_c96L48_am4g7_fullchem_1980_lowmix" inherit="cm4_sis2_compile">
+    <description
+communityProject="$(ProjectID)" 
+communityModel="CM4_c96_am4p7_fullchem  $(MOM6_GIT_TAG)" 
+communityModelID="CM4_c96_am4p7_fullchem"
+communityExperimentName="$(name)">
+    </description>
+    <communityComment>
+For more information please refer to the
+&lt;a href="http://wiki.gfdl.noaa.gov/index.php/MDT_Coupled"&gt; Coupled Working Group Wiki.  &lt;/a&gt; and  
+&lt;a href="http://cobweb.gfdl.noaa.gov/~Oar.Gfdl.Mdteam/cm4/$USER/$(name)"&gt; Global Diagnostics Page.  &lt;/a&gt;
+    </communityComment>
+    <scenario 
+      communityForcing="N/A"
+      startTime="$(EXP_CPLD_START)"
+      endTime="$(EXP_CPLD_END)" 
+      parentExperimentID="N/A" 
+      parentExperimentRIP="N/A" 
+      branch_time="0.0">
+    </scenario>
+
+    <input>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1980,1,1,0,0,0,
+        calendar = 'julian'
+        dt_atmos = 1800,
+        dt_cpld  = 3600,
+        use_lag_fluxes = .true.
+        concurrent = .true.
+        do_ocean = .true.
+        ocean_npes = $(OCN_PROD_NPES)
+        atmos_npes = $(ATM_PROD_NPES)
+        atmos_nthreads = $(ATM_PROD_NTHREADS)
+      </namelist>
+      <namelist name="flux_exchange_nml">
+            nblocks=$(ATM_PROD_NTHREADS)
+            debug_stocks = .FALSE.
+            divert_stocks_report = .TRUE.
+            do_area_weighted_flux = .FALSE.
+      </namelist>
+      <namelist name="fms_io_nml">
+            fms_netcdf_restart=.true.
+            threading_read='multi'
+            max_files_r = 200
+            max_files_w = 200
+         !checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+      </namelist>
+      <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 5000000
+            stack_size =0
+      </namelist>
+      <namelist name="xgrid_nml">
+        make_exchange_reproduce = .true.
+        interp_method = 'second_order'
+      </namelist>
+
+      <namelist name="atmos_model_nml">
+         nxblocks = $(ATM_PROD_NXBLOCKS)
+         nyblocks = $(ATM_PROD_NYBLOCKS)
+      </namelist>
+      <namelist name="fv_core_nml">
+        layout = $(FV_PROD_LAYOUT)
+        io_layout = $(FV_PROD_IO_LAYOUT)
+        npx      = 97,
+        npy      = 97,
+        ntiles   = 6,
+        npz      = 48,
+        k_split  = 1,
+        n_split  = 14,
+        a2b_ord  = 4,
+        hord_dp = -8,
+        hord_tr = -8,
+        adjust_dry_mass = $adjust_dry_mass,
+        consv_te = 0.7,
+        fill = .true.
+        print_freq = 0,
+        grid_type = 0,
+        nord = 2,
+        dddmp = 0.0,
+        d2_bg = 0.0,
+        d4_bg = 0.15,
+        tau = 0.      
+        z_tracer=.false.
+      </namelist>
+      <namelist name="land_model_nml">
+        layout = $(LND_PROD_LAYOUT)
+        io_layout = $(LND_PROD_IO_LAYOUT)
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+      </namelist>
+
+      <namelist name="dummy_ocean_nml">
+        ocean_layout = $(OCN_PROD_LAYOUT)
+        ocean_io_layout = $(OCN_PROD_IO_LAYOUT)
+	ocean_mask_table= $(OCN_PROD_MASK_TABLE)
+      </namelist>
+      <namelist name="dummy_ice_nml">
+        ice_layout = $(ICE_PROD_LAYOUT)
+        ice_io_layout = $(ICE_PROD_IO_LAYOUT)
+      </namelist>
+
+      <!--AWG Input datasets -->
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_c96L48.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_amip_chem.nml"/> <!--Please doublecheck this -->
+      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p6_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
+      <!--Please doublecheck this data_table entry -->
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/data_table/data_table_amip</dataSource>
+      </dataFile>
+
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.0E-6
+OVERRIDE_EOF
+     ]]></csh>
+
+    </input>
+
+    <runtime>
+        <production simTime="$(PROD_SIMTIME)" units="years" npes="$(PROD_NPES)" runTime="$(PROD_RUNTIME)">
+          <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
+        </production>
+      <regression name="basic">
+   	<run months="1" npes="2834" runTimePerJob="01:30:00" overrideParams="$(domainparams_A864x2_O1970)"/>
+     </regression>
+
+      <regression name="rts">
+   	<run days="15 16" npes="2834" runTimePerJob="01:30:00" overrideParams="$(domainparams_A864x2_O1970)"/>
+   	<run months="1"   npes="2332" runTimePerJob="01:30:00" overrideParams="$(domainparams_A576x2_O1756)"/>
+  	<run days="2"   npes="2520" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O2304)"/>
+  	<run days="2"   npes="2592" runTimePerJob="00:30:00" overrideParams="$(domainparams_A288x2_O2304)"/>
+  	<run days="2"   npes="2880" runTimePerJob="00:30:00" overrideParams="$(domainparams_A288x2_O2592)"/>
+      </regression>
+
+      <regression name="timing">
+          <run months="1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+      </regression>
+
+      <regression name="timings_eos">
+          <run months="1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+          <run months="1" npes="2258" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1970)"/>
+      	</regression>
+	<regression name="timings">
+          <run months="1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+          <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1970)"/>
+          <run months="1" npes="2648" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O2432)"/>
+          <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x4_O1970)"/>
+          <run months="1" npes="2258" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1970)"/>
+          <run months="1" npes="2648" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O2432)"/>
+          <run months="1" npes="4358" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O3782)"/>
+          <run months="1" npes="4214" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O3782)"/>
+          <run months="1" npes="3429" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O2997)"/>
+      	</regression>
+
+      <regression name="timings_lowmixndiff">
+          <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1970)"/>
+      </regression>
+      <regression name="timings_lowmix">
+          <run months="1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+          <run months="1" npes="2720" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O2432)"/>
+      </regression>
+
+      <reference restart="$(REFERENCE)/archive/1x0m10d_216x2a_1970x1o/restart/00010111.tar"/>
+
+    </runtime>
+
+    <postProcess>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
+    </postProcess>
+
+</experiment>
+
+
+<experiment name="CM4_c96L48_am4g7_fullchem_2000_lowmix_COBALT.$(MOM6_DATE)" inherit="CM4_c96L48_am4g7_fullchem_2000_lowmix_COBALT"/>
+<experiment name="CM4_c96L48_am4g7_fullchem_2000_lowmix_COBALT" inherit="CM4_c96L48_am4g7_fullchem_2000_lowmix">
     <input>
       
       <!--AWG Input datasets -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p6_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g6_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g6_c96L48.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p6_amip_chem.nml"/> <!--Please doublecheck this -->
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_c96L48.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_amip_chem.nml"/> <!--Please doublecheck this -->
       <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
       <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>

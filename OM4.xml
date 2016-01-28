@@ -745,8 +745,14 @@ Make the executable for ocean-ice experiments.
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
             <codeBase version="$(RELEASE)"> shared.git </codeBase>
             <csh><![CDATA[
-            ( cd shared && git checkout use/nnz/ulm_201510_fix_land_io_hang )
-(cd shared && /bin/sed "s/define MAXFIELDMETHODS_ 150/define MAXFIELDMETHODS_ 400/g" -i field_manager/field_manager.F90 )
+#Record mods needed and bug fixes on a dev branch:
+#            cd shared
+#            git checkout -b user/nnz/CM4p7_dev4verona 
+#            git merge --no-ff user/nnz/fix_landio_hang_issue -m "merge fix for hang issue on c3" 
+#            git merge --no-ff user/z1l/bugfix -m "merge fix for stdlog in OMP region "
+#            /bin/sed "s/define MAXFIELDMETHDS_ 150/define MAXFIELDMETHODS_ 400/g" -i field_manager/field_manager.F90 
+#            git commit -a -m "Increase MAXFIELDMETHODS_ for ESM4"
+            ( cd shared && git checkout user/nnz/CM4p7_dev4verona )
              ]]>
             </csh>
          </source>
@@ -760,7 +766,6 @@ Make the executable for ocean-ice experiments.
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)"> ocean_shared.git </codeBase>
         <csh><![CDATA[
-        ( cd ocean_shared && git checkout $(RELEASE) )
         ( cd ocean_shared && git checkout user/nnz/verona_dev_merge )
         ]]>
         </csh>
