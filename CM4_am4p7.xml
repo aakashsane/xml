@@ -95,7 +95,7 @@ They reproduce answers provided by AWG:
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
 
-  <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
+  <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_cloudchem_mom6sis2_$(MOM6_DATE)"/>   <!--  customize as needed -->
   <property name="FRE_VERSION" value="fre/bronx-10"/>             <!-- fre version to be used -->
   <property name="ANALYSIS_SWITCH" value="on"/>                  <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
@@ -1240,11 +1240,7 @@ module load hdf5/1.8.6
       <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
      
       <csh><![CDATA[
-module use -a /sw/eslogin-c2/modulefiles
-module use -a /lustre/f1/Seth.Underwood/usw/eslogin/modulefiles-c2
-module load moab
-module load torque
-
+module use /sw/eslogin-c3/modulefiles
         source $MODULESHOME/init/csh
  
         module use -a /ncrc/home2/fms/local/modulefiles
@@ -1258,6 +1254,8 @@ module load torque
         setenv KMP_STACKSIZE 512m
         setenv NC_BLKSZ 1M
         setenv F_UFMTENDIAN big
+
+module load nco/4.5.2
       ]]></csh>
 
     </platform>
@@ -1677,7 +1675,7 @@ Experiment to build executable.
           # AWG updates
           ( cd atmos_param  && git checkout $(AWG_GIT_TAG) )
           ( cd atmos_shared && git checkout $(AWG_GIT_TAG) )
-          ( cd atmos_shared && git checkout chem_v20151106_lwh )
+          ( cd atmos_shared && git checkout cloudchem_v20151106_lwh )
           ]]>
         </csh>
       </source>
@@ -2034,10 +2032,18 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
       </dataFile>
     </input>
   </experiment>
+  <experiment name="field_table_am4p7_fullchem_nitrate_2000">
+    <input>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p7_fullchem_no3_2000</dataSource>
+      </dataFile>
+    </input>
+  </experiment>
 
   <experiment name="common_data_lm3p2">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+
         <dataSource site="ncrc">/lustre/f1/unswept/David.Paynter/sea_esf_CM4_V5_AUG2015.cpio</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/sea_esf_CM4_V5_AUG2015.cpio</dataSource>
         <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/awg/input/common/sea_esf_CM4_V5_AUG2015.cpio</dataSource>
@@ -2046,7 +2052,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
       <dataFile label="input" target="INPUT/soil_type.nc" chksum="" size="" timestamp="">
          <dataSource site="ncrc">/lustre/f1/unswept/Krista.A.Dunne/mod_input_files/any_grid/soil_type_hwsd_5minute.nc</dataSource>
       </dataFile>
-      
+
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/awg/input/lm3/lm3_data_20150322.tar</dataSource>
         <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/awg/mdt/awg/input/lm3/lm3_data_20150322.tar</dataSource>
@@ -2384,6 +2390,7 @@ set nyblocks = $dummy
           <analysis switch="$(MDBIswitch)" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
 <!-- /MDBI -->
         </timeSeries>
+        <timeSeries freq="hourly" source="atmos_hourly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos4xDailyTS/*)">
             <xi:fallback/>
@@ -3076,7 +3083,231 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
     </runtime>
 
 </experiment>
-      
+
+  <experiment name="c96L48_am4g7_fullchem_nitrate_cloud_LNOx_2000climo_t2" inherit="cm4_compile">
+    <description>
+Same model as c96L48_am4g7_fullchem_nitrate_cloud, but
+configuration with present-day climatological SSTs, present-day GHGs and aerosols.
+
+Derived from AM4 prototype configuration "am4g7" from MDT Atmosphere Working Group.
+Includes updates from David Paynter for radiaiton and 
+from Ming Zhao to improve wind stress and fix negative precipitation from UW convection.   
+Adds "full chemistry" (as in AM3, plus nitrate) and 48 levels.
+
+Chemistry changes from am4g7:
+- updated dry deposition: new depvel file, exponential loss
+- updated NH3 emissions (seasonality)
+- step updates for tracer operator splitting
+- dynamic BC and OC aging
+- active nitrate thermodynamics (ISORROPIA)
+- fix interpolator bug
+- cloud chemistry fix
+- increased lightning NOx
+    </description>
+
+    <input>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1,1,1,0,0,0,
+        calendar = 'noleap'
+        dt_atmos = 1800,
+        dt_cpld  = 7200,
+        use_lag_fluxes = .true.
+        concurrent = .false.
+        do_ocean = .false.
+        ocean_npes = 0
+        atmos_npes = $(ATM_PROD_NPES)
+        atmos_nthreads = $(ATM_PROD_NTHREADS)
+      </namelist>
+      <namelist name="fv_core_nml"> 
+        layout = $(FV_PROD_LAYOUT)
+        io_layout = $(FV_PROD_IO_LAYOUT)
+        npx      = 97,
+        npy      = 97,
+        ntiles   = 6,
+        npz      = 48,
+        k_split  = 1,
+        n_split  = 14,
+        a2b_ord  = 4,
+        hord_dp = -8,
+        hord_tr = -8,
+        adjust_dry_mass = $adjust_dry_mass,
+        consv_te = 0.7,
+        fill = .true.
+        print_freq = 0,
+        grid_type = 0,
+        nord = 2,
+        dddmp = 0.0,
+        d2_bg = 0.0,
+        d4_bg = 0.15,
+        tau = 0.      
+        z_tracer=.false.
+      </namelist>
+      <namelist name="land_model_nml">
+        layout = $(LND_PROD_LAYOUT)
+        io_layout = $(LND_PROD_IO_LAYOUT)
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+      </namelist>
+       <namelist name="flux_exchange_nml">
+        nblocks=$(ATM_PROD_NTHREADS)
+      </namelist>
+      <namelist name="atmos_model_nml">
+         nxblocks = $(ATM_PROD_NXBLOCKS)
+         nyblocks = $(ATM_PROD_NYBLOCKS)
+      </namelist>
+      <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 5000000
+            stack_size =0
+      </namelist>
+      <namelist name="fms_io_nml">
+            fms_netcdf_restart=.true.
+            threading_read='multi'
+            max_files_r = 200
+            max_files_w = 200
+         !checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+      </namelist>
+
+      <!-- _LNOx_2000climo_t2 , increased lightning NOx -->
+      <namelist name="tropchem_driver_nml">
+        relaxed_dt = 864000.,
+        ub_pres = 1.,
+        relaxed_dt_lbc = 86400.,
+        lb_pres = 800.e2,
+        file_sulfate = 'sulfate.nc',
+        file_conc = 'tracerIC.19800101.v2.nc',
+        file_emis_1 = 'emissions.',
+        file_emis_2 = '.1x1.2000.nc',
+        file_emis3d_1 = 'emissions3D.',
+        file_emis3d_2 = '.1x1.2000.nc',
+        file_ub = 'ub_vals.mozart.nc',
+        file_dry = 'depvel_gc_am3_fast_hno3.nc',
+        inv_list = '',
+        file_aircraft = 'emissions.aircraft.1x1.2000.nc',
+        lght_no_prd_factor = 0.6,
+        normalize_lght_no_prd_area = .true.,
+        min_land_frac_lght = 0.1,
+        cloud_chem_type = 'f1p',
+        strat_chem_age_factor = 1.,
+        strat_chem_dclydt_factor = 1.,
+        do_tropchem = .true.,
+        use_tdep_jvals = .true.,
+        file_jval_lut = 'jvals.v6fix.twilight.solarmax',
+        file_jval_lut_min = 'jvals.v6fix.twilight.solarmin',
+        o3_column_top = 0.002,
+        repartition_water_tracers = .true.,
+        allow_negative_cosz = .true.,
+        allow_psc_settling_type1 = .true.,
+        force_cly_conservation = .true.,
+        set_min_h2o_strat = .true.,
+        ch4_filename = 'ch4_gblannualdata',
+        ch4_scale_factor = 1.e-9,
+        time_varying_cfc_lbc = .false.,
+        cfc_lbc_dataset_entry = 2000,1,1,0,0,0,
+        do_fastjx_photo = .true.
+	frac_aerosol_incloud   = 0.7,
+	frac_dust_incloud = 0.0,
+        min_lwc_for_cloud_chem = 1.e-10,
+        aerosol_thermo_method = 'isorropia',
+        max_rh_aerosol = 95.,
+        small_value = 1.e-25,
+        gNH3 = 0.,
+        verbose = 1,
+        retain_cm3_bugs =.false.,
+        check_convergence = .true.
+        sim_data_filename = 'sim.AM3.dat'
+      </namelist>
+      <namelist name="strat_cloud_nml">
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 8.0,
+        Dmin = 1.0e-07,
+        n_land = 150.e6,
+        n_ocean = 50.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 5.e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-5,
+        eros_scale_t = 3.e-5,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 0.8
+        U_evap_snow = 0.8
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 0.3
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
+        aerosol_activation_scheme = "total"
+      </namelist>
+
+      <!-- Namelist -->
+      <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_c96L48.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_2000climo_chem_no3.nml"/>
+      <!-- Input datasets -->
+      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
+      <dataFile label="input" target="INPUT/emissions.nh3.1x1.2000.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/2000/emissions.nh3.1x1.2000_seasonality.nc</dataSource>
+      </dataFile>
+      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p7_fullchem_nitrate_2000']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
+    </input>
+
+    <runtime>
+      <regression name="basic">
+        <run days="8"   npes="216"  overrideParams="$(domainparams_A216x2)" runTimePerJob="01:00:00"/>
+      </regression>
+      <regression name="rts">
+        <run days="4 4"  npes="216" overrideParams="$(domainparams_A216x2)"  runTimePerJob="01:00:00"/>
+        <run months="1"  npes="432" overrideParams="$(domainparams_A432x2)"  runTimePerJob="01:00:00"/>
+        <run months="1"  npes="288" overrideParams="$(domainparams_A288x2)"  runTimePerJob="01:00:00"/>
+        <run months="1"  npes="216" overrideParams="$(domainparams_A216x2)" runTimePerJob="01:00:00"/>
+      </regression>
+
+      <regression name="timing">
+        <run months="1" npes="1728" runTimePerJob="01:00:00" overrideParams="$(domainparams_A1728x2)"/>
+      </regression>
+      <regression name="timings">
+        <run months="1" npes="216"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A216x2)"/>
+        <run months="1" npes="432"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A432x2)"/>
+        <run months="1" npes="288"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A288x2)"/>
+        <run months="1" npes="864"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A864x2)"/>
+        <run months="1" npes="768"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A768x4)"/>
+        <run months="1" npes="864"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A864x4)"/>
+        <run months="1" npes="1152" runTimePerJob="02:00:00" overrideParams="$(domainparams_A1152x2)"/>
+        <run months="1" npes="1728" runTimePerJob="02:00:00" overrideParams="$(domainparams_A1728x2)"/>
+        <run months="1" npes="576"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x4)"/>
+        <run months="1" npes="432"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x8)"/>
+
+      </regression>
+
+      <reference restart="$(REFERENCE)/archive/1x0m8d_216x2a/restart/19800109.tar"/>
+
+    </runtime>
+
+    <postProcess>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+    </postProcess>
+  </experiment>
+  
+
+
+
 <experiment name="c192L32_am4g7" inherit="cm4_compile">
     <description
 communityProject="$(ProjectID)" 
@@ -3487,11 +3718,9 @@ endif
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1007.54x72       
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1229.64x72
 -->
-<!--
      <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
-          /lustre/f1/pdata/gfdl_O/datasets/OM4_025/mosaic.v20140610.unpacked/ocean_static.nc
+          <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_025/mosaic.v20140610.unpacked/ocean_static.nc</dataSource>
      </dataFile>
--->
 
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
@@ -3574,6 +3803,10 @@ endif
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/WOA05_ptemp_salt_annual.nc </dataSource>
       </dataFile>
+      <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/ocean_static.nc</dataSource>
+      </dataFile>
+
 <!--Some of the diagnostics in diag_table.MOM6 cause the 1/2 degree model to crash
     hence we cannot use the following file but need to specify all the diagnostics 
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
@@ -4142,7 +4375,7 @@ endif
             if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
          end
          if( "$non_empty_restarts" != "" ) then
-          ~Rusty.Benson/ncrcat $non_empty_restarts icebergs.res.nc
+          ncrcat $non_empty_restarts icebergs.res.nc
           if( ! -e icebergs.res.nc ) then
             echo ERROR: ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
             exit 1
@@ -4153,7 +4386,7 @@ endif
          mv icebergs.res.nc.* hide_from_fre/
          cd $work
          mkdir hide_from_fre
-         ~Rusty.Benson/ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
+         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
          mv iceberg_trajectories.nc.* hide_from_fre/
       endif
         #Save the last line of timestats without the first (step number) column as a signature of MOM6 answers
@@ -4164,6 +4397,10 @@ endif
          #Make a directory to trick FRE to pick up and archive in ascii
          mkdir extra.results
          mv *velocity_truncations MOM_parameter_doc* SIS_parameter_doc* seaice.stats timestats extra.results/
+      #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
+      #This causes problems for ferret and python tools for analysis.
+      #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
+      cp $work/INPUT/ocean_static_no_mask_table.nc $work/
          ]]></csh>
       <!--REFINE DIAG SCRIPT -->
       <!--refineDiag_data_stager.csh calculates global averages of basic quantities and stores them in a sqlit database file-->
@@ -4731,6 +4968,280 @@ OVERRIDE_EOF
 
 </experiment>
 
+
+<experiment name="CM4_c96L48_am4g7_fullchem_nitrate_cloud_LNOx_t2_2000_lowmix.$(MOM6_DATE)" inherit="CM4_c96L48_am4g7_fullchem_nitrate_cloud_LNOx_t2_2000_lowmix"/>
+<experiment name="CM4_c96L48_am4g7_fullchem_nitrate_cloud_LNOx_t2_2000_lowmix" inherit="cm4_sis2_compile">
+    <description
+communityProject="$(ProjectID)" 
+communityModel="CM4_c96_am4p7_fullchem_nitrate_cloud_LNOx_t2  $(MOM6_GIT_TAG)" 
+communityModelID="CM4_c96_am4p7_fullchem_nitrate_cloud_LNOx_t2"
+communityExperimentName="$(name)">
+    </description>
+    <communityComment>
+For more information please refer to the
+&lt;a href="http://wiki.gfdl.noaa.gov/index.php/MDT_Coupled"&gt; Coupled Working Group Wiki.  &lt;/a&gt; and  
+&lt;a href="http://cobweb.gfdl.noaa.gov/~Oar.Gfdl.Mdteam/cm4/$USER/$(name)"&gt; Global Diagnostics Page.  &lt;/a&gt;
+    </communityComment>
+    <scenario 
+      communityForcing="N/A"
+      startTime="$(EXP_CPLD_START)"
+      endTime="$(EXP_CPLD_END)" 
+      parentExperimentID="N/A" 
+      parentExperimentRIP="N/A" 
+      branch_time="0.0">
+    </scenario>
+
+    <input>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1,1,1,0,0,0,
+        calendar = 'noleap'
+        dt_atmos = 1800,
+        dt_cpld  = 3600,
+        use_lag_fluxes = .true.
+        concurrent = .true.
+        do_ocean = .true.
+        ocean_npes = $(OCN_PROD_NPES)
+        atmos_npes = $(ATM_PROD_NPES)
+        atmos_nthreads = $(ATM_PROD_NTHREADS)
+      </namelist>
+      <namelist name="flux_exchange_nml">
+            nblocks=$(ATM_PROD_NTHREADS)
+            debug_stocks = .FALSE.
+            divert_stocks_report = .TRUE.
+            do_area_weighted_flux = .FALSE.
+      </namelist>
+      <namelist name="fms_io_nml">
+            fms_netcdf_restart=.true.
+            threading_read='multi'
+            max_files_r = 200
+            max_files_w = 200
+         !checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+      </namelist>
+      <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 5000000
+            stack_size =0
+      </namelist>
+      <namelist name="xgrid_nml">
+        make_exchange_reproduce = .true.
+        interp_method = 'second_order'
+      </namelist>
+
+      <namelist name="atmos_model_nml">
+         nxblocks = $(ATM_PROD_NXBLOCKS)
+         nyblocks = $(ATM_PROD_NYBLOCKS)
+      </namelist>
+      <namelist name="fv_core_nml">
+        layout = $(FV_PROD_LAYOUT)
+        io_layout = $(FV_PROD_IO_LAYOUT)
+        npx      = 97,
+        npy      = 97,
+        ntiles   = 6,
+        npz      = 48,
+        k_split  = 1,
+        n_split  = 14,
+        a2b_ord  = 4,
+        hord_dp = -8,
+        hord_tr = -8,
+        adjust_dry_mass = $adjust_dry_mass,
+        consv_te = 0.7,
+        fill = .true.
+        print_freq = 0,
+        grid_type = 0,
+        nord = 2,
+        dddmp = 0.0,
+        d2_bg = 0.0,
+        d4_bg = 0.15,
+        tau = 0.      
+        z_tracer=.false.
+      </namelist>
+      <namelist name="land_model_nml">
+        layout = $(LND_PROD_LAYOUT)
+        io_layout = $(LND_PROD_IO_LAYOUT)
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+      </namelist>
+
+      <namelist name="dummy_ocean_nml">
+        ocean_layout = $(OCN_PROD_LAYOUT)
+        ocean_io_layout = $(OCN_PROD_IO_LAYOUT)
+	ocean_mask_table= $(OCN_PROD_MASK_TABLE)
+      </namelist>
+      <namelist name="dummy_ice_nml">
+        ice_layout = $(ICE_PROD_LAYOUT)
+        ice_io_layout = $(ICE_PROD_IO_LAYOUT)
+      </namelist>
+      
+      <!-- _LNOx_2000climo_t2 , increased lightning NOx -->
+      <namelist name="tropchem_driver_nml">
+        relaxed_dt = 864000.,
+        ub_pres = 1.,
+        relaxed_dt_lbc = 86400.,
+        lb_pres = 800.e2,
+        file_sulfate = 'sulfate.nc',
+        file_conc = 'tracerIC.19800101.v2.nc',
+        file_emis_1 = 'emissions.',
+        file_emis_2 = '.1x1.2000.nc',
+        file_emis3d_1 = 'emissions3D.',
+        file_emis3d_2 = '.1x1.2000.nc',
+        file_ub = 'ub_vals.mozart.nc',
+        file_dry = 'depvel_gc_am3_fast_hno3.nc',
+        inv_list = '',
+        file_aircraft = 'emissions.aircraft.1x1.2000.nc',
+        lght_no_prd_factor = 0.6,
+        normalize_lght_no_prd_area = .true.,
+        min_land_frac_lght = 0.1,
+        cloud_chem_type = 'f1p',
+        strat_chem_age_factor = 1.,
+        strat_chem_dclydt_factor = 1.,
+        do_tropchem = .true.,
+        use_tdep_jvals = .true.,
+        file_jval_lut = 'jvals.v6fix.twilight.solarmax',
+        file_jval_lut_min = 'jvals.v6fix.twilight.solarmin',
+        o3_column_top = 0.002,
+        repartition_water_tracers = .true.,
+        allow_negative_cosz = .true.,
+        allow_psc_settling_type1 = .true.,
+        force_cly_conservation = .true.,
+        set_min_h2o_strat = .true.,
+        ch4_filename = 'ch4_gblannualdata',
+        ch4_scale_factor = 1.e-9,
+        time_varying_cfc_lbc = .false.,
+        cfc_lbc_dataset_entry = 2000,1,1,0,0,0,
+        do_fastjx_photo = .true.
+	frac_aerosol_incloud   = 0.7,
+	frac_dust_incloud = 0.0,
+        min_lwc_for_cloud_chem = 1.e-10,
+        aerosol_thermo_method = 'isorropia',
+        max_rh_aerosol = 95.,
+        small_value = 1.e-25,
+        gNH3 = 0.,
+        verbose = 1,
+        retain_cm3_bugs =.false.,
+        check_convergence = .true.
+        sim_data_filename = 'sim.AM3.dat'
+      </namelist>
+      <namelist name="strat_cloud_nml">
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 8.0,
+        Dmin = 1.0e-07,
+        n_land = 150.e6,
+        n_ocean = 50.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 5.e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-5,
+        eros_scale_t = 3.e-5,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 0.8
+        U_evap_snow = 0.8
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 0.3
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
+        aerosol_activation_scheme = "total"
+      </namelist>
+
+
+      <!--AWG Input datasets -->
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g7_c96L48.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_2000climo_chem_no3.nml"/> <!--Please doublecheck this -->
+      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
+      <dataFile label="input" target="INPUT/emissions.nh3.1x1.2000.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/2000/emissions.nh3.1x1.2000_seasonality.nc</dataSource>
+      </dataFile>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p7_fullchem_nitrate_2000']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
+
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.0E-6
+OVERRIDE_EOF
+     ]]></csh>
+
+    </input>
+
+    <runtime>
+        <production simTime="$(PROD_SIMTIME)" units="years" npes="$(PROD_NPES)" runTime="$(PROD_RUNTIME)">
+          <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
+        </production>
+      <regression name="basic">
+   	<run months="1" npes="2834" runTimePerJob="01:30:00" overrideParams="$(domainparams_A864x2_O1970)"/>
+     </regression>
+
+      <regression name="rts">
+   	<run days="15 16" npes="2834" runTimePerJob="01:30:00" overrideParams="$(domainparams_A864x2_O1970)"/>
+   	<run months="1"   npes="2332" runTimePerJob="01:30:00" overrideParams="$(domainparams_A576x2_O1756)"/>
+  	<run days="2"   npes="2520" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O2304)"/>
+  	<run days="2"   npes="2592" runTimePerJob="00:30:00" overrideParams="$(domainparams_A288x2_O2304)"/>
+  	<run days="2"   npes="2880" runTimePerJob="00:30:00" overrideParams="$(domainparams_A288x2_O2592)"/>
+      </regression>
+
+      <regression name="timing">
+          <run months="1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+      </regression>
+
+      <regression name="timings_eos">
+          <run months="1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+          <run months="1" npes="2258" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1970)"/>
+      	</regression>
+	<regression name="timings">
+          <run months="1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+          <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1970)"/>
+          <run months="1" npes="2648" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O2432)"/>
+          <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x4_O1970)"/>
+          <run months="1" npes="2258" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1970)"/>
+          <run months="1" npes="2648" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O2432)"/>
+          <run months="1" npes="4358" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O3782)"/>
+          <run months="1" npes="4214" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O3782)"/>
+          <run months="1" npes="3429" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O2997)"/>
+      	</regression>
+
+      <regression name="timings_lowmixndiff">
+          <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1970)"/>
+      </regression>
+      <regression name="timings_lowmix">
+          <run months="1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+          <run months="1" npes="2720" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O2432)"/>
+      </regression>
+
+      <reference restart="$(REFERENCE)/archive/1x0m10d_216x2a_1970x1o/restart/00010111.tar"/>
+
+    </runtime>
+
+    <postProcess>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
+    </postProcess>
+
+</experiment>
+
+
 <experiment name="CM4_c96L48_am4g7_fullchem_1980_lowmix" inherit="cm4_sis2_compile">
     <description
 communityProject="$(ProjectID)" 
@@ -4756,8 +5267,8 @@ For more information please refer to the
       <namelist name="coupler_nml">
         months = $months,
         days   = $days,
-        current_date = 1980,1,1,0,0,0,
-        calendar = 'julian'
+        current_date = 1,1,1,0,0,0,
+        calendar = 'noleap'
         dt_atmos = 1800,
         dt_cpld  = 3600,
         use_lag_fluxes = .true.
