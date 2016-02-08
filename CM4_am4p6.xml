@@ -75,7 +75,7 @@ which are saved under /lustre/f1/unswept/Niki.Zadeh/ulm_201505_awg_v20150702_mom
 
   <!--User shoould set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="ulm_201505"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2015.11.30"/>      <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2016.01.16"/>      <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20150923"/> <!-- git tag for AWG  source code -->
   <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -85,8 +85,8 @@ which are saved under /lustre/f1/unswept/Niki.Zadeh/ulm_201505_awg_v20150702_mom
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
 
-  <property name="PROD_RUNTIME"     value="15:00:00"/><!--zeus value="08:00:00"-->
-  <property name="PROD_SEGTIME"     value="07:20:00"/><!--zeus value=""-->
+  <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
+  <property name="PROD_SEGTIME"     value="04:00:00"/><!--Wall clock per segment (usually 1 year)-->
   <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->   
   <property name="EXP_CPLD_START"   value="0001"/> <!--simulation start year--> 
@@ -454,6 +454,17 @@ the faster the model throughput, but also the lower the model efficiency
 	       dummy_ocean_nml:ocean_layout=36,72;dummy_ocean_nml:ocean_io_layout=1,4;
                dummy_ocean_nml:ocean_mask_table=mask_table.622.36x72"/>
 
+   <property name="domainparams_A432x2_O3782"
+             value="
+               coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=3782;
+               coupler_nml:atmos_npes=432;coupler_nml:atmos_nthreads=2; 
+               fv_core_nml:layout=3,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+               land_model_nml:layout=3,24;land_model_nml:io_layout=1,4;
+               ice_model_nml:layout=144,3;ice_model_nml:io_layout=1,3; 
+               dummy_ice_nml:ice_layout=144,3;dummy_ice_nml:ice_io_layout=1,3;
+               dummy_ocean_nml:ocean_layout=72,72;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.1402.72x72"/>
+
    <property name="domainparams_A576x2_O3782"
 	     value="
 	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=3782;
@@ -477,24 +488,20 @@ the faster the model throughput, but also the lower the model efficiency
                dummy_ocean_nml:ocean_layout=36,72;dummy_ocean_nml:ocean_io_layout=1,4;
                dummy_ocean_nml:ocean_mask_table=mask_table.622.36x72"/>
 
+   <property name="domainparams_c192A864x2_O1970x1"
+	     value="
+               coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=1970;
+               coupler_nml:atmos_npes=864;coupler_nml:atmos_nthreads=2; 
+               fv_core_nml:layout=6,24;fv_core_nml:io_layout=1,4;
+               atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+               land_model_nml:layout=6,24;land_model_nml:io_layout=1,4;
+               ice_model_nml:layout=144,6;ice_model_nml:io_layout=1,3;
+               dummy_ice_nml:ice_layout=144,6;dummy_ice_nml:ice_io_layout=1,3;
+               dummy_ocean_nml:ocean_layout=36,72;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.622.36x72"/>
+
 
 <!--The following are needed till frerun supports overrideParams for production runs-->
-  <property name="PROD_NPES"            value="2258"/>  
-  <property name="OCN_PROD_NPES"        value="1970"/>
-  <property name="ATM_PROD_NPES"        value="288"/>
-  <property name="ATM_PROD_NTHREADS"    value="2"/>
-  <property name="ATM_PROD_NXBLOCKS"    value="1"/>
-  <property name="ATM_PROD_NYBLOCKS"    value="2"/>
-  <property name="FV_PROD_LAYOUT"       value="4,12"/>
-  <property name="FV_PROD_IO_LAYOUT"    value="1,4"/>
-  <property name="LND_PROD_LAYOUT"      value="4,12"/>
-  <property name="LND_PROD_IO_LAYOUT"   value="1,4"/>
-  <property name="ICE_PROD_LAYOUT"      value="72,4"/>
-  <property name="ICE_PROD_IO_LAYOUT"   value="1,4"/>
-  <property name="OCN_PROD_LAYOUT"      value="36,72"/>
-  <property name="OCN_PROD_IO_LAYOUT"   value="1,4"/>
-  <property name="OCN_PROD_MASK_TABLE"  value="mask_table.622.36x72"/>
-<!-- For eos
   <property name="PROD_NPES"            value="1972"/>  
   <property name="OCN_PROD_NPES"        value="1756"/>
   <property name="ATM_PROD_NPES"        value="216"/>
@@ -510,7 +517,6 @@ the faster the model throughput, but also the lower the model efficiency
   <property name="OCN_PROD_LAYOUT"      value="32,72"/>
   <property name="OCN_PROD_IO_LAYOUT"   value="1,4"/>
   <property name="OCN_PROD_MASK_TABLE"  value="mask_table.548.32x72"/>
--->
   <setup>
 
     <platform name="ncrc2.intel">
@@ -543,6 +549,7 @@ the faster the model throughput, but also the lower the model efficiency
         module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
         module unload netcdf fre
         module load PrgEnv-intel/4.0.46
+        module swap intel intel/12.1.3.293
         module load $(FRE_VERSION)
         module load git
         setenv KMP_STACKSIZE 512m
@@ -551,7 +558,6 @@ the faster the model throughput, but also the lower the model efficiency
       ]]></csh>
 
     </platform>
-
     <platform name="ncrc2.intel14">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
       <project>gfdl_f</project>
@@ -722,6 +728,60 @@ the faster the model throughput, but also the lower the model efficiency
       <xi:include xpointer="xpointer(//setup/platform[@name='ncrc2.intel']/node())" />
     </platform>
 
+    <platform name="ncrc3.intel15">
+<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
+      <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
+      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
+      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Ming.Zhao/archive/mdt"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
+      <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20151028"/>
+      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     
+      <csh><![CDATA[
+module use -a /sw/eslogin-c2/modulefiles
+module use -a /lustre/f1/Seth.Underwood/usw/eslogin/modulefiles-c2
+module load moab
+module load torque
+
+        source $MODULESHOME/init/csh
+ 
+        module use -a /ncrc/home2/fms/local/modulefiles
+        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+        module unload netcdf fre
+        module load PrgEnv-intel/5.2.82
+        module swap intel intel/15.0.2.164
+
+        module load $(FRE_VERSION)
+        module load git
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+      ]]></csh>
+
+    </platform>
+    <platform name="ncrc3.default">
+      <xi:include xpointer="xpointer(//setup/platform[@name='ncrc3.intel15']/node())" />
+    </platform>
+
     <platform name="theia.intel">
       <project>gfdlport</project>
       <directory stem="$(FRE_STEM)">
@@ -733,7 +793,6 @@ the faster the model throughput, but also the lower the model efficiency
         <state>$HOME/$(stem)/$(name)/$(platform)-$(target)/state</state>
         <work>/scratch4/GFDL/gfdlscr/$USER/work/$FRE_JOBID</work>
         <ptmp>/scratch4/GFDL/gfdlscr/$USER/ptmp</ptmp>
-        <stmp>/scratch4/GFDL/gfdlscr/$USER/stmp</stmp>
         <tmp>/scratch4/GFDL/gfdlscr/$USER/stmp</tmp>
         <archive>/scratch4/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)</archive>
       </directory>
@@ -901,6 +960,12 @@ limit coredumpsize unlimited
     <platform name="gfdl.ncrc2-intel15">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
+    <platform name="gfdl.ncrc3-default">
+      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
+    </platform>
+    <platform name="gfdl.ncrc3-intel15">
+      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
+    </platform>
     <platform name="gfdl.olcf-eos_intel15">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
@@ -949,6 +1014,7 @@ Experiment to build executable.
             <codeBase version="$(RELEASE)"> shared.git </codeBase>
             <csh><![CDATA[
             ( cd shared && git checkout $(AWG_GIT_TAG) )
+            ( cd shared && git checkout user/nnz/awg_v20150923_c3_hang_fix )
             ]]>
             </csh>
       </source>
@@ -1086,7 +1152,6 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-            <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for SIS2 may cause crash -->
          </compile>
     </component>
 
@@ -1456,6 +1521,7 @@ $baseDate
 # Copy AWG and OWG ascii input files to GFDL (waiting for FRE to do this for us)
 if ( $?flagOutputXferOn && $?flagOutputPostProcessOn && $currentSeg == 1 ) then
   #gcp --batch does not understand some variations of home filesystem like /autofs/mnt/ncrc-svm1_home1 so we need to massage rtsxml to comply
+module swap gcp gcp/test
   set xmldirlocal = `dirname $rtsxml | sed -r "s/^\/(autofs|ncrc)\/.+\/$USER\//\~$USER\//"`
   set xmldirRemote = `echo $xmldirlocal | sed -r "$patternSedHome"`
   set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
@@ -1948,6 +2014,16 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
          nxblocks = $(ATM_PROD_NXBLOCKS)
          nyblocks = $(ATM_PROD_NYBLOCKS)
       </namelist>
+      <namelist name="ocean_rough_nml">
+      rough_scheme = 'beljaars'
+      </namelist>
+      <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 5000000
+            stack_size =0
+      </namelist>
+
       <!-- Namelist -->
       <namelist file="$(AWG_INPUT_HOME)/nml/ocean.nml"/>       
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p6_common.nml"/>
@@ -1971,8 +2047,8 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       </regression>
       <regression name="rts">
         <run days="4 4"  npes="216" overrideParams="$(domainparams_A216x2)"  runTimePerJob="01:00:00"/>
-        <run days="8"    npes="432" overrideParams="$(domainparams_A432x2)"  runTimePerJob="01:00:00"/>
-        <run days="8"    npes="288" overrideParams="$(domainparams_A288x2)"  runTimePerJob="01:00:00"/>
+        <run months="1"  npes="432" overrideParams="$(domainparams_A432x2)"  runTimePerJob="01:00:00"/>
+        <run months="1"  npes="288" overrideParams="$(domainparams_A288x2)"  runTimePerJob="01:00:00"/>
         <run months="1"  npes="216" overrideParams="$(domainparams_A216x2)" runTimePerJob="01:00:00"/>
       </regression>
 
@@ -2022,10 +2098,10 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 <experiment name="c96L32_am4g6_conc_rad" inherit="c96L32_am4g6">
   <runtime>
       <regression name="basic">
-        <run days="8"    npes="432" overrideParams="$(domainparams_A432x2_R432x2)"  runTimePerJob="00:30:00"/>
+        <run months="1"  npes="432" overrideParams="$(domainparams_A432x2_R432x2)"  runTimePerJob="00:30:00"/>
       </regression>
       <regression name="rts">
-        <run days="4 4"  npes="432" overrideParams="$(domainparams_A432x2_R432x2)"  runTimePerJob="01:00:00"/>
+        <run days="15 16" npes="432" overrideParams="$(domainparams_A432x2_R432x2)"  runTimePerJob="01:00:00"/>
       </regression>
 
       <regression name="timings">
@@ -2139,8 +2215,8 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       </regression>
       <regression name="rts">
         <run days="4 4"  npes="216" overrideParams="$(domainparams_A216x2)"  runTimePerJob="01:00:00"/>
-        <run days="8"    npes="432" overrideParams="$(domainparams_A432x2)"  runTimePerJob="01:00:00"/>
-        <run days="8"    npes="288" overrideParams="$(domainparams_A288x2)"  runTimePerJob="01:00:00"/>
+        <run months="1"  npes="432" overrideParams="$(domainparams_A432x2)"  runTimePerJob="01:00:00"/>
+        <run months="1"  npes="288" overrideParams="$(domainparams_A288x2)"  runTimePerJob="01:00:00"/>
         <run months="1"  npes="216" overrideParams="$(domainparams_A216x2)" runTimePerJob="01:00:00"/>
       </regression>
 
@@ -2337,8 +2413,8 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       </regression>
       <regression name="rts">
         <run days="4 4" npes="432"  overrideParams="$(domainparams_c192A432x2)" runTimePerJob="01:00:00"/>
-        <run days="8"   npes="864"  overrideParams="$(domainparams_c192A864x2)" runTimePerJob="01:00:00"/>
-        <run days="8"   npes="576"  overrideParams="$(domainparams_c192A576x2)" runTimePerJob="01:00:00"/>
+        <run months="1" npes="864"  overrideParams="$(domainparams_c192A864x2)" runTimePerJob="01:00:00"/>
+        <run months="1" npes="576"  overrideParams="$(domainparams_c192A576x2)" runTimePerJob="01:00:00"/>
         <run months="1" npes="432"  overrideParams="$(domainparams_c192A432x2)" runTimePerJob="01:30:00"/>
       </regression>
 
@@ -2599,16 +2675,22 @@ For more information please refer to the
           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
         </production>
       <regression name="basic">
-        <run days="10" npes="$(PROD_NPES)" runTimePerJob="01:00:00"/>
+        <run months="1" npes="$(PROD_NPES)" runTimePerJob="01:00:00"/>
       </regression>
 
       <regression name="rts">
-        <run days="5 5" npes="$(PROD_NPES)" runTimePerJob="01:00:00"/>
-        <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1970)"/>
+        <run days="15 16" npes="$(PROD_NPES)" runTimePerJob="01:00:00"/>
+        <run days="2"   npes="1972" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O1756)"/>
   	<run days="2"   npes="2520" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O2304)"/>
   	<run days="2"   npes="2592" runTimePerJob="00:30:00" overrideParams="$(domainparams_A288x2_O2304)"/>
   	<run days="2"   npes="2880" runTimePerJob="00:30:00" overrideParams="$(domainparams_A288x2_O2592)"/>
       </regression>
+
+      <regression name="repeat">
+          <run months="1" npes="1972" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+          <run months="1" npes="1972" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+      </regression>
+
 
       <regression name="layout_change">
   	<run days="2"   npes="2520" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O2304)"/>
@@ -2621,7 +2703,7 @@ For more information please refer to the
           <run months="1" npes="2258" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1970)"/>
       	</regression>
 	<regression name="timing">
-          <run months="1" npes="2258" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1970)"/>
+          <run months="1" npes="4214" runTimePerJob="00:30:00" overrideParams="$(domainparams_A432x2_O3782)"/>
       	</regression>
 	<regression name="timings">
           <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1970)"/>
@@ -2770,6 +2852,7 @@ For more information please refer to the
 </experiment>
 
 
+<experiment name="CM4_c192L32_am4g6_2000_sis2.$(MOM6_DATE)" inherit="CM4_c192L32_am4g6_2000_sis2"/>
 <experiment name="CM4_c192L32_am4g6_2000_sis2" inherit="cm4_sis2_compile">
     <description
 communityProject="$(ProjectID)" 
@@ -2898,11 +2981,14 @@ For more information please refer to the
           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
         </production>
       <regression name="basic">
-        <run days="10"  npes="2402" runTimePerJob="01:00:00" overrideParams="$(domainparams_c192A432x2_O1970x1)"/>
+        <run months="1" npes="2402" runTimePerJob="01:00:00" overrideParams="$(domainparams_c192A432x2_O1970x1)"/>
       </regression>
       <regression name="rts"> 
-        <run days="5 5" npes="2402" runTimePerJob="01:00:00" overrideParams="$(domainparams_c192A432x2_O1970x1)"/>
-        <run months="1" npes="2402" runTimePerJob="01:00:00" overrideParams="$(domainparams_c192A432x2_O1970x1)"/>
+        <run days="15 16" npes="2402" runTimePerJob="01:00:00" overrideParams="$(domainparams_c192A432x2_O1970x1)"/>
+      </regression>
+
+      <regression name="timing">
+        <run months="1" npes="2834" runTimePerJob="01:00:00" overrideParams="$(domainparams_c192A864x2_O1970x1)"/>
       </regression>
 
       <reference restart="$(REFERENCE)/archive/1x0m10d_1728pe/restart/00010111.tar"/>
@@ -2951,6 +3037,9 @@ For more information please refer to the
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_GS_edits.nc
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/All_edits.nc
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75.nc
@@ -3015,17 +3104,33 @@ For more information please refer to the
          #Find non-empty iceberg restarts and combine them AND then remove uncombined restarts
          #This should be handled properly by FRE
          #ncrcat icebergs.res.nc.* icebergs.res.nc
+      ls icebergs.res.nc.*
+      if( ! $status ) then
+         which ncdump
+         if( $status ) then
+           echo ncdump not available! We need to stop the run or the model restarts incorrectly!
+           exit 1
+         endif
+
          set non_empty_restarts = ""
          foreach file ( `ls icebergs.res.nc.????` )
             if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
          end
-         ncrcat $non_empty_restarts icebergs.res.nc
+         if( "$non_empty_restarts" != "" ) then
+          ~Rusty.Benson/ncrcat $non_empty_restarts icebergs.res.nc
+          if( ! -e icebergs.res.nc ) then
+            echo ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
+            exit 1
+          endif
+         endif
+
          mkdir hide_from_fre
          mv icebergs.res.nc.* hide_from_fre/
          cd $work
          mkdir hide_from_fre
-         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
+         ~Rusty.Benson/ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
          mv iceberg_trajectories.nc.* hide_from_fre/
+      endif
          #Save the last line of timestats without the first (step number) column as a signature of MOM6 answers
          tail -1 timestats | cut -c8- > RESTART/$enddate.timestats.res
          #Save the whole timestats under ascii/
@@ -3215,6 +3320,8 @@ For more information please refer to the
       </namelist>
      </input>
   </experiment>
+
+<experiment name="CM4_c96L32_am4g6_2000_sis2_lowmix_intel15_c3" inherit="CM4_c96L32_am4g6_2000_sis2_lowmix"/>
 
 <experiment name="CM4_c96L32_am4g6_2000_sis2_lowmix.$(MOM6_DATE)" inherit="CM4_c96L32_am4g6_2000_sis2_lowmix"/>
 <experiment name="CM4_c96L32_am4g6_2000_sis2_lowmix_intel15_eos" inherit="CM4_c96L32_am4g6_2000_sis2_lowmix"/>
@@ -3469,6 +3576,7 @@ ln -s  /archive/Bill.Hurlin/$(FRE_STEM)/CM4_c96L32_am4g5_2000_sis2_meke_dEddPara
 link_hist_EOF
 
 chmod +x $work/additional_setup
+module swap gcp gcp/test
 gcp $work/additional_setup gfdl:$(NB_ROOT)/mom6/
 
 
