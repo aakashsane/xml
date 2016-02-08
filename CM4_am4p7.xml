@@ -76,7 +76,7 @@ They reproduce answers provided by AWG:
 
   <!--User shoould set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="ulm_201510"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2016.01.16"/>      <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2016.02.03"/>      <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20151106"/> <!-- git tag for AWG  source code -->
   <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -1657,6 +1657,7 @@ Experiment to build executable.
 #            /bin/sed "s/define MAXFIELDMETHDS_ 150/define MAXFIELDMETHODS_ 400/g" -i field_manager/field_manager.F90 
 #            git commit -a -m "Increase MAXFIELDMETHODS_ for ESM4"
             ( cd shared && git checkout user/nnz/CM4p7_dev4verona )
+#            git merge --no-ff origin/user/z1l/horiz_interp -m "merge test" #May change answers
             ]]>
             </csh>
       </source>
@@ -2234,7 +2235,6 @@ $baseDate
 # Copy AWG and OWG ascii input files to GFDL (waiting for FRE to do this for us)
 if ( $?flagOutputXferOn && $?flagOutputPostProcessOn && $currentSeg == 1 ) then
   #gcp --batch does not understand some variations of home filesystem like /autofs/mnt/ncrc-svm1_home1 so we need to massage rtsxml to comply
-module swap gcp gcp/test
   set xmldirlocal = `dirname $rtsxml | sed -r "s/^\/(autofs|ncrc)\/.+\/$USER\//\~$USER\//"`
   set xmldirRemote = `echo $xmldirlocal | sed -r "$patternSedHome"`
   set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
@@ -2390,7 +2390,8 @@ set nyblocks = $dummy
           <analysis switch="$(MDBIswitch)" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
 <!-- /MDBI -->
         </timeSeries>
-        <timeSeries freq="hourly" source="atmos_hourly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+<!--        <timeSeries freq="hourly" source="atmos_hourly" chunkLength="$(PP_CPLD_CHUNK_A)"/> not in diag_table-->
+
         <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos4xDailyTS/*)">
             <xi:fallback/>
@@ -2687,7 +2688,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <namelist name="coupler_nml">
         months = $months,
         days   = $days,
-        current_date = 1980,1,1,0,0,0,
+        current_date = 1,1,1,0,0,0,
         calendar = 'julian'
         dt_atmos = 1800,
         dt_cpld  = 7200,
@@ -3695,6 +3696,10 @@ endif
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75.nc
       </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc
+      </dataFile>
+
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/WOA05_pottemp_salt.nc 
      </dataFile>      
@@ -4706,6 +4711,33 @@ OVERRIDE_EOF
    </input>
 </experiment>
 
+<experiment name="CM4_c96L32_am4g7_2000_sis2_lowmix_hycom5.$(MOM6_DATE)" inherit="CM4_c96L32_am4g7_2000_sis2_lowmix_hycom5"/>
+<experiment name="CM4_c96L32_am4g7_2000_sis2_lowmix_hycom5" inherit="CM4_c96L32_am4g7_2000_sis2">
+   <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.0E-6
+Z_INIT_REMAP_GENERAL = True
+Z_INIT_REMAP_FULL_COLUMN = True
+REMAP_AFTER_INITIALIZATION = False
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75_800m.nc,sigma2,FNC1:2,4000,4.5,.01"
+MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"
+MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01" 
+REGRID_COMPRESSIBILITY_FRACTION = 0.01
+BOUNDARY_EXTRAPOLATION = True
+DYNAMIC_SURFACE_PRESSURE = True
+
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
 <experiment name="CM4_c96L32_am4g7_DR_2000_sis2_lowmix_hycom3" inherit="CM4_c96L32_am4g7_2000_sis2">
    <input>
      <namelist name="monin_obukhov_nml">
