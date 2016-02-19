@@ -742,6 +742,18 @@ the faster the model throughput, but also the lower the model efficiency
 	       dummy_ocean_nml:ocean_layout=36,36;dummy_ocean_nml:ocean_io_layout=1,4;
                dummy_ocean_nml:ocean_mask_table=mask_table.239.36x36"/><!--1/2 degree ocean grid Only-->
 
+   <property name="domainparams_A576x2_O842p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=842;
+               coupler_nml:atmos_npes=576;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;	
+               fv_core_nml:layout=8,12;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=8,12;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=144,4;ice_model_nml:io_layout=1,4;
+	       dummy_ice_nml:ice_layout=144,4;dummy_ice_nml:ice_io_layout=1,4;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=32,32;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.182.32x32"/><!--1/2 degree ocean grid Only-->
+
    <property name="domainparams_A576x2_O1057p5"
 	     value="
 	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=1057;
@@ -5624,7 +5636,7 @@ For more information please refer to the
         use_lag_fluxes = .true.
         concurrent = .true.
         do_ocean = .true.
-        ocean_npes = 1057   
+        ocean_npes = 842   
         atmos_npes = 576  
         atmos_nthreads = 2 
       </namelist>
@@ -5689,9 +5701,9 @@ For more information please refer to the
       </namelist>
 
       <namelist name="dummy_ocean_nml">
-        ocean_layout = 36,36  
+        ocean_layout = 32,32  
         ocean_io_layout = 1,4 
-	ocean_mask_table= mask_table.239.36x36 
+	ocean_mask_table= mask_table.182.32x32 
       </namelist>
       <namelist name="dummy_ice_nml">
         ice_layout = 144,4 
@@ -5769,7 +5781,7 @@ SIS_OVERRIDE_EOF
     </input>
 
     <runtime>
-        <production simTime="$(PROD_SIMTIME)" units="years" npes="1633" runTime="$(PROD_RUNTIME)">
+        <production simTime="$(PROD_SIMTIME)" units="years" npes="1418" runTime="$(PROD_RUNTIME)">
           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
         </production>
       <regression name="basic">
@@ -5800,6 +5812,10 @@ SIS_OVERRIDE_EOF
           <run days="2" npes="1080" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O864)"/>
       	</regression>
 
+	<regression name="layouts2">
+          <run days="2" npes="1418" runTimePerJob="00:20:00" overrideParams="$(domainparams_A576x2_O842p5)"/>
+      	</regression>
+	
 	<regression name="timings_c3">
           <run months="1" npes="1633" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
           <run months="1" npes="1274" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O842p5)"/>
