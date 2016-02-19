@@ -1656,8 +1656,9 @@ Experiment to build executable.
 #            git merge --no-ff user/z1l/bugfix -m "merge fix for stdlog in OMP region "
 #            /bin/sed "s/define MAXFIELDMETHDS_ 150/define MAXFIELDMETHODS_ 400/g" -i field_manager/field_manager.F90 
 #            git commit -a -m "Increase MAXFIELDMETHODS_ for ESM4"
-            ( cd shared && git checkout user/nnz/CM4p7_dev4verona )
+#            ( cd shared && git checkout 86547a10eb03ce26b366ac7dadfea6d631ef325f )
 #            git merge --no-ff origin/user/z1l/horiz_interp -m "merge test" #May change answers
+            ( cd shared && git checkout user/nnz/CM4p7_dev4verona )
             ]]>
             </csh>
       </source>
@@ -1762,7 +1763,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
       <source versionControl="git" root="https://github.com">
         <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase>
-        <csh>
+        <csh><![CDATA[
           git clone -b $(MOM6_GIT_TAG) https://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
@@ -1770,6 +1771,9 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
           git clone --recursive https://github.com/NOAA-GFDL/MOM6.git src/MOM6 
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git submodule update #This gets the right version of submodules
+###############################Only for 2016.02.03 tag###########################################	  
+( cd src/SIS2 && git checkout cb457141901bd6367a97e9ed62307c254285991b )#Only for 2016.02.03 tag		  
+#################################################################################################
           popd
 
           pushd mom6
@@ -1787,7 +1791,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
           if ($status != 0) then
             echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
           endif
-        </csh>
+        ]]></csh>
       </source>
       <compile>
         <cppDefs><![CDATA[ $(F2003_FLAGS) -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
@@ -4732,7 +4736,7 @@ MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"
 MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01" 
 REGRID_COMPRESSIBILITY_FRACTION = 0.01
 BOUNDARY_EXTRAPOLATION = True
-DYNAMIC_SURFACE_PRESSURE = True
+TOPO_EDITS_FILE = "All_edits.nc"
 
 OVERRIDE_EOF
      ]]></csh>
