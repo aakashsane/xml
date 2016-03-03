@@ -15,7 +15,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm_201510"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2016.01.16"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2016.03.02"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -389,6 +389,89 @@ module load nco/4.5.2
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
  
+    </platform>
+    <platform name="ncrc3.pgi15">
+      <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)"/>
+         <directory>
+            <!--unswept locations-->
+            <root>$CPERM/$USER/$(FRE_STEM)</root>
+            <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+            <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+            <!--swept locations (including the staged archive location)-->
+            <archive>$CTMP/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)</archive>
+            <stdout>$CTMP/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+            <work>$CTMP/$USER/work/$(FRE_STEM)/$FRE_JOBID</work>
+         </directory>
+ 
+      <csh><![CDATA[
+module use /sw/eslogin-c3/modulefiles
+        source $MODULESHOME/init/csh
+ 
+        module use -a /ncrc/home2/fms/local/modulefiles
+        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+        module unload netcdf fre
+        module load PrgEnv-pgi/5.2.82
+        module swap pgi pgi/15.3.0 
+
+        module load $(FRE_VERSION)
+        module load git
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+module load nco/4.5.2
+     ]]></csh>
+
+     <property name="MY_ROOT"          value="$(rootDir)"/>
+     <property name="FMS_ARCHIVE_ROOT" value="$CDATA/fms"/>
+     <property name="F2003_FLAGS"      value="-DINTERNAL_FILE_NML -g -traceback"/> <!-- -g -traceback -->
+     <property name="REFERENCE"        value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+     <property name="NB_ROOT"          value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
+     <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+     <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+     <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+ 
+    </platform>
+    <platform name="ncrc3.intel16">
+<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
+      <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+     
+      <csh><![CDATA[
+module use /sw/eslogin-c3/modulefiles
+
+        source $MODULESHOME/init/csh
+ 
+        module use -a /ncrc/home2/fms/local/modulefiles
+        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+        module unload netcdf fre
+        module load PrgEnv-intel/5.2.82
+        module swap intel intel/16.0.0.109
+
+        module load $(FRE_VERSION)
+        module load git
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+      ]]></csh>
+
+     <property name="MY_ROOT"          value="$(rootDir)"/>
+     <property name="FMS_ARCHIVE_ROOT" value="$CDATA/fms"/>
+     <property name="F2003_FLAGS"      value="-DINTERNAL_FILE_NML -g -traceback"/> <!-- -g -traceback -->
+     <property name="REFERENCE"        value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+     <property name="NB_ROOT"          value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
+     <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+     <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+     <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
     </platform>
     
     <platform name="ncrc3.default">
@@ -807,6 +890,8 @@ Make the executable for ocean-ice experiments.
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
+            <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for MOM6 may cause crash -->
+
          </compile>
       </component>
       
