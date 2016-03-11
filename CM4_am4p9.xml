@@ -75,7 +75,7 @@ They reproduce answers provided by AWG:
 
   <!--User shoould set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="ulm_201510"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2016.01.16"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2016.03.02"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20160212"/>           <!-- git tag for AWG source code -->
   <property name="BERGS_GIT_TAG" value="dev/master"/>             <!-- git tag for icebergs source code -->
@@ -2460,7 +2460,11 @@ set nyblocks = $dummy
 
 <!-- FULL CHEMISTRY -->
       <component type="tracer_level" source="atmos_tracer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)">
+	  <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/tracerMonthTS/*)">
+	    <xi:fallback/>
+	  </xi:include>
+	</timeSeries>
         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/tracerAnnualTS/*)">
             <xi:fallback/>
@@ -2592,7 +2596,11 @@ set nyblocks = $dummy
 
 <!-- FULL CHEMISTRY -->
       <component type="tracer_level" source="atmos_tracer" sourceGrid="atmos-cubedsphere" xyInterp="360,576" interpMethod="conserve_order1">
-        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)">
+	  <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/tracerMonthTS/*)">
+	    <xi:fallback/>
+	  </xi:include>
+	</timeSeries>
         <timeSeries freq="annual"  chunkLength="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/tracerAnnualTS/*)">
             <xi:fallback/>
@@ -3160,6 +3168,11 @@ endif
  
       </regression>
 
+      <regression name="basic2">
+          <run days="2" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+          <run days="1 1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+      </regression>
+
       <regression name="timing">
           <run months="1" npes="2044" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1756)"/>
       </regression>
@@ -3341,6 +3354,12 @@ endif
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/analysis_vgrid_lev35.v1.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_edits.nc</dataSource>
@@ -4130,7 +4149,7 @@ endif
             ocean_albedo_option = 5
       </namelist>
       <namelist name="ocean_rough_nml">
-            rough_scheme = 'beljaars'
+            rough_scheme = 'COARE3.5'
       </namelist>
      </input>
   </experiment>
@@ -4173,6 +4192,24 @@ OVERRIDE_EOF
  
 </experiment>
 
+<experiment name="CM4_c96L32_am4g9_2000_lowmix_MLE" inherit="CM4_c96L32_am4g9_2000">
+   <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.0E-6
+MLE_USE_PBL_MLD = True
+MLE_MLD_DECAY_TIME = 432000
+
+OVERRIDE_EOF
+     ]]></csh>
+   </input>
+ 
+</experiment>
 <experiment name="CM4_c96L32_am4g9_2000_low_mixing3" inherit="CM4_c96L32_am4g9_2000">
 								       
    <input>
@@ -4329,7 +4366,7 @@ OVERRIDE_EOF
 
 
 <experiment name="CM4_c96L48_am4g9_fullchem_nitrate_LNOx_2000_lowmix.$(MOM6_DATE)" inherit="CM4_c96L48_am4g9_fullchem_nitrate_LNOx_2000_lowmix"/>
-<experiment name="CM4_c96L48_am4g9_fullchem_nitrate_LNOx_2000_lowmix" inherit="cm4_compile">
+<experiment name="CM4_c96L48_am4g9_fullchem_nitrate_LNOx_2000_lowmix" inherit="cm4_sis2_compile">
     <description
 communityProject="$(ProjectID)" 
 communityModel="CM4_c96_am4p9_fullchem_nitrate_LNOx  $(MOM6_GIT_TAG)" 
@@ -4483,6 +4520,11 @@ OVERRIDE_EOF
   	<run days="2"   npes="2520" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O2304)"/>
   	<run days="2"   npes="2592" runTimePerJob="00:30:00" overrideParams="$(domainparams_A288x2_O2304)"/>
   	<run days="2"   npes="2880" runTimePerJob="00:30:00" overrideParams="$(domainparams_A288x2_O2592)"/>
+      </regression>
+
+      <regression name="basic2">
+          <run days="2" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+          <run days="1 1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
       </regression>
 
       <regression name="timing">
@@ -4643,9 +4685,8 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
 
 </experiment>
 
-<experiment name="CM4_c96L32_am4g9_2000_OMp5_c3_intel15" inherit="CM4_c96L32_am4g9_2000_OMp5"/>
 <experiment name="CM4_c96L32_am4g9_2000_OMp5.$(MOM6_DATE)" inherit="CM4_c96L32_am4g9_2000_OMp5"/>
-<experiment name="CM4_c96L32_am4g9_2000_OMp5" inherit="cm4_compile">
+<experiment name="CM4_c96L32_am4g9_2000_OMp5" inherit="cm4_sis2_compile">
     <description
 communityProject="$(ProjectID)" 
 communityModel="CM4_c96_am4p9_SIS2  $(MOM6_GIT_TAG)" 
@@ -4810,13 +4851,11 @@ USE_NEUTRAL_DIFFUSION	 = True
 KHTR = 500.
 KHTH = 500.
 #override TOPO_EDITS_FILE = ""
-
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-
 SIS_OVERRIDE_EOF
      ]]></csh>
 
@@ -4831,13 +4870,11 @@ SIS_OVERRIDE_EOF
       </regression>
 
       <regression name="rts">
-        <run days="15 26" npes="1633" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
+        <run days="15 16" npes="1633" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
+        <run days="2"     npes="1418" runTimePerJob="00:30:00" overrideParams="$(domainparams_A576x2_O842p5)"/>
   	<run days="2"     npes="864"  runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O648)"/>
   	<run days="2"     npes="1080" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O864)"/>
         <run months="1"   npes="1418" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O842p5)"/>
-      </regression>
-      <regression name="basic2">
-          <run days="2" npes="1418" runTimePerJob="00:30:00" overrideParams="$(domainparams_A576x2_O842p5)"/>
       </regression>
 
 	<regression name="layouts">
@@ -4891,8 +4928,271 @@ SIS_OVERRIDE_EOF
 
 </experiment>
 
+<experiment name="CM4_c96L32_am4g9_2000_OMp5_lmix_H5_nmle_ndiff_meke.$(MOM6_DATE)" inherit="CM4_c96L32_am4g9_2000_OMp5_lmix_H5_nmle_ndiff_meke"/>
+<experiment name="CM4_c96L32_am4g9_2000_OMp5_lmix_H5_nmle_ndiff_meke" inherit="cm4_sis2_compile">
+    <description
+communityProject="$(ProjectID)" 
+communityModel="CM4_c96_am4p9_SIS2_OMp5  $(MOM6_GIT_TAG)" 
+communityModelID="CM4_c96_am4p9_SIS2_OMp5"
+communityExperimentName="$(name)">
+         2016/02/22 JPK ESM4 2000 Control
+         no coastal roughness
+         dt_atmos   1800
+         dt (ocn)   1800
+         dt_cpld    3600
+         dt_therm   7200
 
-<experiment name="CM4_c96L32_am4g9_2000_OMp5_COBALT.$(MOM6_DATE)" inherit="CM4_c96L32_am4g9_2000_OMp5">
+    </description>
+    <communityComment>
+For more information please refer to the
+&lt;a href="http://wiki.gfdl.noaa.gov/index.php/MDT_Coupled"&gt; Coupled Working Group Wiki.  &lt;/a&gt; and  
+&lt;a href="http://cobweb.gfdl.noaa.gov/~Oar.Gfdl.Mdteam/cm4/$USER/$(name)"&gt; Global Diagnostics Page.  &lt;/a&gt;
+    </communityComment>
+    <scenario 
+      communityForcing="N/A"
+      startTime="$(EXP_CPLD_START)"
+      endTime="$(EXP_CPLD_END)" 
+      parentExperimentID="N/A" 
+      parentExperimentRIP="N/A" 
+      branch_time="0.0">
+    </scenario>
+
+    <input>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1,1,1,0,0,0,
+        calendar = 'NOLEAP'
+        dt_atmos = 1800,
+        dt_cpld  = 3600,
+        use_lag_fluxes = .true.
+        concurrent = .true.
+        do_ocean = .true.
+        ocean_npes = 842   
+        atmos_npes = 576  
+        atmos_nthreads = 2 
+      </namelist>
+      <namelist name="flux_exchange_nml">
+            nblocks=$(ATM_PROD_NTHREADS)
+            debug_stocks = .FALSE.
+            divert_stocks_report = .TRUE.
+            do_area_weighted_flux = .FALSE.
+      </namelist>
+      <namelist name="fms_io_nml">
+            fms_netcdf_restart=.true.
+            threading_read='multi'
+            max_files_r = 200
+            max_files_w = 200
+         !checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+	    
+      </namelist>
+      <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 7000000
+            stack_size =0
+      </namelist>
+      <namelist name="xgrid_nml">
+        make_exchange_reproduce = .true.
+        interp_method = 'second_order'
+      </namelist>
+
+      <namelist name="atmos_model_nml">
+         nxblocks = 1 
+         nyblocks = 2 
+      </namelist>
+      <namelist name="fv_core_nml">
+        layout = 8,12   
+        io_layout = 1,4 
+        npx      = 97,
+        npy      = 97,
+        ntiles   = 6,
+        npz      = 32,
+        k_split  = 1,
+        n_split  = 14,
+        a2b_ord  = 4,
+        hord_dp = -8,
+        hord_tr = -8,
+        adjust_dry_mass = $adjust_dry_mass,
+        consv_te = 0.7,
+        fill = .true.
+        print_freq = 0,
+        grid_type = 0,
+        nord = 2,
+        dddmp = 0.0,
+        d2_bg = 0.0,
+        d4_bg = 0.15,
+        tau = 0.      
+        z_tracer=.false.
+      </namelist>
+      <namelist name="land_model_nml">
+        layout = 8,12 
+        io_layout = 1,4 
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+        use_coast_rough = .true.,
+        use_coast_topo_rough = .false.,
+        max_coast_frac=0.67
+      </namelist>
+
+      <namelist name="dummy_ocean_nml">
+        ocean_layout = 32,32  
+        ocean_io_layout = 1,4 
+	ocean_mask_table= mask_table.182.32x32 
+      </namelist>
+      <namelist name="dummy_ice_nml">
+        ice_layout = 144,4 
+        ice_io_layout = 1,4 
+      </namelist>
+      <namelist name="ocean_rough_nml">
+        rough_scheme = 'COARE3.5'
+      </namelist>
+
+
+      <!--AWG Input datasets -->
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p9_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g9_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g9_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p7_2000climo.nml"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2_Op5grid']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='c96L32_Op5_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p7_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='common_init_csh_blocks']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_05grid_data']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
+
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+REMAP_AFTER_INITIALIZATION = False                                                   
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"                                      
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75_800m.nc,sigma2,FNC1:2,4000,4.5,.01"                                      
+MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"                                   
+MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01"                              
+REGRID_COMPRESSIBILITY_FRACTION = 0.01                                               
+BOUNDARY_EXTRAPOLATION = True                                                        
+DYNAMIC_SURFACE_PRESSURE = True
+MLE_USE_PBL_MLD = True
+MLE_MLD_DECAY_TIME = 432000
+#override KD = 2.0E-6
+#override USE_NEUTRAL_DIFFUSION = True                                               
+#override KHTR = 300.                                                                
+KH_RES_FN_POWER = 100                                                                
+MEKE_KHTH_FAC = 1.0                                                                  
+VISC_RES_FN_POWER = 100 
+#override DT = 1800
+#override DT_THERM = 7200  
+#override DIABATIC_FIRST = False
+THERMO_SPANS_COUPLING = True
+#override USE_RIVER_HEAT_CONTENT = True
+#override USE_CALVING_HEAT_CONTENT = True
+#override OCEAN_SURFACE_STAGGER = "C"
+#override TOPO_EDITS_FILE       = ""
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+
+    </input>
+
+    <runtime>
+        <production simTime="$(PROD_SIMTIME)" units="years" npes="1418" runTime="$(PROD_RUNTIME)">
+          <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
+        </production>
+      <regression name="basic">
+          <run months="1" npes="1633" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
+      </regression>
+
+      <regression name="rts">
+        <run days="15 16" npes="1633" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
+      </regression>
+      <regression name="basic2">
+          <run days="2"   npes="1633" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
+          <run days="1 1" npes="1633" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
+      </regression>
+
+      <regression name="basic1">
+          <run days="2"   npes="864" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O648)"/>
+          <run days="1 1" npes="864" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O648)"/>
+      </regression>
+	<regression name="layouts">
+          <run days="2" npes="1876" runTimePerJob="00:30:00" overrideParams="$(domainparams_A576x2_O1300p5)"/>
+          <run days="2" npes="2196" runTimePerJob="00:30:00" overrideParams="$(domainparams_A576x2_O1620)"/>
+          <run days="2" npes="1633" runTimePerJob="00:30:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
+          <run days="2" npes="1872" runTimePerJob="00:30:00" overrideParams="$(domainparams_A576x2_O1296)"/>
+          <run days="2" npes="864"  runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O648)"/>
+          <run days="2" npes="1080" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O864)"/>
+          <run days="2" npes="1418" runTimePerJob="00:30:00" overrideParams="$(domainparams_A576x2_O842p5)"/>
+      	</regression>
+
+	<regression name="timings_c3">
+          <run months="1" npes="1633" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
+          <run months="1" npes="1274" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O842p5)"/>
+      	</regression>
+	<regression name="timings_t1">
+          <run months="1" npes="658"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O442p5)"/>
+          <run months="1" npes="1274" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O842p5)"/>
+          <run months="1" npes="1489" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O1057p5)"/>
+          <run months="1" npes="1633" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
+          <run months="1" npes="1876" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1300p5)"/>
+          <run months="1" npes="2164" runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O1300p5)"/>
+          <run months="1" npes="2472" runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O1608p5)"/>
+          <run months="1" npes="2305" runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O1441p5)"/>
+          <run months="1" npes="2301" runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O1437p5)"/>
+       	</regression>
+
+	<regression name="timings">
+          <run months="1" npes="1728" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O1296)"/>
+          <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O648)"/>
+          <run months="1" npes="1489" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O1057p5)"/>
+          <run months="1" npes="1732" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O1300p5)"/>
+          <run months="1" npes="1383" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O951p5)"/>
+          <run months="1" npes="1383" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O951p5)"/>
+          <run months="1" npes="1876" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1300p5)"/>
+          <run months="1" npes="2908" runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O2044p5)"/>
+          <run months="1" npes="2164" runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O1300p5)"/>
+          <run months="1" npes="2472" runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O1608p5)"/>
+          <run months="1" npes="2305" runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O1441p5)"/>
+      	</regression>
+
+      <reference restart="$(REFERENCE)/archive/1x1m0d_216x2a_1756x1o/restart/00010201.tar"/>
+
+    </runtime>
+
+    <postProcess>
+      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
+    </postProcess>
+
+</experiment>
+
+
+<experiment name="CM4_c96L32_am4g9_2000_OMp5_lmix_H5_nmle_ndiff_meke_COBALT.$(MOM6_DATE)" inherit="CM4_c96L32_am4g9_2000_OMp5_lmix_H5_nmle_ndiff_meke">
     <input>
       <namelist name="coupler_nml">
         months = $months,
@@ -4952,41 +5252,42 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
-#override SMAG_LAP_CONST = 0.
-#override AH_VEL_SCALE = 0.
-#override RESOLN_SCALED_KH = False
-#override CORIOLIS_SCHEME = "ARAKAWA_HSU90"
-#override MEKE_BGSRC = 0.
-#override MEKE_FRCOEFF = 1.0
-#override MEKE_GMCOEFF = 0.0
-#override MEKE_ALPHA_RHINES = 0.0
-#override MEKE_ALPHA_EADY = 0.0
-#override MEKE_ALPHA_GRID = 1.0
-#override MEKE_VISCOSITY_COEFF = -0.4
-#override MEKE_KH = 600.
-#override MEKE_VISC_DRAG = False
-#override MEKE_CB = 0.
-#override MEKE_COLD_START = True
-#override MEKE_BACKSCAT_RO_C = 8.0
-#override MEKE_BACKSCAT_RO_POW = 2.0
-#override WRITE_GEOM = 1.0
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+REMAP_AFTER_INITIALIZATION = False                                                   
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"                                      
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75_800m.nc,sigma2,FNC1:2,4000,4.5,.01"                                      
+MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"                                   
+MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01"                              
+REGRID_COMPRESSIBILITY_FRACTION = 0.01                                               
+BOUNDARY_EXTRAPOLATION = True                                                        
+DYNAMIC_SURFACE_PRESSURE = True
+MLE_USE_PBL_MLD = True
+MLE_MLD_DECAY_TIME = 432000
+#override KD = 2.0E-6
+#override USE_NEUTRAL_DIFFUSION = True                                               
+#override KHTR = 300.                                                                
+KH_RES_FN_POWER = 100                                                                
+MEKE_KHTH_FAC = 1.0                                                                  
+VISC_RES_FN_POWER = 100 
 #override DT = 1800
-#override DT_THERM = 7200
+#override DT_THERM = 7200  
 #override DIABATIC_FIRST = False
 THERMO_SPANS_COUPLING = True
-USE_NEUTRAL_DIFFUSION	 = True
-KHTR = 500.
-KHTH = 500.
-#override TOPO_EDITS_FILE = ""
 #override USE_generic_tracer = True
 #override CHL_FROM_FILE = False
-
+#override USE_RIVER_HEAT_CONTENT = True
+#override USE_CALVING_HEAT_CONTENT = True
+#override OCEAN_SURFACE_STAGGER = "C"
+#override TOPO_EDITS_FILE       = ""
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
 SIS_OVERRIDE_EOF
      ]]></csh>
 
