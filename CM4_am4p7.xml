@@ -76,7 +76,7 @@ They reproduce answers provided by AWG:
 
   <!--User shoould set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="ulm_201510"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2016.03.02"/>      <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2016.03.22"/>      <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/>  <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20151106"/> <!-- git tag for AWG  source code -->
   <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -4770,8 +4770,8 @@ SIS_OVERRIDE_EOF
      ]]></csh>
    </input>
 </experiment>
-<experiment name="CM4_c96L32_am4g7_2000_sis2_lowmix_hycom5_nmle.$(MOM6_DATE)" inherit="CM4_c96L32_am4g7_2000_sis2_lowmix_hycom5"/>
-<experiment name="CM4_c96L32_am4g7_2000_sis2_lowmix_hycom5_nmle" inherit="CM4_c96L32_am4g7_2000_sis2">
+<experiment name="CM4_c96L32_am4g7_2000_sis2_lowmix_hycom5_nmle_cdt1800.$(MOM6_DATE)" inherit="CM4_c96L32_am4g7_2000_sis2_lowmix_hycom5_nmle_cdt1800"/>
+<experiment name="CM4_c96L32_am4g7_2000_sis2_lowmix_hycom5_nmle_cdt1800" inherit="CM4_c96L32_am4g7_2000_sis2">
    <input>
       <csh><![CDATA[
 #amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
@@ -4781,7 +4781,7 @@ endif
 #
 
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override KD = 2.0E-6
+#override KD = 2.E-6
 Z_INIT_REMAP_GENERAL = True
 Z_INIT_REMAP_FULL_COLUMN = True
 REMAP_AFTER_INITIALIZATION = False
@@ -4794,6 +4794,11 @@ BOUNDARY_EXTRAPOLATION = True
 DYNAMIC_SURFACE_PRESSURE = True
 MLE_USE_PBL_MLD = True
 MLE_MLD_DECAY_TIME = 432000.
+THERMO_SPANS_COUPLING = True
+#override DIABATIC_FIRST  = False
+THERMO_SPANS_COUPLING = True
+#override DIABATIC_FIRST  = False
+
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
@@ -4806,6 +4811,46 @@ SIS_OVERRIDE_EOF
    </input>
 </experiment>
 
+<experiment name="CM4_c96L32_am4g7_2000_sis2_lowmix_hycom5_nmle_MEKE_cdt1800.$(MOM6_DATE)" inherit="CM4_c96L32_am4g7_2000_sis2_lowmix_hycom5_nmle_MEKE_cdt1800"/>
+<experiment name="CM4_c96L32_am4g7_2000_sis2_lowmix_hycom5_nmle_MEKE_cdt1800" inherit="CM4_c96L32_am4g7_2000_sis2">
+   <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override KD = 2.E-6
+Z_INIT_REMAP_GENERAL = True
+Z_INIT_REMAP_FULL_COLUMN = True
+REMAP_AFTER_INITIALIZATION = False
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75_800m.nc,sigma2,FNC1:2,4000,4.5,.01"
+MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"
+MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01" 
+REGRID_COMPRESSIBILITY_FRACTION = 0.01
+BOUNDARY_EXTRAPOLATION = True
+DYNAMIC_SURFACE_PRESSURE = True
+MLE_USE_PBL_MLD = True
+MLE_MLD_DECAY_TIME = 432000.
+USE_NEUTRAL_DIFFUSION = True
+KHTR = 300.
+MEKE_KHTH_FAC = 1.0
+KH_RES_FN_POWER = 100
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
+   </input>
+</experiment>
 <experiment name="CM4_c96L32_am4g7_DR_2000_sis2_lowmix_hycom3" inherit="CM4_c96L32_am4g7_2000_sis2">
    <input>
      <namelist name="monin_obukhov_nml">
