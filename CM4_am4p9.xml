@@ -2047,7 +2047,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
           <csh><![CDATA[
           # AWG updates
           ( cd coupler && git checkout $(AWG_GIT_TAG) )
-( cd coupler && git merge --no-ff origin/user/rab/hyperthread -m "merge test")
+          ( cd coupler && git checkout user/nnz/merge_rab_hyperthread )
 
           ]]>
           </csh>
@@ -2935,12 +2935,12 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         concurrent = .false.
         do_ocean = .false.
         ocean_npes = 0
-        atmos_npes = $(ATM_PROD_NPES)
-        atmos_nthreads = $(ATM_PROD_NTHREADS)
+        atmos_npes = 864
+        atmos_nthreads = 2
       </namelist>
       <namelist name="fv_core_nml"> 
-        layout = $(FV_PROD_LAYOUT)
-        io_layout = $(FV_PROD_IO_LAYOUT)
+        layout = 6,24
+        io_layout = 1,4
         npx      = 97,
         npy      = 97,
         ntiles   = 6,
@@ -2963,18 +2963,26 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         z_tracer=.false.
       </namelist>
       <namelist name="land_model_nml">
-        layout = $(LND_PROD_LAYOUT)
-        io_layout = $(LND_PROD_IO_LAYOUT)
+        layout = 6,24
+        io_layout = 1,4
         tau_snow_T_adj = 604800.
         prohibit_negative_canopy_water=.false.
 	min_frac = 1e-8
       </namelist>
+      <namelist name="ice_model_nml">
+        spec_ice = .true.,
+        alb_sno = 0.80
+        t_range_melt = 10.0
+        layout = 144,6
+        io_layout = 1,3
+      </namelist>
+
        <namelist name="flux_exchange_nml">
-        nblocks=$(ATM_PROD_NTHREADS)
+        nblocks=2
       </namelist>
       <namelist name="atmos_model_nml">
-         nxblocks = $(ATM_PROD_NXBLOCKS)
-         nyblocks = $(ATM_PROD_NYBLOCKS)
+         nxblocks = 1
+         nyblocks = 2
       </namelist>
       <namelist name="fms_nml">
             clock_grain='ROUTINE'
@@ -3035,6 +3043,10 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
     </input>
 
     <runtime>
+      <production simTime="$(PROD_SIMTIME)" units="years" npes="864" runTime="16:00:00">
+        <segment simTime="12" units="months" runTime="1:20:00"/>
+      </production>
+ 
       <regression name="basic">
         <run days="8"   npes="216"  overrideParams="$(domainparams_A216x2)" runTimePerJob="00:20:00"/>
       </regression>
@@ -3137,12 +3149,12 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         concurrent = .false.
         do_ocean = .false.
         ocean_npes = 0
-        atmos_npes = $(ATM_PROD_NPES)
-        atmos_nthreads = $(ATM_PROD_NTHREADS)
+        atmos_npes = 864
+        atmos_nthreads = 2
       </namelist>
       <namelist name="fv_core_nml"> 
-        layout = $(FV_PROD_LAYOUT)
-        io_layout = $(FV_PROD_IO_LAYOUT)
+        layout = 6,24
+        io_layout = 1,4
         npx      = 97,
         npy      = 97,
         ntiles   = 6,
@@ -3165,18 +3177,25 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         z_tracer=.false.
       </namelist>
       <namelist name="land_model_nml">
-        layout = $(LND_PROD_LAYOUT)
-        io_layout = $(LND_PROD_IO_LAYOUT)
+        layout = 6,24
+        io_layout = 1,4
         tau_snow_T_adj = 604800.
         prohibit_negative_canopy_water=.false.
 	min_frac = 1e-8
       </namelist>
+      <namelist name="ice_model_nml">
+        spec_ice = .true.,
+        alb_sno = 0.80
+        t_range_melt = 10.0
+        layout = 144,6
+        io_layout = 1,3
+      </namelist>
        <namelist name="flux_exchange_nml">
-        nblocks=$(ATM_PROD_NTHREADS)
+        nblocks=2
       </namelist>
       <namelist name="atmos_model_nml">
-         nxblocks = $(ATM_PROD_NXBLOCKS)
-         nyblocks = $(ATM_PROD_NYBLOCKS)
+         nxblocks = 1
+         nyblocks = 2
       </namelist>
       <namelist name="fms_nml">
             clock_grain='ROUTINE'
@@ -5500,6 +5519,10 @@ SIS_OVERRIDE_EOF
   	<run days="2"     npes="864"  runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O648)"/>
   	<run days="2"     npes="1080" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O864)"/>
         <run months="1"   npes="1418" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O842p5)"/>
+      </regression>
+
+      <regression name="debug">
+          <run days="1" npes="1489" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O1057p5)"/>
       </regression>
 
 	<regression name="layouts">
