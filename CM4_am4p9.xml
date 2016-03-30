@@ -73,7 +73,7 @@ They reproduce answers provided by AWG:
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
-  <!--User shoould set the following properties according to the plan for the production run-->	
+  <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="ulm_201510"/>              <!-- Release tag for the shared source code -->
   <property name="MOM6_DATE"    value="2016.03.22"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
@@ -81,12 +81,15 @@ They reproduce answers provided by AWG:
   <property name="BERGS_GIT_TAG" value="dev/master"/>             <!-- git tag for icebergs source code -->
   <property name="ProjectID"    value="MDT"/>                     <!-- database top level -->
 
+  <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
+                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
   <property name="PROD_SIMTIME"     value="60"/>   <!--simulation length in years-->
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
 
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
   <property name="PROD_SEGTIME"     value="04:00:00"/><!--Wall clock per segment (usually 1 year)-->
+
   <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->   
   <property name="EXP_CPLD_START"   value="0001"/> <!--simulation start year--> 
@@ -4525,7 +4528,7 @@ endif
       
       <component type="ocean_monthly"   source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_month">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_monthly.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>
         </timeSeries>
 
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)" >
@@ -4538,20 +4541,20 @@ endif
 
       <component type="ocean_annual"    source="ocean_annual" sourceGrid="ocean-tripolar">
         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
         </timeAverage>
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
         </timeAverage>
         <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_annual"/>
       </component>
 
       <component type="ocean_annual_z" source="ocean_annual_z" sourceGrid="ocean-tripolar">
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual_z.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual_z.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
 
         <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_annual_z"/>	
