@@ -5692,6 +5692,57 @@ SIS_OVERRIDE_EOF
 
 </experiment>
 
+<experiment name="CM4_c96L32_am4g9_fullaero_2000_t1_OMp5_lmix_H5_nmle_ndiff_meke_m1" inherit="CM4_c96L32_am4g9_fullaero_2000_t1_OMp5_lmix_H5_nmle_ndiff_meke">
+    <description
+communityProject="$(ProjectID)"
+communityModel="CM4_c96L32_am4g9_fullaero_2000_t1_OMp5_lmix_H5_nmle_ndiff_meke_m1  $(MOM6_GIT_TAG)"
+communityModelID="CM4_c96L32_am4g9_fullaero_2000_t1_OMp5_lmix_H5_nmle_ndiff_meke_m1"
+communityExperimentName="$(name)">
+    </description>
+    <communityComment>
+Same as CM4_c96L32_am4g9_fullaero_2000_t1_OMp5_lmix_H5_nmle_ndiff_meke but with a new tuning for corresponding AMIP run from Ming:
+
+"
+these changes result in ~2.2W/m2 increase in net TOA radiation compared to the control AM4g9-fullaerosol (based on my 5year run).
+The OLR and SWABS are about 237.8, and 241.2W/m2. It would be hard to justify such a large TOA imbalance (+3.4W/m2). 
+But I agree it may be useful as a sensitivity test to understand some coupled model behavior.
+"
+
+For more information please refer to the
+&lt;a href="http://wiki.gfdl.noaa.gov/index.php/MDT_Coupled"&gt; Coupled Working Group Wiki.  &lt;/a&gt; and
+&lt;a href="http://cobweb.gfdl.noaa.gov/~Oar.Gfdl.Mdteam/cm4/$USER/$(name)"&gt; Global Diagnostics Page.  &lt;/a&gt;
+    </communityComment>
+    <scenario
+      communityForcing="N/A"
+      startTime="$(EXP_CPLD_START)"
+      endTime="$(EXP_CPLD_END)"
+      parentExperimentID="N/A"
+      parentExperimentRIP="N/A"
+      branch_time="0.0">
+    </scenario>
+    <input>
+
+    <namelist name="cloud_generator_nml">
+      do_inhomogeneous_clouds = .true.
+      defaultOverlap = 4
+      overlapLengthScale = 1.75
+    </namelist>
+    <namelist name="radiation_driver_nml">
+      rad_time_step= 10800,
+      rad_package = 'sea_esf',
+      do_clear_sky_pass=.true.,
+      !calc_hemi_integrals = .false.,
+      renormalize_sw_fluxes=.true.,
+      zenith_spec = 'diurnally_varying',
+      using_restart_file = .false.
+      do_conserve_energy = .true.
+      sw_rad_time_step = 3600,
+      use_single_lw_sw_ts = .false.,
+    </namelist>
+
+   </input>
+</experiment>
+
 <experiment name="CM4_c96L32_am4g9_fullaero_2000_t1_OMp5_lmix_H5_nmle_ndiff_meke.$(MOM6_DATE)" inherit="CM4_c96L32_am4g9_fullaero_2000_t1_OMp5_lmix_H5_nmle_ndiff_meke"/>
 <experiment name="CM4_c96L32_am4g9_fullaero_2000_t1_OMp5_lmix_H5_nmle_ndiff_meke" inherit="cm4_sis2_compile">
     <description
