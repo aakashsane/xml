@@ -2559,6 +2559,12 @@ SIS_OVERRIDE_EOF
 	</dataTable>
 -->
 
+      <fieldTable order="append">
+"namelists","ocean_mod","generic_age/*global*"
+/
+
+      </fieldTable>
+
       <diagTable order="append">
 #================
 # Additional DIAGNOSTICS
@@ -2582,6 +2588,10 @@ SIS_OVERRIDE_EOF
 "generic_age","age_stf",    "age_stf",    "generic_tracers","all",.true.,"none",2
 "generic_argon","argon",    "argon",        "generic_tracers","all",.true.,"none",2
 "generic_argon","argon_stf","argon_stf",    "generic_tracers","all",.true.,"none",2
+#
+"generic_tracers_z",          0,  "days", 1, "days", "time",
+"generic_cfc_z_new","cfc_11",     "cfc_11",     "generic_tracers_z","all",.true.,"none",2
+"generic_cfc_z_new","cfc_12",     "cfc_12",     "generic_tracers_z","all",.true.,"none",2
 
       </diagTable>
 
@@ -2591,12 +2601,12 @@ cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override USE_OCMIP2_CFC = False
 #override USE_IDEAL_AGE_TRACER = False
 USE_generic_tracer = True
-GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+GENERIC_TRACER_IC_FILE = "_NULL_"
 OVERRIDE_EOF
 
 #Add null CFC's to a restart file
 cd $work/INPUT
-ncap -O --script 'cfc_11 = ptemp * 0.0 ; cfc_12 = ptemp * 0.0 ; sf6 = ptemp * 0.0 ; age  = ptemp * 0.0 ; argon = ptemp * 0.0 ' GOLD_IC.2010.11.15.nc MOM_GENERICS.res.nc
+#ncap -O --script 'cfc_11 = ptemp * 0.0 ; cfc_12 = ptemp * 0.0 ; sf6 = ptemp * 0.0 ; age  = ptemp * 0.0 ; argon = ptemp * 0.0 ' GOLD_IC.2010.11.15.nc MOM_GENERICS.res.nc
 #CFC is constant_init_tracer so the ice fluxes are not needed.
 \rm ice_ocmip2_cfc.res.nc
 
