@@ -291,7 +291,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
           module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
           module unload netcdf fre fre-commands
           module load PrgEnv-intel/5.2.40
-          module load intel/14.0.2.144
+          module sawp intel intel/14.0.2.144
           module load git
           module load $(FRE_VERSION)
           setenv KMP_STACKSIZE 512m
@@ -330,7 +330,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
           module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
           module unload netcdf fre fre-commands
           module load PrgEnv-intel/5.2.40
-          module load intel/15.0.2.164
+          module swap intel intel/15.0.2.164
           module load git
           module load $(FRE_VERSION)
           setenv KMP_STACKSIZE 512m
@@ -370,7 +370,7 @@ module use /sw/eslogin-c3/modulefiles
           module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
           module unload netcdf fre fre-commands
           module load PrgEnv-intel/5.2.82
-          module load intel/15.0.2.164
+          module swap intel intel/15.0.2.164
           module load git
           module load $(FRE_VERSION)
 module load nco/4.5.2
@@ -839,7 +839,7 @@ Make the executable for ocean-ice experiments.
             </csh>
          </source>
          <compile>
-            <cppDefs>-Duse_libMPI -Duse_netCDF $(F2003_FLAGS)</cppDefs>
+            <cppDefs>-Duse_libMPI -Duse_netCDF $(F2003_FLAGS) -DMAXFIELDMETHODS_=400</cppDefs>
          </compile>
       </component>
 
@@ -2301,6 +2301,7 @@ OVERRIDE_EOF
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/INPUT/sgs_h2.nc</dataSource>                            
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/INPUT/tideamp.nc</dataSource>                           
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/INPUT/tke_tidal_cm2p2.nc</dataSource>                   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/analysis_vgrid_lev35.v1.nc</dataSource>
       </dataFile>                                                                                                                     
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -2494,7 +2495,7 @@ endif
        </regression>
 
        <regression name="debug">
-         <run days="1 1"    npes="64" overrideParams="dummy_ocean_nml:ocean_layout=4,16;dummy_ocean_nml:ocean_io_layout=1,2;dummy_ice_nml:ice_layout=4,16;dummy_ice_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
+         <run days="2"    npes="64" overrideParams="dummy_ocean_nml:ocean_layout=4,16;dummy_ocean_nml:ocean_io_layout=1,2;dummy_ice_nml:ice_layout=4,16;dummy_ice_nml:ice_io_layout=1,4" runTimePerJob="00:30:00"/>
 
        </regression>
 
