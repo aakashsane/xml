@@ -16,7 +16,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm_201510"/> <!-- CVS tag for shared source code -->
    <property name="MOM6_DATE"    value="2016.03.22"/>     <!-- git tag date for MOM6 source code -->
-   <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)_2"/>
+   <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="dev/master"/>
    <property name="FRE_VERSION"  value="fre/bronx-10"/>
@@ -1975,6 +1975,48 @@ $baseDate
      </namelist>
 
    </input>
+   </experiment>
+
+   <experiment name="OM4_lowmix" inherit="OM4_SIS2_baseline">
+    <input>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.E-6
+#override MLE_USE_PBL_MLD = True
+#override MLE_MLD_DECAY_TIME = 4.32E5
+OVERRIDE_EOF
+     ]]></csh>
+    </input>
+   </experiment>
+
+   <experiment name="OM4_lowmix_MEKE" inherit="OM4_SIS2_baseline">
+    <input>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.E-6
+#override MLE_USE_PBL_MLD = True
+#override MLE_MLD_DECAY_TIME = 4.32E5
+#override KH_RES_FN_POWER = 100
+#override MEKE_KHTH_FAC = 1.0
+OVERRIDE_EOF
+     ]]></csh>
+    </input>
+   </experiment>
+
+   <experiment name="OM4_lowmix_MEKE_KHTR600" inherit="OM4_SIS2_baseline">
+    <input>
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#override KD = 2.E-6
+#override MLE_USE_PBL_MLD = True
+#override MLE_MLD_DECAY_TIME = 4.32E5
+#override KH_RES_FN_POWER = 100
+#override MEKE_KHTH_FAC = 1.0
+#override USE_NEUTRAL_DIFFUSION = True
+#override KHTR = 600.
+OVERRIDE_EOF
+     ]]></csh>
+    </input>
    </experiment>
 
    <experiment name="OM4_SIS2_CORE2_baseline" inherit="OM4_SIS2_baseline_config">
