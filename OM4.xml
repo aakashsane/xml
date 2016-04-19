@@ -16,13 +16,16 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm_201510"/> <!-- CVS tag for shared source code -->
    <property name="MOM6_DATE"    value="2016.03.22"/>     <!-- git tag date for MOM6 source code -->
-   <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
+   <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)_2"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="dev/master"/>
    <property name="FRE_VERSION"  value="fre/bronx-10"/>
 
+  <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
+                                                                 <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs-->
+
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-   <property name="PROD_SIMTIME"   value="2"/>
+   <property name="PROD_SIMTIME"   value="20"/>
    <!--Post-processing  chunk lengths -->
    <property name="CHUNK_LENGTH_A" value="5yr"/>
    <property name="CHUNK_LENGTH_B" value="20yr"/>
@@ -233,7 +236,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
     
    <setup>
     <platform name="ncrc2.intel">
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -268,11 +271,12 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
  
     </platform>
 
     <platform name="ncrc2.intel14">
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -307,11 +311,12 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
  
     </platform>
     
     <platform name="ncrc2.intel15">
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -346,11 +351,12 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
  
     </platform>
 
     <platform name="ncrc3.intel15">
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -388,10 +394,11 @@ module load nco/4.5.2
      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
  
     </platform>
     <platform name="ncrc3.pgi15">
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -430,11 +437,54 @@ module load nco/4.5.2
      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
+ 
+    </platform>
+    <platform name="ncrc3.gnu">
+      <project>gfdl_YOURGROUPLETTER</project>
+      <directory stem="$(FRE_STEM)"/>
+         <directory>
+            <!--unswept locations-->
+            <root>$CPERM/$USER/$(FRE_STEM)</root>
+            <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+            <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+            <!--swept locations (including the staged archive location)-->
+            <archive>$CTMP/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)</archive>
+            <stdout>$CTMP/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+            <work>$CTMP/$USER/work/$(FRE_STEM)/$FRE_JOBID</work>
+         </directory>
+ 
+      <csh><![CDATA[
+module use /sw/eslogin-c3/modulefiles
+        source $MODULESHOME/init/csh
+ 
+        module use -a /ncrc/home2/fms/local/modulefiles
+        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+        module unload netcdf fre
+        module load PrgEnv-gnu/5.2.82
+
+        module load $(FRE_VERSION)
+        module load git
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+module load nco/4.5.2
+     ]]></csh>
+
+     <property name="MY_ROOT"          value="$(rootDir)"/>
+     <property name="FMS_ARCHIVE_ROOT" value="$CDATA/fms"/>
+     <property name="F2003_FLAGS"      value="-DINTERNAL_FILE_NML -fbacktrace"/> <!-- -g -traceback -->
+     <property name="REFERENCE"        value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+     <property name="NB_ROOT"          value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
+     <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+     <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+     <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
  
     </platform>
     <platform name="ncrc3.intel16">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
         <root>$CPERM/$USER/$(FRE_STEM)</root>
@@ -472,6 +522,7 @@ module use /sw/eslogin-c3/modulefiles
      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
     </platform>
     
     <platform name="ncrc3.default">
@@ -479,7 +530,7 @@ module use /sw/eslogin-c3/modulefiles
     </platform>
 
     <platform name="ncrc2.intel16">
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -514,6 +565,7 @@ module use /sw/eslogin-c3/modulefiles
      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
  
     </platform>
 
@@ -523,7 +575,7 @@ module use /sw/eslogin-c3/modulefiles
 	 on the executable before runtime
        --> 
 
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -559,6 +611,7 @@ module load perftools/5.3.2
      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
     </platform>
 
     <platform name="ncrc2.default">
@@ -566,7 +619,7 @@ module load perftools/5.3.2
     </platform>
 
     <platform name="ncrc2.gnu">
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)"/>
  
       <csh><![CDATA[
@@ -593,11 +646,12 @@ module load perftools/5.3.2
      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
  
     </platform>
 
     <platform name="ncrc2.gnu_O3">
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)"/>
 
       <mkmfTemplate file="/ncrc/home2/Niki.Zadeh/fre/fre-commands/site/ncrc/gnu.mk"/>
@@ -626,11 +680,12 @@ module load perftools/5.3.2
      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
  
     </platform>
     
     <platform name="ncrc2.pgi14">
-      <project>gfdl_f</project>
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)"/>
  
       <csh><![CDATA[
@@ -657,6 +712,7 @@ module load perftools/5.3.2
      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
  
     </platform>
     
@@ -699,6 +755,7 @@ module load perftools/5.3.2
      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
     
     </platform>
 
@@ -732,6 +789,7 @@ module load perftools/5.3.2
       <property name="FMS_ESM_ARCHIVE_ROOT" value="/lustre/atlas/proj-shared/cli061/pdata/fms/esm"/>
       <property name="OBGC_ARCHIVE_ROOT"    value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/retrospective"/> 
       <property name="OBGC_MODEL_UPDATES"   value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/retrospective"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
 
       <project>cli061</project>
       <csh><![CDATA[
@@ -777,6 +835,7 @@ limit coredumpsize unlimited
       <property name="FMS_ESM_ARCHIVE_ROOT" value=""/>
       <property name="OBGC_ARCHIVE_ROOT"    value=""/> 
       <property name="OBGC_MODEL_UPDATES"   value="/home/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
 
       <csh><![CDATA[
         source $MODULESHOME/init/csh
@@ -834,7 +893,7 @@ Make the executable for ocean-ice experiments.
 #            git merge --no-ff user/z1l/bugfix -m "merge fix for stdlog in OMP region "
 #            /bin/sed "s/define MAXFIELDMETHDS_ 150/define MAXFIELDMETHODS_ 400/g" -i field_manager/field_manager.F90 
 #            git commit -a -m "Increase MAXFIELDMETHODS_ for ESM4"
-            ( cd shared && git checkout user/nnz/CM4p7_dev4verona )
+#            ( cd shared && git checkout user/nnz/CM4p7_dev4verona )
              ]]>
             </csh>
          </source>
@@ -865,9 +924,10 @@ Make the executable for ocean-ice experiments.
           git clone -b $(MOM6_GIT_TAG) https://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
-          git submodule init src/MOM6 src/SIS2 tools/python/MIDAS
+          git submodule init src/MOM6 src/SIS2 src/icebergs tools/python/MIDAS
           git clone --recursive https://github.com/NOAA-GFDL/MOM6.git src/MOM6 
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
+          git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
           popd
 
@@ -895,9 +955,9 @@ Make the executable for ocean-ice experiments.
          </compile>
       </component>
       
-      <component name="icebergs" paths="icebergs" requires="fms">
-         <source versionControl="git" root="https://github.com/NOAA-GFDL">
-            <codeBase version="$(BERGS_GIT_TAG)"> icebergs.git </codeBase>
+      <component name="icebergs" paths="mom6/src/icebergs" requires="fms">
+         <source versionControl="git" root="https://github.com">
+            <codeBase version="$(BERGS_GIT_TAG)"> NULL </codeBase>
          </source>
          <compile>
             <cppDefs><![CDATA[-D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
@@ -1578,19 +1638,19 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
       </component>
       <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_monthly.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>
         </timeSeries>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_month">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_monthly.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>
         </timeSeries>
       </component>
 
       <component type="ocean_annual_z" start="$(PP_START_YEAR)" source="ocean_annual_z"  sourceGrid="ocean-tripolar">
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual_z.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual_z.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
 
         <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>	
@@ -1598,10 +1658,10 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
 
       <component type="ocean_annual" start="$(PP_START_YEAR)"  source="ocean_annual"  sourceGrid="ocean-tripolar"> 
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
         </timeAverage>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/ocn_annual.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
         </timeAverage>
       </component>
 
@@ -2969,6 +3029,9 @@ $baseDate
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75.nc</dataSource>
       </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
+      </dataFile>
 
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
@@ -3268,8 +3331,8 @@ SIS_OVERRIDE_EOF
 
    </experiment>
 
-   <experiment name="OM4_SIS2_05_DT1800_KHTHKHTR500_scatter_COBALT.$(MOM6_DATE)" inherit="OM4_SIS2_05_DT1800_KHTHKHTR500_scatter_COBALT"/>
-   <experiment name="OM4_SIS2_05_DT1800_KHTHKHTR500_scatter_COBALT$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
+   <experiment name="OMp5_COBALT.$(MOM6_DATE)" inherit="OMp5_COBALT"/>
+   <experiment name="OMp5_COBALT$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
 
      <input>
       <namelist name="coupler_nml">
@@ -3312,11 +3375,67 @@ SIS_OVERRIDE_EOF
        domains_stack_size = 7000000
        stack_size =0
      </namelist>
+      <namelist name="dummy_ocean_nml">
+       ocean_layout = 36,36
+       ocean_io_layout = 1,4
+       ocean_mask_table=mask_table.239.36x36
+     </namelist>
+     <namelist name="dummy_ice_nml">
+       ice_layout = 36,36
+       ice_io_layout = 1,4
+       ice_mask_table=mask_table.239.36x36
+     </namelist>
+
 
      <diagTable>
 $name
 $baseDate
      </diagTable>
+     <diagTable order="append">
+#================
+# sample z DIAGNOSTICS
+#================
+#===========================
+# ocean_cobalt_1day_z
+#===========================
+"ocean_cobalt_day",       1,  "days", 1, "days", "time",
+ "generic_cobalt","def_fe_Di",       "def_fe_Di",          "ocean_cobalt_day","all",.true.,"none",2
+ "generic_cobalt","def_fe_Lg",       "def_fe_Lg",          "ocean_cobalt_day","all",.true.,"none",2
+ "generic_cobalt","def_fe_Sm",       "def_fe_Sm",          "ocean_cobalt_day","all",.true.,"none",2
+ "generic_cobalt","felim_Di",        "felim_Di",           "ocean_cobalt_day","all",.true.,"none",2
+ "generic_cobalt","felim_Lg",        "felim_Lg",           "ocean_cobalt_day","all",.true.,"none",2
+ "generic_cobalt","felim_Sm",        "felim_Sm",           "ocean_cobalt_day","all",.true.,"none",2
+ "generic_cobalt","irrlim_Di",       "irrlim_Di",          "ocean_cobalt_day","all",.true.,"none",2
+ "generic_cobalt","irrlim_Lg",       "irrlim_Lg",          "ocean_cobalt_day","all",.true.,"none",2
+ "generic_cobalt","irrlim_Sm",       "irrlim_Sm",          "ocean_cobalt_day","all",.true.,"none",2
+ "generic_cobalt","chl",                "chl",                "ocean_cobalt_day","all",.true.,"none",2
+ "generic_cobalt","htotal",             "htotal",             "ocean_cobalt_day","all",.true.,"none",2
+ "generic_cobalt","no3",                "no3",                "ocean_cobalt_day","all",.true.,"none",2
+ "generic_cobalt","o2",                 "o2",                 "ocean_cobalt_day","all",.true.,"none",2
+#
+ "ocean_model","temp","temp","ocean_cobalt_day","all",.true.,"none",2
+ "ocean_model","salt","salt","ocean_cobalt_day","all",.true.,"none",2
+
+"ocean_cobalt_day_z",       1,  "days", 1, "days", "time",
+ "generic_cobalt_z_new","def_fe_Di",       "def_fe_Di",          "ocean_cobalt_day_z","all",.true.,"none",2
+ "generic_cobalt_z_new","def_fe_Lg",       "def_fe_Lg",          "ocean_cobalt_day_z","all",.true.,"none",2
+ "generic_cobalt_z_new","def_fe_Sm",       "def_fe_Sm",          "ocean_cobalt_day_z","all",.true.,"none",2
+ "generic_cobalt_z_new","felim_Di",        "felim_Di",           "ocean_cobalt_day_z","all",.true.,"none",2
+ "generic_cobalt_z_new","felim_Lg",        "felim_Lg",           "ocean_cobalt_day_z","all",.true.,"none",2
+ "generic_cobalt_z_new","felim_Sm",        "felim_Sm",           "ocean_cobalt_day_z","all",.true.,"none",2
+ "generic_cobalt_z_new","irrlim_Di",       "irrlim_Di",          "ocean_cobalt_day_z","all",.true.,"none",2
+ "generic_cobalt_z_new","irrlim_Lg",       "irrlim_Lg",          "ocean_cobalt_day_z","all",.true.,"none",2
+ "generic_cobalt_z_new","irrlim_Sm",       "irrlim_Sm",          "ocean_cobalt_day_z","all",.true.,"none",2
+ "generic_cobalt_z_new","chl",                "chl",                "ocean_cobalt_day_z","all",.true.,"none",2
+ "generic_cobalt_z_new","htotal",             "htotal",             "ocean_cobalt_day_z","all",.true.,"none",2
+ "generic_cobalt_z_new","no3",                "no3",                "ocean_cobalt_day_z","all",.true.,"none",2
+ "generic_cobalt_z_new","o2",                 "o2",                 "ocean_cobalt_day_z","all",.true.,"none",2
+#                                                                                                                                                             11
+ "ocean_model_z_new","temp","temp","ocean_cobalt_day_z","all",.true.,"none",2
+ "ocean_model_z_new","salt","salt","ocean_cobalt_day_z","all",.true.,"none",2
+
+     </diagTable>
+
 
       <xi:include xpointer="xpointer(//experiment[@name='OM4_common']/input/node())"/>
       <!--MOM6 Input datasets-->
@@ -3326,9 +3445,50 @@ $baseDate
       <!--CORE forcing datasets-->
       <xi:include xpointer="xpointer(//experiment[@name='CORE_data']/input/node())"/>
       <!--COBALT source datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='OBGC_COBALT_data_p5']/input/node())"/>
+      <xi:include xpointer="xpointer(//experiment[@name='OBGC_COBALT_Preind_data_p5']/input/node())"/>
+      <!--COBALT field table-->
+      <xi:include xpointer="xpointer(//experiment[@name='OBGC_COBALT_Preind_field_table']/input/node())"/>
+      <!--COBALT diag table-->
+      <xi:include xpointer="xpointer(//experiment[@name='OBGC_COBALT_diag_table']/input/node())"/>
+
+<dataTable>
+"OCN", "runoff_no3_flux_ice_ocn",   "NO3_CONC",   "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_ldon_flux_ice_ocn",  "LDON_CONC",  "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_sldon_flux_ice_ocn", "SLDON_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_srdon_flux_ice_ocn", "SRDON_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_ndet_flux_ice_ocn",  "NDET_CONC",  "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_po4_flux_ice_ocn",   "PO4_CONC",   "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_ldop_flux_ice_ocn",  "LDOP_CONC",  "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_sldop_flux_ice_ocn", "SLDOP_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_srdop_flux_ice_ocn", "SRDOP_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_fed_flux_ice_ocn", ""   , ""                             , "none" ,  0.0
+"OCN", "runoff_alk_flux_ice_ocn", ""   , ""                             , "none" ,  0.48e-3
+"OCN", "runoff_dic_flux_ice_ocn", ""   , ""                             , "none" ,  0.24e-3
+"OCN", "runoff_lith_flux_ice_ocn", ""  , ""                             , "none" , 13.0e-3
+"OCN", "dry_dep_fed_flux_ice_ocn", "FLUX",         "./INPUT/Soluble_Fe_Flux_moxim11_climatology.nc", "bilinear" , -1.0
+"OCN", "dry_dep_lith_flux_ice_ocn", "FLUX",        "./INPUT/Mineral_Fe_Flux_moxim11_climatology.nc", "bilinear" , -1594.0
+"OCN", "dry_dep_po4_flux_ice_ocn", "FLUX",         "./INPUT/Mineral_Fe_Flux_moxim11_climatology.nc", "bilinear" , -0.035
+"OCN", "wet_dep_no3_flux_ice_ocn",  "NO3_WET_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
+"OCN", "dry_dep_no3_flux_ice_ocn",  "NO3_DRY_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
+"OCN", "wet_dep_nh4_flux_ice_ocn",  "NH4_WET_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
+"OCN", "dry_dep_nh4_flux_ice_ocn",  "NH4_DRY_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
+#
+# jgj 2015/12/09 data table for o2 gas exchange
+#
+"ATM", "o2_flux_pcair_atm", ""         , ""                             , "none" , 0.21
+# jgj 2015/12/09 co2 data table for Preindustrial Control
+#
+## restoring co2 and radiation co2 data overrides set to 286e-6
+"ATM" , "co2_dvmr_restore", "",     "", "none",  368.11e-06
+"ATM" , "co2_dvmr_rad",     "",     "", "none",  368.11e-06
+</dataTable>
   
-    <csh><![CDATA[
+      <csh><![CDATA[
+#amip initCond tar file includes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
@@ -3339,34 +3499,32 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
 #override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
 #override SALT_RESTORE_FILE     = "salt_restore.nc"
-#override SMAG_LAP_CONST = 0.
-#override AH_VEL_SCALE = 0.
-#override RESOLN_SCALED_KH = False
-#override CORIOLIS_SCHEME = "ARAKAWA_HSU90"
-#override MEKE_BGSRC = 0.
-#override MEKE_FRCOEFF = 1.0
-#override MEKE_GMCOEFF = 0.0
-#override MEKE_ALPHA_RHINES = 0.0
-#override MEKE_ALPHA_EADY = 0.0
-#override MEKE_ALPHA_GRID = 1.0
-#override MEKE_VISCOSITY_COEFF = -0.4
-#override MEKE_KH = 600.
-#override MEKE_VISC_DRAG = False
-#override MEKE_CB = 0.
-#override MEKE_COLD_START = True
-#override MEKE_BACKSCAT_RO_C = 8.0
-#override MEKE_BACKSCAT_RO_POW = 2.0
-#override WRITE_GEOM = 1.0
-USE_NEUTRAL_DIFFUSION	 = True
-KHTR = 500.
-KHTH = 500.
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+REMAP_AFTER_INITIALIZATION = False                                                   
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"                                      
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75_800m.nc,sigma2,FNC1:2,4000,4.5,.01"                                      
+MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"                                   
+MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01"                              
+REGRID_COMPRESSIBILITY_FRACTION = 0.01                                               
+BOUNDARY_EXTRAPOLATION = True                                                        
+DYNAMIC_SURFACE_PRESSURE = True 
+#override USE_NEUTRAL_DIFFUSION = True                                               
+#override KHTR = 300.                                                                
+KH_RES_FN_POWER = 100                                                                
+MEKE_KHTH_FAC = 1.0                                                                  
+VISC_RES_FN_POWER = 100 
 #override DT = 1800
-#override DT_THERM = 7200
+#override DT_THERM = 7200  
 #override DIABATIC_FIRST = False
 THERMO_SPANS_COUPLING = True
-USE_generic_tracer = True
+#override USE_generic_tracer = True
 #override CHL_FROM_FILE = True
-#override TOPO_EDITS_FILE = ""
+#override USE_RIVER_HEAT_CONTENT = True
+#override USE_CALVING_HEAT_CONTENT = True
+
+#override OCEAN_SURFACE_STAGGER = "C"
+#override TOPO_EDITS_FILE       = ""
 
 MOM_OVERRIDE_EOF
 
@@ -3382,4 +3540,356 @@ SIS_OVERRIDE_EOF
 
    </experiment>
    
+<experiment name="OBGC_COBALT_Preind_data_p5">
+    <input>
+       <!-- IC files -->
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/woa13/woa13_all_n_annual_01.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/woa13/woa13_all_p_annual_01.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/woa13/woa13_all_i_annual_01.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/woa13/woa13_all_o_annual_01.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/glodap/20151013/Alk.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/glodap/20151013/Preind_DIC.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/init_ocean_cobalt.res.nc" chksum="" size="" timestamp="">
+         <dataSource
+platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds_mumem_htotalbounds.ocean_cobalt.res.nc</dataSource>
+      </dataFile>
+
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(FMS_ESM_ARCHIVE_ROOT)/TOPAZ/deposition_horowitz/depflux_total.mean.1860.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/Soluble_Fe_Flux_moxim11_climatology.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/Mineral_Fe_Flux_moxim11_climatology.nc</dataSource>
+      </dataFile>
+
+      <!-- grid specific -->
+      <dataFile label="input" target="INPUT/news_nutrients.nc" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(ESM4_ARCHIVE_ROOT)/news_nutrients_halfdeg_20151207.nc</dataSource>
+      </dataFile>
+
+     </input>
+
+</experiment>
+
+<experiment name="OBGC_COBALT_Preind_data_table">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.COBALT_preind_20151209</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.COBALT_preind_20151209</dataSource>
+      </dataFile>
+    </input>
+</experiment>
+
+<experiment name="OBGC_COBALT_diag_table">
+    <input>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/diag_table.COBALT_20151026</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/diag_table.COBALT_20151026</dataSource>
+      </dataFile>
+    </input>
+</experiment>
+
+<experiment name="OBGC_COBALT_Preind_field_table">
+    <input>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="" order="append">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.COBALT_init_tracers_latlon_preind_dic_20151209</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.COBALT_init_tracers_latlon_preind_dic_20151209</dataSource>
+      </dataFile>
+    </input>
+</experiment>
+
+<experiment name="ESM4_o2_gas_exchange_data_table">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.o2_20151209</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.o2_20151209</dataSource>
+      </dataFile>
+    </input>
+</experiment>
+
+<experiment name="ESM4_Preind_co2_data_table">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.co2_preind_20151209</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.co2_preind_20151209</dataSource>
+      </dataFile>
+    </input>
+</experiment>
+	
+<experiment name="ESM4_atmos_Preind_co2_field_table">
+    <input>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.atmos_co2_20151209</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.atmos_co2_20151209</dataSource>
+      </dataFile>
+     </input>
+</experiment>
+ 
+
+ <!-- OCEAN BGC post-processing-->
+  <experiment name="COBALT_postprocess">
+
+      <postProcess> 
+      <!--REFINE DIAG SCRIP -->
+      <!--By default a refineDiag script causes the annual data to be unpacked and saved in /ptmp/$USER-->
+      <!--MOM6_refineDiag.csh is currently empty and is here only to cause the unpack annual history files in /ptmp-->
+      <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh"/>
+
+      <!--PostProcessing component models-->
+      <component type="ocean_cobalt_1day" start="$(PP_START_YEAR)" source="ocean_cobalt_1day" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)" />
+      </component>
+
+      <component type="ocean_cobalt_tracers_month" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_month" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+<!--
+      <component type="ocean_cobalt_tracers_year" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_year" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+-->
+
+      <component type="ocean_cobalt_sfc" start="$(PP_START_YEAR)" source="ocean_cobalt_sfc" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_btm" start="$(PP_START_YEAR)" source="ocean_cobalt_btm" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_phytolim_sfc" start="$(PP_START_YEAR)" source="ocean_cobalt_phytolim_sfc" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_fdet_100" start="$(PP_START_YEAR)" source="ocean_cobalt_fdet_100" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_biomass_100" start="$(PP_START_YEAR)" source="ocean_cobalt_biomass_100" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_prod_100" start="$(PP_START_YEAR)" source="ocean_cobalt_prod_100" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_miscflux_100" start="$(PP_START_YEAR)" source="ocean_cobalt_miscflux_100" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+<!--
+      <component type="ocean_cobalt_phyto_diags" start="$(PP_START_YEAR)" source="ocean_cobalt_phyto_diags" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_bact_diags" start="$(PP_START_YEAR)" source="ocean_cobalt_bact_diags" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+-->
+
+<!--
+      <component type="ocean_cobalt_zoo_diags" start="$(PP_START_YEAR)" source="ocean_cobalt_zoo_diags" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+-->
+
+      <component type="ocean_cobalt_misc" start="$(PP_START_YEAR)" source="ocean_cobalt_misc" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+ 
+<!-- cobalt diagnostics interpolated to 1x1 -->
+
+<!--
+      <component type="ocean_cobalt_1day_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_1day" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+         </dataFile>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)" />
+      </component>
+-->
+<!--
+
+      <component type="ocean_cobalt_tracers_month_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_month" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+         </dataFile>
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_tracers_year_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_year" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+         </dataFile>
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_sfc_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_sfc" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+         </dataFile>
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_btm_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_btm" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+         </dataFile>
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_phytolim_sfc_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_phytolim_sfc" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+         </dataFile>
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_fdet_100_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_fdet_100" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+         </dataFile>
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_biomass_100_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_biomass_100" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+         </dataFile>
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_prod_100_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_prod_100" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+         </dataFile>
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_miscflux_100_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_miscflux_100" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+         </dataFile>
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_phyto_diags_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_phyto_diags" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+      </dataFile>
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_bact_diags_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_bact_diags" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+      </dataFile>
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_zoo_diags_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_zoo_diags" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+      </dataFile>
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_misc_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_misc" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <dataFile label="xyInterpRegridFile">
+            /archive/jgj/datasets/ESM4/remap/OM4_025_mosaic.remap.nc
+      </dataFile>
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+-->
+
+<!-- cobalt _z diagnostics
+      <component type="ocean_cobalt_tracers_month_z" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_month_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+-->
+
+     </postProcess>
+
+ </experiment>
+
 </experimentSuite>
