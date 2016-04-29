@@ -3730,7 +3730,8 @@ endif
       </regression>
 
       <regression name="timing">
-          <run months="1" npes="2044" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1756)"/>
+         <run months="1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
+         <run months="1" npes="2186" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1970)"/>
       </regression>
 
       <regression name="timings_eos">
@@ -4710,6 +4711,163 @@ endif
      </input>
   </experiment>
 
+<experiment name="CM4_c96L32_am4g9_2000_sis2_lowmix_hycom5_nmle_MEKE_KHTR600.$(MOM6_DATE)" inherit="CM4_c96L32_am4g9_2000_sis2_lowmix_hycom5_nmle_MEKE_KHTR600"/>
+<experiment name="CM4_c96L32_am4g9_2000_sis2_lowmix_hycom5_nmle_MEKE_KHTR600" inherit="CM4_c96L32_am4g9_2000">
+   <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override KD = 2.E-6
+Z_INIT_REMAP_GENERAL = True
+Z_INIT_REMAP_FULL_COLUMN = True
+REMAP_AFTER_INITIALIZATION = False
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75_800m.nc,sigma2,FNC1:2,4000,4.5,.01"
+MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"
+MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01"
+REGRID_COMPRESSIBILITY_FRACTION = 0.01
+BOUNDARY_EXTRAPOLATION = True
+DYNAMIC_SURFACE_PRESSURE = True
+MLE_USE_PBL_MLD = True
+MLE_MLD_DECAY_TIME = 432000.
+USE_NEUTRAL_DIFFUSION = True
+KHTR = 600.
+MEKE_KHTH_FAC = 1.0
+KH_RES_FN_POWER = 100
+THERMO_SPANS_COUPLING = True
+#override DIABATIC_FIRST  = False
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+   </input>
+</experiment>
+
+<experiment name="CM4_c96L32_am4g9_2000_sis2_lowmix_hycom5_nmle_MEKE_KHTR600cdt1800.$(MOM6_DATE)" inherit="CM4_c96L32_am4g9_2000_sis2_lowmix_hycom5_nmle_MEKE_KHTR600cdt1800"/>
+<experiment name="CM4_c96L32_am4g9_2000_sis2_lowmix_hycom5_nmle_MEKE_KHTR600cdt1800" inherit="CM4_c96L32_am4g9_2000">
+   <input>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1,1,1,0,0,0,
+        calendar = 'NOLEAP'
+        dt_atmos = 1800,
+        dt_cpld  = 1800,
+        use_lag_fluxes = .true.
+        concurrent = .true.
+        do_ocean = .true.
+        ocean_npes = $(OCN_PROD_NPES)
+        atmos_npes = $(ATM_PROD_NPES)
+        atmos_nthreads = $(ATM_PROD_NTHREADS)
+      </namelist>
+
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override KD = 2.E-6
+Z_INIT_REMAP_GENERAL = True
+Z_INIT_REMAP_FULL_COLUMN = True
+REMAP_AFTER_INITIALIZATION = False
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75_800m.nc,sigma2,FNC1:2,4000,4.5,.01"
+MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"
+MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01"
+REGRID_COMPRESSIBILITY_FRACTION = 0.01
+BOUNDARY_EXTRAPOLATION = True
+DYNAMIC_SURFACE_PRESSURE = True
+MLE_USE_PBL_MLD = True
+MLE_MLD_DECAY_TIME = 432000.
+USE_NEUTRAL_DIFFUSION = True
+KHTR = 600.
+MEKE_KHTH_FAC = 1.0
+KH_RES_FN_POWER = 100
+THERMO_SPANS_COUPLING = True
+#override DIABATIC_FIRST  = False
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
+   </input>
+</experiment>
+<experiment name="CM4_c96L32_am4g9_2000_sis2_lowmix_hycom5_nmle_MEKE_KHTR600_EqTh100_cdt1800.$(MOM6_DATE)" inherit="CM4_c96L32_am4g9_2000_sis2_lowmix_hycom5_nmle_MEKE_KHTR600_EqTh100_cdt1800"/>
+<experiment name="CM4_c96L32_am4g9_2000_sis2_lowmix_hycom5_nmle_MEKE_KHTR600_EqTh100_cdt1800" inherit="CM4_c96L32_am4g9_2000">
+   <input>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1,1,1,0,0,0,
+        calendar = 'NOLEAP'
+        dt_atmos = 1800,
+        dt_cpld  = 1800,
+        use_lag_fluxes = .true.
+        concurrent = .true.
+        do_ocean = .true.
+        ocean_npes = $(OCN_PROD_NPES)
+        atmos_npes = $(ATM_PROD_NPES)
+        atmos_nthreads = $(ATM_PROD_NTHREADS)
+      </namelist>
+
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override KD = 2.E-6
+Z_INIT_REMAP_GENERAL = True
+Z_INIT_REMAP_FULL_COLUMN = True
+REMAP_AFTER_INITIALIZATION = False
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75_800m.nc,sigma2,FNC1:2,4000,4.5,.01"
+MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"
+MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01"
+REGRID_COMPRESSIBILITY_FRACTION = 0.01
+BOUNDARY_EXTRAPOLATION = True
+DYNAMIC_SURFACE_PRESSURE = True
+MLE_USE_PBL_MLD = True
+MLE_MLD_DECAY_TIME = 432000.
+USE_NEUTRAL_DIFFUSION = True
+KHTR = 600.
+MEKE_KHTH_FAC = 1.0
+KH_RES_FN_POWER = 100
+THERMO_SPANS_COUPLING = True
+#override DIABATIC_FIRST  = False
+#override KHTH = 100.
+#override KHTH_MIN = 100.
+#override KHTH_MAX = 2500.
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+#override MAXTRUNC = 50
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
+   </input>
+</experiment>
 <experiment name="CM4_c96L32_am4g9_2000_lowmix_intel15_c3" inherit="CM4_c96L32_am4g9_2000_lowmix"/>
 <experiment name="CM4_c96L32_am4g9_2000_lowmix_intel15_t1" inherit="CM4_c96L32_am4g9_2000_lowmix"/>
 <experiment name="CM4_c96L32_am4g9_2000_lowmix.$(MOM6_DATE)" inherit="CM4_c96L32_am4g9_2000_lowmix"/>

@@ -16,12 +16,12 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="ulm_201510"/> <!-- CVS tag for shared source code -->
    <property name="MOM6_DATE"    value="2016.03.22"/>     <!-- git tag date for MOM6 source code -->
-   <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
+   <property name="FRE_STEM"     value="$(RELEASE)_mom6zdiag_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="dev/master"/>
    <property name="FRE_VERSION"  value="fre/bronx-10"/>
 
-  <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
+  <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs-->
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
@@ -64,20 +64,12 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
    <property name="DEBUGLEVEL"   value=""/>
    <property name="STATIC"       value=""/>  
 
-   <property name="domainparams_O360"
-             value="coupler_nml:ocean_npes=360;
-                    dummy_ice_nml:ice_mask_table=MOM_mask_table;
-                    dummy_ice_nml:ice_layout=36,10;dummy_ice_nml:ice_io_layout=1,5;
-                    icebergs_nml:make_calving_reproduce=.true.;
-                    dummy_ocean_nml:ocean_layout=36,10;dummy_ocean_nml:ocean_io_layout=1,5;
-                    dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
-
    <property name="domainparams_O432"
              value="coupler_nml:ocean_npes=432;
                     dummy_ice_nml:ice_mask_table=MOM_mask_table;
                     dummy_ice_nml:ice_layout=144,3;dummy_ice_nml:ice_io_layout=1,3;
                     icebergs_nml:make_calving_reproduce=.true.;
-                    dummy_ocean_nml:ocean_layout=36,12;dummy_ocean_nml:ocean_io_layout=1,4;
+                    dummy_ocean_nml:ocean_layout=12,36;dummy_ocean_nml:ocean_io_layout=1,4;
                     dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
 
    <property name="domainparams_O512"
@@ -252,7 +244,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
     
    <setup>
     <platform name="ncrc2.intel">
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -292,7 +284,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
     </platform>
 
     <platform name="ncrc2.intel14">
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -372,7 +364,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
     </platform>
 
     <platform name="ncrc3.intel15">
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -414,7 +406,7 @@ module load nco/4.5.2
  
     </platform>
     <platform name="ncrc3.pgi15">
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -457,7 +449,7 @@ module load nco/4.5.2
  
     </platform>
     <platform name="ncrc3.gnu">
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -500,7 +492,7 @@ module load nco/4.5.2
     </platform>
     <platform name="ncrc3.intel16">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
         <root>$CPERM/$USER/$(FRE_STEM)</root>
@@ -546,7 +538,7 @@ module use /sw/eslogin-c3/modulefiles
     </platform>
 
     <platform name="ncrc2.intel16">
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -585,13 +577,52 @@ module use /sw/eslogin-c3/modulefiles
  
     </platform>
 
+    <platform name="ncrc2.intel16_g">
+      <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)"/>
+         <directory>
+            <!--unswept locations-->
+            <root>$CPERM/$USER/$(FRE_STEM)</root>
+            <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+            <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+            <!--swept locations (including the staged archive location)-->
+            <archive>$CTMP/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)</archive>
+            <stdout>$CTMP/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+            <work>$CTMP/$USER/work/$(FRE_STEM)/$FRE_JOBID</work>
+         </directory>
+ 
+      <csh><![CDATA[
+          source $MODULESHOME/init/csh
+          module use -a /ncrc/home2/fms/local/modulefiles
+          module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+          module unload netcdf fre fre-commands
+          module load PrgEnv-intel/5.2.40
+          module swap intel intel/16.0.0.109
+          module load git
+          module load $(FRE_VERSION)
+          setenv KMP_STACKSIZE 512m
+          setenv NC_BLKSZ 1M
+          alias cpget 'cp \!^ \!^.copy ; \rm -f \!^ ; mv \!^.copy \!^ ; chmod +w \!^ '
+     ]]></csh>
+
+     <property name="MY_ROOT"          value="$(rootDir)"/>
+     <property name="FMS_ARCHIVE_ROOT" value="$CDATA/fms"/>
+     <property name="F2003_FLAGS"      value="-DINTERNAL_FILE_NML -g -traceback"/> <!-- -g -traceback -->
+     <property name="REFERENCE"        value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+     <property name="NB_ROOT"          value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
+     <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+     <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+     <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
+ 
+    </platform>
     <platform name="ncrc2.intel_perftools">
      <!--
 	 After compilation we need to invoke the command "pat_build fms_MOM6_SIS2_compile.x"
 	 on the executable before runtime
        --> 
 
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)"/>
          <directory>
             <!--unswept locations-->
@@ -635,7 +666,7 @@ module load perftools/5.3.2
     </platform>
 
     <platform name="ncrc2.gnu">
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)"/>
  
       <csh><![CDATA[
@@ -667,7 +698,7 @@ module load perftools/5.3.2
     </platform>
 
     <platform name="ncrc2.gnu_O3">
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)"/>
 
       <mkmfTemplate file="/ncrc/home2/Niki.Zadeh/fre/fre-commands/site/ncrc/gnu.mk"/>
@@ -701,7 +732,7 @@ module load perftools/5.3.2
     </platform>
     
     <platform name="ncrc2.pgi14">
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)"/>
  
       <csh><![CDATA[
@@ -873,10 +904,10 @@ limit coredumpsize unlimited
     <platform name="gfdl.ncrc2-intel">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
-    <platform name="gfdl.ncrc2-intel15">
+    <platform name="gfdl.ncrc3-intel15">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
-    <platform name="gfdl.ncrc3-intel15">
+    <platform name="gfdl.ncrc2-intel15_g">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
 
@@ -912,7 +943,7 @@ Make the executable for ocean-ice experiments.
 #            git merge --no-ff user/z1l/bugfix -m "merge fix for stdlog in OMP region "
 #            /bin/sed "s/define MAXFIELDMETHDS_ 150/define MAXFIELDMETHODS_ 400/g" -i field_manager/field_manager.F90 
 #            git commit -a -m "Increase MAXFIELDMETHODS_ for ESM4"
-#            ( cd shared && git checkout user/nnz/CM4p7_dev4verona )
+            ( cd shared && git checkout user/nnz/CM4p7_dev4verona )
              ]]>
             </csh>
          </source>
@@ -921,7 +952,9 @@ Make the executable for ocean-ice experiments.
          </compile>
       </component>
 
-      <component paths="ocean_shared" requires="fms" name="ocean_shared">
+<!--  To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
+
+      <component paths="ocean_shared" requires="fms mom6" name="ocean_shared">
       <description domainName="Ocean Generic Tracers" communityName="GFDL-ocean-shared" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)"> ocean_shared.git </codeBase>
@@ -931,11 +964,11 @@ Make the executable for ocean-ice experiments.
         </csh>
       </source>
       <compile>
-        <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+        <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_MOM6_DIAG -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
       </compile>
     </component>
-
-      <component name="mom6" requires="fms ocean_shared" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/">
+-->
+      <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared">
          <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
          <source versionControl="git" root="https://github.com">
         <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase>
@@ -950,6 +983,18 @@ Make the executable for ocean-ice experiments.
           git submodule update #This gets the right version of submodules
           popd
 
+####The following line is needed only for the 2016.03.22 tag#####
+(cd mom6/src/SIS2 &&  git merge --no-ff origin/nikizadehgfdl-patch-1 -m "bug fix")
+(cd mom6/src/MOM6 &&  git cherry-pick 5aeaa818687e579a0e826140c49a28c5c1f59ba8)
+
+	  #Updates needed for using MOM6 diagnostics/remapping in generic tracers package
+	  (cd mom6/src/MOM6 && git checkout origin/user/nnz/zdiag4cobalt)
+
+          #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
+	  git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git 
+          (cd ocean_shared && git checkout origin/user/nnz/zdiag4cobalt)
+	  
+	
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
           if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
@@ -968,7 +1013,7 @@ Make the executable for ocean-ice experiments.
            ]]>  </csh>
          </source>
          <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
+            <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
             <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for MOM6 may cause crash -->
 
          </compile>
@@ -1023,10 +1068,12 @@ Make the executable for ocean-ice experiments.
       <component name="atmos_null" paths="atmos_null atmos_param" requires="fms">
           <library path="$(MY_LIBS)/atmos_null/libatmos_null.a" headerDir="$(MY_LIBS)/atmos_null"/>
       </component>
+<!--
       <component paths="ocean_shared" requires="fms" name="ocean_shared">
          <library path="$(MY_LIBS)/ocean_shared/libocean_shared.a" headerDir="$(MY_LIBS)/ocean_shared"/>
       </component> 
-      <component paths="mom6" requires="fms ocean_shared" name="mom6">
+-->
+      <component paths="mom6 ocean_shared" requires="fms" name="mom6">
          <library path="$(MY_LIBS)/mom6/libmom6.a" headerDir="$(MY_LIBS)/mom6"/>
       </component> 
       <component paths="icebergs" requires="fms" name="icebergs">
@@ -1035,7 +1082,7 @@ Make the executable for ocean-ice experiments.
       <component paths="sis2" requires="fms icebergs" name="sis2">
          <library path="$(MY_LIBS)/sis2/libsis2.a" headerDir="$(MY_LIBS)/sis2"/>
       </component> 
-      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6 ocean_shared icebergs">
+      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6 icebergs">
          <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
             <codeBase version="$(RELEASE)"> coupler.git </codeBase>
@@ -2733,9 +2780,24 @@ SIS_OVERRIDE_EOF
 "generic_argon","argon",    "argon",        "generic_tracers","all",.true.,"none",2
 "generic_argon","argon_stf","argon_stf",    "generic_tracers","all",.true.,"none",2
 #
-"generic_tracers_z",          0,  "days", 1, "days", "time",
+"ocean_model","temp","temp","generic_tracers","all",.true.,"none",2
+"ocean_model","salt","salt","generic_tracers","all",.true.,"none",2
+
+#
+"generic_tracers_z",          1,  "days", 1, "days", "time",
 "generic_cfc_z_new","cfc_11",     "cfc_11",     "generic_tracers_z","all",.true.,"none",2
 "generic_cfc_z_new","cfc_12",     "cfc_12",     "generic_tracers_z","all",.true.,"none",2
+"generic_cfc_z_new","cfc_11_stf", "cfc_11_stf", "generic_tracers_z","all",.true.,"none",2
+"generic_cfc_z_new","cfc_12_stf", "cfc_12_stf", "generic_tracers_z","all",.true.,"none",2
+"generic_sf6_z_new","sf6",        "sf6",        "generic_tracers_z","all",.true.,"none",2
+"generic_sf6_z_new","sf6_stf",    "sf6_stf",    "generic_tracers_z","all",.true.,"none",2
+"generic_age_z_new","age",        "age",        "generic_tracers_z","all",.true.,"none",2
+"generic_age_z_new","age_stf",    "age_stf",    "generic_tracers_z","all",.true.,"none",2
+"generic_argon_z_new","argon",    "argon",      "generic_tracers_z","all",.true.,"none",2
+"generic_argon_z_new","argon_stf","argon_stf",  "generic_tracers_z","all",.true.,"none",2
+#
+"ocean_model_z_new","temp","temp","generic_tracers_z","all",.true.,"none",2
+"ocean_model_z_new","salt","salt","generic_tracers_z","all",.true.,"none",2
 
       </diagTable>
 
@@ -2746,6 +2808,7 @@ cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override USE_IDEAL_AGE_TRACER = False
 USE_generic_tracer = True
 GENERIC_TRACER_IC_FILE = "_NULL_"
+DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
 OVERRIDE_EOF
 
 #Add null CFC's to a restart file
@@ -3282,6 +3345,10 @@ $baseDate
          <run months="1" npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:50:00"/>
        </regression>
        
+       <regression name="timing">
+         <run months="1" npes="2783" overrideParams="$(domainparams_O2783p5)" runTimePerJob="01:40:00"/>
+       </regression>
+
        <regression name="timings">
          <run months="1" npes="1057" overrideParams="$(domainparams_O1057p5)" runTimePerJob="00:50:00"/>
          <run months="1" npes="1300" overrideParams="$(domainparams_O1300p5)" runTimePerJob="00:50:00"/>
@@ -3302,10 +3369,9 @@ $baseDate
       <regression name="debug">
          <run days="1"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
          <run days="1"  npes="432"  overrideParams="$(domainparams_O432)"  runTimePerJob="01:00:00"/>
-         <run days="1"  npes="360"  overrideParams="$(domainparams_O360)"  runTimePerJob="01:00:00"/>
       </regression>
 
-      <production simTime="$(PROD_SIMTIME)" units="years" npes="1057" runTime="$(PROD_RUNTIME)">
+      <production simTime="$(PROD_SIMTIME)" units="years" npes="2783" runTime="$(PROD_RUNTIME)">
            <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
        </production>
 
@@ -3376,88 +3442,6 @@ SIS_OVERRIDE_EOF
 
    </experiment>
 
-   <experiment name="OM4_SIS2_05_z_diag$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
-     <input>
-     <namelist name="diag_manager_nml">
-       max_axes = 150,
-       max_files = 100,
-       max_num_axis_sets = 100,
-       max_input_fields = 699
-       max_output_fields = 699
-       mix_snapshot_average_fields=.false.
-     </namelist>
-
-     <diagTable order="append">
-#================
-# sample z DIAGNOSTICS
-#================
-#===========================
-# ocean_cobalt_1day_z
-#===========================
-"ocean_cobalt_day",       1,  "days", 1, "days", "time",
- "ocean_model","temp","temp","ocean_cobalt_day","all",.true.,"none",2
- "ocean_model","salt","salt","ocean_cobalt_day","all",.true.,"none",2
-
-"ocean_cobalt_day_z",       1,  "days", 1, "days", "time",
- "ocean_model_z_new","temp","temp","ocean_cobalt_day_z","all",.true.,"none",2
- "ocean_model_z_new","salt","salt","ocean_cobalt_day_z","all",.true.,"none",2
-
-     </diagTable>
-
-    <csh><![CDATA[
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
-#override Z_INIT_FILE_SALT_VAR  = "salt"
-#override TIDEAMP_FILE          = "tidal_amplitude.nc"
-#override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
-#override SALT_RESTORE_FILE     = "salt_restore.nc"
-#override TOPO_EDITS_FILE = ""
-DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
-
-MOM_OVERRIDE_EOF
-
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-
-SIS_OVERRIDE_EOF
-
-     ]]></csh>
-   </input>
-   </experiment>
-   <experiment name="OM4_SIS2_05_THERMO_SPANS_COUPLING$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
-     <input>
-    <csh><![CDATA[
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
-#override Z_INIT_FILE_SALT_VAR  = "salt"
-#override TIDEAMP_FILE          = "tidal_amplitude.nc"
-#override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
-#override SALT_RESTORE_FILE     = "salt_restore.nc"
-#override TOPO_EDITS_FILE = ""
-#override DT = 1800
-THERMO_SPANS_COUPLING = True
-#override DIABATIC_FIRST = False
-#override DT_THERM = 7200
-
-MOM_OVERRIDE_EOF
-
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-
-SIS_OVERRIDE_EOF
-     ]]></csh>
-   </input>
-   </experiment>
    
    <experiment name="OM4_SIS2_05_hycomff_c.$(MOM6_DATE)" inherit="OM4_SIS2_05_hycomff_c"/>
    <experiment name="OM4_SIS2_05_hycomff_c$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
@@ -3498,14 +3482,140 @@ SIS_OVERRIDE_EOF
 
    </experiment>
 
-   <experiment name="OMp5_COBALT.$(MOM6_DATE)" inherit="OMp5_COBALT"/>
-   <experiment name="OMp5_COBALT$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
+   <experiment name="OMp5_baseline.$(MOM6_DATE)" inherit="OMp5_baseline"/>
+   <experiment name="OMp5_baseline$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
 
      <input>
       <namelist name="coupler_nml">
        months = $months,
        days   = $days,
-       current_date = 1948,1,1,0,0,0,
+       current_date = 1900,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'NOLEAP',
+       dt_cpld  = 3600,
+       dt_atmos = 3600,
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.true.
+     </namelist>
+     <namelist name="generic_tracer_nml">
+       do_generic_tracer=.false.
+       do_generic_CFC=.false.
+       do_generic_COBALT=.false.
+       do_generic_TOPAZ=.false.
+       force_update_fluxes=.true. !This has to be set for THERMO_SPANS_COUPLING to work
+     </namelist>
+     <namelist name="diag_manager_nml">
+       max_axes = 150,
+       max_files = 100,
+       max_num_axis_sets = 100,
+       max_input_fields = 699
+       max_output_fields = 699
+       mix_snapshot_average_fields=.false.
+     </namelist>
+     <namelist name="fms_nml">
+       clock_grain='ROUTINE'
+       clock_flags='NONE'
+       domains_stack_size = 7000000
+       stack_size =0
+     </namelist>
+      <namelist name="dummy_ocean_nml">
+       ocean_layout = 36,36
+       ocean_io_layout = 1,4
+       ocean_mask_table=mask_table.239.36x36
+     </namelist>
+     <namelist name="dummy_ice_nml">
+       ice_layout = 36,36
+       ice_io_layout = 1,4
+       ice_mask_table=mask_table.239.36x36
+     </namelist>
+
+
+     <diagTable>
+$name
+$baseDate
+     </diagTable>
+
+
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_common']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_05grid_data']/input/node())"/>
+      <!--SIS2 Input datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
+      <!--CORE forcing datasets-->
+      <xi:include xpointer="xpointer(//experiment[@name='CORE_data']/input/node())"/>
+
+  
+      <csh><![CDATA[
+#amip initCond tar file includes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
+#override SALT_RESTORE_FILE     = "salt_restore.nc"
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+REMAP_AFTER_INITIALIZATION = False                                                   
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"                                      
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75_800m.nc,sigma2,FNC1:2,4000,4.5,.01"                                      
+MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"                                   
+MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01"                              
+REGRID_COMPRESSIBILITY_FRACTION = 0.01                                               
+BOUNDARY_EXTRAPOLATION = True                                                        
+DYNAMIC_SURFACE_PRESSURE = True 
+#override USE_NEUTRAL_DIFFUSION = True                                               
+#override KHTR = 300.                                                                
+KH_RES_FN_POWER = 100                                                                
+MEKE_KHTH_FAC = 1.0                                                                  
+VISC_RES_FN_POWER = 100 
+#override DT = 1800
+#override DT_THERM = 7200  
+#override DIABATIC_FIRST = False
+THERMO_SPANS_COUPLING = True
+#override USE_generic_tracer = False
+#override CHL_FROM_FILE = True
+#override USE_RIVER_HEAT_CONTENT = True
+#override USE_CALVING_HEAT_CONTENT = True
+#override OCEAN_SURFACE_STAGGER = "C"
+#override TOPO_EDITS_FILE       = ""
+DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+
+SIS_OVERRIDE_EOF
+     ]]></csh>
+
+   </input>
+
+   </experiment>
+   <experiment name="OMp5_COBALT_zdiag.$(MOM6_DATE)" inherit="OMp5_COBALT_zdiag"/>
+   <experiment name="OMp5_COBALT_zdiag$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
+
+     <input>
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1900,1,1,0,0,0,
        hours = 0
        minutes = 0
        seconds = 0
@@ -3543,67 +3653,56 @@ SIS_OVERRIDE_EOF
        stack_size =0
      </namelist>
       <namelist name="dummy_ocean_nml">
-       ocean_layout = 36,36
-       ocean_io_layout = 1,4
-       ocean_mask_table=mask_table.239.36x36
+       ocean_layout = 60,60
+       ocean_io_layout = 1,5
+       ocean_mask_table=mask_table.817.60x60
      </namelist>
      <namelist name="dummy_ice_nml">
-       ice_layout = 36,36
-       ice_io_layout = 1,4
-       ice_mask_table=mask_table.239.36x36
+       ice_layout = 60,60
+       ice_io_layout = 1,5
+       ice_mask_table=mask_table.817.60x60
      </namelist>
+
 
      <diagTable>
 $name
 $baseDate
      </diagTable>
-
-<!--
      <diagTable order="append">
 #================
 # sample z DIAGNOSTICS
 #================
 #===========================
-# ocean_cobalt_1day_z
+# ocean_cobalt_month_z
 #===========================
-"ocean_cobalt_day",       1,  "days", 1, "days", "time",
- "generic_cobalt","def_fe_Di",       "def_fe_Di",          "ocean_cobalt_day","all",.true.,"none",2
- "generic_cobalt","def_fe_Lg",       "def_fe_Lg",          "ocean_cobalt_day","all",.true.,"none",2
- "generic_cobalt","def_fe_Sm",       "def_fe_Sm",          "ocean_cobalt_day","all",.true.,"none",2
- "generic_cobalt","felim_Di",        "felim_Di",           "ocean_cobalt_day","all",.true.,"none",2
- "generic_cobalt","felim_Lg",        "felim_Lg",           "ocean_cobalt_day","all",.true.,"none",2
- "generic_cobalt","felim_Sm",        "felim_Sm",           "ocean_cobalt_day","all",.true.,"none",2
- "generic_cobalt","irrlim_Di",       "irrlim_Di",          "ocean_cobalt_day","all",.true.,"none",2
- "generic_cobalt","irrlim_Lg",       "irrlim_Lg",          "ocean_cobalt_day","all",.true.,"none",2
- "generic_cobalt","irrlim_Sm",       "irrlim_Sm",          "ocean_cobalt_day","all",.true.,"none",2
- "generic_cobalt","chl",                "chl",                "ocean_cobalt_day","all",.true.,"none",2
- "generic_cobalt","htotal",             "htotal",             "ocean_cobalt_day","all",.true.,"none",2
- "generic_cobalt","no3",                "no3",                "ocean_cobalt_day","all",.true.,"none",2
- "generic_cobalt","o2",                 "o2",                 "ocean_cobalt_day","all",.true.,"none",2
+"ocean_cobalt_month",       1,  "months", 1, "days", "time",
+ "generic_cobalt","def_fe_Di",       "def_fe_Di",          "ocean_cobalt_month","all",.true.,"none",2
+ "generic_cobalt","def_fe_Lg",       "def_fe_Lg",          "ocean_cobalt_month","all",.true.,"none",2
+ "generic_cobalt","def_fe_Sm",       "def_fe_Sm",          "ocean_cobalt_month","all",.true.,"none",2
+ "generic_cobalt","chl",                "chl",                "ocean_cobalt_month","all",.true.,"none",2
+ "generic_cobalt","htotal",             "htotal",             "ocean_cobalt_month","all",.true.,"none",2
+ "generic_cobalt","alk",                "alk",                "ocean_cobalt_month","all",.true.,"none",2
+ "generic_cobalt","dic",                "dic",                "ocean_cobalt_month","all",.true.,"none",2
+ "generic_cobalt","o2",                 "o2",                 "ocean_cobalt_month","all",.true.,"none",2
 #
- "ocean_model","temp","temp","ocean_cobalt_day","all",.true.,"none",2
- "ocean_model","salt","salt","ocean_cobalt_day","all",.true.,"none",2
+ "ocean_model","temp","temp","ocean_cobalt_month","all",.true.,"none",2
+ "ocean_model","salt","salt","ocean_cobalt_month","all",.true.,"none",2
 
-"ocean_cobalt_day_z",       1,  "days", 1, "days", "time",
- "generic_cobalt_z_new","def_fe_Di",       "def_fe_Di",          "ocean_cobalt_day_z","all",.true.,"none",2
- "generic_cobalt_z_new","def_fe_Lg",       "def_fe_Lg",          "ocean_cobalt_day_z","all",.true.,"none",2
- "generic_cobalt_z_new","def_fe_Sm",       "def_fe_Sm",          "ocean_cobalt_day_z","all",.true.,"none",2
- "generic_cobalt_z_new","felim_Di",        "felim_Di",           "ocean_cobalt_day_z","all",.true.,"none",2
- "generic_cobalt_z_new","felim_Lg",        "felim_Lg",           "ocean_cobalt_day_z","all",.true.,"none",2
- "generic_cobalt_z_new","felim_Sm",        "felim_Sm",           "ocean_cobalt_day_z","all",.true.,"none",2
- "generic_cobalt_z_new","irrlim_Di",       "irrlim_Di",          "ocean_cobalt_day_z","all",.true.,"none",2
- "generic_cobalt_z_new","irrlim_Lg",       "irrlim_Lg",          "ocean_cobalt_day_z","all",.true.,"none",2
- "generic_cobalt_z_new","irrlim_Sm",       "irrlim_Sm",          "ocean_cobalt_day_z","all",.true.,"none",2
- "generic_cobalt_z_new","chl",                "chl",                "ocean_cobalt_day_z","all",.true.,"none",2
- "generic_cobalt_z_new","htotal",             "htotal",             "ocean_cobalt_day_z","all",.true.,"none",2
- "generic_cobalt_z_new","no3",                "no3",                "ocean_cobalt_day_z","all",.true.,"none",2
- "generic_cobalt_z_new","o2",                 "o2",                 "ocean_cobalt_day_z","all",.true.,"none",2
+"ocean_cobalt_month_z",       1,  "months", 1, "days", "time",
+ "generic_cobalt_z_new","def_fe_Di",       "def_fe_Di",          "ocean_cobalt_month_z","all",.true.,"none",2
+ "generic_cobalt_z_new","def_fe_Lg",       "def_fe_Lg",          "ocean_cobalt_month_z","all",.true.,"none",2
+ "generic_cobalt_z_new","def_fe_Sm",       "def_fe_Sm",          "ocean_cobalt_month_z","all",.true.,"none",2
+ "generic_cobalt_z_new","chl",                "chl",                "ocean_cobalt_month_z","all",.true.,"none",2
+ "generic_cobalt_z_new","htotal",             "htotal",             "ocean_cobalt_month_z","all",.true.,"none",2
+ "generic_cobalt_z_new","alk",                "alk",                "ocean_cobalt_month_z","all",.true.,"none",2
+ "generic_cobalt_z_new","dic",                "dic",                "ocean_cobalt_month_z","all",.true.,"none",2
+ "generic_cobalt_z_new","o2",                 "o2",                 "ocean_cobalt_month_z","all",.true.,"none",2
 #                                                                                                                                                             11
- "ocean_model_z_new","temp","temp","ocean_cobalt_day_z","all",.true.,"none",2
- "ocean_model_z_new","salt","salt","ocean_cobalt_day_z","all",.true.,"none",2
+ "ocean_model_z_new","temp","temp","ocean_cobalt_month_z","all",.true.,"none",2
+ "ocean_model_z_new","salt","salt","ocean_cobalt_month_z","all",.true.,"none",2
 
      </diagTable>
--->
+
 
       <xi:include xpointer="xpointer(//experiment[@name='OM4_common']/input/node())"/>
       <!--MOM6 Input datasets-->
@@ -3690,11 +3789,9 @@ THERMO_SPANS_COUPLING = True
 #override CHL_FROM_FILE = True
 #override USE_RIVER_HEAT_CONTENT = True
 #override USE_CALVING_HEAT_CONTENT = True
-
 #override OCEAN_SURFACE_STAGGER = "C"
 #override TOPO_EDITS_FILE       = ""
 DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
-
 
 MOM_OVERRIDE_EOF
 
@@ -3703,7 +3800,6 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NJGLOBAL = 576
 
 SIS_OVERRIDE_EOF
-
      ]]></csh>
 
    </input>
@@ -3767,8 +3863,8 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
 <experiment name="OBGC_COBALT_diag_table">
     <input>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/diag_table.COBALT_20151026</dataSource>
-        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/diag_table.COBALT_20151026</dataSource>
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/diag_table.COBALT_20151218</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/diag_table.COBALT_20151218</dataSource>
       </dataFile>
     </input>
 </experiment>
