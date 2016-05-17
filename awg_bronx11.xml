@@ -310,7 +310,7 @@ Experiment to build executable. See git log for source code provenance.
     </description>
 
     <component name="fms" paths="shared">
-     <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid=""/>
+     <description domainName="infrastructure" <Name="FMS" <Version="$(RELEASE)" communityGrid>""/</Name="FMS" communityVersion>"$(RELEASE)" communityGrid></Version="$(RELEASE)" communityGrid>""/</Name="FMS" communityVersion>
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)"> shared.git </codeBase>
       </source>
@@ -320,7 +320,7 @@ Experiment to build executable. See git log for source code provenance.
     </component>
 
     <component name="atmos_phys" requires="fms" paths="atmos_param atmos_shared">
-      <description domainName="" communityName="" communityVersion="$(RELEASE)" communityGrid=""/>
+      <description domainName="" <Name="" <Version="$(RELEASE)" communityGrid>""/</Name="" communityVersion>"$(RELEASE)" communityGrid></Version="$(RELEASE)" communityGrid>""/</Name="" communityVersion>
         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
           <codeBase version="$(RELEASE)">atmos_shared.git atmos_param.git</codeBase>
         </source>
@@ -344,7 +344,7 @@ Experiment to build executable. See git log for source code provenance.
     </component>
 
     <component name="ice_sis" requires="fms" paths="ice_sis ice_param">
-      <description domainName="Sea Ice SIS" communityName="GFDL-SIS" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
+      <description domainName="Sea Ice SIS" <Name="GFDL-SIS" <Version="$(RELEASE)" communityGrid>"Tripolar"/</Name="GFDL-SIS" communityVersion>"$(RELEASE)" communityGrid></Version="$(RELEASE)" communityGrid>"Tripolar"/</Name="GFDL-SIS" communityVersion>
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)"> ice_sis.git ice_param.git </codeBase>
       </source>
@@ -354,7 +354,7 @@ Experiment to build executable. See git log for source code provenance.
     </component>
 
     <component name="land_lad2" requires="fms" paths="land_lad2">
-      <description domainName="LM3" communityName="land_lad2" communityVersion="ulm_lad2_20160112_slm" communityGrid=""/>
+      <description domainName="LM3" <Name="land_lad2" <Version="ulm_lad2_20160112_slm" communityGrid>""/</Name="land_lad2" communityVersion>"ulm_lad2_20160112_slm" communityGrid></Version="ulm_lad2_20160112_slm" communityGrid>""/</Name="land_lad2" communityVersion>
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)">land_lad2.git</codeBase>
       </source>
@@ -387,7 +387,7 @@ find ${bld_dir}/land -type f -name \*.f90 > land/pathnames_land
     </component>
 
     <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/">
-      <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
+      <description domainName="Ocean" <Name="GFDL-MOM6" <Version="$(MOM6_GIT_TAG)" communityGrid>"Tripolar"/</Name="GFDL-MOM6" communityVersion>"$(MOM6_GIT_TAG)" communityGrid></Version="$(MOM6_GIT_TAG)" communityGrid>"Tripolar"/</Name="GFDL-MOM6" communityVersion>
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/github_mirror">
         <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase>
         <csh>
@@ -421,7 +421,7 @@ find ${bld_dir}/land -type f -name \*.f90 > land/pathnames_land
     </component>
 
     <component name="coupler" paths="coupler" requires="fms atmos_dyn atmos_phys land_lad2 ice_sis mom6 ">
-      <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>
+      <description domainName="FMS Coupler" <Name="coupler" <Version="$(RELEASE)" communityGrid>""/</Name="coupler" communityVersion>"$(RELEASE)" communityGrid></Version="$(RELEASE)" communityGrid>""/</Name="coupler" communityVersion>
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)"> coupler.git </codeBase>
       </source>
@@ -1622,15 +1622,28 @@ touch MOM_input
 <!--=+=====================-->
   <experiment name="c96L32_am4g6" inherit="cm4p10_$(AWG_VERSION)">
 <!-- MDBI -->
-    <description
-communityProject="$(ProjectID)"
-communityModel="am4p6"
-communityModelID="am4p6"
-communityExperimentName="$(name)"
-communityExperimentID="$(name)" >
-<!-- /MDBI -->
+
+<publicMetadata DBswitch="on">
+ <Project>"$(ProjectID)"</Project>
+ <Model>"am4p6"</Model>
+ <ModelID>"am4p6"</ModelID>
+ <ExperimentName>"$(name)"</ExperimentName>
+ <ExperimentID>"$(name)" </ExperimentID>
+    <realization r="1" i="1" p="1"/>
+    <comment>
+Experiment name = $(name)
+    </comment>
+          <Forcing>"N/A"</Forcing>
+      <startTime>"$(EXP_AMIP_START)"</startTime>
+      <endTime>"$(EXP_AMIP_END)"</endTime>
+      <parentExperimentID>"N/A"</parentExperimentID>
+      <parentExperimentRIP>"N/A"</parentExperimentRIP>
+      <branch_time>"0.0"</branch_time>
+    </publicMetadata>
+</publicMetadata>
+    <description>
 AM4 prototype configuration "am4g6" from MDT Atmosphere Working Group.
-Derived from "am4g5r5".  with the fix of sea salt and dust for aerosol activation 
+Derived from "am4g5r5".  with the fix of sea salt and dust for aerosol activation
 (in large-scale and UW convection), and update from Ming Zhao.
 
 - c96 horizontal grid with approximately 100km resolution and 32 vertical levels.
@@ -1638,26 +1651,15 @@ Derived from "am4g5r5".  with the fix of sea salt and dust for aerosol activatio
 - Tiedtke cloud scheme
 
 Changes from am4g5r5:
-- the fix of sea salt and dust for aerosol activation (in large-scale and UW convection) 
+- the fix of sea salt and dust for aerosol activation (in large-scale and UW convection)
 - pick the max of 2 plumes in uw_conv.F90 from Ming Zhao
 - donner deep updates from Will
 
 For more information about the AWG configurations, refer to
 http://cobweb.gfdl.noaa.gov/~cjg/awg
+
     </description>
-<!-- MDBI -->
-    <realization r="1" i="1" p="1"/>
-    <communityComment>
-Experiment name = $(name)
-    </communityComment>
-    <scenario
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)"
-      parentExperimentID="N/A"
-      parentExperimentRIP="N/A"
-      branch_time="0.0">
-    </scenario>
+
 <!-- /MDBI -->
 
     <input>
@@ -1748,12 +1750,11 @@ Experiment name = $(name)
 
   <experiment name="c96L32_am4g7" inherit="cm4p10_$(AWG_VERSION)">
 <!-- MDBI -->
-    <description
-communityProject="$(ProjectID)"
-communityModel="am4p7"
-communityModelID="am4p7"
-communityExperimentName="$(name)"
-communityExperimentID="$(name)" >
+    <publicMetadata DBswitch="on"><Project>"$(ProjectID)"</Project>
+<Model>"am4p7"</Model>
+<ModelID>"am4p7"</ModelID>
+<ExperimentName>"$(name)"</ExperimentName>
+<ExperimentID>"$(name)" </ExperimentID>
 <!-- /MDBI -->
 AM4 prototype configuration "am4g7" from MDT Atmosphere Working Group.
 Derived from "am4g6",  with radiation updates from David Paynter, 
@@ -1779,17 +1780,16 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
     </description>
 <!-- MDBI -->
     <realization r="1" i="1" p="1"/>
-    <communityComment>
+    <comment>
 Experiment name = $(name)
-    </communityComment>
-    <scenario
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)"
-      parentExperimentID="N/A"
-      parentExperimentRIP="N/A"
-      branch_time="0.0">
-    </scenario>
+    </comment>
+          <Forcing>"N/A"</Forcing>
+      <startTime>"$(EXP_AMIP_START)"</startTime>
+      <endTime>"$(EXP_AMIP_END)"</endTime>
+      <parentExperimentID>"N/A"</parentExperimentID>
+      <parentExperimentRIP>"N/A"</parentExperimentRIP>
+      <branch_time>"0.0"</branch_time>
+    </publicMetadata>
 <!-- /MDBI -->
 
     <input>
@@ -1879,12 +1879,11 @@ Experiment name = $(name)
   <experiment name="c96L48_am4g7_fullchem" inherit="cm4p10_$(AWG_VERSION)">
 
 <!-- MDBI -->
-    <description
-communityProject="$(ProjectID)"
-communityModel="am4p7"
-communityModelID="am4p7"
-communityExperimentName="$(name)"
-communityExperimentID="$(name)" >
+    <publicMetadata DBswitch="on"><Project>"$(ProjectID)"</Project>
+<Model>"am4p7"</Model>
+<ModelID>"am4p7"</ModelID>
+<ExperimentName>"$(name)"</ExperimentName>
+<ExperimentID>"$(name)" </ExperimentID>
 <!-- /MDBI -->
 
 Derived from AM4 prototype configuration "am4g7" from MDT Atmosphere Working Group.
@@ -1918,17 +1917,16 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 
 <!-- MDBI -->
     <realization r="1" i="1" p="1"/>
-    <communityComment>
+    <comment>
 Experiment name = $(name)
-    </communityComment>
-    <scenario
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)"
-      parentExperimentID="N/A"
-      parentExperimentRIP="N/A"
-      branch_time="0.0">
-    </scenario>
+    </comment>
+          <Forcing>"N/A"</Forcing>
+      <startTime>"$(EXP_AMIP_START)"</startTime>
+      <endTime>"$(EXP_AMIP_END)"</endTime>
+      <parentExperimentID>"N/A"</parentExperimentID>
+      <parentExperimentRIP>"N/A"</parentExperimentRIP>
+      <branch_time>"0.0"</branch_time>
+    </publicMetadata>
 <!-- /MDBI -->
 
     <input>
@@ -2013,12 +2011,11 @@ Experiment name = $(name)
 
   <experiment name="c96L32_am4g8" inherit="c96L32_am4g7">
 <!-- MDBI -->
-    <description
-communityProject="$(ProjectID)"
-communityModel="am4p8"
-communityModelID="am4p8"
-communityExperimentName="$(name)"
-communityExperimentID="$(name)" >
+    <publicMetadata DBswitch="on"><Project>"$(ProjectID)"</Project>
+<Model>"am4p8"</Model>
+<ModelID>"am4p8"</ModelID>
+<ExperimentName>"$(name)"</ExperimentName>
+<ExperimentID>"$(name)" </ExperimentID>
 <!-- /MDBI -->
 AM4 prototype configuration "am4g8" from MDT Atmosphere Working Group.
 Derived from "am4g7",  with a new topographic drag formulation Steve Garner.
@@ -2035,17 +2032,16 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
     </description>
 <!-- MDBI -->
     <realization r="1" i="1" p="1"/>
-    <communityComment>
+    <comment>
 Experiment name = $(name)
-    </communityComment>
-    <scenario
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)"
-      parentExperimentID="N/A"
-      parentExperimentRIP="N/A"
-      branch_time="0.0">
-    </scenario>
+    </comment>
+          <Forcing>"N/A"</Forcing>
+      <startTime>"$(EXP_AMIP_START)"</startTime>
+      <endTime>"$(EXP_AMIP_END)"</endTime>
+      <parentExperimentID>"N/A"</parentExperimentID>
+      <parentExperimentRIP>"N/A"</parentExperimentRIP>
+      <branch_time>"0.0"</branch_time>
+    </publicMetadata>
 <!-- /MDBI -->
     <input>
       <namelist name="damping_driver_nml">
@@ -2091,12 +2087,11 @@ Experiment name = $(name)
 <!--=+=====================-->
   <experiment name="c96L32_am4g9" inherit="cm4p10_$(AWG_VERSION)">
 <!-- MDBI -->
-    <description
-communityProject="$(ProjectID)"
-communityModel="am4p9"
-communityModelID="am4p9"
-communityExperimentName="$(name)"
-communityExperimentID="$(name)" >
+    <publicMetadata DBswitch="on"><Project>"$(ProjectID)"</Project>
+<Model>"am4p9"</Model>
+<ModelID>"am4p9"</ModelID>
+<ExperimentName>"$(name)"</ExperimentName>
+<ExperimentID>"$(name)" </ExperimentID>
 <!-- /MDBI -->
 AM4 prototype configuration "am4g9" from MDT Atmosphere Working Group.
 Derived from "am4g7",  with radiation bug-fix and updates from David Paynter, 
@@ -2116,17 +2111,16 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
     </description>
 <!-- MDBI -->
     <realization r="1" i="1" p="1"/>
-    <communityComment>
+    <comment>
 Experiment name = $(name)
-    </communityComment>
-    <scenario
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)"
-      parentExperimentID="N/A"
-      parentExperimentRIP="N/A"
-      branch_time="0.0">
-    </scenario>
+    </comment>
+          <Forcing>"N/A"</Forcing>
+      <startTime>"$(EXP_AMIP_START)"</startTime>
+      <endTime>"$(EXP_AMIP_END)"</endTime>
+      <parentExperimentID>"N/A"</parentExperimentID>
+      <parentExperimentRIP>"N/A"</parentExperimentRIP>
+      <branch_time>"0.0"</branch_time>
+    </publicMetadata>
 <!-- /MDBI -->
 
     <input>
@@ -2217,12 +2211,11 @@ Experiment name = $(name)
 
   <experiment name="c96L48_am4g9_fullchem" inherit="cm4p10_$(AWG_VERSION)">
 <!-- MDBI -->
-    <description
-communityProject="$(ProjectID)"
-communityModel="am4p7"
-communityModelID="am4p7"
-communityExperimentName="$(name)"
-communityExperimentID="$(name)" >
+    <publicMetadata DBswitch="on"><Project>"$(ProjectID)"</Project>
+<Model>"am4p7"</Model>
+<ModelID>"am4p7"</ModelID>
+<ExperimentName>"$(name)"</ExperimentName>
+<ExperimentID>"$(name)" </ExperimentID>
 <!-- /MDBI -->
 Derived from AM4 prototype configuration "am4g9" from MDT Atmosphere Working Group,
 but with "full chemistry" as in "am4f4" and 48 levels.
@@ -2237,17 +2230,16 @@ This is the same as
 
 <!-- MDBI -->
     <realization r="1" i="1" p="1"/>
-    <communityComment>
+    <comment>
 Experiment name = $(name)
-    </communityComment>
-    <scenario
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)"
-      parentExperimentID="N/A"
-      parentExperimentRIP="N/A"
-      branch_time="0.0">
-    </scenario>
+    </comment>
+          <Forcing>"N/A"</Forcing>
+      <startTime>"$(EXP_AMIP_START)"</startTime>
+      <endTime>"$(EXP_AMIP_END)"</endTime>
+      <parentExperimentID>"N/A"</parentExperimentID>
+      <parentExperimentRIP>"N/A"</parentExperimentRIP>
+      <branch_time>"0.0"</branch_time>
+    </publicMetadata>
 <!-- /MDBI -->
 
     <input>
@@ -2337,12 +2329,11 @@ Experiment name = $(name)
 <!--=+=====================-->
   <experiment name="c96L32_am4g10" inherit="cm4p10_$(AWG_VERSION)">
 <!-- MDBI -->
-    <description
-communityProject="$(ProjectID)"
-communityModel="am4p10"
-communityModelID="am4p10"
-communityExperimentName="$(name)"
-communityExperimentID="$(name)" >
+    <publicMetadata DBswitch="on"><Project>"$(ProjectID)"</Project>
+<Model>"am4p10"</Model>
+<ModelID>"am4p10"</ModelID>
+<ExperimentName>"$(name)"</ExperimentName>
+<ExperimentID>"$(name)" </ExperimentID>
 <!-- /MDBI -->
 AM4 prototype configuration "am4g10" from MDT Atmosphere Working Group.
 Derived from "am4g7",  with radiation bug-fix and updates from David Paynter, 
@@ -2362,17 +2353,16 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
     </description>
 <!-- MDBI -->
     <realization r="1" i="1" p="1"/>
-    <communityComment>
+    <comment>
 Experiment name = $(name)
-    </communityComment>
-    <scenario
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)"
-      parentExperimentID="N/A"
-      parentExperimentRIP="N/A"
-      branch_time="0.0">
-    </scenario>
+    </comment>
+          <Forcing>"N/A"</Forcing>
+      <startTime>"$(EXP_AMIP_START)"</startTime>
+      <endTime>"$(EXP_AMIP_END)"</endTime>
+      <parentExperimentID>"N/A"</parentExperimentID>
+      <parentExperimentRIP>"N/A"</parentExperimentRIP>
+      <branch_time>"0.0"</branch_time>
+    </publicMetadata>
 <!-- /MDBI -->
 
     <input>
@@ -2467,12 +2457,11 @@ Experiment name = $(name)
 
 
 <!-- MDBI -->
-    <description
-communityProject="$(ProjectID)"
-communityModel="am4p10"
-communityModelID="am4p10"
-communityExperimentName="$(name)"
-communityExperimentID="$(name)" >
+    <publicMetadata DBswitch="on"><Project>"$(ProjectID)"</Project>
+<Model>"am4p10"</Model>
+<ModelID>"am4p10"</ModelID>
+<ExperimentName>"$(name)"</ExperimentName>
+<ExperimentID>"$(name)" </ExperimentID>
 <!-- /MDBI -->
 AM4 prototype configuration "am4g10" from MDT Atmosphere Working Group.
 Derived from "am4g7",  with radiation bug-fix and updates from David Paynter, 
@@ -2492,17 +2481,16 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
     </description>
 <!-- MDBI -->
     <realization r="1" i="1" p="1"/>
-    <communityComment>
+    <comment>
 Experiment name = $(name)
-    </communityComment>
-    <scenario
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)"
-      parentExperimentID="N/A"
-      parentExperimentRIP="N/A"
-      branch_time="0.0">
-    </scenario>
+    </comment>
+          <Forcing>"N/A"</Forcing>
+      <startTime>"$(EXP_AMIP_START)"</startTime>
+      <endTime>"$(EXP_AMIP_END)"</endTime>
+      <parentExperimentID>"N/A"</parentExperimentID>
+      <parentExperimentRIP>"N/A"</parentExperimentRIP>
+      <branch_time>"0.0"</branch_time>
+    </publicMetadata>
 <!-- /MDBI -->
 
     <input>
@@ -2593,12 +2581,11 @@ Experiment name = $(name)
 
   <experiment name="c96L32_am4h7" inherit="cm4p10_$(AWG_VERSION)">
 <!-- MDBI -->
-    <description
-communityProject="$(ProjectID)"
-communityModel="am4p7"
-communityModelID="am4p7"
-communityExperimentName="$(name)"
-communityExperimentID="$(name)" >
+    <publicMetadata DBswitch="on"><Project>"$(ProjectID)"</Project>
+<Model>"am4p7"</Model>
+<ModelID>"am4p7"</ModelID>
+<ExperimentName>"$(name)"</ExperimentName>
+<ExperimentID>"$(name)" </ExperimentID>
 <!-- /MDBI -->
 AM4 prototype configuration "am4h7" from MDT Atmosphere Working Group.
 Derived from "am4h6". 
@@ -2621,17 +2608,16 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
     </description>
 <!-- MDBI -->
     <realization r="1" i="1" p="1"/>
-    <communityComment>
+    <comment>
 Experiment name = $(name)
-    </communityComment>
-    <scenario
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)"
-      parentExperimentID="N/A"
-      parentExperimentRIP="N/A"
-      branch_time="0.0">
-    </scenario>
+    </comment>
+          <Forcing>"N/A"</Forcing>
+      <startTime>"$(EXP_AMIP_START)"</startTime>
+      <endTime>"$(EXP_AMIP_END)"</endTime>
+      <parentExperimentID>"N/A"</parentExperimentID>
+      <parentExperimentRIP>"N/A"</parentExperimentRIP>
+      <branch_time>"0.0"</branch_time>
+    </publicMetadata>
 <!-- /MDBI -->
 
     <input>
@@ -3612,12 +3598,11 @@ configuration with present-day climatological SSTs + 2K, present-day GHGs and ae
   <experiment name="c96L32_am4b6_DDLite" inherit="cm4p10_$(AWG_VERSION)">
 
 <!-- MDBI -->
-    <description
-communityProject="$(ProjectID)"
-communityModel="am4b5"
-communityModelID="am4b5"
-communityExperimentName="$(name)"
-communityExperimentID="$(name)" >
+    <publicMetadata DBswitch="on"><Project>"$(ProjectID)"</Project>
+<Model>"am4b5"</Model>
+<ModelID>"am4b5"</ModelID>
+<ExperimentName>"$(name)"</ExperimentName>
+<ExperimentID>"$(name)" </ExperimentID>
 <!-- /MDBI -->
 
 AM4 AMIP hybrid configuration, starting from AM4 prototype configuration "am4g5r1"
@@ -3653,17 +3638,16 @@ used user/wfc/Donner20150727merge
 
 <!-- MDBI -->
     <realization r="1" i="1" p="1"/>
-    <communityComment>
+    <comment>
 Experiment name = $(name)
-    </communityComment>
-    <scenario
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)"
-      parentExperimentID="N/A"
-      parentExperimentRIP="N/A"
-      branch_time="0.0">
-    </scenario>
+    </comment>
+          <Forcing>"N/A"</Forcing>
+      <startTime>"$(EXP_AMIP_START)"</startTime>
+      <endTime>"$(EXP_AMIP_END)"</endTime>
+      <parentExperimentID>"N/A"</parentExperimentID>
+      <parentExperimentRIP>"N/A"</parentExperimentRIP>
+      <branch_time>"0.0"</branch_time>
+    </publicMetadata>
 <!-- /MDBI -->
     <input>
       <namelist name="atmos_model_nml">
@@ -3740,12 +3724,11 @@ Experiment name = $(name)
   <experiment name="c96L48_am4b6_DDFull" inherit="cm4p10_$(AWG_VERSION)">
 
 <!-- MDBI -->
-    <description
-communityProject="$(ProjectID)" 
-communityModel="am4g5" 
-communityModelID="am4g5"
-communityExperimentName="$(name)" 
-communityExperimentID="$(name)" >
+    <publicMetadata DBswitch="on"><Project>"$(ProjectID)" </Project>
+<Model>"am4g5" </Model>
+<ModelID>"am4g5"</ModelID>
+<ExperimentName>"$(name)" </ExperimentName>
+<ExperimentID>"$(name)" </ExperimentID>
 <!-- /MDBI -->
 
 AM4 AMIP hybrid configuration, starting from AM4 prototype configuration "c96L48_am4g5r1"
@@ -3805,17 +3788,16 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 
 <!-- MDBI -->
     <realization r="1" i="1" p="1"/>
-    <communityComment>
+    <comment>
 Experiment name = $(name)
-    </communityComment>
-    <scenario 
-      communityForcing="N/A"
-      startTime="$(EXP_AMIP_START)"
-      endTime="$(EXP_AMIP_END)" 
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      branch_time="0.0">
-    </scenario>
+    </comment>
+          <Forcing>"N/A"</Forcing>
+      <startTime>"$(EXP_AMIP_START)"</startTime>
+      <endTime>"$(EXP_AMIP_END)" </endTime>
+      <parentExperimentID>"N/A" </parentExperimentID>
+      <parentExperimentRIP>"N/A" </parentExperimentRIP>
+      <branch_time>"0.0"</branch_time>
+    </publicMetadata>
 <!-- /MDBI -->
 
     <input>
