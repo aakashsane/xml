@@ -247,16 +247,20 @@ configuration.
       <property name="FP_ARCHIVE_ROOT"     value="/lustre/f1/unswept/Fabien.Paulot/archive"/>
       <property name="MIZ_ARCHIVE_ROOT"    value="$(MIZ_ARCHIVE_ROOT_GAEA)"/>
 
-      <csh><![CDATA[
-        source $MODULESHOME/init/csh
-        module use /sw/eslogin-c3/modulefiles
-        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
-        module unload netcdf fre
-        module load PrgEnv-intel/5.2.82
-        module swap intel intel/15.0.2.164
-        module load  $(FRE_VERSION)
-        module load git
+      <freVersion>bronx-11</freVersion>
+      <compiler type=”intel” version=”15.0.2.164” />
 
+
+      <csh><![CDATA[
+#        source $MODULESHOME/init/csh
+#        module use /sw/eslogin-c3/modulefiles
+#        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray
+#        module unload netcdf fre
+#        module load PrgEnv-intel/5.2.82
+#        module swap intel intel/15.0.2.164
+#        module load  $(FRE_VERSION)
+#        module load git
+#
        setenv KMP_STACKSIZE 512m
        setenv NC_BLKSZ 1M
        setenv OMP_SCHEDULE "static,1"
@@ -277,14 +281,14 @@ configuration.
       <property name="FP_ARCHIVE_ROOT"     value="/archive"/>
       <property name="LWH_ARCHIVE_ROOT"    value="/archive"/>
       <property name="MIZ_ARCHIVE_ROOT"    value="$(MIZ_ARCHIVE_ROOT_GFDL)"/>
-
+      <freVersion>bronx-11</freVersion>
       <csh><![CDATA[
-        source $MODULESHOME/init/csh
-        module use -a /home/fms/local/modulefiles
-        module purge
-        module load $(FRE_VERSION)
-        module load fre-analysis
-        module load git
+#        source $MODULESHOME/init/csh
+#        module use -a /home/fms/local/modulefiles
+#        module purge
+#        module load $(FRE_VERSION)
+#        module load fre-analysis
+#        module load git
         ]]>
       </csh>
     </platform>
@@ -432,23 +436,23 @@ find ${bld_dir}/land -type f -name \*.f90 > land/pathnames_land
 <!--= TEMPLATES FOR INPUT DATA =-->
 <!--============================-->
 
-  <experiment name="L48_data">
+  <freInclude name="L48_data">
     <input>
       <dataFile label="input" target="INPUT/gas_conc_3D_am3p9.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/liteChem/input/aerosol/gas_conc_3D48L_am3p9.nc</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="L32_data">
+  <freInclude name="L32_data">
     <input>
       <dataFile label="input" target="INPUT/gas_conc_3D_am3p9.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/liteChem/input/aerosol/gas_conc_3D32L_am3p9.nc</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="c96L48_initCond_Land20151006">
+  <freInclude name="c96L48_initCond_Land20151006">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
 <!--
@@ -458,184 +462,184 @@ find ${bld_dir}/land -type f -name \*.f90 > land/pathnames_land
         <dataSource platform="$(platform)">/lustre/f1/unswept/Larry.Horowitz/awg/IC/awg_C96L48_LM3_OM4_025_grid_lm3p2_topo_v20151101.tar</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="c96L48_initCond">
+  <freInclude name="c96L48_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c96L48/awg_C96L48_LM3_OM4_025_grid_lm4p1_topo_v20160210.tar</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="c96L32_aero_initCond_Land20151006">
+  <freInclude name="c96L32_aero_initCond_Land20151006">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c96L32/topo_v20150507/awg_C96L32_LM3_OM4_025_grid_lm3p2_19810101.remapped.topodrag.v20150507.tar</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
 
-  <experiment name="c96L32_aero_initCond">
+  <freInclude name="c96L32_aero_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c96L32/aero_ic/awg_C96L32_LM3_OM4_025_grid_lm4p1_topo_v20160209.tar</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
 
-  <experiment name="c96L32_initCond_Land20151006">
+  <freInclude name="c96L32_initCond_Land20151006">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/Ming.Zhao/archive/mdt/awgmiz/ic/awg_C96L32_LM3_OM4_025_grid_lm3p2_topo_v20151101.tar</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="c96L32_initCond">
+  <freInclude name="c96L32_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/Ming.Zhao/archive/mdt/awgmiz/ic/awg_C96L32_LM3_OM4_025_grid_lm4p1_topo_v20160111.tar</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="c192L48_initCond">
+  <freInclude name="c192L48_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/ic/awg_C192L48_LM3_OM4_025_grid_southshifted_19810101.remapped.v20150302.tar</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="c192L32_initCond">
+  <freInclude name="c192L32_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20150522/Combine_LM3p2sosn_C192_OM4_025_19810101.remapped.v20150521_With_southshifted.v20150302.tar</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
 
 
-  <experiment name="field_table_faero">
+  <freInclude name="field_table_faero">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_faero</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="field_table_faero_tke">
+  <freInclude name="field_table_faero_tke">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_faero_tke</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
 
 
 
-  <experiment name="field_table_am4p7_fullchem">
+  <freInclude name="field_table_am4p7_fullchem">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p7_fullchem</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="field_table_am4p7_fullchem_2000">
+  <freInclude name="field_table_am4p7_fullchem_2000">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p7_fullchem_2000</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="field_table_am4p7_fullchem_1860">
+  <freInclude name="field_table_am4p7_fullchem_1860">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p7_fullchem_1860</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
 
 
 
 
-  <experiment name="field_table_am4p9_fullchem">
+  <freInclude name="field_table_am4p9_fullchem">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p9_fullchem</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="field_table_am4p9_fullchem_2000">
+  <freInclude name="field_table_am4p9_fullchem_2000">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p9_fullchem_2000</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="field_table_am4p9_fullchem_1860">
+  <freInclude name="field_table_am4p9_fullchem_1860">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p9_fullchem_1860</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
 
 
-  <experiment name="field_table_am4p10">
+  <freInclude name="field_table_am4p10">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p10</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="field_table_am4p10_fullchem">
+  <freInclude name="field_table_am4p10_fullchem">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p10_fullchem</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="field_table_am4p10_fullchem_2000">
+  <freInclude name="field_table_am4p10_fullchem_2000">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p10_fullchem_2000</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="field_table_am4p10_fullchem_1860">
+  <freInclude name="field_table_am4p10_fullchem_1860">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p10_fullchem_1860</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="field_table_am4p10_fullchem_2000aero">
+  <freInclude name="field_table_am4p10_fullchem_2000aero">
     <input>
       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p10_fullchem_2000aero</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
 
 
-  <experiment name="common_data_lm3p2_bug">
+  <freInclude name="common_data_lm3p2_bug">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/David.Paynter/sea_esf_CM4_V4_AUG2015.cpio</dataSource>
@@ -690,10 +694,10 @@ find ${bld_dir}/land -type f -name \*.f90 > land/pathnames_land
       </dataFile>
 
     </input>
-  </experiment>
+  </freInclude>
 
 
-  <experiment name="common_data_lm3p2">
+  <freInclude name="common_data_lm3p2">
     <input>
       <dataFile label="input" target="INPUT/soil_type.nc" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">${CPERM}/Krista.A.Dunne/mod_input_files/any_grid/soil_type_hwsd_5minute.nc</dataSource>
@@ -751,10 +755,10 @@ find ${bld_dir}/land -type f -name \*.f90 > land/pathnames_land
       </dataFile>
 
     </input>
-  </experiment>
+  </freInclude>
 
 
-  <experiment name="diag_table_lm3p2_faero">
+  <freInclude name="diag_table_lm3p2_faero">
     <input>
       <diagTable>
 $name
@@ -771,9 +775,9 @@ $baseDate
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="diag_table_lm3p2_fullaero">
+  <freInclude name="diag_table_lm3p2_fullaero">
     <input>
       <diagTable>
 $name
@@ -790,9 +794,9 @@ $baseDate
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="diag_table_lm3p2_fullchem">
+  <freInclude name="diag_table_lm3p2_fullchem">
     <input>
       <diagTable>
 $name
@@ -809,9 +813,9 @@ $baseDate
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="amip_data">
+  <freInclude name="amip_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/Hadley_sst/20160504/hadisst.186912-201602.tar</dataSource>
@@ -824,9 +828,9 @@ $baseDate
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/data_table/data_table_co2</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="climo_data">
+  <freInclude name="climo_data">
     <input>
       <dataFile label="input" target="INPUT/hadisst_sst.data.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/common/sst.climo.1981-2000.data.nc</dataSource>
@@ -841,9 +845,9 @@ $baseDate
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/data_table/data_table_amip</dataSource>
       </dataFile>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="c96_data_lm3p2">
+  <freInclude name="c96_data_lm3p2">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <!--dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/fre/tikal/LM3/LM3p2_C96_CM2G_historical_HC1_quick/ncrc2.default-prod/static_veg/19810101.static_veg.lm3p2.remapped_to_c96_OM4_025.v20150322.tar</dataSource-->
@@ -976,12 +980,12 @@ set adjust_dry_mass = `/ncrc/home1/Larry.Horowitz/bin/adjust_dry_mass.csh`
 touch MOM_input
       ]]></csh>
     </input>
-  </experiment>
+  </freInclude>
 
 
 
 
-  <experiment name="c96_data_lm3p2_Land20151006">
+  <freInclude name="c96_data_lm3p2_Land20151006">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/fre/tikal/LM3/LM3p2_C96_CM2G_historical_HC1_quick/ncrc2.default-prod/static_veg/19810101.static_veg.lm3p2.remapped_to_c96_OM4_025.v20150322.tar</dataSource>
@@ -1113,9 +1117,9 @@ set adjust_dry_mass = `/ncrc/home1/Larry.Horowitz/bin/adjust_dry_mass.csh`
 touch MOM_input
       ]]></csh>
     </input>
-  </experiment>
+  </freInclude>
 
-  <experiment name="c192_data_lm3p2">
+  <freInclude name="c192_data_lm3p2">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <!--dataSource platform="$(platform)">$(AWG_ARCHIVE_ROOT)/awg/input/lm3/19810101.static_veg.remapped_to_C192_OM4_025_southshifted.v20150302.tar</dataSource-->
@@ -1215,13 +1219,13 @@ set adjust_dry_mass = `/ncrc/home1/Larry.Horowitz/bin/adjust_dry_mass.csh`
 touch MOM_input
       ]]></csh>
     </input>
-  </experiment>
+  </freInclude>
 
 <!--================================-->
 <!--= TEMPLATES FOR POSTPROCESSING =-->
 <!--================================-->
 
-  <experiment name="c96_amip_postprocess">
+  <freInclude name="c96_amip_postprocess">
     <postProcess>
       <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_data_stager_globalAve.csh"/>
       <component type="atmos" zInterp="era40" start="$(ANA_AMIP_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
@@ -1316,9 +1320,9 @@ touch MOM_input
       </component>
 
     </postProcess>
-  </experiment>
+  </freInclude>
 
-  <experiment name="c96_climo_postprocess">
+  <freInclude name="c96_climo_postprocess">
     <postProcess>
 
       <component type="atmos" zInterp="era40" start="$(ANA_CLIMO_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
@@ -1413,9 +1417,9 @@ touch MOM_input
       </component>
 
     </postProcess>
-  </experiment>
+  </freInclude>
 
-  <experiment name="c192_amip_postprocess">
+  <freInclude name="c192_amip_postprocess">
     <postProcess>
 
       <component type="atmos" zInterp="era40" start="$(ANA_AMIP_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
@@ -1510,9 +1514,9 @@ touch MOM_input
       </component>
 
     </postProcess>
-  </experiment>
+  </freInclude>
 
-  <experiment name="c192_climo_postprocess">
+  <freInclude name="c192_climo_postprocess">
     <postProcess>
 
       <component type="atmos" zInterp="era40" start="$(ANA_CLIMO_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
@@ -1607,7 +1611,7 @@ touch MOM_input
       </component>
 
     </postProcess>
-  </experiment>
+  </freInclude>
 
 <!--====================-->
 <!--= AMIP EXPERIMENTS =-->
@@ -1682,13 +1686,13 @@ Experiment name = $(name)
         atmos_nthreads = $atmos_nthreads
       </namelist>
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2_bug']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2_bug']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='amip_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_initCond_Land20151006']/input/node())"/>
     </input>
 
     <runtime>
@@ -1733,7 +1737,7 @@ Experiment name = $(name)
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_postprocess']/postProcess/node())"/>
     </postProcess>
 
   </experiment>
@@ -1814,13 +1818,13 @@ Experiment name = $(name)
         atmos_nthreads = $atmos_nthreads
       </namelist>
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2_bug']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2_bug']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='amip_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_initCond_Land20151006']/input/node())"/>
     </input>
 
     <runtime>
@@ -1865,7 +1869,7 @@ Experiment name = $(name)
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_postprocess']/postProcess/node())"/>
     </postProcess>
 
   </experiment>
@@ -1954,16 +1958,16 @@ Experiment name = $(name)
       </namelist>
 
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2_bug']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2_bug']/input/node())"/>
       <dataFile label="input" target="INPUT/emissions.nh3.1x1.1859_2020.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/historical/emissions.nh3.1x1.1859_2020_seasonality.nc</dataSource>
       </dataFile>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullchem']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p7_fullchem']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p7_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='amip_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L48_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L48_initCond_Land20151006']/input/node())"/>
     </input>
 
     <runtime>
@@ -1997,7 +2001,7 @@ Experiment name = $(name)
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_postprocess']/postProcess/node())"/>
     </postProcess>
 
   </experiment>
@@ -2152,13 +2156,13 @@ Experiment name = $(name)
       </namelist>
 
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='amip_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_initCond']/input/node())"/>
     </input>
 
     <runtime>
@@ -2203,7 +2207,7 @@ Experiment name = $(name)
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_postprocess']/postProcess/node())"/>
     </postProcess>
   </experiment>
 
@@ -2273,17 +2277,17 @@ Experiment name = $(name)
       </namelist>
 
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2']/input/node())"/>
        <dataFile label="input" target="INPUT/emissions.nh3.1x1.1859_2020.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/historical/emissions.nh3.1x1.1859_2020_seasonality.nc</dataSource>
        </dataFile>
 
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullchem']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p9_fullchem']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p9_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='amip_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L48_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L48_initCond']/input/node())"/>
     </input>
 
     <runtime>
@@ -2321,7 +2325,7 @@ Experiment name = $(name)
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_postprocess']/postProcess/node())"/>
     </postProcess>
 
   </experiment>
@@ -2398,13 +2402,13 @@ Experiment name = $(name)
       </namelist>
 
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullaero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p10']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_aero_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p10']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='amip_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_aero_initCond']/input/node())"/>
     </input>
 
     <runtime>
@@ -2449,7 +2453,7 @@ Experiment name = $(name)
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_postprocess']/postProcess/node())"/>
     </postProcess>
   </experiment>
 
@@ -2530,17 +2534,17 @@ Experiment name = $(name)
       </namelist>
 
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2']/input/node())"/>
        <dataFile label="input" target="INPUT/emissions.nh3.1x1.1859_2020.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/historical/emissions.nh3.1x1.1859_2020_seasonality.nc</dataSource>
        </dataFile>
 
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullchem']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p10_fullchem']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p10_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='amip_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L48_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L48_initCond']/input/node())"/>
     </input>
 
     <runtime>
@@ -2578,7 +2582,7 @@ Experiment name = $(name)
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_postprocess']/postProcess/node())"/>
     </postProcess>
 
   </experiment>
@@ -2657,13 +2661,13 @@ Experiment name = $(name)
       </namelist>
 
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2_bug']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_faero_tke']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2_bug']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_faero_tke']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='amip_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_initCond_Land20151006']/input/node())"/>
     </input>
 
     <runtime>
@@ -2708,7 +2712,7 @@ Experiment name = $(name)
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_postprocess']/postProcess/node())"/>
     </postProcess>
 
   </experiment>
@@ -2753,13 +2757,13 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
         atmos_nthreads = $atmos_nthreads
       </namelist>
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2_bug']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2_bug']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='climo_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_initCond_Land20151006']/input/node())"/>
     </input>
 
     <runtime>
@@ -2793,7 +2797,7 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
     </postProcess>
   </experiment>
 
@@ -2833,13 +2837,13 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
         atmos_nthreads = $atmos_nthreads
       </namelist>
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2_bug']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2_bug']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='climo_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_initCond_Land20151006']/input/node())"/>
     </input>
 
     <runtime>
@@ -2873,7 +2877,7 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
     </postProcess>
   </experiment>
 
@@ -2931,16 +2935,16 @@ except eros_scale=8.e-6 in strat_cloud_nml to re-balance TOA radiation.
       </namelist>
 
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2_bug']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2_bug']/input/node())"/>
       <dataFile label="input" target="INPUT/emissions.nh3.1x1.2000.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/2000/emissions.nh3.1x1.2000_seasonality.nc</dataSource>
       </dataFile>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullchem']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p7_fullchem_2000']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p7_fullchem_2000']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='climo_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L48_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L48_initCond_Land20151006']/input/node())"/>
     </input>
 
     <runtime>
@@ -2974,7 +2978,7 @@ except eros_scale=8.e-6 in strat_cloud_nml to re-balance TOA radiation.
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
     </postProcess>
   </experiment>
 
@@ -3063,13 +3067,13 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
       </namelist>
 
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='climo_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_initCond']/input/node())"/>
     </input>
 
     <runtime>
@@ -3103,7 +3107,7 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
     </postProcess>
   </experiment>
 
@@ -3158,16 +3162,16 @@ This is the same as
         atmos_nthreads = $atmos_nthreads
       </namelist>
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2']/input/node())"/>
       <dataFile label="input" target="INPUT/emissions.nh3.1x1.2000.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/2000/emissions.nh3.1x1.2000_seasonality.nc</dataSource>
       </dataFile>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullchem']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p9_fullchem_2000']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p9_fullchem_2000']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='climo_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L48_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L48_initCond']/input/node())"/>
     </input>
 
     <runtime>
@@ -3201,7 +3205,7 @@ This is the same as
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
     </postProcess>
   </experiment>
 
@@ -3242,13 +3246,13 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
       </namelist>
 
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullaero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p10']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_aero_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p10']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='climo_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_aero_initCond']/input/node())"/>
     </input>
 
     <runtime>
@@ -3282,7 +3286,7 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
     </postProcess>
   </experiment>
 
@@ -3333,16 +3337,16 @@ Chemistry changes from am4g7:
         atmos_nthreads = $atmos_nthreads
       </namelist>
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2']/input/node())"/>
       <dataFile label="input" target="INPUT/emissions.nh3.1x1.2000.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/2000/emissions.nh3.1x1.2000_seasonality.nc</dataSource>
       </dataFile>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_fullchem']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p10_fullchem_2000']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullchem']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p10_fullchem_2000']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='climo_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L48_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L48_initCond']/input/node())"/>
     </input>
 
     <runtime>
@@ -3376,7 +3380,7 @@ Chemistry changes from am4g7:
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
     </postProcess>
   </experiment>
 
@@ -3418,13 +3422,13 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
       </namelist>
 
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2_bug']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_faero_tke']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2_bug']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_faero_tke']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='climo_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_initCond_Land20151006']/input/node())"/>
     </input>
 
     <runtime>
@@ -3458,7 +3462,7 @@ configuration with present-day climatological SSTs, present-day GHGs and aerosol
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
     </postProcess>
   </experiment>
 
@@ -3533,14 +3537,14 @@ configuration with present-day climatological SSTs, but pre-industrial GHGs and 
     <input>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p10_fullchem_1860climo.nml"/>
 
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2']/input/node())"/>
       <dataFile label="input" target="INPUT/emissions.nh3.1x1.1860.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/1860/emissions.nh3.1x1.1860_seasonality.nc</dataSource>
       </dataFile>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p10_fullchem_1860']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='climo_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L48_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p10_fullchem_1860']/input/node())"/>
     </input>
   </experiment>
 
@@ -3553,14 +3557,14 @@ configuration with present-day climatological SSTs, but pre-industrial GHGs and 
     <input>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p10_fullchem_2000aero.nml"/>
 
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2']/input/node())"/>
       <dataFile label="input" target="INPUT/emissions.nh3.1x1.1860.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/1860/emissions.nh3.1x1.1860_seasonality.nc</dataSource>
       </dataFile>
-      <xi:include xpointer="xpointer(//experiment[@name='climo_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_am4p10_fullchem_2000aero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='climo_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L48_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p10_fullchem_2000aero']/input/node())"/>
     </input>
   </experiment>
 
@@ -3687,13 +3691,13 @@ Experiment name = $(name)
         atmos_nthreads = $atmos_nthreads
       </namelist>
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2_bug']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L32_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L32_initCond_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2_bug']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='amip_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_initCond_Land20151006']/input/node())"/>
     </input>
 
     <runtime>
@@ -3726,7 +3730,7 @@ Experiment name = $(name)
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_postprocess']/postProcess/node())"/>
     </postProcess>
 
   </experiment>
@@ -3840,13 +3844,13 @@ Experiment name = $(name)
         atmos_nthreads = $atmos_nthreads
       </namelist>
       <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//experiment[@name='common_data_lm3p2_bug']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='diag_table_lm3p2_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='field_table_faero']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='amip_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='L48_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//experiment[@name='c96L48_initCond_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_data_lm3p2_bug']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_faero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='amip_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2_Land20151006']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L48_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L48_initCond_Land20151006']/input/node())"/>
     </input>
     <runtime>
       <production simTime="$(EXP_AMIP_LEN)" units="years" npes="864" runTime="16:00:00">
@@ -3891,7 +3895,7 @@ Experiment name = $(name)
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='c96_amip_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_postprocess']/postProcess/node())"/>
     </postProcess>
 
   </experiment>
