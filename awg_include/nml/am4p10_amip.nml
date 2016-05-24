@@ -1,15 +1,15 @@
  &aerosol_nml
     family_names = "small_dust", "large_dust", "black_carbon","organic_carbon", "sea_salt", "sulfate", "aerosol", "pm2.5", "dust", "POA"
-    in_family1 = T,F,F,F,F,F,F,F,F,F,
-    in_family2 = F,T,F,F,F,F,F,F,F,F,
-    in_family3 = F,F,F,F,F,F,T,T,F,F,
-    in_family4 = F,F,F,F,F,F,F,F,T,T,
-    in_family5 = F,F,F,T,T,T,F,F,F,F,
-    in_family6 = F,F,T,F,F,F,F,F,F,F,
-    in_family7 = T,T,T,T,T,T,T,T,T,T,
-    in_family8 = T,F,T,T,T,F,T,T,T,T,
-    in_family9 = T,T,F,F,F,F,F,F,F,F,
-    in_family10= F,F,F,F,F,F,F,F,T,T,
+    in_family1 = F,T,F,F,F,F,F,F,F,F,F,F,F,F,F,F,
+    in_family2 = F,F,T,T,T,T,F,F,F,F,F,F,F,F,F,F,
+    in_family3 = F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,F,
+    in_family4 = T,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,
+    in_family5 = F,F,F,F,F,F,F,T,T,T,T,T,F,F,F,F,
+    in_family6 = F,F,F,F,F,F,T,F,F,F,F,F,F,F,F,F,
+    in_family7 = T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,
+    in_family8 = T,T,F,F,F,F,T,T,T,F,F,F,T,T,T,T,
+    in_family9 = F,T,T,T,T,T,F,F,F,F,F,F,F,F,F,F,
+    in_family10= F,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,
     aerosol_data_source = "predicted"
 /
 
@@ -383,9 +383,7 @@
         omna_input_name='omemisnat'
       omss_source = 'ODowd'
         omss_coef = 0.05
-      soa_source = 'add_soa'
-        gas_conc_name='C4H10',soa_filename ='gas_conc_3D_am3p9.nc',
-        soa_time_dependency_type='constant'
+      no_biobur_if_no_pbl = .false.
 /
 
  &ice_spec_nml
@@ -471,16 +469,14 @@
       calc_n2o_tfs_monthly = .true.,
       n2o_tf_time_displacement = 360.0,
 
-
 /
 
  &shortwave_driver_nml
       do_cmip_diagnostics = .true.,
       swform = 'esfsw99'
       solar_dataset_entry = $baseDate
-      time_varying_solar_constant = .true,
+      time_varying_solar_constant = .true.,
 /
-
 
  &simple_sulfate_nml
         gas_conc_filename='gas_conc_3D_am3p9.nc'
@@ -505,6 +501,7 @@
           biobur_time_dependency_type='time_varying',biobur_dataset_entry=$baseDate
         cloud_chem_solver="f1p"
         pH_cloud=4.5
+        no_biobur_if_no_pbl = .false.
 /
 
  &tropchem_driver_nml
