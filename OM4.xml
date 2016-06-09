@@ -14,8 +14,8 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <property name="RELEASE"      value="ulm_201510"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2016.05.13"/>     <!-- git tag date for MOM6 source code -->
+   <property name="RELEASE"      value="verona_prerelease"/> <!-- CVS tag for shared source code -->
+   <property name="MOM6_DATE"    value="2016.05.26"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -632,7 +632,7 @@ limit coredumpsize unlimited
    </setup>
 
    <property name="OM4_033_ARCHIVE"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input/verona/John.Dunne_OM4_033_20151028"/>
-   <property name="OM4_05_ARCHIVE"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input/verona/John.Dunne_OM4_05_20151028"/>
+   <property name="OM4_05_ARCHIVE"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input/verona/John.Dunne_OM4_05_20160517"/>
    
    
    <property name="MOM6_EXAMPLES"  value="$root/$(LIBS_ROOT)/src/mom6"/>
@@ -646,31 +646,12 @@ Make the executable for ocean-ice experiments.
          <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid="NA"/>
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
             <codeBase version="$(RELEASE)"> shared.git </codeBase>
-        <csh><![CDATA[
-        ( cd shared && git checkout user/nnz/CM4p7_dev4verona )
-        ]]></csh>
          </source>
          <compile>
             <cppDefs>-Duse_libMPI -Duse_netCDF $(F2003_FLAGS) -DMAXFIELDMETHODS_=400</cppDefs>
          </compile>
       </component>
 
-<!--  To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
-
-      <component paths="ocean_shared" requires="fms mom6" name="ocean_shared">
-      <description domainName="Ocean Generic Tracers" communityName="GFDL-ocean-shared" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
-      <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="$(RELEASE)"> ocean_shared.git </codeBase>
-        <csh><![CDATA[
-        ( cd ocean_shared && git checkout user/nnz/verona_dev_merge )
-        ]]>
-        </csh>
-      </source>
-      <compile>
-        <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_MOM6_DIAG -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-      </compile>
-    </component>
--->
       <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared">
          <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
          <source versionControl="git" root="https://github.com">
@@ -686,12 +667,10 @@ Make the executable for ocean-ice experiments.
           git submodule update #This gets the right version of submodules
           popd
 
-	  #Updates needed for using MOM6 diagnostics/remapping in generic tracers package
-	  #(cd mom6/src/MOM6 && git checkout origin/user/nnz/zdiag4cobalt)
 
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
 	  git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git 
-          (cd ocean_shared && git checkout origin/user/nnz/zdiag4cobalt)
+          (cd ocean_shared && git checkout user/nnz/verona_dev_merge)
 	  
 	
           pushd mom6
@@ -767,11 +746,6 @@ Make the executable for ocean-ice experiments.
       <component name="atmos_null" paths="atmos_null atmos_param" requires="fms">
           <library path="$(MY_LIBS)/atmos_null/libatmos_null.a" headerDir="$(MY_LIBS)/atmos_null"/>
       </component>
-<!--
-      <component paths="ocean_shared" requires="fms" name="ocean_shared">
-         <library path="$(MY_LIBS)/ocean_shared/libocean_shared.a" headerDir="$(MY_LIBS)/ocean_shared"/>
-      </component> 
--->
       <component paths="mom6 ocean_shared" requires="fms" name="mom6">
          <library path="$(MY_LIBS)/mom6/libmom6.a" headerDir="$(MY_LIBS)/mom6"/>
       </component> 
@@ -785,9 +759,6 @@ Make the executable for ocean-ice experiments.
          <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
             <codeBase version="$(RELEASE)"> coupler.git </codeBase>
-        <csh><![CDATA[
-        ( cd coupler && git checkout user/rwh/no_deep_ice_vars )
-        ]]></csh>
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
@@ -1116,6 +1087,12 @@ endif
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m_575m.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/analysis_vgrid_lev35.v1.nc</dataSource>
@@ -1485,8 +1462,8 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
       <component type="ocean_Bering_Strait" source="rregionocean_Bering_Strait" sourceGrid="ocean-tripolar">
         <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="rregionocean_Bering_Strait"/>
       </component>
-      <component type="ocean_Canadian_Archipelago" source="rregionocean_Canadian_Archipelago" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="rregionocean_Canadian_Archipelago"/>
+      <component type="ocean_Davis_Strait" source="rregionocean_Davis_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="rregionocean_Davis_Strait"/>
       </component>
       <component type="ocean_Windward_Passage" source="rregionocean_Windward_Passage" sourceGrid="ocean-tripolar">
         <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="rregionocean_Windward_Passage"/>
@@ -1669,8 +1646,7 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
          <!--the following two should reproduce eachother but not the basic because basic uses mask_table-->
          <run days="2"  npes="2304" overrideParams="$(domainparams_O2304)" runTimePerJob="00:30:00"/>
          <run days="2"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
-         <!--the following is for checking the timings or production run-->
-         <run months="1"  npes="1756"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1756)"/>
+         <run days="2"  npes="512"  overrideParams="$(domainparams_O512)"  runTimePerJob="00:30:00"/>
        </regression>
 
       <regression name="timing">
@@ -1680,10 +1656,9 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
        </regression>
 
       <regression name="timings">
-          <run months="1"  npes="$(PROD_NPES)"  runTimePerJob="00:50:00"/>
-          <run months="1"  npes="2432"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O2432)"/>
-          <run months="1"  npes="1756"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1756)"/>
-          <run months="1"  npes="1970"          runTimePerJob="00:50:00" overrideParams="$(domainparams_O1970)"/>
+          <run months="1"  npes="2997"  runTimePerJob="00:50:00" overrideParams="$(domainparams_O2997)"/>
+          <run months="1"  npes="2432"  runTimePerJob="00:50:00" overrideParams="$(domainparams_O2432)"/>
+          <run months="1"  npes="1970"  runTimePerJob="00:50:00" overrideParams="$(domainparams_O1970)"/>
        </regression>
       <regression name="debug">
          <run days="1"   npes="512" overrideParams="$(domainparams_O512)" runTimePerJob="01:30:00"/>
@@ -1747,8 +1722,8 @@ $baseDate
        minutes = 0
        seconds = 0
        calendar = 'NOLEAP',
-       dt_cpld  = 3600,
-       dt_atmos = 3600,
+       dt_cpld  = 1800,
+       dt_atmos = 1800,
        do_atmos = .false.,
        do_land = .false.,
        do_ice = .true.,
@@ -1780,74 +1755,16 @@ $baseDate
        max_input_fields = 699
        max_output_fields = 699
        mix_snapshot_average_fields=.false.
-       max_field_attributes=4
      </namelist>
-
+     <!--verona-->
+     <namelist name="sat_vapor_pres_nml">
+      construct_table_wrt_liq = .true.,
+      construct_table_wrt_liq_and_ice = .true.,
+     </namelist>
 
    </input>
    </experiment>
 
-   <experiment name="OM4_lowmix" inherit="OM4_SIS2_baseline">
-    <input>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override KD = 2.E-6
-#override MLE_USE_PBL_MLD = True
-#override MLE_MLD_DECAY_TIME = 4.32E5
-OVERRIDE_EOF
-     ]]></csh>
-    </input>
-   </experiment>
-
-   <experiment name="OM4_lowmix_MEKE_dtcpld1800" inherit="OM4_SIS2_baseline">
-    <input>
-      <namelist name="coupler_nml">
-       months = $months,
-       days   = $days,
-       current_date = 1900,1,1,0,0,0,
-       hours = 0
-       minutes = 0
-       seconds = 0
-       calendar = 'NOLEAP',
-       dt_cpld  = 1800,
-       dt_atmos = 1800,
-       do_atmos = .false.,
-       do_land = .false.,
-       do_ice = .true.,
-       do_ocean = .true.,
-       atmos_npes = 0,
-       ocean_npes = 0,
-       concurrent = .false.
-       use_lag_fluxes=.false.
-     </namelist>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override KD = 2.E-6
-#override MLE_USE_PBL_MLD = True
-#override MLE_MLD_DECAY_TIME = 4.32E5
-#override KH_RES_FN_POWER = 100
-#override MEKE_KHTH_FAC = 1.0
-OVERRIDE_EOF
-     ]]></csh>
-    </input>
-   </experiment>
-
-   <experiment name="OM4_lowmix_MEKE_KHTR600" inherit="OM4_SIS2_baseline">
-    <input>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override KD = 2.E-6
-#override MLE_USE_PBL_MLD = True
-#override MLE_MLD_DECAY_TIME = 4.32E5
-#override KH_RES_FN_POWER = 100
-#override MEKE_KHTH_FAC = 1.0
-#override USE_NEUTRAL_DIFFUSION = True
-#override KHTR = 600.
-OVERRIDE_EOF
-     ]]></csh>
-    </input>
-   </experiment>
 
    <experiment name="OM4_SIS2_CORE2_baseline" inherit="OM4_SIS2_baseline_config">
     <description communityProject="OWG" communityModel="OM4_SIS2 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)" >
@@ -1926,6 +1843,11 @@ $baseDate
        make_exchange_reproduce = .false.
        interp_method = 'second_order'
      </namelist>
+     <!--verona-->
+     <namelist name="sat_vapor_pres_nml">
+      construct_table_wrt_liq = .true.,
+      construct_table_wrt_liq_and_ice = .true.,
+     </namelist>
 
    </input>
    </experiment>
@@ -1965,196 +1887,6 @@ OVERRIDE_EOF
     </input>
    </experiment>
 
-
-
-    <experiment name="OM4_SIS2_DT1200" inherit="OM4_SIS2_baseline">
-   <input>
-     <csh><![CDATA[
-cat > $work/INPUT/SIS_override << OVERRIDE_EOF
-#override DT_ICE_DYNAMICS = 1200.0
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-
-   </experiment>
-
-   <experiment name="OM4_SIS2_low_mixing3.$(MOM6_DATE)" inherit="OM4_SIS2_low_mixing3"/>
-   <experiment name="OM4_SIS2_low_mixing3" inherit="OM4_SIS2_baseline">
-    <input>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override MSTAR = 0.3
-#override KD = 2.0E-6
-OVERRIDE_EOF
-     ]]></csh>
-    </input>
-   </experiment>
-   
-   <experiment name="OM4_SIS2_low_mixing3_neutDiff.$(MOM6_DATE)" inherit="OM4_SIS2_low_mixing3_neutDiff"/>
-   <experiment name="OM4_SIS2_low_mixing3_neutDiff" inherit="OM4_SIS2_baseline">
-    <input>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override MSTAR = 0.3
-#override KD = 2.0E-6
-#override USE_NEUTRAL_DIFFUSION = True
-OVERRIDE_EOF
-     ]]></csh>
-    </input>
-   </experiment>
-
-   <experiment name="OM4_SIS2_FBC" inherit="OM4_SIS2_baseline">
-   <input>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-TOPO_EDITS_FILE = "Faroe_edits.nc"
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-   </experiment>
-
-   <experiment name="OM4_SIS2_FBC_GS" inherit="OM4_SIS2_baseline">
-   <input>
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-TOPO_EDITS_FILE = "Faroe_GS_edits.nc"
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-   </experiment>
-
-
-   <experiment name="OM4_SIS2_DT_THERM_7200" inherit="OM4_SIS2_baseline">
-	<description communityProject="OWG" communityModel="OM4_SIS2 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)">
- global 1/4 degree z  with THERMO_SPANS_COUPLING
-	</description>
-
-    <input>
-
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-THERMO_SPANS_COUPLING = True
-#override DT_THERM = 7200
-#override DIABATIC_FIRST = False
-OVERRIDE_EOF
-     ]]></csh>
-   </input>
-   </experiment>
-
- 
-   <experiment name="OM4_SIS2_COBALT_initFromSrc.$(MOM6_DATE)" inherit="OM4_SIS2_COBALT_initFromSrc"/>
-   <experiment name="OM4_SIS2_COBALT_initFromSrc" inherit="OM4_SIS2_baseline">
-    <input>
-
-      <namelist name="coupler_nml">
-       months = $months,
-       days   = $days,
-       current_date = 1948,1,1,0,0,0,
-       hours = 0
-       minutes = 0
-       seconds = 0
-       calendar = 'NOLEAP',
-       dt_cpld  = 3600,
-       dt_atmos = 3600,
-       do_atmos = .false.,
-       do_land = .false.,
-       do_ice = .true.,
-       do_ocean = .true.,
-       atmos_npes = 0,
-       ocean_npes = 0,
-       concurrent = .false.
-       use_lag_fluxes=.true.
-     </namelist>
-       <namelist name="generic_tracer_nml">
-       do_generic_tracer=.true.
-       do_generic_CFC=.false.
-       do_generic_COBALT=.true.
-       do_generic_TOPAZ=.false.
-         </namelist>
-         <namelist name="diag_manager_nml">
-       max_axes = 150,
-       max_files = 100,
-       max_num_axis_sets = 100,
-       max_input_fields = 699
-       max_output_fields = 699
-       mix_snapshot_average_fields=.false.
-       max_field_attributes=4
-         </namelist>
-         <namelist name="fms_nml">
-            clock_grain='ROUTINE'
-            clock_flags='NONE'
-            domains_stack_size = 7000000
-            stack_size =0
-         </namelist>
-
-     <diagTable>
-$name
-$baseDate
-     </diagTable>
-      
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_common']/input/node())"/>
-      <!--MOM6 Input datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_data']/input/node())"/>
-      <!--SIS2 Input datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
-      <!--OM4 gridSpec mosaic datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_grid']/input/node())"/>
-      <!--CORE forcing datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='CORE_data']/input/node())"/>
-      <!--COBALT source datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='OBGC_COBALT_data']/input/node())"/>
-     
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-USE_generic_tracer = True
-#override CHL_FROM_FILE = True
-OVERRIDE_EOF
-     ]]></csh>
-
-   </input>
-
-   <runtime>
-       <reference restart="$(REFERENCE)/1x0m10d_2997pe/restart/19700111.tar"/>
-   </runtime>
-     
-   </experiment>
-
-
-   <experiment name="OM4_SIS2_COBALT_initFromSrc_DT_THERM_7200.$(MOM6_DATE)" inherit="OM4_SIS2_COBALT_initFromSrc_DT_THERM_7200"/>
-   <experiment name="OM4_SIS2_COBALT_initFromSrc_DT_THERM_7200" inherit="OM4_SIS2_COBALT_initFromSrc">
-    <description communityProject="OWG" communityModel="OM4_SIS $(FRE_STEM)" communityModelID="OWG_OM4_SIS2" communityExperimentName="$(name)">
- global 1/4 degree z  with THERMO_SPANS_COUPLING
-    </description>
-
-    <input>
-
-       <namelist name="generic_tracer_nml">
-       do_generic_tracer=.true.
-       do_generic_CFC=.false.
-       do_generic_COBALT=.true.
-       do_generic_TOPAZ=.false.
-       force_update_fluxes=.true. !This has to be set for THERMO_SPANS_COUPLING to work
-       </namelist>
-
-
-<csh><![CDATA[
-cat > $work/INPUT/MOM_override << OVERRIDE_EOF
-#override USE_OCMIP2_CFC = False
-USE_generic_tracer = True
-THERMO_SPANS_COUPLING = True
-#override DT_THERM = 7200
-#override DIABATIC_FIRST = False
-OVERRIDE_EOF
-
-     ]]></csh>
-   </input>
-
-   <runtime>
-       <reference restart="$(REFERENCE)/1x0m10d_2997pe/restart/19700111.tar"/>
-   </runtime>
-    
-   </experiment>
-   
    <!--****************************************************************************************-->
    <!--***************************** 1 degree experiments        ****************************-->
    <!--****************************************************************************************-->
@@ -2331,6 +2063,11 @@ force_all_pes_traj = .true.
        ice_mask_table='MOM_mask_table'
      </namelist>
 
+     <!--verona-->
+     <namelist name="sat_vapor_pres_nml">
+      construct_table_wrt_liq = .true.,
+      construct_table_wrt_liq_and_ice = .true.,
+     </namelist>
 
      <csh type="always">
         <![CDATA[
@@ -2790,9 +2527,13 @@ $baseDate
        max_input_fields = 699
        max_output_fields = 699
        mix_snapshot_average_fields=.false.
-       max_field_attributes=4
      </namelist>
 
+     <!--verona-->
+     <namelist name="sat_vapor_pres_nml">
+      construct_table_wrt_liq = .true.,
+      construct_table_wrt_liq_and_ice = .true.,
+     </namelist>
    </input>
 
    <runtime>   
@@ -2890,20 +2631,20 @@ $baseDate
         <dataSource site="ncrc">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/ocean_static.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/WOA05_ptemp_salt_annual.nc </dataSource>
+       <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/WOA05_ptemp_salt_monthly.nc </dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/salt_restore.nc </dataSource>
       </dataFile>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_input</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/MOM_input</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/layer_coord.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/layer_coord.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/MOM_channels_global_025</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/MOM_channels_global_025</dataSource>
       </dataFile>      
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m.nc</dataSource>
@@ -2959,283 +2700,9 @@ touch $work/INPUT/SIS_override
      </input>
    </experiment>
 
-   <experiment name="OM4_SIS2_05_baseline.$(MOM6_DATE)" inherit="OM4_SIS2_05_baseline"/>
-   <experiment name="OM4_SIS2_05_baseline$(STATIC)" inherit="MOM6_SIS2_compile$(STATIC)">
-    <description communityProject="OWG" communityModel="OM4_SIS2_05 $(FRE_STEM)" communityModelID="OWG_OM4_SIS2_05" communityExperimentName="$(name)" >
- global 1/3 degree z test case
-    </description>  
-    <scenario 
-      communityForcing="CORE"
-      parentExperimentID="N/A" 
-      parentExperimentRIP="N/A" 
-      startTime="$(PP_START_YEAR)"
-      endTime="$(PP_END_YEAR)" 
-      branch_time="0.0">
-    </scenario>
-    <communityComment>
-    For more information please refer to the
-    &lt;a href="http://wiki.gfdl.noaa.gov/index.php/MOM6"&gt; MOM6 Wiki.  &lt;/a&gt;
-    </communityComment>
-
-
-    <input>
-  
-     <csh><![CDATA[
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
-#override Z_INIT_FILE_SALT_VAR  = "salt"
-#override TIDEAMP_FILE          = "tidal_amplitude.nc"
-#override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
-#override SALT_RESTORE_FILE     = "salt_restore.nc"
-#override TOPO_EDITS_FILE = ""
-
-MOM_OVERRIDE_EOF
-
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-
-SIS_OVERRIDE_EOF
-
-     ]]></csh>
-
-
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_common']/input/node())"/>
-      <!--MOM6 Input datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_05grid_data']/input/node())"/>
-      <!--SIS2 Input datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='SIS2_data']/input/node())"/>
-      <!--CORE forcing datasets-->
-      <xi:include xpointer="xpointer(//experiment[@name='CORE_data']/input/node())"/>
-
-     
-     <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
-        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
-        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
-     </dataFile>
-     <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
-        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
-        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/field_table</dataSource>
-     </dataFile>
-      
-      <diagTable>
-$name
-$baseDate
-      </diagTable>
-
-      <namelist name="coupler_nml">
-       months = $months,
-       days   = $days,
-       current_date = 1900,1,1,0,0,0,
-       hours = 0
-       minutes = 0
-       seconds = 0
-       calendar = 'NOLEAP',
-       dt_cpld  = 3600,
-       dt_atmos = 3600,
-       do_atmos = .false.,
-       do_land = .false.,
-       do_ice = .true.,
-       do_ocean = .true.,
-       atmos_npes = 0,
-       ocean_npes = 1057,
-       concurrent = .false.
-       use_lag_fluxes=.false. 
-     </namelist>
-
-      <namelist name="dummy_ocean_nml">
-       ocean_layout = 36,36
-       ocean_io_layout = 1,4
-       ocean_mask_table=mask_table.239.36x36
-     </namelist>
-     <namelist name="dummy_ice_nml">
-       ice_layout = 36,36
-       ice_io_layout = 1,4
-       ice_mask_table=mask_table.239.36x36
-     </namelist>
-
-    <namelist name="fms_nml">
-            clock_grain='ROUTINE'
-            clock_flags='NONE'
-            domains_stack_size = 8000000
-            stack_size =0
-      </namelist>
-     <namelist name="fms_io_nml" >
-         fms_netcdf_restart=.true.
-         threading_read='multi'
-         max_files_r = 200
-         max_files_w = 200
-!         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
-     </namelist>
-
-   </input>
-
-   <runtime>   
-       <regression name="basic">
-         <run months="1" npes="432"  overrideParams="$(domainparams_O432)"   runTimePerJob="00:50:00"/>
-       </regression>
-       <regression name="rts">
-         <run days="15 16" npes="432"  overrideParams="$(domainparams_O432)"  runTimePerJob="00:50:00"/>
-         <!--the following two should reproduce eachother but not the basic because basic uses mask_table-->
-         <run days="2"  npes="1152" overrideParams="$(domainparams_O1152)" runTimePerJob="00:30:00"/>
-         <run days="2"  npes="512"  overrideParams="$(domainparams_O512)"  runTimePerJob="01:00:00"/>
-         <run days="2"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
-         <run days="2"  npes="864"  overrideParams="$(domainparams_O864)"  runTimePerJob="01:00:00"/>	 
-          <!--the following is for checking the timings or production run-->
-         <run months="1" npes="1057" overrideParams="$(domainparams_O1057p5)" runTimePerJob="00:50:00"/>
-       </regression>
-       
-       <regression name="timing">
-         <run months="1" npes="128" overrideParams="$(domainparams_O128)" runTimePerJob="00:50:00"/>
-         <run months="1" npes="128" overrideParams="$(domainparams_O128x2)" runTimePerJob="00:50:00"/>
-         <run months="1" npes="128" overrideParams="$(domainparams_O128x1h)" runTimePerJob="00:50:00"/>
-         <run months="1" npes="128" overrideParams="$(domainparams_O128x2h)" runTimePerJob="00:50:00"/>
-         <run months="1" npes="256" overrideParams="$(domainparams_O256)" runTimePerJob="00:50:00"/>
-       </regression>
-
-       <regression name="timings">
-         <run months="1" npes="1057" overrideParams="$(domainparams_O1057p5)" runTimePerJob="00:50:00"/>
-         <run months="1" npes="1300" overrideParams="$(domainparams_O1300p5)" runTimePerJob="00:50:00"/>
-         <run months="1" npes="1441" overrideParams="$(domainparams_O1441p5)" runTimePerJob="00:50:00"/>
-         <run months="1" npes="1608" overrideParams="$(domainparams_O1608p5)" runTimePerJob="00:50:00"/>
-       </regression>
-       <regression name="timings2">
-         <run months="1" npes="2119" overrideParams="$(domainparams_O2119p5)" runTimePerJob="00:40:00"/>
-         <run months="1" npes="2783" overrideParams="$(domainparams_O2783p5)" runTimePerJob="00:40:00"/>
-         <run months="1" npes="3314" overrideParams="$(domainparams_O3314p5)" runTimePerJob="00:40:00"/>
-         <run months="1" npes="3925" overrideParams="$(domainparams_O3925p5)" runTimePerJob="00:40:00"/>
-       </regression>
-       <regression name="timings3">
-         <run months="1" npes="2119" overrideParams="$(domainparams_O2119p5)" runTimePerJob="01:40:00"/>
-         <run months="1" npes="2700" overrideParams="$(domainparams_O2700p5)" runTimePerJob="01:40:00"/>
-       </regression>
-
-      <regression name="debug">
-         <run days="1"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
-         <run days="1"  npes="432"  overrideParams="$(domainparams_O432)"  runTimePerJob="01:00:00"/>
-         <run days="1"  npes="360"  overrideParams="$(domainparams_O360)"  runTimePerJob="01:00:00"/>
-      </regression>
-
-      <production simTime="$(PROD_SIMTIME)" units="years" npes="1057" runTime="$(PROD_RUNTIME)">
-           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
-       </production>
-
-      <reference restart="$(REFERENCE)/1x0m10d_1152pe/restart/19000111.tar"/>
-
-   </runtime>
-
-    <postProcess>
-      <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
-    </postProcess>
-     
-   </experiment>
-
-   <experiment name="OM4_SIS2_05_DT1800_KHTHKHTR500_scatter.$(MOM6_DATE)" inherit="OM4_SIS2_05_DT1800_KHTHKHTR500_scatter"/>
-   <experiment name="OM4_SIS2_05_DT1800_KHTHKHTR500_scatter$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
-
-     <input>
-  
-    <csh><![CDATA[
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
-#override Z_INIT_FILE_SALT_VAR  = "salt"
-#override TIDEAMP_FILE          = "tidal_amplitude.nc"
-#override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
-#override SALT_RESTORE_FILE     = "salt_restore.nc"
-#override DT = 1800
-THERMO_SPANS_COUPLING = True
-#override DIABATIC_FIRST = False
-#override DT_THERM = 7200
-#override SMAG_LAP_CONST = 0.
-#override AH_VEL_SCALE = 0.
-#override RESOLN_SCALED_KH = False
-#override CORIOLIS_SCHEME = "ARAKAWA_HSU90"
-#override MEKE_BGSRC = 0.
-#override MEKE_FRCOEFF = 1.0
-#override MEKE_GMCOEFF = 0.0
-#override MEKE_ALPHA_RHINES = 0.0
-#override MEKE_ALPHA_EADY = 0.0
-#override MEKE_ALPHA_GRID = 1.0
-#override MEKE_VISCOSITY_COEFF = -0.4
-#override MEKE_KH = 600.
-#override MEKE_VISC_DRAG = False
-#override MEKE_CB = 0.
-#override MEKE_COLD_START = True
-#override MEKE_BACKSCAT_RO_C = 8.0
-#override MEKE_BACKSCAT_RO_POW = 2.0
-#override WRITE_GEOM = 1.0
-USE_NEUTRAL_DIFFUSION	 = True
-KHTR = 500.
-KHTH = 500.
-#override TOPO_EDITS_FILE = ""
-
-MOM_OVERRIDE_EOF
-
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-
-SIS_OVERRIDE_EOF
-
-     ]]></csh>
-
-   </input>
-
-   </experiment>
-
-   
-   <experiment name="OM4_SIS2_05_hycomff_c.$(MOM6_DATE)" inherit="OM4_SIS2_05_hycomff_c"/>
-   <experiment name="OM4_SIS2_05_hycomff_c$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
-
-     <input>
-  
-    <csh><![CDATA[
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
-#override Z_INIT_FILE_SALT_VAR  = "salt"
-#override TIDEAMP_FILE          = "tidal_amplitude.nc"
-#override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
-#override SALT_RESTORE_FILE     = "salt_restore.nc"
-Z_INIT_REMAP_GENERAL = True
-Z_INIT_REMAP_FULL_COLUMN = True
-REMAP_AFTER_INITIALIZATION = False
-#override REGRIDDING_COORDINATE_MODE = "HYCOM1"
-#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75.nc,sigma2,FNC1:2,6500,3,.01"
-REGRID_COMPRESSIBILITY_FRACTION = 0.01
-BOUNDARY_EXTRAPOLATION = True
-#override TOPO_EDITS_FILE = ""
-
-MOM_OVERRIDE_EOF
-
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-
-SIS_OVERRIDE_EOF
-
-     ]]></csh>
-
-   </input>
-
-   </experiment>
 
    <experiment name="OMp5_baseline.$(MOM6_DATE)" inherit="OMp5_baseline"/>
-   <experiment name="OMp5_baseline$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
+   <experiment name="OMp5_baseline$(STATIC)" inherit="MOM6_SIS2_compile$(STATIC)">
 
      <input>
       <namelist name="coupler_nml">
@@ -3271,7 +2738,6 @@ SIS_OVERRIDE_EOF
        max_input_fields = 699
        max_output_fields = 699
        mix_snapshot_average_fields=.false.
-       max_field_attributes=4
      </namelist>
      <namelist name="fms_nml">
        clock_grain='ROUTINE'
@@ -3290,6 +2756,11 @@ SIS_OVERRIDE_EOF
        ice_mask_table=mask_table.239.36x36
      </namelist>
 
+     <!--verona-->
+     <namelist name="sat_vapor_pres_nml">
+      construct_table_wrt_liq = .true.,
+      construct_table_wrt_liq_and_ice = .true.,
+     </namelist>
 
      <diagTable>
 $name
@@ -3307,15 +2778,10 @@ $baseDate
 
   
       <csh><![CDATA[
-#amip initCond tar file includes ice_model.res.nc not suitable for the coupled model
-if ( $currentSeg == 1 ) then
-\rm -f $work/INPUT/ice_model.res.nc
-endif
-#
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
@@ -3323,27 +2789,14 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override SALT_RESTORE_FILE     = "salt_restore.nc"
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
-REMAP_AFTER_INITIALIZATION = False                                                   
-#override REGRIDDING_COORDINATE_MODE = "HYCOM1"                                      
-#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75_800m.nc,sigma2,FNC1:2,4000,4.5,.01"                                      
-MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"                                   
-MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01"                              
-REGRID_COMPRESSIBILITY_FRACTION = 0.01                                               
-BOUNDARY_EXTRAPOLATION = True                                                        
-DYNAMIC_SURFACE_PRESSURE = True 
-#override USE_NEUTRAL_DIFFUSION = True                                               
 #override KHTR = 300.                                                                
-KH_RES_FN_POWER = 100                                                                
 MEKE_KHTH_FAC = 1.0                                                                  
 VISC_RES_FN_POWER = 100 
 #override DT = 1800
 #override DT_THERM = 7200  
 #override DIABATIC_FIRST = False
-THERMO_SPANS_COUPLING = True
 #override USE_generic_tracer = False
 #override CHL_FROM_FILE = True
-#override USE_RIVER_HEAT_CONTENT = True
-#override USE_CALVING_HEAT_CONTENT = True
 #override OCEAN_SURFACE_STAGGER = "C"
 #override TOPO_EDITS_FILE       = ""
 DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
@@ -3358,31 +2811,69 @@ SIS_OVERRIDE_EOF
      ]]></csh>
 
    </input>
+   <runtime>   
+       <regression name="basic">
+         <run months="1" npes="1057" overrideParams="$(domainparams_O1057p5)" runTimePerJob="00:50:00"/>
+       </regression>
+       <regression name="rts">
+         <run days="15 16" npes="1057" overrideParams="$(domainparams_O1057p5)" runTimePerJob="00:50:00"/>
+         <!--the following two should reproduce eachother but not the basic because basic uses mask_table-->
+         <run days="2"  npes="432"  overrideParams="$(domainparams_O432)"  runTimePerJob="00:30:00"/>
+         <run days="2"  npes="512"  overrideParams="$(domainparams_O512)"  runTimePerJob="01:00:00"/>
+         <run days="2"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
+         <run days="2"  npes="864"  overrideParams="$(domainparams_O864)"  runTimePerJob="01:00:00"/>	 
+       </regression>
+       <regression name="restart">
+         <run days="2"  npes="432"  overrideParams="$(domainparams_O432)"  runTimePerJob="00:30:00"/>
+         <run days="1 1"  npes="432"  overrideParams="$(domainparams_O432)"  runTimePerJob="00:30:00"/>
+       </regression>
+
+       <regression name="timing">
+         <run months="1" npes="128" overrideParams="$(domainparams_O128)" runTimePerJob="00:50:00"/>
+         <run months="1" npes="128" overrideParams="$(domainparams_O128x2)" runTimePerJob="00:50:00"/>
+         <run months="1" npes="128" overrideParams="$(domainparams_O128x1h)" runTimePerJob="00:50:00"/>
+         <run months="1" npes="128" overrideParams="$(domainparams_O128x2h)" runTimePerJob="00:50:00"/>
+         <run months="1" npes="256" overrideParams="$(domainparams_O256)" runTimePerJob="00:50:00"/>
+       </regression>
+
+       <regression name="timings">
+         <run months="1" npes="1300" overrideParams="$(domainparams_O1300p5)" runTimePerJob="00:50:00"/>
+         <run months="1" npes="1441" overrideParams="$(domainparams_O1441p5)" runTimePerJob="00:50:00"/>
+         <run months="1" npes="1608" overrideParams="$(domainparams_O1608p5)" runTimePerJob="00:50:00"/>
+        <run months="1" npes="2119" overrideParams="$(domainparams_O2119p5)" runTimePerJob="01:40:00"/>
+         <run months="1" npes="2700" overrideParams="$(domainparams_O2700p5)" runTimePerJob="01:40:00"/>
+       </regression>
+       <regression name="timings2">
+         <run months="1" npes="951" overrideParams="$(domainparams_O951p5)" runTimePerJob="01:00:00"/>
+         <run months="1" npes="1057" overrideParams="$(domainparams_O1057p5)" runTimePerJob="01:00:00"/>
+         <run months="1" npes="2783" overrideParams="$(domainparams_O2783p5)" runTimePerJob="00:40:00"/>
+         <run months="1" npes="3314" overrideParams="$(domainparams_O3314p5)" runTimePerJob="00:40:00"/>
+       </regression>
+
+      <regression name="debug">
+         <run days="1"  npes="648"  overrideParams="$(domainparams_O648)"  runTimePerJob="01:00:00"/>
+         <run days="1"  npes="432"  overrideParams="$(domainparams_O432)"  runTimePerJob="01:00:00"/>
+         <run days="1"  npes="360"  overrideParams="$(domainparams_O360)"  runTimePerJob="01:00:00"/>
+      </regression>
+
+      <production simTime="$(PROD_SIMTIME)" units="years" npes="1057" runTime="$(PROD_RUNTIME)">
+           <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
+       </production>
+
+      <reference restart="$(REFERENCE)/1x0m10d_1152pe/restart/19000111.tar"/>
+
+   </runtime>
+
+    <postProcess>
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_postprocess']/postProcess/node())"/>
+    </postProcess>
+     
 
    </experiment>
    <experiment name="OMp5_COBALT_zdiag.$(MOM6_DATE)" inherit="OMp5_COBALT_zdiag"/>
-   <experiment name="OMp5_COBALT_zdiag$(STATIC)" inherit="OM4_SIS2_05_baseline$(STATIC)">
+   <experiment name="OMp5_COBALT_zdiag$(STATIC)" inherit="OMp5_baseline">
 
      <input>
-      <namelist name="coupler_nml">
-       months = $months,
-       days   = $days,
-       current_date = 1900,1,1,0,0,0,
-       hours = 0
-       minutes = 0
-       seconds = 0
-       calendar = 'NOLEAP',
-       dt_cpld  = 3600,
-       dt_atmos = 3600,
-       do_atmos = .false.,
-       do_land = .false.,
-       do_ice = .true.,
-       do_ocean = .true.,
-       atmos_npes = 0,
-       ocean_npes = 0,
-       concurrent = .false.
-       use_lag_fluxes=.true.
-     </namelist>
      <namelist name="generic_tracer_nml">
        do_generic_tracer=.true.
        do_generic_CFC=.false.
@@ -3397,23 +2888,6 @@ SIS_OVERRIDE_EOF
        max_input_fields = 899
        max_output_fields = 899
        mix_snapshot_average_fields=.false.
-       max_field_attributes=4
-     </namelist>
-     <namelist name="fms_nml">
-       clock_grain='ROUTINE'
-       clock_flags='NONE'
-       domains_stack_size = 7000000
-       stack_size =0
-     </namelist>
-      <namelist name="dummy_ocean_nml">
-       ocean_layout = 60,60
-       ocean_io_layout = 1,5
-       ocean_mask_table=mask_table.817.60x60
-     </namelist>
-     <namelist name="dummy_ice_nml">
-       ice_layout = 60,60
-       ice_io_layout = 1,5
-       ice_mask_table=mask_table.817.60x60
      </namelist>
 
 
@@ -3430,28 +2904,30 @@ $baseDate
 # ocean_cobalt_sample_z
 #===========================
 "ocean_cobalt_sample",       1,  "days", 1, "days", "time",
- "generic_cobalt","def_fe_Di",       "def_fe_Di",          "ocean_cobalt_sample","all",.true.,"none",2
- "generic_cobalt","def_fe_Lg",       "def_fe_Lg",          "ocean_cobalt_sample","all",.true.,"none",2
- "generic_cobalt","def_fe_Sm",       "def_fe_Sm",          "ocean_cobalt_sample","all",.true.,"none",2
+ "generic_cobalt","def_fe_Di",          "def_fe_Di",          "ocean_cobalt_sample","all",.true.,"none",2
  "generic_cobalt","chl",                "chl",                "ocean_cobalt_sample","all",.true.,"none",2
  "generic_cobalt","htotal",             "htotal",             "ocean_cobalt_sample","all",.true.,"none",2
  "generic_cobalt","alk",                "alk",                "ocean_cobalt_sample","all",.true.,"none",2
  "generic_cobalt","dic",                "dic",                "ocean_cobalt_sample","all",.true.,"none",2
  "generic_cobalt","o2",                 "o2",                 "ocean_cobalt_sample","all",.true.,"none",2
+ "generic_cobalt","lith",               "lith",               "ocean_cobalt_sample","all",.true.,"none",2
+ "generic_cobalt","dep_dry_lith",       "dep_dry_lith",       "ocean_cobalt_sample","all",.true.,"none",2
+ "generic_cobalt","dep_wet_lith",       "dep_wet_lith",       "ocean_cobalt_sample","all",.true.,"none",2
 #
  "ocean_model","temp","temp","ocean_cobalt_sample","all",.true.,"none",2
  "ocean_model","salt","salt","ocean_cobalt_sample","all",.true.,"none",2
 
 "ocean_cobalt_sample_z",       1,  "days", 1, "days", "time",
- "generic_cobalt_z_new","def_fe_Di",       "def_fe_Di",          "ocean_cobalt_sample_z","all",.true.,"none",2
- "generic_cobalt_z_new","def_fe_Lg",       "def_fe_Lg",          "ocean_cobalt_sample_z","all",.true.,"none",2
- "generic_cobalt_z_new","def_fe_Sm",       "def_fe_Sm",          "ocean_cobalt_sample_z","all",.true.,"none",2
+ "generic_cobalt_z_new","def_fe_Di",          "def_fe_Di",          "ocean_cobalt_sample_z","all",.true.,"none",2
  "generic_cobalt_z_new","chl",                "chl",                "ocean_cobalt_sample_z","all",.true.,"none",2
  "generic_cobalt_z_new","htotal",             "htotal",             "ocean_cobalt_sample_z","all",.true.,"none",2
  "generic_cobalt_z_new","alk",                "alk",                "ocean_cobalt_sample_z","all",.true.,"none",2
  "generic_cobalt_z_new","dic",                "dic",                "ocean_cobalt_sample_z","all",.true.,"none",2
  "generic_cobalt_z_new","o2",                 "o2",                 "ocean_cobalt_sample_z","all",.true.,"none",2
-#                                                                                                                                                             11
+ "generic_cobalt_z_new","lith",               "lith",               "ocean_cobalt_sample_z","all",.true.,"none",2
+ "generic_cobalt_z_new","dep_dry_lith",       "dep_dry_lith",       "ocean_cobalt_sample_z","all",.true.,"none",2
+ "generic_cobalt_z_new","dep_wet_lith",       "dep_wet_lith",       "ocean_cobalt_sample_z","all",.true.,"none",2
+#
  "ocean_model_z_new","temp","temp","ocean_cobalt_sample_z","all",.true.,"none",2
  "ocean_model_z_new","salt","salt","ocean_cobalt_sample_z","all",.true.,"none",2
 
@@ -3504,46 +2980,28 @@ $baseDate
 </dataTable>
   
       <csh><![CDATA[
-#amip initCond tar file includes ice_model.res.nc not suitable for the coupled model
-if ( $currentSeg == 1 ) then
-\rm -f $work/INPUT/ice_model.res.nc
-endif
-#
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_annual.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
-#override CHL_FILE              = "seawifs_1998-2006_smoothed_2X.nc"
 #override SALT_RESTORE_FILE     = "salt_restore.nc"
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
-REMAP_AFTER_INITIALIZATION = False                                                   
-#override REGRIDDING_COORDINATE_MODE = "HYCOM1"                                      
-#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75_800m.nc,sigma2,FNC1:2,4000,4.5,.01"                                      
-MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"                                   
-MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01"                              
-REGRID_COMPRESSIBILITY_FRACTION = 0.01                                               
-BOUNDARY_EXTRAPOLATION = True                                                        
-DYNAMIC_SURFACE_PRESSURE = True 
-#override USE_NEUTRAL_DIFFUSION = True                                               
 #override KHTR = 300.                                                                
-KH_RES_FN_POWER = 100                                                                
 MEKE_KHTH_FAC = 1.0                                                                  
 VISC_RES_FN_POWER = 100 
 #override DT = 1800
 #override DT_THERM = 7200  
 #override DIABATIC_FIRST = False
-THERMO_SPANS_COUPLING = True
-#override USE_generic_tracer = True
-#override CHL_FROM_FILE = True
-#override USE_RIVER_HEAT_CONTENT = True
-#override USE_CALVING_HEAT_CONTENT = True
 #override OCEAN_SURFACE_STAGGER = "C"
 #override TOPO_EDITS_FILE       = ""
 DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
+
+#override USE_generic_tracer = True
+#override CHL_FROM_FILE = False
 
 MOM_OVERRIDE_EOF
 
