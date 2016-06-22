@@ -1,0 +1,445 @@
+ &aer_ccn_act_nml
+      sul_concen = 0.3
+      low_concen = 0.5
+      high_concen = 1.0
+/
+
+ &aerosol_nml
+    family_names = "small_dust", "large_dust", "black_carbon","organic_carbon", "sea_salt", "sulfate", "aerosol", "pm2.5", "dust", "POA", "SOA"
+    in_family1 = F,T,F,F,F,F,F,F,F,F,F,F,F,F,F,F,
+    in_family2 = F,F,T,T,T,T,F,F,F,F,F,F,F,F,F,F,
+    in_family3 = F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,F,
+    in_family4 = T,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,
+    in_family5 = F,F,F,F,F,F,F,T,T,T,T,T,F,F,F,F,
+    in_family6 = F,F,F,F,F,F,T,F,F,F,F,F,F,F,F,F,
+    in_family7 = T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,
+    in_family8 = T,T,F,F,F,F,T,T,T,F,F,F,T,T,T,T,
+    in_family9 = F,T,T,T,T,T,F,F,F,F,F,F,F,F,F,F,
+    in_family10= F,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,
+    in_family11= T,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,
+    aerosol_data_source = "predicted"
+/
+
+ &atmosphere_nml
+/
+
+ &cana_nml
+      turbulence_to_use = "lm3v"
+      canopy_air_mass_for_tracers = 10.
+      init_co2 = 286.e-6
+/
+
+
+ &cloud_generator_nml
+      do_inhomogeneous_clouds = .true.
+      defaultOverlap = 4
+      overlapLengthScale = 1.
+/
+
+ &cloud_rad_nml
+      overlap = 2,
+      do_brenguier = .false.,
+      scale_factor = 1.00
+/
+
+ &cloudrad_diagnostics_nml
+      do_isccp = .true.
+      isccp_scale_factor = 1.00
+      water_ice_ratio = 10.
+/
+
+ &cloudrad_package_nml
+      microphys_form = 'predicted'
+/
+
+ &clouds_nml
+      do_zonal_clouds = .false.,
+      do_obs_clouds  = .false.
+/
+
+ &cu_mo_trans_nml
+      transport_scheme='diffusive'
+      diff_norm = 2.5
+/
+
+
+ &diag_cloud_nml
+      linvers = .false., lcnvcld = .false.,
+      l_theqv = .true., lomega = .true.,
+      low_lev_cloud_index = 16, nofog = .false.
+/
+
+ &diag_cloud_rad_nml
+      l_har_anvil   = .true.,
+      l_har_coldcld = .true.,
+      l_anom_abs_v  = .true.
+/
+
+ &diag_integral_nml
+      file_name  = 'diag_integral.out',
+      time_units = 'days',
+      output_interval = 1.0
+      fields_per_print_line = 5
+/
+
+ &diag_manager_nml
+        mix_snapshot_average_fields = .false.,
+        max_input_fields = 800,
+        max_output_fields = 1500
+        max_axes = 100
+        max_num_axis_sets = 50
+        max_files = 40
+        issue_oor_warnings = .false.
+/
+
+ &dust_nml
+      dust_source_name = 'source',
+      dust_source_filename = 'dust_source_Iceland_1x1.nc'
+      uthresh = 1.
+      coef_emis = 1.25e-10
+/
+
+ &edt_nml
+      n_print_levels = 14,
+      use_qcmin = .true.,
+      num_pts_ij = 0,
+      min_adj_time = 1.0,
+      do_gaussian_cloud = .false.,
+      use_extrapolated_ql = .false.
+/
+
+ &esfsw_driver_nml
+      do_sw_continuum = .true.
+/
+
+ &esfsw_parameters_nml
+      sw_resolution = 'med'
+      sw_diff_streams = 1
+/
+
+ &fms_io_nml
+        threading_read  = 'multi',
+        max_files_r = 100,
+        max_files_w = 100,
+/
+
+ &fms_nml
+        domains_stack_size = $domains_stack_size
+        print_memory_usage = .false.
+        clock_grain = 'MODULE'
+/
+
+ &fv_mapz_nml
+        vert_profile_reconstruct_top  =.true.,
+        vert_profile_reconstruct_bot = .true.
+/
+
+ &gas_tf_nml
+      interp_form = 'log' ,
+      do_calcstdco2tfs = .true.,
+      do_writestdco2tfs= .false.,
+      do_readstdco2tfs = .false.,
+      do_calcstdch4tfs = .true.,
+      do_writestdch4tfs= .false.,
+      do_readstdch4tfs = .false.,
+      do_calcstdn2otfs = .true.,
+      do_writestdn2otfs= .false.,
+      do_readstdn2otfs = .false.
+/
+
+ &glac_data_nml
+      use_lm2_awc = .true., 
+      rsa_exp_global = 10.,
+      dat_emis_dry = 1., dat_emis_sat = 1.
+/
+
+ &glac_nml
+      conserve_glacier_mass = .true.
+      lm2 = .true.
+/
+
+ &lake_data_nml
+      lake_to_use = 'from-rivers'
+      num_l = 20,
+      dat_emis_dry = 1.,
+      dat_emis_sat = 1.,
+      dat_heat_capacity_ref = 0.,
+      f_iso_liq = 0.02, 0.01
+      f_iso_ice = 0.02, 0.01
+      f_vol_liq = 0.003, 0.
+      f_vol_ice = 0.003, 0.
+      f_geo_liq = 0., 0.
+      f_geo_ice = 0., 0.
+/
+
+ &lake_nml
+      albedo_to_use = 'brdf-params'
+      float_ice_to_top = .true.
+/
+
+ &land_debug_nml
+      watch_point = 0, 0, 0, 1
+/
+
+ &land_model_nml
+        layout   = $land_layout
+        io_layout = $land_io_layout
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+/
+
+ &lscale_cond_nml
+      do_evap = .true.
+/
+
+ &lw_gases_stdtf_nml
+      NSTDCO2LVLS=496
+/
+
+ &microphys_rad_nml
+      do_orig_donner_stoch = .false.,
+      lwem_form = 'fuliou'
+/
+
+ &moist_conv_nml
+      beta = 0.0
+/
+
+ &monin_obukhov_nml
+      stable_option =  2,
+      rich_crit = 1.0,
+      zeta_trans =  0.5
+/
+
+ &my25_turb_nml
+      do_thv_stab = .true.,
+      TKEmin = 1.e-8,
+      AKmin_land = 5.,
+      AKmin_sea  = 0.
+/
+
+ &physics_driver_nml
+/
+
+ &rad_output_file_nml
+      write_data_file=.true.
+/
+
+ &radiation_diag_nml
+      iradprt_gl = 20, 6,
+      jradprt_gl = 12, 20,
+      num_pts_ij = 0
+/
+
+ &ras_nml
+      aratio = 0.9,
+      modify_pbl=.true.
+      rn_frac_bot = 0.5,
+      rn_pbot = 800.0e2,
+      puplim =  500.0e02,
+      rn_ptop = 500.0e2,
+      rn_frac_top = 0.975,
+      Tokioka_on = .true.,
+      Tokioka_con = 0.025,
+      Tokioka_plim = 500.0e2,
+      cufric =.false.
+      do_rasdeep = .false.
+      do_fixed_pres_deep = .true.
+      prevent_unreasonable =.true.
+      a = 1.6851, 1.1686, 0.7663, 0.5255, 0.4100, 0.3677,
+          0.3151, 0.2216, 0.1521, 0.0750, 0.0000, 0.0000,
+          0.0000, 0.0000, 0.0000
+/
+
+ &rh_based_clouds_nml
+      cirrus_cld_prop_form = 'part', 
+      cldht_type_form = '93'
+/
+
+ &river_nml
+      dt_slow     = 86400.
+      land_area_called_cellarea = .true.
+      all_big_outlet_ctn0 = .true.
+      stop_on_mask_mismatch = .true.
+/
+
+ &river_physics_nml
+      lake_sfc_w_min = 20.
+/
+
+ &sat_vapor_pres_nml
+      construct_table_wrt_liq = .true.,
+      construct_table_wrt_liq_and_ice = .true.,
+      use_exact_qs = .true.
+/
+
+ &sealw99_nml
+      do_thick = .false.,
+      do_nlte = .false.,
+      do_lwcldemiss = .true.,
+      continuum_form = 'ckd2.1',
+      linecatalog_form = 'hitran_2000',
+
+      calc_co2_tfs_on_first_step = .false.,
+      calc_co2_tfs_monthly = .true.,
+      co2_tf_time_displacement = 360.0,
+
+      calc_ch4_tfs_on_first_step = .false.,
+      calc_ch4_tfs_monthly = .true.,
+      ch4_tf_time_displacement = 360.0,
+
+      calc_n2o_tfs_on_first_step = .false.,
+      calc_n2o_tfs_monthly = .true.,
+      n2o_tf_time_displacement = 360.0,
+
+      verbose = 5
+/
+
+ &secondary_organics_nml
+        gas_conc_filename ='gas_conc_3D_am3p9.nc'
+/
+
+ &shortwave_driver_nml
+      do_cmip_diagnostics = .true.,
+      calculate_volcanic_sw_heating = .false.,
+      swform = 'esfsw99'
+/
+
+ &snow_data_nml
+      emis_snow_max = 1.
+      emis_snow_min = 1.
+      z0_momentum = 0.01
+      num_l = 5
+      dz = 0.05, 0.2, 0.5, 0.2, 0.05, 0.0, 0.0, 0.0, 0.0, 0.0
+      f_iso_cold = 0.90, 0.64
+      f_vol_cold = 0.09, 0.13
+      f_geo_cold = 0.00, 0.00
+      f_iso_warm = 0.90, 0.64
+      f_vol_warm = 0.09, 0.13
+      f_geo_warm = 0.00, 0.00
+      depth_crit = 0.0334
+/
+
+ &snow_nml
+      min_snow_mass = 1.e-10
+      albedo_to_use = 'brdf-params'
+/
+
+ &soil_data_nml
+      dat_emis_dry     = 1., 1., 1., 1., 1., 1., 1., 1., 1.
+      dat_emis_sat     = 1., 1., 1., 1., 1., 1., 1., 1., 1.
+      dat_tf_depr      = 2., 2., 2., 2., 2., 2., 2., 2., 2.
+      gw_scale_soil_depth  = 10.
+      freeze_factor    = 2.0
+      comp             = 1e-4
+      num_l            = 20
+      dz = 0.020, 0.040, 0.040, 0.050, 0.05, 0.100, 0.10, 0.200, 0.200, 0.2, 
+           0.40,  0.40,  0.40,  0.4,   0.4,   1.0,   1.0,  1.0,  1.5,   2.5
+      geohydrology_to_use = 'hill_ar5'
+/
+
+ &soil_nml
+      allow_neg_wl  = .true.
+      init_w        = 500.
+      albedo_to_use = 'brdf-maps'
+      uptake_to_use = 'darcy2d-linearized'
+      uptake_oneway = .true.
+      active_layer_drainage_acceleration = 100.
+      write_soil_carbon_restart = .FALSE.
+/
+
+ &ssalt_nml
+      coef_emis1 = 0.38,
+      coef_emis2 = 0.65
+/
+
+ &stable_bl_turb_nml
+      alsm = 500.0,
+      alsh = 500.0
+/
+
+ &static_veg_nml
+        use_static_veg = .true.
+        write_static_veg = .false.
+        timeline   = 'loop'
+        start_loop = 1981, 1, 1, 0, 0, 0
+        end_loop   = 1982, 1, 1, 0, 0, 0
+        fill_land_mask = .TRUE.
+        input_file = 'INPUT/19810101.static_veg_out.nc'
+/
+
+ &surface_flux_nml
+      gust_min = 1.e-10
+/
+
+ &topo_rough_nml
+      use_topo_rough    = .true.
+      max_topo_rough    = 100.0 
+      topo_rough_factor = 0.01
+      topo_rough_source = 'input',
+      topo_rough_file = 'INPUT/mg_drag.res.nc',
+/
+
+ &tropchem_driver_nml
+        do_tropchem = .false.
+/
+
+ &vegn_data_nml
+      dat_snow_crit = 0.0167, 0.0167, 0.0333, 0.2, 0.1
+      vegn_to_use = 'uniform'
+      K1=10,
+      K2=0.1,
+      fsc_liv=0.9,
+      fsc_wood=0.45,
+      c1(4) = 0.3
+      c2(4) = 0.3
+      Vmax = 2.0E-5, 2.0E-5, 2.0E-5, 2.0E-5, 1.5E-5,
+      m_cond = 4., 9., 9., 7., 7.,
+      alpha_phot = 0.05, 0.06, 0.06, 0.06, 0.06,
+      gamma_resp = 0.03, 0.02, 0.02, 0.02, 0.02,
+      fact_crit_phen(0:4) = 0., 0., 0., 0., 0.
+      fact_crit_fire(0:4) = 0., 0., 0., 0., 0.
+      cnst_crit_phen(0:4) = 0.30, 0.4, 0.30, 0.30, 0.30
+      cnst_crit_fire(0:4) = 0.25, 0.4, 0.30, 0.15, 0.15
+      wet_leaf_dreg(0:4)  = .3, .3, .3, .3, .3
+      dfr = 3e-2,3e-2,7e-3,7e-3,7e-3,
+      ksi =  0, 0, 0, 0, 0,
+      leaf_refl(0:4,1) = 0.11, 0.11, 0.10, 0.10, 0.10
+      leaf_refl(0:4,2) = 0.58, 0.58, 0.45, 0.45, 0.50,
+      dat_root_zeta(0:4) =   0.35212, 0.17039, 0.28909, 0.25813, 0.17039
+      critical_root_density = 0.0,
+      tau_drip_s     = 259200.0
+      cmc_lai(0:4) = 0.02, 0.02, 0.02, 0.02, 0.02
+      csc_lai(0:4) = 0.2, 0.2, 0.2, 0.2, 0.2
+      t_transp_min = 268.
+      srl(0:1) = 112.0e3, 150.0e3
+      root_perm = 14*5e-7
+      alpha(1,3) = 4 
+      leaf_age_tau(2) = 150
+      smoke_fraction = 0.9, 0.9, 0.6, 0.6, 0.6
+/
+
+ &vert_diff_driver_nml
+      do_conserve_energy = .true.
+/
+
+ &vert_turb_driver_nml
+      use_tau          = .false.,
+      gust_scheme      = 'beljaars',
+      do_mellor_yamada = .false.,
+      do_entrain       = .true.,
+      do_edt           = .false.,
+      do_diffusivity   = .false.,
+      do_stable_bl     = .true.,
+      do_shallow_conv  = .false.
+/
+
+ &harvesting_nml
+      waste_below_ground_wood = .false.
+/
+
+ &xgrid_nml
+        make_exchange_reproduce = .true.
+        interp_method = 'second_order'
+/
+
