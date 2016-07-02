@@ -438,7 +438,7 @@ fdata = cdms2.open(fYear + '.ocean_scalar_annual.nc')
 def extractScalarField(varName):
   return fdata(varName)[0]
 
-ignoreList = ['time_bounds', 'average_T2', 'average_T1', 'average_DT']
+ignoreList = ['time_bounds', 'time_bnds', 'average_T2', 'average_T1', 'average_DT']
 varDict = fdata.variables
 varDict = list(set(varDict) - set(ignoreList))
 
