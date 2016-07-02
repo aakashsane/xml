@@ -64,6 +64,7 @@ foreach reg (global nh sh tropics)
   cp -f ${localRoot}/db/${reg}AveAtmos.db ${localRoot}/db/.${reg}AveAtmos.db
   cp -f ${localRoot}/db/${reg}AveOcean.db ${localRoot}/db/.${reg}AveOcean.db
   cp -f ${localRoot}/db/${reg}AveLand.db ${localRoot}/db/.${reg}AveLand.db  
+  cp -f ${localRoot}/db/${reg}AveCOBALT.db ${localRoot}/db/.${reg}AveCOBALT.db  
 end
 
 #-- Cat a Python script that performs the averages and writes to a copy of the DB
@@ -437,7 +438,7 @@ fdata = cdms2.open(fYear + '.ocean_scalar_annual.nc')
 def extractScalarField(varName):
   return fdata(varName)[0]
 
-ignoreList = ['time_bounds', 'average_T2', 'average_T1', 'average_DT']
+ignoreList = ['time_bounds', 'time_bnds', 'average_T2', 'average_T1', 'average_DT']
 varDict = fdata.variables
 varDict = list(set(varDict) - set(ignoreList))
 
@@ -680,17 +681,99 @@ for varName in varDict:
   conn.close()
 EOF
 
+cat > global_COBALT_ave.py <<EOF
+import sqlite3, cdms2, cdutil, MV2, numpy, cdtime
+import sys
+import glob
+
+# Set current year
+fYear = "${oname}"
+
+# Test to see if sqlite databse exits, if not, then create it
+dbFile = "${localRoot}/db/.globalAveCOBALT.db"
+
+#Read in gridSpec files
+fgs = cdms2.open(fYear + '.ocean_static.nc')
+
+cellArea = fgs('areacello')
+geoLat   = fgs('geolat')
+geoLon   = fgs('geolon')
+
+def areaMean(varName,cellArea,geoLat,geoLon,region='global'):
+  var = fdata(varName)
+  var = cdutil.YEAR(var).squeeze()
+  if (region == 'tropics'):
+    var = MV2.masked_where(MV2.logical_or(geoLat < -30., geoLat > 30.),var)
+    cellArea = MV2.masked_where(MV2.logical_or(geoLat < -30., geoLat > 30.),cellArea)
+  elif (region == 'nh'):
+    var  = MV2.masked_where(MV2.less_equal(geoLat,30.),var)
+    cellArea  = MV2.masked_where(MV2.less_equal(geoLat,30.),cellArea)
+  elif (region == 'sh'):
+    var  = MV2.masked_where(MV2.greater_equal(geoLat,-30.),var)
+    cellArea  = MV2.masked_where(MV2.greater_equal(geoLat,-30.),cellArea)
+  elif (region == 'global'):
+    var  = var
+    cellArea = cellArea
+  res = MV2.array(var*cellArea).sum()/cellArea.sum()
+  return res, cellArea.sum()
+
+#Get a list of all COBALT files
+#cobaltFiles = glob.glob('*cobalt*')
+#cobaltFiles = [x for x in cobaltFiles if 'day' not in x]
+cobaltFiles = ['ocean_cobalt_sfc', 'ocean_cobalt_misc']
+
+for cobaltFile in cobaltFiles:
+  #Read in data nc files
+  fdata = cdms2.open(fYear + '.' + cobaltFile + '.nc')
+  varDict = fdata.variables
+  globalMeanDic={}
+  tropicsMeanDic={}
+  nhMeanDic={}
+  shMeanDic={}
+  for varName in varDict:
+    if (len(varDict[varName].shape) == 3):
+      if (fdata(varName).getAxis(1).id == 'yh' and fdata(varName).getAxis(2).id == 'xh'):
+        conn = sqlite3.connect("${localRoot}/db/.globalAveCOBALT.db")
+        c = conn.cursor()
+        globalMeanDic[varName], areaSum = areaMean(varName,cellArea,geoLat,geoLon,region='global')
+        sql = 'create table if not exists ' + varName + ' (year integer primary key, value float)'
+        sqlres = c.execute(sql)
+        sql = 'insert or replace into ' + varName + ' values(' + fYear[:4] + ',' + str(globalMeanDic[varName]) + ')'
+        try:
+          sqlres = c.execute(sql)
+          conn.commit()
+        except: pass
+        c.close()
+        conn.close()
+  fdata.close()
+
+conn = sqlite3.connect("${localRoot}/db/.globalAveCOBALT.db")
+c = conn.cursor()
+sql = 'create table if not exists ' + 'area' + ' (year integer primary key, value float)'
+sqlres = c.execute(sql)
+sql = 'insert or replace into ' + 'area' + ' values(' + fYear[:4] + ',' + str(areaSum) + ')'
+try:
+  sqlres = c.execute(sql)
+  conn.commit()
+except: pass
+c.close()
+conn.close()
+
+EOF
+
 #-- Run the averager script
 python global_atmos_ave.py
 python global_ocean_ave.py
 python global_land_ave.py
 python amoc.py
+python global_COBALT_ave.py
 
 #-- Copy the database back to its original location
 foreach reg (global nh sh tropics)
   cp -f ${localRoot}/db/.${reg}AveAtmos.db ${localRoot}/db/${reg}AveAtmos.db
   cp -f ${localRoot}/db/.${reg}AveOcean.db ${localRoot}/db/${reg}AveOcean.db
   cp -f ${localRoot}/db/.${reg}AveLand.db ${localRoot}/db/${reg}AveLand.db  
+  cp -f ${localRoot}/db/.${reg}AveCOBALT.db ${localRoot}/db/${reg}AveCOBALT.db  
 end
 
 echo "  ---------- end refineDiag_data_stager.csh ----------  "
