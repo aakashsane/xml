@@ -11,14 +11,21 @@
 /
 
  &deep_conv_nml
-        auto_th0_d = 0.35e-3
+        auto_th0_d = 0.2e-3
         tcrit_d    = -38.0,
         peff_l_d   = 5.0e-5
         peff_i_d   = 10.e-5
         rkm_dp1 = 2.
         rkm_dp2 = 0.1
+        norder  = 1
+        crh_th_ocean = 0.5
+        crh_th_land  = 0.5
+        cin_th = 5.
+        cape_th = 10.
         cwfn_th = 10.
+        frac_rkm_pert = 0.
         tau_dp = 28800.
+        tau_dp_fact = 3.
         mixing_assumption_d = 4
         do_ppen_d  = .true.
         rpen_d     = 5.0
@@ -26,11 +33,21 @@
         cfrac_d    = 0.15
         hcevap_d   = 0.9
         pblfac_d   = 0.25
+        ffldep_d   = 0.
         frac_limit_d = 0.25
+        dcapedm_th = 100
         dcwfndm_th = 100
         lofactor_d = 0.5
+        do_lod_rkm   = .false.
+        do_lod_cfrac = .false.
+        do_lod_tcrit = .false.
+        do_stochastic_rkm =.false.
         do_cgust_dp  = .true.
         cgust_choice = 3
+        cin_fact  = 1.
+        do_forcedlifting_d = .false.
+        wcrit_min_gust = 0.2
+        do_forced_conv = .false.
 /
 
  &donner_deep_clouds_W_nml
@@ -107,8 +124,6 @@
 
 &rotstayn_klein_mp_nml
         rk_act_only_if_ql_gt_qmin = .true.
-        include_homogeneous_for_wetdep = .false.
-        include_adjustment_for_wetdep = .true.
 /
 
 
@@ -124,26 +139,48 @@
 
  &uw_conv_nml
         use_online_aerosol = .true.,
+        iclosure        = 0,
+        rkm_sh1         = 15.0,
         rkm_sh          = 3.0,
+        cldhgt_max      = 50.e3,
+        do_uwcmt        = .false.,
+        apply_tendency  = .true.,
+        wmin_ratio      = 0.05,
+        do_lands        = .false.
+        landfact_m      = 0.5
+        lochoice        = 0
+        lofactor0       = 0.75
         do_deep         = .true.,
         idpchoice       = 2
         do_rescale      = .true.
-        do_rescale_t    = .true.
         use_sub_seasalt = .false.
         use_new_let     = .true.
         do_subcloud_flx = .true.
         plev_cin        = 60000.
         src_choice      = 1
         wrel_min        = 1.
+        duration        = 10800
+        do_stime        = .false.
+        do_dtime        = .false.
+        stime0          = 0.8
+        dtime0          = 0.1
+        do_prog_tke     = .false.
+        tau_tke         = 7200
+        bfact           = 0.05
+        pblrat0         = 2.0
         do_prog_gust    = .true.
         tau_gust        = 10800
+        gfact           = 1.0
+        do_gust_qt      = .false.
+        gqt_choice      = 0
         cgust0          = 2.
         cgust_max       = 4.
-        tracer_check_type = 2
+        sigma0          = 0.5
+        tracer_check_type = 1
 /
 
  &uw_plume_nml
-        auto_th0 = 0.35e-3,
+        auto_th0 = 0.2e-3,
         tcrit    = -38.0,
         peff_l   = 5.0e-5
         peff_i   = 10.e-5
@@ -162,18 +199,6 @@
         hcevap   = 0.9
         pblfac   = 0.25
 /
-
- &vert_turb_driver_nml
-      use_tau          = .false.,
-      gust_scheme      = 'beljaars',
-      do_mellor_yamada = .false.,
-      do_entrain       = .true.,
-      do_edt           = .false.,
-      do_diffusivity   = .false.,
-      do_stable_bl     = .true.,
-      do_shallow_conv  = .false.
-/
-
 
  &wetdep_nml
         scale_aerosol_wetdep = 1.
