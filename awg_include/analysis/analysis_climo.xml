@@ -5,12 +5,12 @@
       <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="yes" script="$FRE_ANALYSIS_HOME/cjs/stub/cjs_precip_intensity.csh"/>
 -->
       <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="yes" script="$FRE_ANALYSIS_HOME/cjs/stub/cjs_precip_intensity2.csh"/>
-      <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="yes" script="/home/fms/local/opt/fre-analysis/test/bw/stub/bw_diurnal_precip.csh"/>
+      <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="yes" script="$FRE_ANALYSIS_HOME/bw/stub/bw_diurnal_precip.csh"/>
    </atmos8xDailyTS>
 
    <atmos4xDailyTS>
-  <!-- <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="yes" script="/home/fms/local/opt/fre-analysis/test/keo/tropical_storms/frepp.keo_tropical_storms_wsfc.csh" /> -->
-      <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="yes" script="/home/fms/local/opt/fre-analysis/test/jwd/tropical_storms/frepp.jwd_tropical_storms_wsfc.csh" />
+  <!-- <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="yes" script="$FRE_ANALYSIS_HOME/keo/tropical_storms/frepp.keo_tropical_storms_wsfc.csh" /> -->
+      <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="yes" script="$FRE_ANALYSIS_HOME/jwd/tropical_storms/frepp.jwd_tropical_storms_wsfc.csh" />
    </atmos4xDailyTS>
 
    <atmosDailyTS>
@@ -67,6 +67,21 @@
       <!--Koppen climate types-->
       <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="yes" script="/home/atw/fms/diags/atw_atmos_ts_monthly/koppen/frepp.atw_atmos_ts_monthly_koppen.csh -n -s vs_uea"/>
 
+      <!--Standard atmospheric diagnostics-->
+      <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/bw/stub/bw_atmos_timeseries.csh"/>
+
+      <!--annual and seasonal mean comparisons of atmospheric fields against existing Obs4MIPs and Ana4MIPs datasets:  - TRMM - GPCP - CERES-EBAF - ERA-Interim - MERRA -->
+      <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/jpk/Obs4MIPs/Krasting-Obs4MIPs.csh"/>
+
+      <!--NCAR's CVDP analysis -->
+      <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="yes" script="$FRE_ANALYSIS_HOME/eem/stub/cvdp/frepp.cvdp.csh"/>
+
+      <!-- ESMValTool Diagnostics -->
+      <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="no" script="$FRE_ANALYSIS_HOME/eem/stub/ESMValTools/ESMValTool-driver.csh -d SAMonsoon"/>
+      <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="no" script="$FRE_ANALYSIS_HOME/eem/stub/ESMValTools/ESMValTool-driver.csh -d WAMonsoon"/>
+      <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="no" script="$FRE_ANALYSIS_HOME/eem/stub/ESMValTools/ESMValTool-driver.csh -d flatoIPCC"/>
+      <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="no" script="$FRE_ANALYSIS_HOME/eem/stub/ESMValTools/ESMValTool-driver.csh -d MJO-mean-state" />
+
    </atmosMonthTS>
 
    <atmosMonthAve>
@@ -76,6 +91,8 @@
       <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/bw/stub/pjk_atmos_av_mon.csh"/>
       <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/bw/stub/tk_atmos_av_mon.csh"/>
       <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/bw/stub/lwh_atmos_av_mon.csh"/> 
+      <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/bw/stub/bw_atmos_pr_atl_pac.csh"/>
+      <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/bw/stub/bw_box_whisker.csh"/>
       <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjg/stub/cjg_atmos_av_mon.csh"/>
       <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/radiation_atmos_av_mon.csh"/>
       <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/sak_atmos_av_mon.csh"/>
@@ -88,7 +105,7 @@
       <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/surface_atmos_av_mon.csh"/>
       <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/wind_atmos_av_mon.csh"/>
       <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/temp_atmos_av_mon.csh"/>
-      <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh -c amip"/>
+      <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh -c amip"/>
    </atmosMonthAve>
 
    <atmosLevelAnnualTS>
@@ -118,6 +135,10 @@
    <tracerAnnualTS>
       <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="yes" script="$FRE_ANALYSIS_HOME/van/stub/van.ch4budget.ann_ts.csh"/>
    </tracerAnnualTS>
+   <tracerMonthTS>
+      <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="no" script="$FRE_ANALYSIS_HOME/eem/stub/ESMValTools/ESMValTool-driver.csh -d Emmons" />
+      <analysis switch="$(ANALYSIS_SWITCH)" startYear="$(ANA_CLIMO_START)" endYear="$(ANA_CLIMO_END)" cumulative="no" script="$FRE_ANALYSIS_HOME/eem/stub/ESMValTools/ESMValTool-driver.csh -f righi15gmd_Emmons "/>
+   </tracerMonthTS>
 
    <!-- Land analysis scripts from Krista Dunne -->
    <landMonthTS>

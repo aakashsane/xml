@@ -87,18 +87,13 @@
 /
 
  &esfsw_driver_nml
-     do_four_stream = .true.
-     reproduce_ulm   = .false.
-     do_ch4_sw_effects = .true.
-     do_n2o_sw_effects = .true.
-     do_sw_continuum   = .true.
-     do_quench = .true.
+      do_sw_continuum = .true.
 /
 
  &esfsw_parameters_nml
       sw_code_version = 'esf2015' ! replaces deprecated sw_resolution = 'med'
       sw_diff_streams = 1
-      sw_NIRVISgas_bands = 11 ! ulm's default value =9, ulm_patch=11
+      sw_NIRVISgas_bands = 9 ! ulm's default value =9, ulm_patch=11
 /
 
  &fms_io_nml
@@ -217,13 +212,11 @@
 
  &lw_gases_stdtf_nml
       NSTDCO2LVLS=496
-      do_co2_bug = .false.
 /
 
  &microphys_rad_nml
       do_orig_donner_stoch = .false.,
       lwem_form = 'fuliou'
-      do_hu = .true.  
 /
 
  &moist_conv_nml
@@ -254,21 +247,6 @@
       iradprt_gl = 20, 6,
       jradprt_gl = 12, 20,
       num_pts_ij = 0
-/
-
- &radiation_driver_nml
-      rad_time_step= 10800,
-      rad_package = 'sea_esf',
-      do_clear_sky_pass=.true.,
-      !calc_hemi_integrals = .false.,
-      renormalize_sw_fluxes=.true.,
-      zenith_spec = 'diurnally_varying',
-      using_restart_file = .false.
-      do_conserve_energy = .true.
-/
-
- &radiation_driver_diag_nml
-      all_step_diagnostics = .true.,
 /
 
  &ras_nml
@@ -322,7 +300,7 @@
       do_nlte = .false.,
       do_lwcldemiss = .true.,
       continuum_form = 'ckd2.1',
-      linecatalog_form = 'hitran_2012',
+      linecatalog_form = 'hitran_2000',
       verbose = 5
 /
 
@@ -419,6 +397,9 @@
         input_file = 'INPUT/19810101.static_veg_out.nc'
 /
 
+ &surface_flux_nml
+      gust_min = 1.e-10
+/
 
  &topo_rough_nml
       use_topo_rough    = .true.
@@ -473,6 +454,16 @@
       do_conserve_energy = .true.
 /
 
+ &vert_turb_driver_nml
+      use_tau          = .false.,
+      gust_scheme      = 'beljaars',
+      do_mellor_yamada = .false.,
+      do_entrain       = .true.,
+      do_edt           = .false.,
+      do_diffusivity   = .false.,
+      do_stable_bl     = .true.,
+      do_shallow_conv  = .false.
+/
 
  &xgrid_nml
         make_exchange_reproduce = .true.

@@ -1,36 +1,32 @@
- &cloud_generator_nml
-      do_inhomogeneous_clouds = .true.
-      defaultOverlap = 4
-      overlapLengthScale = 4.
-/
-
  &cloud_spec_nml
+        force_use_of_temp_for_seed = .true.
         cloud_type_form = 'stratuw'
-	do_stochastic_clouds = .true.
-	use_cloud_tracers_in_radiation = .false. !from radiation in common.nml
 /
 
  &deep_conv_nml
-        auto_th0_d = 0.35e-3
-        tcrit_d    = -38.0,
-        peff_l_d   = 5.0e-5
-        peff_i_d   = 10.e-5
-        rkm_dp1 = 2.
+        rkm_dp1 = 2
         rkm_dp2 = 0.1
-        cwfn_th = 10.
+        norder = 1
+        cbmf_dp_frac1 = 1.
+        cbmf_dp_frac2 = 1.
+        crh_th_ocean = 0.5
+        crh_th_land  = 0.5
+        cape_th = 100.
         tau_dp = 28800.
         mixing_assumption_d = 4
         do_ppen_d  = .true.
-        rpen_d     = 5.0
         do_pevap_d = .true.
         cfrac_d    = 0.15
         hcevap_d   = 0.9
-        pblfac_d   = 0.25
+        auto_th0_d = 1.0e-3
+        tcrit_d    = -110.0,
         frac_limit_d = 0.25
-        dcwfndm_th = 100
-        lofactor_d = 0.5
-        do_cgust_dp  = .true.
-        cgust_choice = 3
+        dcapedm_th = 100
+        lofactor_d = 0.75
+        do_lod_rkm   = .false.
+        do_lod_cfrac = .false.
+        do_lod_tcrit = .false.
+        do_forcedlifting_d = .false.
 /
 
  &donner_deep_clouds_W_nml
@@ -100,83 +96,75 @@
         do_legacy_strat_cloud = .false.,
 /
 
- &random_number_streams_nml
-        force_use_of_temp_for_seed = .true.
+ &strat_cloud_nml
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 8.0,
+        Dmin = 1.0e-07,
+        n_land = 300.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 1.e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-6,
+        eros_scale_t = 3.e-6,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.0
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 0.7
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
 /
-
-
-&rotstayn_klein_mp_nml
-        rk_act_only_if_ql_gt_qmin = .true.
-        include_homogeneous_for_wetdep = .false.
-        include_adjustment_for_wetdep = .true.
-/
-
 
  &strat_clouds_W_nml
-
+      do_stochastic_clouds = .true.
 /
 
  &uw_closure_nml
-        do_old_cbmfmax = .true.,
         rkfre    = 0.2
         wcrit_min= 0.2
 /
 
  &uw_conv_nml
         use_online_aerosol = .true.,
+        iclosure        = 0,
         rkm_sh          = 3.0,
+        cldhgt_max      = 50.e3,
+        do_uwcmt        = .false.,
+        apply_tendency  = .true.,
+        wmin_ratio      = 0.05,
+        do_lands        = .false.
+        landfact_m      = 0.5
+        gama            = 0.,
+        lochoice        = 0
+        lofactor0       = 0.75
         do_deep         = .true.,
-        idpchoice       = 2
+        idpchoice       = 1
         do_rescale      = .true.
-        do_rescale_t    = .true.
         use_sub_seasalt = .false.
-        use_new_let     = .true.
-        do_subcloud_flx = .true.
-        plev_cin        = 60000.
-        src_choice      = 1
-        wrel_min        = 1.
-        do_prog_gust    = .true.
-        tau_gust        = 10800
-        cgust0          = 2.
-        cgust_max       = 4.
-        tracer_check_type = 2
+        wrel_min=1.
 /
 
  &uw_plume_nml
-        auto_th0 = 0.35e-3,
-        tcrit    = -38.0,
-        peff_l   = 5.0e-5
-        peff_i   = 10.e-5
         rmaxfrac = 0.15
+        auto_th0 = 1.0e-3,
+        tcrit    = -110.0,
         frac_drs = 0.0
         wmin     = 0.5
         deltaqc0 = 0.5e-3 
-        do_pdfpcp= .false.
+        do_pdfpcp= .true.
         do_pmadjt= .true.
         do_emmax = .true.
         do_pnqv  = .true.
         mixing_assumption = 2
-        mp_choice = 2
+        mp_choice = 1
         do_pevap = .true.
-        cfrac    = 0.15
         hcevap   = 0.9
-        pblfac   = 0.25
+        cfrac    = 0.15
 /
-
- &vert_turb_driver_nml
-      use_tau          = .false.,
-      gust_scheme      = 'beljaars',
-      do_mellor_yamada = .false.,
-      do_entrain       = .true.,
-      do_edt           = .false.,
-      do_diffusivity   = .false.,
-      do_stable_bl     = .true.,
-      do_shallow_conv  = .false.
-/
-
-
- &wetdep_nml
-        scale_aerosol_wetdep = 1.
-/
-
 
