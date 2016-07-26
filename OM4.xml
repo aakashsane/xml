@@ -14,7 +14,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <property name="RELEASE"      value="verona_prerelease"/> <!-- CVS tag for shared source code -->
+   <property name="RELEASE"      value="verona"/> <!-- CVS tag for shared source code -->
    <property name="MOM6_DATE"    value="2016.05.26"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
@@ -54,7 +54,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
 
 
    <!--Users need not change the following properties -->
-   <property name="reference_tag"  value="ulm_answers"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
+   <property name="reference_tag"  value="verona_answers"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
    <property name="PROG_MAIN"   value="coupler/coupler_main.o"/>
    <property name="LIBS_ROOT"   value="OM4_libs_compile"/>
    <property name="FMS_LIB_DIR" value="./$(LIBS_ROOT)/$(platform)-$(target)/exec"/>
@@ -495,7 +495,6 @@ module use /sw/eslogin-c3/modulefiles
         <state>$HOME/$(stem)/$(name)/$(platform)-$(target)/state</state>
         <work>/scratch4/GFDL/gfdlscr/$USER/work/$FRE_JOBID</work>
         <ptmp>/scratch4/GFDL/gfdlscr/$USER/ptmp</ptmp>
-        <tmp>/scratch4/GFDL/gfdlscr/$USER/tmp</tmp>
         <archive>/scratch4/GFDL/gfdlscr/$USER/$(stem)/$(name)/$(platform)-$(target)</archive>
       </directory>
 
@@ -653,10 +652,11 @@ Make the executable for ocean-ice experiments.
       </component>
 
       <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared">
-         <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
-         <source versionControl="git" root="https://github.com">
-        <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase>
+       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
+       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
         <csh><![CDATA[
+          \rm -rf ocean_null
           git clone -b $(MOM6_GIT_TAG) https://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
@@ -689,22 +689,23 @@ Make the executable for ocean-ice experiments.
             echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
           endif
            ]]>  </csh>
-         </source>
-         <compile>
+       </source>
+       <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
             <!--<makeOverrides>OPENMP=""</makeOverrides>--> <!-- openmp switch for MOM6 may cause crash -->
 
-         </compile>
+       </compile>
       </component>
       
       <component name="icebergs" paths="mom6/src/icebergs" requires="fms">
-         <source versionControl="git" root="https://github.com">
-            <codeBase version="$(BERGS_GIT_TAG)"> NULL </codeBase>
-         </source>
-         <compile>
+       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
+        <csh>\rm -rf ocean_null</csh>
+       </source>
+       <compile>
             <cppDefs><![CDATA[-D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
-         </compile>
-         <description domainName="N/A" communityName="N/A" communityVersion="$(RELEASE)" communityGrid="N/A"/>
+       </compile>
+       <description domainName="N/A" communityName="N/A" communityVersion="$(RELEASE)" communityGrid="N/A"/>
       </component>
 
 
@@ -786,9 +787,10 @@ Make the executable for ocean-ice experiments.
          <library path="$(MY_LIBS)/sis2/libsis2.a" headerDir="$(MY_LIBS)/sis2"/>
       </component>
       <component name="mom6_static_90x45" requires="fms ocean_shared" paths="$root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h $root/$(LIBS_ROOT)/src/mom6/src/MOM6/config_src/coupled_driver $root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/*/ $root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/*/*/">
-         <source versionControl="git" root="https://github.com">
-           <codeBase version="$(MOM6_GIT_TAG)"> NULL </codeBase><!--Do not checkout any code-->
-           <csh><![CDATA[
+       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
+        <csh><![CDATA[
+          \rm -rf ocean_null
           echo "No need to checkout any new source code for this component!" 
           /bin/cp  $root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory.h $root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
           /bin/sed "s/NIPROC_ 32/NIPROC_ 90/g" -i $root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
@@ -1668,7 +1670,7 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
            <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
        </production>
 
-      <reference restart="$(REFERENCE)/1x0m10d_2997pe/restart/19000111.tar"/>
+      <reference restart="$(REFERENCE)/1x1m0d_1756pe/restart/19000201.tar"/>
 
     </runtime>
 
@@ -2069,86 +2071,8 @@ force_all_pes_traj = .true.
       construct_table_wrt_liq_and_ice = .true.,
      </namelist>
 
-     <csh type="always">
-        <![CDATA[
-#------------------------------------------
-## Find out whether to restart.
+      <xi:include xpointer="xpointer(//experiment[@name='OM4_common']/input/node())"/>
 
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc 
-
-touch $work/INPUT/MOM_override
-touch $work/INPUT/SIS_override
-
-#scan auxiliary_nml
-#the reason for defining dummy variables is to parse the stdout for the timing database, please leave them as is
-
-set dummy = `awk '/ocean_mask_table/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-set OCN_MASK_TABLE = $dummy
-set dummy     = `awk '/ocean_layout/     {gsub(/=/," ");           print $2,$3}' $work/input.nml`
-set OCN_LAYOUT     = $dummy
-set dummy  = `awk '/ocean_io_layout/  {gsub(/=/," ");           print $2,$3}' $work/input.nml`
-set OCN_IO_LAYOUT  = $dummy
-
-cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
-#override undef NIPROC_IO
-#override undef NJPROC_IO
-#override undef NIPROC
-#override undef NJPROC
-#override IO_LAYOUT = $OCN_IO_LAYOUT
-#override LAYOUT    = $OCN_LAYOUT
-#override MASKTABLE = $OCN_MASK_TABLE
-MOM_LAYOUT_EOF
-
-#scan auxiliary_nml
-set dummy = `awk '/ice_mask_table/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-set ICE_MASK_TABLE = $dummy
-set dummy = `awk '/ice_layout/     {gsub(/=/," ");           print $2,$3}' $work/input.nml`
-set ICE_LAYOUT     = $dummy
-set dummy = `awk '/ice_io_layout/  {gsub(/=/," ");           print $2,$3}' $work/input.nml`
-set ICE_IO_LAYOUT  = $dummy
-
-cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
-#override undef NIPROC_IO
-#override undef NJPROC_IO
-#override undef NIPROC
-#override undef NJPROC
-#override IO_LAYOUT = $ICE_IO_LAYOUT
-#override LAYOUT    = $ICE_LAYOUT
-#override MASKTABLE = $ICE_MASK_TABLE
-SIS_LAYOUT_EOF
-
-
-cd $work
-## Run the model
-#------------------------------------------
-       ]]>
-      </csh>
-
-     <csh><![CDATA[
-#
-# Copy MOM6 input files needed for postprocessing  to GFDL (waiting for FRE to do this for us)
-#
-set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
-if ( $?flagOutputXferOn && $?flagOutputPostProcessOn ) then
-
-  #trick to copy MOM6 directory but avoid traversing the .datasets links
-  tar cvf mom6.tar --exclude='.datasets' -C $(MOM6_EXAMPLES) . > /dev/null
-  #tar cvf mom6.tar  --exclude='.datasets' --exclude='src' --exclude='INPUT'  -C $(MOM6_EXAMPLES) . > /dev/null
-  mkdir mom6
-  tar xvf mom6.tar -C ./mom6 > /dev/null
-  if ("${platform_domain}" == "ncrc.gov") then
-    gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  else if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
-    gcp -cd -r --sync mom6 gfdl:$(NB_ROOT)/
-  endif
-endif
-      ]]></csh>
 
    </input>
    <runtime>
@@ -2381,6 +2305,12 @@ cd $work/INPUT
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_GS_edits.nc</dataSource>
       </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
+      </dataFile>
 
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
@@ -2563,7 +2493,7 @@ $baseDate
            <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
        </production>
 
-      <reference restart="$(REFERENCE)/1x0m10d_1152pe/restart/19000111.tar"/>
+      <reference restart="$(REFERENCE)/1x0m2d_432x1o/restart/19000103.tar"/>
 
    </runtime>
 
@@ -2860,7 +2790,7 @@ SIS_OVERRIDE_EOF
            <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
        </production>
 
-      <reference restart="$(REFERENCE)/1x0m10d_1152pe/restart/19000111.tar"/>
+      <reference restart="$(REFERENCE)/1x1m0d_1057x1o/restart/19000201.tar"/>
 
    </runtime>
 
@@ -3081,7 +3011,7 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
 
 <experiment name="OBGC_COBALT_Preind_field_table">
     <input>
-      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="" order="append">
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.COBALT_init_tracers_latlon_preind_dic_20151209</dataSource>
         <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.COBALT_init_tracers_latlon_preind_dic_20151209</dataSource>
       </dataFile>
