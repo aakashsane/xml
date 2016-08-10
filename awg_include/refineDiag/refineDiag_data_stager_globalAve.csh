@@ -714,6 +714,7 @@ def areaMean(varName,cellArea,geoLat,geoLon,region='global'):
   elif (region == 'global'):
     var  = var
     cellArea = cellArea
+  cellArea.mask[:] = var.mask[:]
   res = MV2.array(var*cellArea).sum()/cellArea.sum()
   return res, cellArea.sum()
 
