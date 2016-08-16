@@ -27,6 +27,23 @@ echo "  ---------- begin refineDiag_data_stager.csh ----------  "
 cd $work/$hsmdate
 pwd
 
+#-- This block is to run the refactored diagnostics and ingest them 
+#-- into the mySQL database det_analysis currently running on Cobweb.
+if ( $?tripleID  ) then
+    if ( ${tripleID} != "" ) then
+        python /home/fms/local/opt/fre-analysis/test/eem/code/detVitals/atmos_analysis.py -t ${tripleID} -y ${oname}
+        python /home/fms/local/opt/fre-analysis/test/eem/code/detVitals/ocean_analysis.py -t ${tripleID} -y ${oname}
+        python /home/fms/local/opt/fre-analysis/test/eem/code/detVitals/land_analysis.py -t ${tripleID} -y ${oname}
+        python /home/fms/local/opt/fre-analysis/test/eem/code/detVitals/cobalt_analysis.py -t ${tripleID} -y ${oname}
+        python /home/fms/local/opt/fre-analysis/test/eem/code/detVitals/detVitalsAverager.py -t ${tripleID} 
+    else
+        echo "tripleID for the experiment ${name} is not properly set... skipping detVitals diagnostics."
+    endif
+else
+    echo "tripleID for the experiment ${name} is not properly set... skipping detVitals diagnostics."
+endif
+
+
 #-- Unload any previous versions of Python and load the system default
 module unload python
 module unload cdat
