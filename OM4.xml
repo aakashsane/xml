@@ -15,7 +15,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="verona"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2016.05.26"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2016.06.29"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="dev/master"/>
@@ -25,10 +25,10 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs-->
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-   <property name="PROD_SIMTIME"   value="20"/>
+   <property name="PROD_SIMTIME"   value="10"/>
    <!--Post-processing  chunk lengths -->
    <property name="CHUNK_LENGTH_A" value="5yr"/>
-   <property name="CHUNK_LENGTH_B" value="20yr"/>
+   <property name="CHUNK_LENGTH_B" value="10yr"/>
 
    <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->
@@ -61,7 +61,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
-   <property name="DEBUGLEVEL"   value=""/>
+   <property name="DEBUGLEVEL"   value="_0"/>
    <property name="STATIC"       value=""/>  
 
    <property name="domainparams_O128"
@@ -121,6 +121,14 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
                     icebergs_nml:make_calving_reproduce=.true.;
                     dummy_ocean_nml:ocean_layout=36,12;dummy_ocean_nml:ocean_io_layout=1,4;
                     dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
+
+   <property name="domainparams_O480"
+	     value="coupler_nml:ocean_npes=480;
+	            dummy_ice_nml:ice_layout=32,18;dummy_ice_nml:ice_io_layout=1,3;
+		    dummy_ice_nml:ice_mask_table=mask_table.96.32x18;
+                    icebergs_nml:make_calving_reproduce=.true.;
+	            dummy_ocean_nml:ocean_layout=32,18;dummy_ocean_nml:ocean_io_layout=1,3;
+                    dummy_ocean_nml:ocean_mask_table=mask_table.96.32x18"/>
 
    <property name="domainparams_O512"
 	     value="coupler_nml:ocean_npes=512;
@@ -212,6 +220,25 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
 	            dummy_ice_nml:ice_layout=45,72;dummy_ice_nml:ice_io_layout=1,4;
 	            dummy_ocean_nml:ocean_layout=45,72;dummy_ocean_nml:ocean_io_layout=1,4;
                     dummy_ocean_nml:ocean_mask_table=MOM_mask_table"/>
+
+   <property name="domainparams_O3551"
+	     value="coupler_nml:ocean_npes=3551;
+	            dummy_ice_nml:ice_layout=90,54;dummy_ice_nml:ice_io_layout=1,3;
+		    dummy_ice_nml:ice_mask_table=mask_table.1309.90x54;
+	            dummy_ocean_nml:ocean_layout=90,54;dummy_ocean_nml:ocean_io_layout=1,3;
+                    dummy_ocean_nml:ocean_mask_table=mask_table.1309.90x54"/>
+   <property name="domainparams_O3782"
+	     value="coupler_nml:ocean_npes=3782;
+	            dummy_ice_nml:ice_layout=72,72;dummy_ice_nml:ice_io_layout=1,4;
+		    dummy_ice_nml:ice_mask_table=mask_table.1402.72x72;
+	            dummy_ocean_nml:ocean_layout=72,72;dummy_ocean_nml:ocean_io_layout=1,4;
+                    dummy_ocean_nml:ocean_mask_table=mask_table.1402.72x72"/>
+   <property name="domainparams_O4671"
+	     value="coupler_nml:ocean_npes=4671;
+	            dummy_ice_nml:ice_layout=90,72;dummy_ice_nml:ice_io_layout=1,4;
+		    dummy_ice_nml:ice_mask_table=mask_table.1809.90x72;
+	            dummy_ocean_nml:ocean_layout=90,72;dummy_ocean_nml:ocean_io_layout=1,4;
+                    dummy_ocean_nml:ocean_mask_table=mask_table.1809.90x72"/>
 
    <!--1/2 degree ocean grid Only-->
    <property name="domainparams_O951p5"
@@ -692,8 +719,7 @@ Make the executable for ocean-ice experiments.
        </source>
        <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
-            <!--<makeOverrides>OPENMP=""</makeOverrides>--> <!-- openmp switch for MOM6 may cause crash -->
-
+            <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for MOM6 may cause crash -->
        </compile>
       </component>
       
@@ -715,8 +741,8 @@ Make the executable for ocean-ice experiments.
 	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
          </source>
          <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]>
-            </cppDefs>
+            <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+            <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for MOM6 may cause crash -->
          </compile>
       </component>
 
@@ -1375,6 +1401,20 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
          mkdir hide_from_fre
          mv icebergs.res.nc.* hide_from_fre/
          
+         set non_empty_restarts = ""
+         foreach file ( `ls bonds_iceberg.res.nc.????` )
+            if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
+         end
+         if( "$non_empty_restarts" != "" ) then
+          ncrcat $non_empty_restarts bonds_iceberg.res.nc
+          if( ! -e bonds_iceberg.res.nc ) then
+            echo ERROR: ncrcat did not produce bonds_iceberg restart file! We need to stop the run or the model restarts incorrectly!
+            exit 1
+          endif
+         endif
+         mkdir hide_from_fre
+         mv bonds_iceberg.res.nc.* hide_from_fre/
+
          cd $work         
          mkdir hide_from_fre
          ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
@@ -1558,7 +1598,7 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
             if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
          end
          if( "$non_empty_restarts" != "" ) then
-          ~Rusty.Benson/ncrcat $non_empty_restarts icebergs.res.nc
+          ncrcat $non_empty_restarts icebergs.res.nc
           if( ! -e icebergs.res.nc ) then
             echo ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
             exit 1
@@ -1566,9 +1606,24 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
          endif
          mkdir hide_from_fre
          mv icebergs.res.nc.* hide_from_fre/
+         
+         set non_empty_restarts = ""
+         foreach file ( `ls bonds_iceberg.res.nc.????` )
+            if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
+         end
+         if( "$non_empty_restarts" != "" ) then
+          ncrcat $non_empty_restarts bonds_iceberg.res.nc
+          if( ! -e bonds_iceberg.res.nc ) then
+            echo ERROR: ncrcat did not produce bonds_iceberg restart file! We need to stop the run or the model restarts incorrectly!
+            exit 1
+          endif
+         endif
+         mkdir hide_from_fre
+         mv bonds_iceberg.res.nc.* hide_from_fre/
+
          cd $work
          mkdir hide_from_fre
-         ~Rusty.Benson/ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
+         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
          mv iceberg_trajectories.nc.* hide_from_fre/
       endif
 
@@ -1658,9 +1713,17 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
        </regression>
 
       <regression name="timings">
-          <run months="1"  npes="2997"  runTimePerJob="00:50:00" overrideParams="$(domainparams_O2997)"/>
-          <run months="1"  npes="2432"  runTimePerJob="00:50:00" overrideParams="$(domainparams_O2432)"/>
-          <run months="1"  npes="1970"  runTimePerJob="00:50:00" overrideParams="$(domainparams_O1970)"/>
+         <run months="1"    npes="512" overrideParams="$(domainparams_O512x2)"  runTimePerJob="01:00:00"/>
+         <run months="1"    npes="512" overrideParams="$(domainparams_O512)"    runTimePerJob="01:00:00"/>
+         <run months="1"    npes="512" overrideParams="$(domainparams_O512x1h)" runTimePerJob="01:00:00"/>
+         <run months="1"    npes="480" overrideParams="$(domainparams_O480)"    runTimePerJob="01:00:00"/>
+          <run months="1"  npes="1756"  runTimePerJob="00:30:00" overrideParams="$(domainparams_O1756)"/>
+          <run months="1"  npes="1970"  runTimePerJob="00:30:00" overrideParams="$(domainparams_O1970)"/>
+          <run months="1"  npes="2432"  runTimePerJob="00:30:00" overrideParams="$(domainparams_O2432)"/>
+          <run months="1"  npes="2997"  runTimePerJob="00:30:00" overrideParams="$(domainparams_O2997)"/>
+          <run months="1"  npes="3551"  runTimePerJob="00:30:00" overrideParams="$(domainparams_O3551)"/>
+          <run months="1"  npes="3782"  runTimePerJob="00:30:00" overrideParams="$(domainparams_O3782)"/>
+          <run months="1"  npes="4671"  runTimePerJob="00:30:00" overrideParams="$(domainparams_O4671)"/>
        </regression>
       <regression name="debug">
          <run days="1"   npes="512" overrideParams="$(domainparams_O512)" runTimePerJob="01:30:00"/>
@@ -2095,7 +2158,7 @@ force_all_pes_traj = .true.
            <segment simTime="12" units="months" runTime="02:00:00"/>
        </production>
 
-       <reference restart="$(REFERENCE)/1x0m20d_64pe/restart/00010121.tar"/>
+       <reference restart="$(REFERENCE)/1x0m20d_128pe/restart/00010121.tar"/>
    </runtime>
     <postProcess>
       <xi:include xpointer="xpointer(//experiment[@name='OM4i_postprocess']/postProcess/node())"/>
@@ -2770,13 +2833,16 @@ SIS_OVERRIDE_EOF
          <run months="1" npes="1300" overrideParams="$(domainparams_O1300p5)" runTimePerJob="00:50:00"/>
          <run months="1" npes="1441" overrideParams="$(domainparams_O1441p5)" runTimePerJob="00:50:00"/>
          <run months="1" npes="1608" overrideParams="$(domainparams_O1608p5)" runTimePerJob="00:50:00"/>
-        <run months="1" npes="2119" overrideParams="$(domainparams_O2119p5)" runTimePerJob="01:40:00"/>
+         <run months="1" npes="2119" overrideParams="$(domainparams_O2119p5)" runTimePerJob="01:40:00"/>
          <run months="1" npes="2700" overrideParams="$(domainparams_O2700p5)" runTimePerJob="01:40:00"/>
        </regression>
        <regression name="timings2">
          <run months="1" npes="951" overrideParams="$(domainparams_O951p5)" runTimePerJob="01:00:00"/>
          <run months="1" npes="1057" overrideParams="$(domainparams_O1057p5)" runTimePerJob="01:00:00"/>
          <run months="1" npes="2783" overrideParams="$(domainparams_O2783p5)" runTimePerJob="00:40:00"/>
+         <run months="1" npes="3925" overrideParams="$(domainparams_O3925p5)" runTimePerJob="00:40:00"/>
+       </regression>
+       <regression name="timings3"><!--non-positive domain-->
          <run months="1" npes="3314" overrideParams="$(domainparams_O3314p5)" runTimePerJob="00:40:00"/>
        </regression>
 
