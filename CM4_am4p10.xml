@@ -75,7 +75,7 @@ They reproduce answers provided by AWG:
 
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="verona"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2016.06.29"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2016.09.22a"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20160506"/>           <!-- git tag for AWG source code -->
   <property name="BERGS_GIT_TAG" value="dev/master"/>             <!-- git tag for icebergs source code -->
@@ -2030,7 +2030,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
 
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
           git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
-          (cd ocean_shared && git checkout origin/user/nnz/verona_dev_merge)
+          (cd ocean_shared && git checkout $(MOM6_GIT_TAG))
 
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
@@ -4747,6 +4747,34 @@ SIS_OVERRIDE_EOF
 </input>
 </experiment>
 
+<experiment name="CM4_g10r14_160526_MLE30d_ePBLj.$(MOM6_DATE)" inherit="CM4_g10r14_160526_MLE30d_ePBLj"/>
+<experiment name="CM4_g10r14_160526_MLE30d_ePBLj" inherit="CM4_c96L32_am4g10r14_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.2
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override WSTAR_USTAR_COEF = 1.0
+#override USE_MLD_ITERATION = True
+#override EPBL_IS_ADDITIVE = False
+#override TKE_SHEAR_DECAY_CONST = 0.55
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+</input>
+</experiment>
 <experiment name="CM4_c96L32_am4g10r8_2000_OMp5" inherit="cm4_sis2_compile">
     <description
 communityProject="$(ProjectID)" 
@@ -5466,149 +5494,118 @@ SIS_OVERRIDE_EOF
 
 </input>
 </experiment>
-<experiment name="CM4_c96L32_am4g10r8_2000_OMp5_lmix_H5_nmle_ndiff_meke_KHTH200_KDE-5" inherit="CM4_c96L32_am4g10r8_2000_OMp5">
-  <input>
-      <namelist name="land_model_nml">
-        layout = 8,12
-        io_layout = 1,4
-        tau_snow_T_adj = 604800.
-        prohibit_negative_canopy_water=.false.
-        min_frac = 1e-8
-        use_coast_rough = .true.,
-        use_coast_topo_rough = .false.,
-        max_coast_frac=0.67
+<experiment name="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLj" inherit="CM4_c96L32_am4g10r13_2000_OMp5_lmix_H5_nmle_ndiff_meke_KHTH200">
+<input>
+    <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.4,
+        parcel_option = 2,
+        beta_rad      = 0.33,
+        Ashear        = 20.0, 
+        beta_surf     = 0.23,
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+    </namelist>
+      <namelist name="strat_cloud_nml">
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 10.0,
+        Dmin = 1.0e-07,
+        n_land = 150.e6,
+        n_ocean = 50.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 2.0e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-5,
+        eros_scale_t = 5.e-5,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.0
+        U_evap_snow = 1.0
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 0.3
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
+        aerosol_activation_scheme = "total"
+      </namelist>
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.5e-3,
+        tcrit    = -25.15,
+        peff_l   = 5.0e-5
+        peff_i   = 11.0e-5
+        frac_drs = 0.0
+        rpen     = 4.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 2
+        do_pevap = .true.
+        do_new_pblfac = .true.
+        include_emf_s = .false.
+        cfrac    = 0.15
+        hcevap   = 0.8
+        hcevappbl = 1.0
+        pblfac   = 1.0
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+        bigc = 0.0
+      </namelist>
+      <namelist name="deep_conv_nml">
+        crh_th_ocean = 0.4
+        crh_th_land  = 0.4
+        auto_th0_d = 0.5e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 5.0e-5
+        peff_i_d   = 11.0e-5
+        rkm_dp1 = 2.
+        rkm_dp2 = 0.1
+        crh_max = 0.95
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        rpen_d     = 4.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.8
+        hcevappbl_d = 1.0
+        pblfac_d   = 1.0
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 1.0
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+        include_emf_d = .false.
       </namelist>
 
       <csh><![CDATA[
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
+else
+   set restart_flag = 'r'
+endif
 #amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
 if ( $currentSeg == 1 ) then
 \rm -f $work/INPUT/ice_model.res.nc
 endif
 #
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
-#override Z_INIT_FILE_SALT_VAR  = "salt"
-#override TIDEAMP_FILE  = "tidal_amplitude.nc"
-#override CHL_FROM_FILE = True
-#override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
-Z_INIT_REMAP_GENERAL = True                                                          
-Z_INIT_REMAP_FULL_COLUMN = True                                                      
-MEKE_KHTH_FAC = 1.0                                                                  
-VISC_RES_FN_POWER = 100 
-#override DIABATIC_FIRST = False
-#override OCEAN_SURFACE_STAGGER = "C"
-#override TOPO_EDITS_FILE       = ""
-DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
-#override ENERGYSAVEDAYS = 30
-
-#override KHTR = 500.
-#override KHTH = 200.                                                                
-#override DT = 1800
-#override DT_THERM = 7200
-#override KD = 2.0E-5
-
-MOM_OVERRIDE_EOF
-
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override MIN_OCN_INTERTIAL_H = 2.
-
-SIS_OVERRIDE_EOF
-     ]]></csh>
-
-    </input>
-</experiment>
-
-<experiment name="CM4_c96L32_am4g10r8_1860_OMp5_lmix_H5_nmle_ndiff_meke_KHTH200_KDE-5" inherit="CM4_c96L32_am4g10r8_2000_OMp5">
-  <input>
-      <namelist name="land_model_nml">
-        layout = 8,12
-        io_layout = 1,4
-        tau_snow_T_adj = 604800.
-        prohibit_negative_canopy_water=.false.
-        min_frac = 1e-8
-        use_coast_rough = .true.,
-        use_coast_topo_rough = .false.,
-        max_coast_frac=0.67
-      </namelist>
-    <namelist name="radiative_gases_nml">
-      use_co2_10um = .true.
-
-      verbose = 3
-      gas_printout_freq = 240
-
-      time_varying_co2 = .false.,
-      co2_variation_type = 'linear',
-      co2_dataset_entry = 1860,1,1,0,0,
-      co2_specification_type = 'time_series',
-      co2_floor = 100.0E-06,
-      co2_ceiling = 1600.0E-06,
-      co2_data_source = 'input'
-
-      time_varying_ch4 = .false.,
-      ch4_variation_type = 'linear'
-      ch4_dataset_entry = 1860,1,1,0,0,
-      ch4_specification_type = 'time_series'
-      ch4_data_source = 'input'
-
-      time_varying_n2o = .false.,
-      n2o_variation_type = 'linear'
-      n2o_dataset_entry = 1860,1,1,0,0,
-      n2o_specification_type = 'time_series'
-      n2o_data_source = 'input'
-
-      time_varying_f11 = .false.,
-      f11_variation_type = 'linear'
-      f11_dataset_entry = 1860,1,1,0,0,
-      f11_specification_type = 'time_series'
-      f11_data_source = 'input'
-
-      time_varying_f12 = .false.,
-      f12_variation_type = 'linear'
-      f12_dataset_entry = 1860,1,1,0,0,
-      f12_specification_type = 'time_series'
-      f12_data_source = 'input'
-
-      time_varying_f113 = .false.,
-      f113_variation_type = 'linear'
-      f113_dataset_entry = 1860,1,1,0,0,
-      f113_specification_type = 'time_series'
-      f113_data_source = 'input'
-
-      time_varying_f22 = .false.,
-      f22_variation_type = 'linear'
-      f22_dataset_entry = 1860,1,1,0,0,
-      f22_specification_type = 'time_series'
-      f22_data_source = 'input'
-
-      calc_co2_tfs_on_first_step = .false.,
-      calc_co2_tfs_monthly = .true.,
-      co2_tf_time_displacement = 0.0,
-
-      calc_ch4_tfs_on_first_step = .true.,
-      calc_ch4_tfs_monthly = .false.,
-      ch4_tf_time_displacement = 0.0,
-
-      calc_n2o_tfs_on_first_step = .true.,
-      calc_n2o_tfs_monthly = .false.,
-      n2o_tf_time_displacement = 0.0,
-     </namelist>
-     <namelist name="shortwave_driver_nml">
-      do_cmip_diagnostics = .true.,
-      swform = 'esfsw99'
-      solar_dataset_entry = 1860,1,1,0,0,
-      time_varying_solar_constant = .false.,
-     </namelist>
-
-      <csh><![CDATA[
-#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
-if ( $currentSeg == 1 ) then
-\rm -f $work/INPUT/ice_model.res.nc
-endif
-#
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
@@ -5617,32 +5614,29 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
-MEKE_KHTH_FAC = 1.0                                                                  
-VISC_RES_FN_POWER = 100 
-#override DIABATIC_FIRST = False
-#override OCEAN_SURFACE_STAGGER = "C"
-#override TOPO_EDITS_FILE       = ""
 DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
-#override ENERGYSAVEDAYS = 30
-
-#override KHTR = 500.
-#override KHTH = 200.                                                                
-#override DT = 1800
-#override DT_THERM = 7200
-#override KD = 2.0E-5
+#override ENERGYSAVEDAYS = .25
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.2
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override WSTAR_USTAR_COEF = 1.0
+#override USE_MLD_ITERATION = True
+#override EPBL_IS_ADDITIVE = False
+#override TKE_SHEAR_DECAY_CONST = 0.55
 
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-
 #override MIN_OCN_INTERTIAL_H = 2.
 
 SIS_OVERRIDE_EOF
      ]]></csh>
 
-    </input>
+</input>
 </experiment>
 
 
