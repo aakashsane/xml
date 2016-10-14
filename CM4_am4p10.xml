@@ -75,7 +75,7 @@ They reproduce answers provided by AWG:
 
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="verona"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2016.09.22a"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2016.10.14"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20160506"/>           <!-- git tag for AWG source code -->
   <property name="BERGS_GIT_TAG" value="dev/master"/>             <!-- git tag for icebergs source code -->
@@ -2061,6 +2061,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+            <makeOverrides>OPENMP=""</makeOverrides> <!-- SIS2 does not compile with -openmp in dev/master/2016.10.14-->
          </compile>
     </component>
 
@@ -4080,7 +4081,7 @@ endif
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/All_edits.nc</dataSource>
       </dataFile>
-      <dataFile label="input" target="INPUT/WOA05_pottemp_salt.nc" chksum="" size="" timestamp="">
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/WOA05_ptemp_salt_monthly.nc </dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
@@ -4339,7 +4340,7 @@ endif
             ocean_albedo_option = 5
       </namelist>
       <namelist name="ocean_rough_nml">
-            rough_scheme = 'COARE3.5'
+            rough_scheme = 'coare3.5'
       </namelist>
      </input>
   </experiment>
@@ -4954,11 +4955,11 @@ SIS_OVERRIDE_EOF
           <segment simTime="12" units="months" runTime="02:00:00"/>
         </production>
       <regression name="basic">
-          <run months="1" npes="1418"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O842p5)"/>
+          <run months="1" npes="1058"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O842p5)"/>
       </regression>
 
       <regression name="rts">
-        <run days="15 16" npes="1418"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O842p5)"/>
+        <run days="15 16" npes="1058"  runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O842p5)"/>
         <run days="2"     npes="1058"  runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O842p5)"/>
   	<run days="2"     npes="864"  runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O648)"/>
   	<run days="2"     npes="1080" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O864)"/>
@@ -5151,7 +5152,7 @@ if ( $currentSeg == 1 ) then
 endif
 #
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE  = "tidal_amplitude.nc"
@@ -5452,11 +5453,6 @@ SIS_OVERRIDE_EOF
       </namelist>
 
       <csh><![CDATA[
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
 #amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
 if ( $currentSeg == 1 ) then
 \rm -f $work/INPUT/ice_model.res.nc
@@ -5465,7 +5461,7 @@ endif
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
@@ -5494,6 +5490,16 @@ SIS_OVERRIDE_EOF
 
 </input>
 </experiment>
+
+<experiment name="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLj_c4_intel16_norough" inherit="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLj">
+<input>
+      <namelist name="ocean_rough_nml">
+            rough_scheme = 'COARE3.5'
+      </namelist>
+</input>
+</experiment>
+
+<experiment name="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLj_c4_intel16" inherit="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLj"/>
 <experiment name="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLj" inherit="CM4_c96L32_am4g10r13_2000_OMp5_lmix_H5_nmle_ndiff_meke_KHTH200">
 <input>
     <namelist name="entrain_nml">
@@ -5593,11 +5599,6 @@ SIS_OVERRIDE_EOF
       </namelist>
 
       <csh><![CDATA[
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
 #amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
 if ( $currentSeg == 1 ) then
 \rm -f $work/INPUT/ice_model.res.nc
@@ -5606,7 +5607,7 @@ endif
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
@@ -5631,6 +5632,146 @@ MOM_OVERRIDE_EOF
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
+#override MIN_OCN_INTERTIAL_H = 2.
+
+SIS_OVERRIDE_EOF
+     ]]></csh>
+
+</input>
+</experiment>
+
+<experiment name="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLl" inherit="CM4_c96L32_am4g10r13_2000_OMp5_lmix_H5_nmle_ndiff_meke_KHTH200">
+<input>
+    <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.4,
+        parcel_option = 2,
+        beta_rad      = 0.33,
+        Ashear        = 20.0,
+        beta_surf     = 0.23,
+        radperturb    = 0.10,
+        critjump      = 0.10,
+    </namelist>
+      <namelist name="strat_cloud_nml">
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 10.0,
+        Dmin = 1.0e-07,
+        n_land = 150.e6,
+        n_ocean = 50.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 2.0e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-5,
+        eros_scale_t = 5.e-5,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.0
+        U_evap_snow = 1.0
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 0.3
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
+        aerosol_activation_scheme = "total"
+      </namelist>
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.5e-3,
+        tcrit    = -25.15,
+        peff_l   = 5.0e-5
+        peff_i   = 11.0e-5
+        frac_drs = 0.0
+        rpen     = 4.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 2
+        do_pevap = .true.
+        do_new_pblfac = .true.
+        include_emf_s = .false.
+        cfrac    = 0.15
+        hcevap   = 0.8
+        hcevappbl = 1.0
+        pblfac   = 1.0
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+        bigc = 0.0
+      </namelist>
+      <namelist name="deep_conv_nml">
+        crh_th_ocean = 0.4
+        crh_th_land  = 0.4
+        auto_th0_d = 0.5e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 5.0e-5
+        peff_i_d   = 11.0e-5
+        rkm_dp1 = 2.
+        rkm_dp2 = 0.1
+        crh_max = 0.95
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        rpen_d     = 4.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.8
+        hcevappbl_d = 1.0
+        pblfac_d   = 1.0
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 1.0
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+        include_emf_d = .false.
+      </namelist>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FROM_FILE = True
+#override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
+Z_INIT_REMAP_GENERAL = True
+Z_INIT_REMAP_FULL_COLUMN = True
+DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
+#override ENERGYSAVEDAYS = .25
+#override USE_MLD_ITERATION = True
+#override MSTAR = 2.9
+#override NSTAR = 0.2
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override EPBL_IS_ADDITIVE = False
+#override USE_MLD_ITERATION = True
+#override PRANDTL_TURB = 1.25
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
 
 SIS_OVERRIDE_EOF
@@ -5736,7 +5877,7 @@ endif
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
@@ -5950,7 +6091,7 @@ endif
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
@@ -6363,7 +6504,7 @@ endif
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
