@@ -4776,6 +4776,32 @@ SIS_OVERRIDE_EOF
      ]]></csh>
 </input>
 </experiment>
+
+<experiment name="CM4_g10r14_160526_MLE30d_ePBLm" inherit="CM4_c96L32_am4g10r14_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.2
+#override WSTAR_USTAR_COEF = 1.0
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override USE_MLD_ITERATION = True
+#override EPBL_TRANSITION_SCALE = 0.1
+#override EPBL_IS_ADDITIVE = False
+#override PRANDTL_TURB = 1.25
+MOM_OVERRIDE_EOF
+
+     ]]></csh>
+</input>
+</experiment>
 <experiment name="CM4_c96L32_am4g10r8_2000_OMp5" inherit="cm4_sis2_compile">
     <description
 communityProject="$(ProjectID)" 

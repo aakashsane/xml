@@ -75,17 +75,17 @@ They reproduce answers provided by AWG:
 
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="verona"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2016.06.29"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2016.10.14"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20160914"/>           <!-- git tag for AWG source code -->
   <property name="ProjectID"    value="MDT"/>                     <!-- database top level -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                   <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
-  <property name="PROD_SIMTIME"     value="15"/>   <!--simulation length in years-->
+  <property name="PROD_SIMTIME"     value="60"/>   <!--simulation length in years-->
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
-  <property name="PP_CPLD_CHUNK_B"  value="10yr"/> <!--bigger  chunk length for pp/analysis-->
-
+  <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
+  <property name="PP_START_YEAR"  value="1860" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
   <property name="PROD_SEGTIME"     value="04:00:00"/><!--Wall clock per segment (usually 1 year)-->
 
@@ -725,6 +725,14 @@ the faster the model throughput, but also the lower the model efficiency
                <ocn ranks="576" threads="1"    layout = "16,36"  io_layout = "1,4" mask_table="MOM_mask_table"/>
 	     </resources>
    </freInclude>
+   <freInclude name="resourceparams_A576x2_O648">
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="576" threads="2"    layout = "6,16"   io_layout = "1,4" />
+	       <lnd                            layout = "6,16"   io_layout = "1,4" />
+	       <ice                            layout = "72,8"   io_layout = "1,4" />
+	       <ocn ranks="648" threads="1"    layout = "18,36"  io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
    <freInclude name="resourceparams_A216x2_O864">
 	     <resources jobWallclock="01:00:00">
                <atm ranks="216" threads="2"    layout = "3,12"   io_layout = "1,4" />
@@ -930,7 +938,7 @@ the faster the model throughput, but also the lower the model efficiency
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A576x2_O842p5"><!--1/2 degree ocean grid Only-->
-	     <resources jobWallclock="01:00:00">
+	     <resources jobWallclock="00:30:00">
                <atm ranks="576" threads="2"	    layout = "8,12"   io_layout = "1,4" />
 	       <lnd                            layout = "8,12"   io_layout = "1,4" />
 	       <ice                            layout = "144,4"   io_layout = "1,4" />
@@ -1064,7 +1072,7 @@ the faster the model throughput, but also the lower the model efficiency
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="16.0.3.210" />
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
         <root>$CPERM/$USER/$(FRE_STEM)</root>
@@ -1089,6 +1097,9 @@ the faster the model throughput, but also the lower the model efficiency
       <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
       <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
       <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/> 
+      <property name="MODEL_UPDATES_WH"     value="/ncrc/home1/Bill.Hurlin"/>
+
      
       <csh><![CDATA[
 module use -a /usw/eslogin/modulefiles-c3
@@ -1103,7 +1114,7 @@ module use -a /usw/eslogin/modulefiles-c3
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="15.0.2.164" />
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>gfdl_f</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
         <root>$CPERM/$USER/$(FRE_STEM)</root>
@@ -1128,6 +1139,8 @@ module use -a /usw/eslogin/modulefiles-c3
       <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
       <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
       <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
+      <property name="MODEL_UPDATES_WH"     value="/ncrc/home1/Bill.Hurlin"/>
      
       <csh><![CDATA[
         module load git
@@ -1167,6 +1180,8 @@ module load nco/4.5.2
       <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
       <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
       <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
+      <property name="MODEL_UPDATES_WH"     value="/ncrc/home1/Bill.Hurlin"/>
      
       <csh><![CDATA[
         module load git
@@ -1207,6 +1222,8 @@ module load nco/4.5.2
       <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
       <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
       <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
+      <property name="MODEL_UPDATES_WH"     value="/ncrc/home1/Bill.Hurlin"/>
      
       <csh><![CDATA[
         module load git
@@ -1246,6 +1263,8 @@ module load nco/4.5.2
       <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
       <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
       <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
+      <property name="MODEL_UPDATES_WH"     value="/ncrc/home1/Bill.Hurlin"/>
      
       <csh><![CDATA[
         module load git
@@ -1287,6 +1306,8 @@ module load nco/4.5.2
       <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
       <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
       <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
+      <property name="MODEL_UPDATES_WH"     value="/ncrc/home1/Bill.Hurlin"/>
 
       <csh><![CDATA[
         module use -a /home/fms/local/modulefiles
@@ -1332,7 +1353,8 @@ module load nco/4.5.2
       <property name="FMS_ESM_ARCHIVE_ROOT" value="/lustre/atlas/proj-shared/cli061/pdata/fms/esm"/>
       <property name="OBGC_ARCHIVE_ROOT"    value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/retrospective"/> 
       <property name="OBGC_MODEL_UPDATES"   value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/retrospective"/>
-
+      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
+      <property name="MODEL_UPDATES_WH"     value="/ncrc/home1/Bill.Hurlin"/>
       <property name="FMS_ARCHIVE_ROOT" value="/lustre/atlas/proj-shared/cli061/pdata/fms" />
       
       <project>cli061</project>
@@ -1388,6 +1410,8 @@ limit coredumpsize unlimited
       <property name="FMS_ESM_ARCHIVE_ROOT" value="/lustre/atlas/proj-shared/cli061/pdata/fms/esm"/>
       <property name="OBGC_ARCHIVE_ROOT"    value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/retrospective"/> 
       <property name="OBGC_MODEL_UPDATES"   value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/retrospective"/>
+      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
+      <property name="MODEL_UPDATES_WH" value="/ncrc/home1/Bill.Hurlin"/>
       
       <project>cli061</project>
       <csh><![CDATA[
@@ -1434,6 +1458,9 @@ limit coredumpsize unlimited
       <property name="FMS_ESM_ARCHIVE_ROOT" value=""/>
       <property name="OBGC_ARCHIVE_ROOT"    value=""/> 
       <property name="OBGC_MODEL_UPDATES"   value="/home/Jasmin.John"/>
+      <property name="ESM4_ARCHIVE_ROOT"    value=""/>
+      <property name="MODEL_UPDATES_WH"     value="/home/Bill.Hurlin"/>
+
 
       <csh><![CDATA[
         source $MODULESHOME/init/csh
@@ -1587,7 +1614,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
 
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
           git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
-          (cd ocean_shared && git checkout origin/user/nnz/verona_dev_merge)
+          (cd ocean_shared && git checkout $(MOM6_GIT_TAG))
 
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
@@ -1604,6 +1631,8 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
           if ($status != 0) then
             echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
           endif
+ 
+ 
         ]]></csh>
       </source>
       <compile>
@@ -1619,6 +1648,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
        </source>
        <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+            <makeOverrides>OPENMP=""</makeOverrides> <!-- SIS2 does not compile with -openmp in dev/master/2016.10.14-->
        </compile>
     </component>
 
@@ -1752,7 +1782,24 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
       </dataFile>
     </input>
   </freInclude>
-
+  <freInclude name="c96_LM4_Op5">
+    <input>
+      <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_c96.720x576.tar</dataSource>
+      </dataFile>
+     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fre/tikal/LM3/LM3p2_C96_CM2G_historical_HC1_quick/ncrc2.default-prod/static_veg/19810101.static_veg.lm3p2.remapped_to_c96_OM4_05_720x576.v20151120.tar</dataSource>
+        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/awg/mdt/awg/input/lm3/19810101.static_veg.lm3p2.remapped_to_c96_OM4_05_720x576.v20151120.tar</dataSource>
+        <dataSource site="olcf"></dataSource>
+       </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/river_data_hydrography.c96_OM4_05-v20151028_20160628.tar</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$CPERM/Huan.Guo/INPUT/drag/c96_topo_rough_land.nc.tar</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
 
   <freInclude name="common_AM4">
     <input>
@@ -2136,27 +2183,6 @@ $baseDate
     </input>
   </freInclude>
 
-  <freInclude name="c96_data_lm3p2_Op5grid">
-    <input>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fre/tikal/LM3/LM3p2_C96_CM2G_historical_HC1_quick/ncrc2.default-prod/static_veg/19810101.static_veg.lm3p2.remapped_to_c96_OM4_05_720x576.v20151120.tar</dataSource>
-        <dataSource site="theia"></dataSource>
-        <dataSource site="olcf"></dataSource>
-       </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <!--dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/c96_OM4_05_hydrography.tar</dataSource-->
-        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/river_data_hydrography.c96_OM4_05-v20151028_20160628.tar</dataSource>
-      </dataFile>
-      <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_c96.720x576.tar</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(MIZ_ARCHIVE_ROOT)/awgmiz/mg_drag.nc.tar</dataSource>
-      </dataFile>
-    </input>
-  </freInclude>
-
-
   <freInclude name="common_init_csh_blocks">
     <input>
       <csh type="always"><![CDATA[
@@ -2307,11 +2333,9 @@ set nyblocks = $dummy
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos8xDailyTS/*)">
             <xi:fallback/>
           </xi:include>
-<!-- MDBI, this switch must be on to trigger "fredb" automatically -->
+          <!-- MDBIswitch must be on to trigger "fredb" automatically -->
           <analysis switch="$(MDBIswitch)" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
-<!-- /MDBI -->
         </timeSeries>
-<!--        <timeSeries freq="hourly" source="atmos_hourly" chunkLength="$(PP_CPLD_CHUNK_A)"/> not in diag_table-->
 
         <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos4xDailyTS/*)">
@@ -3114,6 +3138,33 @@ endif
 
   </experiment>
 
+  <experiment name="CM4_g11r11_160526_MLE30d_ePBLm" inherit="CM4_c96L32_am4g11r11_2010">
+    <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.2
+#override WSTAR_USTAR_COEF = 1.0
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override USE_MLD_ITERATION = True
+#override EPBL_TRANSITION_SCALE = 0.1
+#override EPBL_IS_ADDITIVE = False
+#override PRANDTL_TURB = 1.25
+MOM_OVERRIDE_EOF
+
+     ]]></csh>
+
+    </input>
+  </experiment>
+
   <experiment name="CM4_c96L32_am4g11r11_2010_OMp5.$(MOM6_DATE)" inherit="CM4_c96L32_am4g11r11_2010_OMp5"/>
   <experiment name="CM4_c96L32_am4g11r11_2010_OMp5" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="on">
@@ -3233,7 +3284,7 @@ For more information please refer to the
 
       <!-- Input datasets -->
       <xi:include xpointer="xpointer(//freInclude[@name='common_LM4']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='c96_LM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_LM4_Op5']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_AM4']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_2010_cmip6']/input/node())"/>
@@ -3241,7 +3292,6 @@ For more information please refer to the
       <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='c96_data_lm3p2_Op5grid']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96L32_Op5_initCond']/input/node())"/>
       <!--MOM6 Input datasets-->
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_05grid_data']/input/node())"/>
@@ -3254,7 +3304,7 @@ if ( $currentSeg == 1 ) then
 endif
 #
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
@@ -3262,16 +3312,11 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
-#override KHTR = 300.                                                                
-MEKE_KHTH_FAC = 1.0                                                                  
-VISC_RES_FN_POWER = 100 
-#override DT = 2400
-#override DT_THERM = 10800
-#override DIABATIC_FIRST = False
-#override OCEAN_SURFACE_STAGGER = "C"
-#override TOPO_EDITS_FILE       = ""
 DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
 #override ENERGYSAVEDAYS = 30
+#override KHTR = 300.                                                                
+#override DT = 2400
+#override DT_THERM = 10800
 
 MOM_OVERRIDE_EOF
 
@@ -3295,14 +3340,26 @@ SIS_OVERRIDE_EOF
 
       <regression name="rts">
         <run days="15 16" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
-        <run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
+        <run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O648']/node())"/> </run>
   	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
   	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
       </regression>
 
+      <regression name="restart">
+        <run days="8"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+        <run days="4 4"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+        <run days="12"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+        <run days="6 6"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+      </regression>
+
+      <regression name="restart2">
+        <run days="20"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+        <run days="10 10"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+      </regression>
+
       <regression name="debug">
-          <run days="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1057p5']/node())"/> </run>
-          <run days="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x1_O432']/node())"/> </run>
+          <run days="1"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x1_O216']/node())"/> </run>
+          <run days="1 1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x1_O216']/node())"/> </run>
       </regression>
 
       <regression name="debug2">
@@ -3377,20 +3434,13 @@ SIS_OVERRIDE_EOF
       </namelist>
 
       <csh><![CDATA[
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
 #amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
 if ( $currentSeg == 1 ) then
 \rm -f $work/INPUT/ice_model.res.nc
 endif
 #
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
@@ -3415,9 +3465,375 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override MIN_OCN_INTERTIAL_H = 2.
 
 SIS_OVERRIDE_EOF
-     ]]></csh>
+     ]]></csh> 
 
     </input>
+  </experiment>
+ 
+  <experiment name="CM4_c96L32_am4g11r11_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLh" inherit="CM4_c96L32_am4g11r11_2010_OMp5">
+<description>
+Baoquing's atmosphere #337
+</description>
+    <input>
+      <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 5000000
+            stack_size =0
+      </namelist>
+      <namelist name="fms_io_nml">
+            fms_netcdf_restart=.true.
+            threading_read='multi'
+            max_files_r = 200
+            max_files_w = 200
+         !checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+      </namelist>
+
+      <namelist name="shortwave_driver_nml">
+      do_cmip_diagnostics = .true.,
+      swform = 'esfsw99'
+      solar_dataset_entry = 1860,1,1,0,0,
+      time_varying_solar_constant = .false.,
+      </namelist>
+
+      <namelist name="land_model_nml">
+        layout = $lnd_layout
+        io_layout = $lnd_io_layout
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+        use_coast_rough = .true.,
+        use_coast_topo_rough = .false.,
+        max_coast_frac=0.67
+      </namelist>
+
+     <!--AWG Input datasets -->
+
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p11_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g11r11_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g11r11_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p11_1860climo.nml"/>
+
+      <!-- Input datasets -->
+      <xi:include xpointer="xpointer(//freInclude[@name='common_LM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_LM4_Op5']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_AM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_1860_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>  
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_Op5_initCond']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_05grid_data']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>  
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FROM_FILE = True
+#override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
+#override ENERGYSAVEDAYS = .25
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.1
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override EPBL_IS_ADDITIVE = False
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+SIS_OVERRIDE_EOF
+    ]]></csh>
+
+    </input>
+    
+    <postProcess>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
+    </postProcess>
+
+  </experiment>
+  <experiment name="ESM4_c96L32_am4g11r11_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLh" inherit="CM4_c96L32_am4g11r11_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLh">
+<description>
+Keeping our ocean from ESM4p_c96L32_am4g10r14_1860_obgc_pindco2_OMp5_H5_ndff_mke_MLE30d_ePBLh_E using Baoquing's atmosphere
+#337
+Making the settings for the ESM equivalent to ESM4p_c96L32_am4g10r14_1860_obgc_pindco2_OMp5_H5_ndff_mke_MLE30d_ePBLh_E
+carryover set DT_THERM to 10,800 as in _C.  Changed transmission functionsettings as Jasmin has.
+set land flx to 0 as below
+</description>
+    <input>
+      <namelist name="fms_io_nml">
+        fms_netcdf_restart=.true.
+        threading_read='multi'
+        max_files_r = 800
+        max_files_w = 800
+        !checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+      </namelist>
+
+       <namelist name="fms_nml">
+        clock_grain='ROUTINE'
+        clock_flags='NONE'
+        domains_stack_size = 7000000
+        stack_size =0
+      </namelist>
+      <namelist name="generic_tracer_nml">
+       do_generic_tracer=.true.
+       do_generic_CFC=.false.
+       do_generic_COBALT=.true.
+       do_generic_TOPAZ=.false.
+       force_update_fluxes=.true. !This has to be set for THERMO_SPANS_COUPLING to work
+      </namelist>
+    <namelist name="shortwave_driver_nml">
+      do_cmip_diagnostics = .true.,
+      swform = 'esfsw99'
+      solar_dataset_entry = 1860,1,1,0,0,
+      time_varying_solar_constant = .false.,
+      </namelist>
+
+      <namelist name="radiation_driver_nml">
+       rad_time_step= 10800,
+       rad_package = 'sea_esf',
+       do_clear_sky_pass=.true.,
+       !calc_hemi_integrals = .false.,
+       renormalize_sw_fluxes=.true.,
+       zenith_spec = 'diurnally_varying',
+       using_restart_file = .false.
+       do_conserve_energy = .true.
+       sw_rad_time_step = 3600,
+       use_single_lw_sw_ts = .false.,
+       use_co2_tracer_field = .true.                 ! jgj added
+       treat_sfc_refl_dir_as_dif = .false.           ! jgj added
+      </namelist>
+          <namelist name="diag_manager_nml">
+        max_axes = 400,
+        max_files = 400,
+        max_num_axis_sets = 400,
+        max_input_fields = 1000
+        max_output_fields = 1000
+        mix_snapshot_average_fields=.false.
+        max_field_attributes=4
+        !! conserve_water=.false.         ! jgj check
+      </namelist>
+      <namelist name="land_model_nml">
+        layout = $lnd_layout
+        io_layout = $lnd_io_layout
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+        use_coast_rough = .true.,
+        use_coast_topo_rough = .false.,
+        max_coast_frac=0.67
+      </namelist>
+       <namelist name="radiative_gases_nml">
+      use_co2_10um = .true.
+
+      verbose = 3
+      gas_printout_freq = 240
+
+      time_varying_co2 = .false.,
+      co2_variation_type = 'linear',
+      co2_dataset_entry = 1860,1,1,0,0,
+      co2_specification_type = 'base_and_trend',
+      co2_floor = 100.0E-06,
+      co2_ceiling = 1600.0E-06,
+      co2_data_source = 'predicted'
+
+      time_varying_ch4 = .false.,
+      ch4_variation_type = 'linear'
+      ch4_dataset_entry = 1860,1,1,0,0,
+      ch4_specification_type = 'time_series'
+      ch4_data_source = 'input'
+
+      time_varying_n2o = .false.,
+      n2o_variation_type = 'linear'
+      n2o_dataset_entry = 1860,1,1,0,0,
+      n2o_specification_type = 'time_series'
+      n2o_data_source = 'input'
+
+      time_varying_f11 = .false.,
+      f11_variation_type = 'linear'
+      f11_dataset_entry = 1860,1,1,0,0,
+      f11_specification_type = 'time_series'
+      f11_data_source = 'input'
+
+      time_varying_f12 = .false.,
+      f12_variation_type = 'linear'
+      f12_dataset_entry = 1860,1,1,0,0,
+      f12_specification_type = 'time_series'
+      f12_data_source = 'input'
+
+      time_varying_f113 = .false.,
+      f113_variation_type = 'linear'
+      f113_dataset_entry = 1860,1,1,0,0,
+      f113_specification_type = 'time_series'
+      f113_data_source = 'input'
+
+      time_varying_f22 = .false.,
+      f22_variation_type = 'linear'
+      f22_dataset_entry = 1860,1,1,0,0,
+      f22_specification_type = 'time_series'
+      f22_data_source = 'input'
+
+
+      calc_co2_tfs_on_first_step = .false.,
+      calc_co2_tfs_monthly = .true.,
+      co2_tf_time_displacement = 0.0,                 ! jgj was 360
+
+      calc_ch4_tfs_on_first_step = .true.,            ! jgj was false
+      calc_ch4_tfs_monthly = .false.,                 ! jgj was true
+      ch4_tf_time_displacement = 0.0,                 ! jgj was 360
+
+      calc_n2o_tfs_on_first_step = .true.,            ! jgj was false
+      calc_n2o_tfs_monthly = .false.,                 ! jgj was true
+      n2o_tf_time_displacement = 0.0,                 ! jgj was 360
+ 
+      </namelist>
+      <namelist name="atmos_co2_nml">
+       do_co2_restore = .true.               
+       restore_tscale = 3.1536e7,
+       restore_klimit = 32
+       co2_radiation_override = .true.
+       do_co2_emissions = .false.
+      </namelist>
+       <namelist name="vegn_nml">
+      init_Tv = 288.0
+      rad_to_use = 'two-stream'
+      photosynthesis_to_use = 'leuning'
+      snow_rad_to_use = 'paint-leaves'
+      co2_to_use_for_photosynthesis ='prescribed'
+       co2_for_photosynthesis = 285.5e-6     
+      do_cohort_dynamics   = .TRUE.,
+      do_patch_disturbance = .TRUE.,
+      do_phenology         = .TRUE.,
+      do_biogeography      = .TRUE.,
+      do_seed_transport    = .TRUE.,
+      tau_smooth_ncm = 22.0
+      rav_lit_bwood = 300.
+      </namelist>            
+      <dataTable order="append">
+"LND", "ex_flux_co2",         "", "", "none", 0.0
+"LND", "ex_dfdco2_surf",      "", "", "none", 0.0
+"LND", "ex_dfdco2_atm",       "", "", "none", 0.0
+
+      </dataTable>  
+      <diagTable order="append"> 
+"radiation", "vis_extopdep_vlcno_c",           "vis_exopd_vl_c",  "atmos_month_aer", "all", .true.,"none", 2
+"land",     "fco2"                 ,            "fco2"            "land_month",       "all", .true.,"none", 2
+"land",     "qco2_dvmr"                 ,        "qco2_dvmr"      "land_month",       "all", .true.,"none", 2
+"land",     "Ctot"                 ,             "Ctot"           "land_month",       "all", .true.,"none", 2
+
+      </diagTable> 
+     <!--AWG Input datasets -->
+
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p11_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g11r11_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g11r11_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p11_1860climo.nml"/>
+
+      <!-- Input datasets -->
+      <xi:include xpointer="xpointer(//freInclude[@name='common_LM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_LM4_Op5']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_AM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_1860_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>  
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_Op5_initCond']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_05grid_data']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>  
+      <!--ESM4 initcond-->
+      <xi:include xpointer="xpointer(//freInclude[@name='ESM4_c96L32_Op5_1860_initCond']/input/node())"/>
+      <!--COBALT IC datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OBGC_COBALT_IC_Preind_CO2']/input/node())"/>
+      <!--COBALT BC datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OBGC_COBALT_BC_1860_p5']/input/node())"/>
+
+      <!--COBALT data table -->
+      <xi:include xpointer="xpointer(//freInclude[@name='OBGC_COBALT_1860_data_table']/input/node())"/>
+      <!-- O2 gas exchange data table -->
+      <xi:include xpointer="xpointer(//freInclude[@name='ESM4_o2_gas_exchange_data_table']/input/node())"/>
+      <!-- co2 data table -->
+      <xi:include xpointer="xpointer(//freInclude[@name='ESM4_bgcco2_new1860_radco2_new1860_data_table']/input/node())"/>
+      <!--COBALT diag table-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OBGC_COBALT_diag_table']/input/node())"/>
+      <!--Atmos co2 diag table-->
+      <xi:include xpointer="xpointer(//freInclude[@name='ESM4_atmos_co2_diag_table']/input/node())"/>
+      <!--co2 field table -->
+      <xi:include xpointer="xpointer(//freInclude[@name='ESM4_atmos_co2_1860_field_table']/input/node())"/>
+      <!--COBALT field table-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OBGC_COBALT_Preind_field_table']/input/node())"/>       
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FROM_FILE = FALSE
+#override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
+#override ENERGYSAVEDAYS = .25
+#override KHTR = 500.
+#override DT = 1800
+#override DT_THERM = 10800
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.1
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override EPBL_IS_ADDITIVE = False
+#override USE_generic_tracer = True
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+SIS_OVERRIDE_EOF
+    ]]></csh>
+
+    </input>
+    
+    <postProcess>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='COBALT_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='COBALT_z_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='atmos_co2_postprocess']/postProcess/node())"/>
+    </postProcess>
+
   </experiment>
 
 <!--================================-->
@@ -3553,30 +3969,12 @@ SIS_OVERRIDE_EOF
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/MOM_channels_global_025</dataSource>
       </dataFile>      
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m_575m.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/analysis_vgrid_lev35.v1.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_edits.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_GS_edits.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/All_edits.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/WOA05_pottemp_salt.nc" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/WOA05_ptemp_salt_monthly.nc </dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
@@ -3836,9 +4234,414 @@ make_calving_reproduce=.true.
             ocean_albedo_option = 5
       </namelist>
       <namelist name="ocean_rough_nml">
-            rough_scheme = 'COARE3.5'
+            rough_scheme = 'coare3.5'
       </namelist>
      </input>
+  </freInclude>
+
+  <!-- jgj: ESM4 INPUT DATA -->
+  <freInclude name="ESM4_c96L32_Op5_2000_initCond">
+    <input>
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(ESM4_ARCHIVE_ROOT)/IC/ESM4_c96L32_Op5_2000_initCond.tar</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+  <!--wh 8/9/2016-->
+  <freInclude name="ESM4_c96L32_Op5_1860_initCond">
+    <input>
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(ESM4_ARCHIVE_ROOT)/IC/ESM4_c96L32_Op5_1860_initCondv2.tar</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+    <freInclude name="ESM4_c96L32_Op5_historical+control_initCond">
+    <input>
+      <dataFile label="initCond" target="INPUT/00610101.tar" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/unswept/Bill.Hurlin/ESM4_input/restart_ESM4p_c96L32_am4g10r14_1860_00610101.tar/00610101nocouplerres.tar</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+  <freInclude name="ESM4_1860_mean_forcing_data">
+    <input>
+      <dataFile label="input" target="INPUT/lean_solar_spectral_data.dat" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(ESM4_ARCHIVE_ROOT)/forcings/CMIP5_1856_1866avg_monthly_data_b18_TIM</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/asmsw_data.nc" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/volcano/mean_hist/asmsw_data.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/extsw_data.nc" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/volcano/mean_hist/extsw_data.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/extlw_data.nc" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/volcano/mean_hist/extlw_data.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/omgsw_data.nc" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(LWH_ARCHIVE_ROOT)/cm3/ipcc_ar5/input/volcano/mean_hist/omgsw_data.nc</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+
+  <freInclude name="OBGC_COBALT_IC_Preind_CO2">
+    <input>
+       <!-- IC files -->
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/woa13/woa13_all_n_annual_01.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/woa13/woa13_all_p_annual_01.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/woa13/woa13_all_i_annual_01.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/woa13/woa13_all_o_annual_01.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/glodap/20151013/Alk.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/glodap/20151013/Preind_DIC.nc</dataSource>
+      </dataFile>
+       <dataFile label="input" target="INPUT/init_ocean_cobalt.res.nc" chksum="" size="" timestamp="">
+         <dataSource
+platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds_mumem_htotalbounds.ocean_cobalt.res.nc</dataSource>
+      </dataFile>
+
+     </input>
+  </freInclude>
+
+  <freInclude name="OBGC_COBALT_BC_1990_p5">
+    <input>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(FMS_ESM_ARCHIVE_ROOT)/TOPAZ/deposition_horowitz/depflux_total.mean.1990.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(FMS_ESM_ARCHIVE_ROOT)/TOPAZ/deposition_fan/Soluble_Fe_Flux_PI.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(FMS_ESM_ARCHIVE_ROOT)/TOPAZ/deposition_fan/Mineral_Fe_Flux_PI.nc</dataSource>
+      </dataFile>
+
+      <!-- grid specific -->
+      <dataFile label="input" target="INPUT/news_nutrients.nc" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(ESM4_ARCHIVE_ROOT)/news_nutrients_halfdeg_20151207.nc</dataSource>
+      </dataFile>
+     </input>
+  </freInclude>
+  <freInclude name="OBGC_COBALT_BC_1860_p5">
+    <input>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(FMS_ESM_ARCHIVE_ROOT)/TOPAZ/deposition_horowitz/depflux_total.mean.1860.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(FMS_ESM_ARCHIVE_ROOT)/TOPAZ/deposition_fan/Soluble_Fe_Flux_PI.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(FMS_ESM_ARCHIVE_ROOT)/TOPAZ/deposition_fan/Mineral_Fe_Flux_PI.nc</dataSource>
+      </dataFile>
+
+      <!-- grid specific -->
+      <dataFile label="input" target="INPUT/news_nutrients.nc" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(ESM4_ARCHIVE_ROOT)/news_nutrients_halfdeg_20151207.nc</dataSource>
+      </dataFile>
+     </input>
+  </freInclude>
+  <freInclude name="OBGC_COBALT_1990_data_table">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.COBALT_1990_topaz_fe_20160708</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.COBALT_1990_topaz_fe_20160708</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+  <freInclude name="OBGC_COBALT_1860_data_table">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MODEL_UPDATES_WH)/fre/input/ESM4/data_table.COBALT_1860_topaz_fe_20160809</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.COBALT_1990_topaz_fe_20160708</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+  <freInclude name="ESM4_o2_gas_exchange_data_table">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.o2_20151209</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.o2_20151209</dataSource>
+      </dataFile>
+     </input>
+  </freInclude>
+
+  <freInclude name="ESM4_bgcco2_1850_radco2_2000_data_table">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.bgcco2_1850_radco2_2000_20160610</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.bgcco2_1850_radco2_2000_20160610</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+  <freInclude name="ESM4_bgcco2_1850_radco2_1860_data_table">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MODEL_UPDATES_WH)/fre/input/ESM4/data_table.bgcco2_1850_radco2_1860_20160809</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.bgcco2_1850_radco2_2000_20160610</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+  <freInclude name="ESM4_bgcco2_new1860_radco2_2010_data_table">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MODEL_UPDATES_WH)/fre/input/ESM4/data_table.bgcco2_new1860_radco2_2010_20160819</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.bgcco2_1850_radco2_2000_20160610</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+  <freInclude name="ESM4_bgcco2_new1860_radco2_historical_data_table">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MODEL_UPDATES_WH)/fre/input/ESM4/data_table.bgcco2_new1860_radco2_historical_20160819</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.bgcco2_1850_radco2_2000_20160610</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+  <freInclude name="ESM4_bgcco2_historical_radco2_historical_data_table">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MODEL_UPDATES_WH)/fre/input/ESM4/data_table.bgcco2_historical_radco2_historical_20160819</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.bgcco2_1850_radco2_2000_20160610</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+  <freInclude name="ESM4_bgcco2_new1860_radco2_new1860_data_table">
+    <input>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MODEL_UPDATES_WH)/fre/input/ESM4/data_table.bgcco2_new1860_radco2_new1860_20160819</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/data_table.bgcco2_1850_radco2_2000_20160610</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+  <freInclude name="OBGC_COBALT_diag_table">
+    <input>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/diag_table.COBALT_with_z_20160610</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/diag_table.COBALT_with_z_20160610</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+
+  <!-- Atmos co2 diagnostics: note atmos_month and atmos_scalar already in awg diag table -->
+  <freInclude name="ESM4_atmos_co2_diag_table">
+    <input>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/diag_table.atmos_co2_20160304</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/diag_table.atmos_co2_20160304</dataSource>
+      </dataFile>
+     </input>
+  </freInclude>
+
+  <freInclude name="OBGC_COBALT_Preind_field_table">
+    <input>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.COBALT_init_tracers_latlon_preind_dic_20151209</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.COBALT_init_tracers_latlon_preind_dic_20151209</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+
+  <freInclude name="ESM4_atmos_co2_2000_field_table">
+    <input>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.atmos_co2_2000_20160610</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.atmos_co2_2000_20160610</dataSource>
+      </dataFile>
+     </input>
+  </freInclude>
+  <freInclude name="ESM4_atmos_co2_1860_field_table">
+    <input>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MODEL_UPDATES_WH)/fre/input/ESM4/field_table.atmos_co2_1860_20160809</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.atmos_co2_2000_20160610</dataSource>
+      </dataFile>
+     </input>
+  </freInclude>
+  <freInclude name="ESM4_atmos_co2_historical_field_table">
+    <input>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MODEL_UPDATES_WH)/fre/input/ESM4/field_table.atmos_co2_1860_20160809</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.atmos_co2_2000_20160610</dataSource>
+      </dataFile>
+     </input>
+  </freInclude>
+  <freInclude name="ESM4_atmos_co2_2010_field_table">
+    <input>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MODEL_UPDATES_WH)/fre/input/ESM4/field_table.atmos_co2_2010_20160819</dataSource>
+        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/ESM4/field_table.atmos_co2_2000_20160610</dataSource>
+      </dataFile>
+     </input>
+  </freInclude>
+  <!-- Atmos co2 post-processing: note atmos_level, atmos_month and atmos_scalar already in c96_climo_postprocess -->
+  <freInclude name="atmos_co2_postprocess">
+      <postProcess> 
+      <component type="atmos_level_instant" source="atmos_level_instant" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="annual"  chunkLength="$(PP_CPLD_CHUNK_A)">
+        </timeSeries>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
+        </timeAverage>
+      </component>
+     </postProcess>
+  </freInclude>
+ 
+  <!-- OCEAN BGC post-processing-->
+  <freInclude name="COBALT_postprocess">
+
+      <postProcess> 
+      <!--REFINE DIAG SCRIP -->
+      <!--By default a refineDiag script causes the annual data to be unpacked and saved in /ptmp/$USER-->
+      <!--MOM6_refineDiag.csh is currently empty and is here only to cause the unpack annual history files in /ptmp-->
+            <!-- wh removed the string here, left it in OM4_postprocess per Niki and Jasmin-->
+      <refineDiag script=""/>
+
+      <!--PostProcessing component models-->
+      <component type="ocean_cobalt_1day" start="$(PP_START_YEAR)" source="ocean_cobalt_1day" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" />
+      </component>
+
+      <component type="ocean_cobalt_tracers_month" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_month" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_tracers_year" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_year" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_sfc" start="$(PP_START_YEAR)" source="ocean_cobalt_sfc" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_btm" start="$(PP_START_YEAR)" source="ocean_cobalt_btm" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_phytolim_sfc" start="$(PP_START_YEAR)" source="ocean_cobalt_phytolim_sfc" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_fdet_100" start="$(PP_START_YEAR)" source="ocean_cobalt_fdet_100" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_biomass_100" start="$(PP_START_YEAR)" source="ocean_cobalt_biomass_100" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_prod_100" start="$(PP_START_YEAR)" source="ocean_cobalt_prod_100" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_miscflux_100" start="$(PP_START_YEAR)" source="ocean_cobalt_miscflux_100" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_phyto_diags" start="$(PP_START_YEAR)" source="ocean_cobalt_phyto_diags" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_bact_diags" start="$(PP_START_YEAR)" source="ocean_cobalt_bact_diags" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_zoo_diags" start="$(PP_START_YEAR)" source="ocean_cobalt_zoo_diags" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_misc" start="$(PP_START_YEAR)" source="ocean_cobalt_misc" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+     </postProcess>
+  </freInclude>
+ 
+  <freInclude name="COBALT_z_postprocess">
+
+      <postProcess> 
+      <!--REFINE DIAG SCRIP -->
+      <!--By default a refineDiag script causes the annual data to be unpacked and saved in /ptmp/$USER-->
+      <!--MOM6_refineDiag.csh is currently empty and is here only to cause the unpack annual history files in /ptmp-->
+      <!-- wh removed the string here, left it in OM4_postprocess per Niki and Jasmin-->
+      <refineDiag script=""/>
+
+      <!--PostProcessing component models-->
+<!--
+      <component type="ocean_cobalt_1day_z" start="$(PP_START_YEAR)" source="ocean_cobalt_1day_z" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" />
+      </component>
+-->
+
+      <component type="ocean_cobalt_tracers_month_z" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_month_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_tracers_year_z" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_year_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_phyto_diags_z" start="$(PP_START_YEAR)" source="ocean_cobalt_phyto_diags_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_bact_diags_z" start="$(PP_START_YEAR)" source="ocean_cobalt_bact_diags_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_zoo_diags_z" start="$(PP_START_YEAR)" source="ocean_cobalt_zoo_diags_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_misc_z" start="$(PP_START_YEAR)" source="ocean_cobalt_misc_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+     </postProcess>
   </freInclude>
 
 </experimentSuite>
