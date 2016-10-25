@@ -75,17 +75,17 @@ They reproduce answers provided by AWG:
 
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="verona"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2016.10.14"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2016.10.25"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20160914"/>           <!-- git tag for AWG source code -->
   <property name="ProjectID"    value="MDT"/>                     <!-- database top level -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                   <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
-  <property name="PROD_SIMTIME"     value="60"/>   <!--simulation length in years-->
+  <property name="PROD_SIMTIME"     value="100"/>  <!--simulation length in years-->
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
-  <property name="PP_START_YEAR"  value="1860" />
+  <property name="PP_START_YEAR"    value="1860" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
   <property name="PROD_SEGTIME"     value="04:00:00"/><!--Wall clock per segment (usually 1 year)-->
 
@@ -1443,7 +1443,6 @@ limit coredumpsize unlimited
         <archive>$ARCHIVE/$(stem)/$(name)/$(platform)-$(target)</archive>
         <postProcess>$(archiveDir)/pp</postProcess>
         <analysis>$(NB_ROOT)</analysis><!--Do not change this! frepp translates this to $out_dir. This is also the directory under which  frepp looks for mom6 clone.  -->
-	<ptmp>/ptmp/$USER</ptmp>
       </directory>
       <property name="EXEC_ROOT"         value="$(rootDir)"/>
       <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML"/>
@@ -3162,6 +3161,211 @@ MOM_OVERRIDE_EOF
 
      ]]></csh>
 
+    </input>
+  </experiment>
+  
+  <experiment name="CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn" inherit="CM4_c96L32_am4g11r11_2010">
+    <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+MSTAR = 1.0328
+TKE_DECAY = 5.5
+N2_DISSIPATION_NEG = 1.0
+N2_DISSIPATION_POS = 0.4
+NSTAR = 0.2
+ML_OMEGA_FRAC = 0.0
+USE_MLD_ITERATION = True
+EPBL_IS_ADDITIVE = False
+WSTAR_USTAR_COEF = 1.0
+VSTAR_SCALE_FAC = 1.0
+#override PRANDTL_TURB = 1.25
+
+MOM_OVERRIDE_EOF
+
+     ]]></csh>
+    </input>
+  </experiment>
+
+  <experiment name="CM4_c96L32_am4g11r11_1860" inherit="CM4_c96L32_am4g11r11_2010">
+    <input>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1,1,1,0,0,0,
+        calendar = 'NOLEAP'
+        dt_atmos = 1800,
+        dt_cpld  = 1800,
+        use_lag_fluxes = .true.
+        concurrent = .true.
+        do_ocean = .true.
+        ocean_npes = $ocn_ranks  
+        atmos_npes = $atm_ranks 
+        atmos_nthreads = $atm_threads
+      </namelist>
+      <namelist name="flux_exchange_nml">
+            nblocks=$atm_threads
+            debug_stocks = .FALSE.
+            divert_stocks_report = .TRUE.
+            do_area_weighted_flux = .FALSE.
+      </namelist>
+      <namelist name="fms_io_nml">
+            fms_netcdf_restart=.true.
+            threading_read='multi'
+            max_files_r = 200
+            max_files_w = 200
+         !checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+      </namelist>
+      <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 5000000
+            stack_size =0
+      </namelist>
+      <namelist name="xgrid_nml">
+        make_exchange_reproduce = .true.
+        interp_method = 'second_order'
+      </namelist>
+
+      <namelist name="atmos_model_nml">
+         nxblocks = 1
+         nyblocks = $atm_threads
+      </namelist>
+      <namelist name="fv_core_nml">
+        layout = $atm_layout
+        io_layout = $atm_io_layout
+        npx      = 97,
+        npy      = 97,
+        ntiles   = 6,
+        npz      = 32,
+        k_split  = 1,
+        n_split  = 12,
+        a2b_ord  = 4,
+        adjust_dry_mass = $adjust_dry_mass,
+        adj_mass_vmr    = .true.
+        consv_te = 0.7,
+        fill = .true.
+        print_freq = 0,
+        grid_type = 0,
+        nord = 2,
+        dddmp = 0.0,
+        d2_bg = 0.0,
+        d4_bg = 0.15,
+        tau = 0.      
+        z_tracer=.false.
+        kord_tm = -10
+        kord_mt =  10
+        kord_tr =  10
+        hord_mt =  10
+        hord_vt = -10
+        hord_tm = -10
+        hord_dp = -10
+        hord_tr = -8
+        do_uni_zfull = .true.
+        consv_am = .true.
+      </namelist>
+      <namelist name="land_model_nml">
+        layout = $lnd_layout
+        io_layout = $lnd_io_layout
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+	min_frac = 1e-8
+      </namelist>
+
+         <namelist name="diag_manager_nml">
+       max_axes = 200,
+       max_files = 200,
+       max_num_axis_sets = 200,
+       max_input_fields = 1000
+       max_output_fields = 1000
+       mix_snapshot_average_fields=.false.
+       max_field_attributes=4
+         </namelist>
+
+      <!--Note from Ming:
+	  We want to have 1850 runs eventually, but we do not have all the datasets yet.
+	  However we already have the 1850 dataset for solar so we are going to use 1850 for solar_dataset_entry-->
+      <namelist name="shortwave_driver_nml">
+      do_cmip_diagnostics = .true.,
+      swform = 'esfsw99'
+      solar_dataset_entry = 1850,1,1,0,0, 
+      time_varying_solar_constant = .false.,
+      </namelist>
+
+      <namelist name="vegn_nml">
+      init_Tv = 288.0
+      rad_to_use = 'two-stream'
+      photosynthesis_to_use = 'leuning'
+      snow_rad_to_use = 'paint-leaves'
+      co2_to_use_for_photosynthesis ='prescribed'
+      co2_for_photosynthesis = 284.65e-6
+      do_cohort_dynamics   = .TRUE.,              
+      do_patch_disturbance = .TRUE.,              
+      do_phenology         = .TRUE.,              
+      do_biogeography      = .TRUE.,              
+      do_seed_transport    = .TRUE.,
+      tau_smooth_ncm = 22.0
+      rav_lit_bwood = 300.
+      </namelist>
+
+     <!--AWG Input datasets -->
+
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p11_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g11r11_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g11r11_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p11_1860climo.nml"/>
+
+      <!-- Input datasets -->
+      <xi:include xpointer="xpointer(//freInclude[@name='common_LM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_LM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_AM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_1860_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>  
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_grid']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_aero_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
+
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_data']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
+
+    </input>
+  </experiment>
+
+  <experiment name="CM4_c96L32_g11r11_160526_1860_MLE30d_ePBLn" inherit="CM4_c96L32_am4g11r11_1860">
+    <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+MSTAR = 1.0328
+TKE_DECAY = 5.5
+N2_DISSIPATION_NEG = 1.0
+N2_DISSIPATION_POS = 0.4
+NSTAR = 0.2
+ML_OMEGA_FRAC = 0.0
+USE_MLD_ITERATION = True
+EPBL_IS_ADDITIVE = False
+WSTAR_USTAR_COEF = 1.0
+VSTAR_SCALE_FAC = 1.0
+#override PRANDTL_TURB = 1.25
+
+MOM_OVERRIDE_EOF
+
+     ]]></csh>
     </input>
   </experiment>
 
