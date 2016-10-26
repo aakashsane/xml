@@ -45,16 +45,16 @@ fremake -x CM4_am4p11.xml -p ncrc3.intel15 -t prod-openmp cm4_compile
 SIS2:
 fremake -x CM4_am4p11.xml -p ncrc3.intel15 -t prod-openmp cm4_sis2_compile
 
-# To run regression test (for the coupled experiment CM4_c96L32_am4g9_2000_lowmix ): 
+# To run regression test (for the coupled experiment CM4_c96L32_am4g11r11_2010 ): 
 
-frerun -r basic -x CM4_am4p11.xml -p ncrc3.intel15 -t prod-openmp CM4_c96L32_am4g9_2000_lowmix
+frerun -r basic -x CM4_am4p11.xml -p ncrc3.intel15 -t prod-openmp CM4_c96L32_am4g11r11_2010
 
 # To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
 
-frerun -x CM4_am4p11.xml -p ncrc3.intel15 -t prod-openmp CM4_c96L32_am4g9_2000_lowmix
+frerun -x CM4_am4p11.xml -p ncrc3.intel15 -t prod-openmp CM4_c96L32_am4g11r11_2010
 
 # To check what is the input data of this experiment:
-inputfiles -x CM4_am4p11.xml -p ncrc3.intel15 CM4_c96L32_am4g9_2000_lowmix
+inputfiles -x CM4_am4p11.xml -p ncrc3.intel15 CM4_c96L32_am4g11r11_2010
 
 NOTES:
       If the experiment name + FRESTEM is too long the post-process initiated on gaea may fail.
@@ -63,25 +63,21 @@ NOTES:
       1. the refine diag list
       2. the contents of the <csh> section of the gfdl platform
       
-NOTE:
-The AMIP experiments in this xml are derived from and identical to the ones in awg.xml 
-They reproduce answers provided by AWG:
-/lustre/f1/unswept/Niki.Zadeh/ulm_201505_awg_v20151106_awg_answers/c96L32_am4g9/ncrc3.intel15-prod-openmp/archive/
-1x0m8d_216x2a/19800109.tar
-
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"      value="verona"/>              <!-- Release tag for the shared source code -->
+  <property name="RELEASE"      value="verona"/>                  <!-- Release tag for the shared source code -->
   <property name="MOM6_DATE"    value="2016.10.25"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20160914"/>           <!-- git tag for AWG source code -->
-  <property name="ProjectID"    value="MDT"/>                     <!-- database top level -->
+  
+  <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
+  <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
-                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
+                                                                 <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
   <property name="PROD_SIMTIME"     value="100"/>  <!--simulation length in years-->
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
@@ -92,14 +88,15 @@ They reproduce answers provided by AWG:
   <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->   
   <property name="EXP_CPLD_START"   value="0001"/> <!--simulation start year--> 
-  <property name="EXP_CPLD_END"     value="0060"/> <!--simulation end   year--> 
+  <property name="EXP_CPLD_END"     value="0100"/> <!--simulation end   year--> 
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
 
-  <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6_$(MOM6_DATE)"/> <!--"$(RELEASE)_$(AWG_GIT_TAG)_mom6_$(MOM6_DATE)"  customize as needed -->
-  <property name="FRE_VERSION" value="bronx-11"/>             <!-- fre version to be used -->
-  <property name="ANALYSIS_SWITCH" value="on"/>                  <!-- on/off switch for ATM/LND analysis -->
-  <property name="MDBIswitch" value="on"/>                       <!-- on/off switch for MDBI database -->
+  <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="FRE_VERSION"     value="bronx-11"/> <!-- fre version to be used -->
+  <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
+  <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
+  <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
 
  
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
@@ -119,24 +116,6 @@ They reproduce answers provided by AWG:
   <property name="MIZ_ARCHIVE_ROOT_GAEA" value="$CPERM/Ming.Zhao/archive/mdt"/>
   <property name="MIZ_ARCHIVE_ROOT_GFDL" value="/archive/miz/mdt/"/>
 
-<!--=================-->
-<!--= CHANGING NPES =-->
-<!--=================-->
-
-<!--
-This xml includes a number of predefined options for the number of PEs.
-Changing the number of PEs can be accomplished by 
-modifying 'npes' and segment 'runTime' in the xml <production> block:
-
-      <production simTime="$(EXP_AMIP_LEN)" units="years" npes="1728" runTime="16:00:00">
-        <segment simTime="12" units="months" runTime="3:00:00"/>
-      </production>
-
-Choosing a particular PE number is a balancing act. The higher npes, 
-the faster the model throughput, but also the lower the model efficiency
-(i.e. the overall simulation will cost more in terms of core hours).
-    
--->
 
    <!--AMIP configurations-->
    <freInclude name="resourceparams_A216x1">
@@ -1071,8 +1050,7 @@ the faster the model throughput, but also the lower the model efficiency
     <platform name="ncrc4.intel16">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="16.0.3.210" />
-<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_f</project>
+      <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
         <root>$CPERM/$USER/$(FRE_STEM)</root>
@@ -1113,8 +1091,7 @@ module use -a /usw/eslogin/modulefiles-c3
     <platform name="ncrc3.intel15">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="15.0.2.164" />
-<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_f</project>
+      <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
         <root>$CPERM/$USER/$(FRE_STEM)</root>
@@ -1154,8 +1131,7 @@ module load nco/4.5.2
     <platform name="ncrc3.intel16">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="16.0.3.210" />
-<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
         <root>$CPERM/$USER/$(FRE_STEM)</root>
@@ -1196,8 +1172,7 @@ module load nco/4.5.2
     <platform name="ncrc3.intel14">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="14.0.2.144" />
-<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
         <root>$CPERM/$USER/$(FRE_STEM)</root>
@@ -1237,8 +1212,7 @@ module load nco/4.5.2
     <platform name="ncrc3.pgi15">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="pgi" version="15.3.0" />
-<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-      <project>gfdl_YOURGROUPLETTER</project>
+      <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
         <root>$CPERM/$USER/$(FRE_STEM)</root>
@@ -1613,6 +1587,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
 
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
           git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
+          (cd ocean_shared && git checkout dev/master)
           (cd ocean_shared && git checkout $(MOM6_GIT_TAG))
 
           pushd mom6
@@ -1647,7 +1622,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
        </source>
        <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-            <makeOverrides>OPENMP=""</makeOverrides> <!-- SIS2 does not compile with -openmp in dev/master/2016.10.14-->
+            <!--<makeOverrides>OPENMP=""</makeOverrides>--> <!-- SIS2 does not compile with -openmp in dev/master/2016.10.14-->
        </compile>
     </component>
 
@@ -3369,6 +3344,204 @@ MOM_OVERRIDE_EOF
     </input>
   </experiment>
 
+  <experiment name="CM4_c96L32_g11r14b_160526_1860_MLE30d_ePBLn" inherit="CM4_c96L32_am4g11r11_1860">
+    <input>
+
+      <namelist name="shortwave_driver_nml">
+      do_cmip_diagnostics = .true.,
+      swform = 'esfsw99'
+      solar_dataset_entry = 1850,1,1,0,0,
+      time_varying_solar_constant = .false.,
+      </namelist>
+
+      <namelist name="deep_conv_nml">
+        crh_th_ocean = 0.4
+        crh_th_land  = 0.4
+        auto_th0_d = 0.2e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 8.0e-5
+        peff_i_d   = 11.e-5
+        rkm_dp1 = 0.5
+        rkm_dp2 = 0.05
+	norder  = 1
+        crh_max = 1.0
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 10
+        do_ppen_d  = .true.
+        rpen_d     = 2.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.85
+        hcevappbl_d = 0.95
+        pblfac_d   = 1.0
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 1.0
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+        include_emf_d = .false.
+      </namelist>
+
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.3,
+        Ashear        = 25.0, 
+        beta_surf     = 0.23,
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+      </namelist>
+
+      <namelist name="land_model_nml">
+        layout = $lnd_layout
+        io_layout = $lnd_io_layout
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+	min_frac = 1e-8	
+      </namelist>
+
+      <namelist name="monin_obukhov_nml">
+	stable_option = 2,
+        rich_crit = 10.0,
+        zeta_trans = 0.5
+      </namelist>
+
+      <namelist name="ocean_rough_nml">
+        rough_scheme = 'coare3.5'
+        roughness_min = 1.e-4
+      </namelist>
+
+      <namelist name="strat_cloud_nml">
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 10.0,
+        Dmin = 1.0e-07,
+        n_land = 300.e6,
+        n_ocean = 100.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 1.e-6,
+        eros_choice = .true.,
+        eros_scale_c = 4.e-5,
+        eros_scale_t = 6.e-5,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.0
+        U_evap_snow = 1.0
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 1.0
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
+        aerosol_activation_scheme = "total"
+      </namelist>
+
+      <namelist name="uw_conv_nml">
+        use_online_aerosol = .true.,
+        rkm_sh1         = 7.0,
+        rkm_sh          = 3.0,
+        do_deep         = .true.,
+        idpchoice       = 2
+        do_rescale      = .true.
+        do_rescale_t    = .true.
+        do_varying_rpen  = .false.
+        use_sub_seasalt = .false.
+        use_new_let     = .true.
+        do_new_subflx   = .true.
+        do_new_pevap    = .false.
+        plev_cin        = 60000.
+        plev_for        = 60000.
+        src_choice      = 1
+        wrel_min        = 1.
+        do_stime        = .false.
+        duration        = 10800
+        do_prog_gust    = .true.
+        tau_gust        = 7200
+        geff            = 1.0
+        cgust0          = 2.
+        cgust_max       = 4.
+        tracer_check_type = 2
+        stop_at_let     = .true.
+        do_hlflx_zero   = .true.
+        do_peff_land    = .false.
+        lofactor0       = 0.5
+        cldhgt_max_shallow = 3000.
+        do_umf_pbl      = .true.
+        do_new_convcld  = .true.
+        do_minmse       = .true.
+        do_uwcmt        = .false.
+        use_hlqtsrc_avg  = .false.
+        use_capecin_avg  = .false.
+        use_pblhttke_avg = .false.
+        reproduce_old_version = .false.
+      </namelist>
+
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.2e-3,
+        tcrit    = -25.15,
+        peff_l   = 8.0e-5
+        peff_i   = 11.e-5
+        frac_drs = 0.0
+        rpen     = 2.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 10
+	scaleh0  = 1000.
+        beta = 0.1
+        rkm_max = 15
+        mp_choice = 2
+        do_pevap = .true.
+        do_new_pblfac = .true.
+        include_emf_s = .false.
+        cfrac    = 0.15
+        hcevap   = 0.85
+        hcevappbl = 0.95
+        pblfac   = 1.0
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+        bigc = 0.0
+      </namelist>
+      
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+MSTAR = 1.0328
+TKE_DECAY = 5.5
+N2_DISSIPATION_NEG = 1.0
+N2_DISSIPATION_POS = 0.4
+NSTAR = 0.2
+ML_OMEGA_FRAC = 0.0
+USE_MLD_ITERATION = True
+EPBL_IS_ADDITIVE = False
+WSTAR_USTAR_COEF = 1.0
+VSTAR_SCALE_FAC = 1.0
+#override PRANDTL_TURB = 1.25
+
+MOM_OVERRIDE_EOF
+
+     ]]></csh>
+    </input>
+  </experiment>
+  
   <experiment name="CM4_c96L32_am4g11r11_2010_OMp5.$(MOM6_DATE)" inherit="CM4_c96L32_am4g11r11_2010_OMp5"/>
   <experiment name="CM4_c96L32_am4g11r11_2010_OMp5" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="on">
@@ -3769,13 +3942,556 @@ SIS_OVERRIDE_EOF
     ]]></csh>
 
     </input>
-    
-    <postProcess>
-      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
-    </postProcess>
 
   </experiment>
+
+
+  <experiment name="CM4_c96L32_am4g11r14b_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLn" inherit="CM4_c96L32_am4g11r11_2010_OMp5">
+<description>
+Ming's atmosphere #387 + ePBLn ocean
+</description>
+    <input>
+      <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 5000000
+            stack_size =0
+      </namelist>
+      <namelist name="fms_io_nml">
+            fms_netcdf_restart=.true.
+            threading_read='multi'
+            max_files_r = 200
+            max_files_w = 200
+         !checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+      </namelist>
+
+      <namelist name="shortwave_driver_nml">
+      do_cmip_diagnostics = .true.,
+      swform = 'esfsw99'
+      solar_dataset_entry = 1850,1,1,0,0,
+      time_varying_solar_constant = .false.,
+      </namelist>
+
+      <namelist name="deep_conv_nml">
+        crh_th_ocean = 0.4
+        crh_th_land  = 0.4
+        auto_th0_d = 0.2e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 8.0e-5
+        peff_i_d   = 11.e-5
+        rkm_dp1 = 0.5
+        rkm_dp2 = 0.05
+	norder  = 1
+        crh_max = 1.0
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 10
+        do_ppen_d  = .true.
+        rpen_d     = 2.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.85
+        hcevappbl_d = 0.95
+        pblfac_d   = 1.0
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 1.0
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+        include_emf_d = .false.
+      </namelist>
+
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.3,
+        Ashear        = 25.0, 
+        beta_surf     = 0.23,
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+      </namelist>
+
+      <namelist name="land_model_nml">
+        layout = $lnd_layout
+        io_layout = $lnd_io_layout
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+	min_frac = 1e-8	
+      </namelist>
+
+      <namelist name="monin_obukhov_nml">
+	stable_option = 2,
+        rich_crit = 10.0,
+        zeta_trans = 0.5
+      </namelist>
+
+      <namelist name="ocean_rough_nml">
+        rough_scheme = 'coare3.5'
+        roughness_min = 1.e-4
+      </namelist>
+
+      <namelist name="strat_cloud_nml">
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 10.0,
+        Dmin = 1.0e-07,
+        n_land = 300.e6,
+        n_ocean = 100.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 1.e-6,
+        eros_choice = .true.,
+        eros_scale_c = 4.e-5,
+        eros_scale_t = 6.e-5,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.0
+        U_evap_snow = 1.0
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 1.0
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
+        aerosol_activation_scheme = "total"
+      </namelist>
+
+      <namelist name="uw_conv_nml">
+        use_online_aerosol = .true.,
+        rkm_sh1         = 7.0,
+        rkm_sh          = 3.0,
+        do_deep         = .true.,
+        idpchoice       = 2
+        do_rescale      = .true.
+        do_rescale_t    = .true.
+        do_varying_rpen  = .false.
+        use_sub_seasalt = .false.
+        use_new_let     = .true.
+        do_new_subflx   = .true.
+        do_new_pevap    = .false.
+        plev_cin        = 60000.
+        plev_for        = 60000.
+        src_choice      = 1
+        wrel_min        = 1.
+        do_stime        = .false.
+        duration        = 10800
+        do_prog_gust    = .true.
+        tau_gust        = 7200
+        geff            = 1.0
+        cgust0          = 2.
+        cgust_max       = 4.
+        tracer_check_type = 2
+        stop_at_let     = .true.
+        do_hlflx_zero   = .true.
+        do_peff_land    = .false.
+        lofactor0       = 0.5
+        cldhgt_max_shallow = 3000.
+        do_umf_pbl      = .true.
+        do_new_convcld  = .true.
+        do_minmse       = .true.
+        do_uwcmt        = .false.
+        use_hlqtsrc_avg  = .false.
+        use_capecin_avg  = .false.
+        use_pblhttke_avg = .false.
+        reproduce_old_version = .false.
+      </namelist>
+
+
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.2e-3,
+        tcrit    = -25.15,
+        peff_l   = 8.0e-5
+        peff_i   = 11.e-5
+        frac_drs = 0.0
+        rpen     = 2.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 10
+	scaleh0  = 1000.
+        beta = 0.1
+        rkm_max = 15
+        mp_choice = 2
+        do_pevap = .true.
+        do_new_pblfac = .true.
+        include_emf_s = .false.
+        cfrac    = 0.15
+        hcevap   = 0.85
+        hcevappbl = 0.95
+        pblfac   = 1.0
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+        bigc = 0.0
+      </namelist>
+
+      
+      <!--AWG Input datasets -->
+
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p11_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g11r11_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g11r11_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p11_1860climo.nml"/>
+
+      <!-- Input datasets -->
+      <xi:include xpointer="xpointer(//freInclude[@name='common_LM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_LM4_Op5']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_AM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_1860_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>  
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_Op5_initCond']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_05grid_data']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>  
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FROM_FILE = True
+#override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
+#override ENERGYSAVEDAYS = .25
+#override DT = 1800
+#override DT_THERM = 10800
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+MSTAR = 1.0328
+TKE_DECAY = 5.5
+N2_DISSIPATION_NEG = 1.0
+N2_DISSIPATION_POS = 0.4
+NSTAR = 0.2
+ML_OMEGA_FRAC = 0.0
+USE_MLD_ITERATION = True
+EPBL_IS_ADDITIVE = False
+WSTAR_USTAR_COEF = 1.0
+VSTAR_SCALE_FAC = 1.0
+#override PRANDTL_TURB = 1.25
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+SIS_OVERRIDE_EOF
+    ]]></csh>
+
+    </input>
+    
+
+  </experiment>
+
+  <experiment name="CM4_c96L32_am4g11r14b_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLh" inherit="CM4_c96L32_am4g11r11_2010_OMp5">
+<description>
+Ming's atmosphere #387
+</description>
+    <input>
+      <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 5000000
+            stack_size =0
+      </namelist>
+      <namelist name="fms_io_nml">
+            fms_netcdf_restart=.true.
+            threading_read='multi'
+            max_files_r = 200
+            max_files_w = 200
+         !checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+      </namelist>
+
+      <namelist name="shortwave_driver_nml">
+      do_cmip_diagnostics = .true.,
+      swform = 'esfsw99'
+      solar_dataset_entry = 1850,1,1,0,0,
+      time_varying_solar_constant = .false.,
+      </namelist>
+
+      <namelist name="deep_conv_nml">
+        crh_th_ocean = 0.4
+        crh_th_land  = 0.4
+        auto_th0_d = 0.2e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 8.0e-5
+        peff_i_d   = 11.e-5
+        rkm_dp1 = 0.5
+        rkm_dp2 = 0.05
+	norder  = 1
+        crh_max = 1.0
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 10
+        do_ppen_d  = .true.
+        rpen_d     = 2.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.85
+        hcevappbl_d = 0.95
+        pblfac_d   = 1.0
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 1.0
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+        include_emf_d = .false.
+      </namelist>
+
+      <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.25,
+        parcel_option = 2,
+        beta_rad      = 0.3,
+        Ashear        = 25.0, 
+        beta_surf     = 0.23,
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+      </namelist>
+
+      <namelist name="land_model_nml">
+        layout = $lnd_layout
+        io_layout = $lnd_io_layout
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+	min_frac = 1e-8	
+      </namelist>
+
+      <namelist name="monin_obukhov_nml">
+	stable_option = 2,
+        rich_crit = 10.0,
+        zeta_trans = 0.5
+      </namelist>
+
+      <namelist name="ocean_rough_nml">
+        rough_scheme = 'coare3.5'
+        roughness_min = 1.e-4
+      </namelist>
+
+      <namelist name="strat_cloud_nml">
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 10.0,
+        Dmin = 1.0e-07,
+        n_land = 300.e6,
+        n_ocean = 100.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 1.e-6,
+        eros_choice = .true.,
+        eros_scale_c = 4.e-5,
+        eros_scale_t = 6.e-5,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.0
+        U_evap_snow = 1.0
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 1.0
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
+        aerosol_activation_scheme = "total"
+      </namelist>
+
+      <namelist name="uw_conv_nml">
+        use_online_aerosol = .true.,
+        rkm_sh1         = 7.0,
+        rkm_sh          = 3.0,
+        do_deep         = .true.,
+        idpchoice       = 2
+        do_rescale      = .true.
+        do_rescale_t    = .true.
+        do_varying_rpen  = .false.
+        use_sub_seasalt = .false.
+        use_new_let     = .true.
+        do_new_subflx   = .true.
+        do_new_pevap    = .false.
+        plev_cin        = 60000.
+        plev_for        = 60000.
+        src_choice      = 1
+        wrel_min        = 1.
+        do_stime        = .false.
+        duration        = 10800
+        do_prog_gust    = .true.
+        tau_gust        = 7200
+        geff            = 1.0
+        cgust0          = 2.
+        cgust_max       = 4.
+        tracer_check_type = 2
+        stop_at_let     = .true.
+        do_hlflx_zero   = .true.
+        do_peff_land    = .false.
+        lofactor0       = 0.5
+        cldhgt_max_shallow = 3000.
+        do_umf_pbl      = .true.
+        do_new_convcld  = .true.
+        do_minmse       = .true.
+        do_uwcmt        = .false.
+        use_hlqtsrc_avg  = .false.
+        use_capecin_avg  = .false.
+        use_pblhttke_avg = .false.
+        reproduce_old_version = .false.
+      </namelist>
+
+
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.2e-3,
+        tcrit    = -25.15,
+        peff_l   = 8.0e-5
+        peff_i   = 11.e-5
+        frac_drs = 0.0
+        rpen     = 2.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 10
+	scaleh0  = 1000.
+        beta = 0.1
+        rkm_max = 15
+        mp_choice = 2
+        do_pevap = .true.
+        do_new_pblfac = .true.
+        include_emf_s = .false.
+        cfrac    = 0.15
+        hcevap   = 0.85
+        hcevappbl = 0.95
+        pblfac   = 1.0
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+        bigc = 0.0
+      </namelist>
+
+      
+      <!--AWG Input datasets -->
+
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p11_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g11r11_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g11r11_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p11_1860climo.nml"/>
+
+      <!-- Input datasets -->
+      <xi:include xpointer="xpointer(//freInclude[@name='common_LM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_LM4_Op5']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_AM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_1860_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>  
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L32_Op5_initCond']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_05grid_data']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>  
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FROM_FILE = True
+#override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+REMAP_AFTER_INITIALIZATION = False                                                   
+#override REGRIDDING_COORDINATE_MODE = "HYCOM1"                                      
+#override ALE_COORDINATE_CONFIG = "HYBRID:hycom1_75_800m.nc,sigma2,FNC1:2,4000,4.5,.01"
+MAXIMUM_INT_DEPTH_CONFIG = "FNC1:5,8000.0,1.0,.01"                                   
+MAX_LAYER_THICKNESS_CONFIG = "FNC1:400,31000.0,0.1,.01"                              
+REGRID_COMPRESSIBILITY_FRACTION = 0.01                                               
+BOUNDARY_EXTRAPOLATION = True                                                        
+DYNAMIC_SURFACE_PRESSURE = True 
+#override USE_NEUTRAL_DIFFUSION = True                                               
+#override KHTR = 500.
+#override KHTH = 200.                                                                
+KH_RES_FN_POWER = 100                                                                
+MEKE_KHTH_FAC = 1.0                                                                  
+VISC_RES_FN_POWER = 100 
+#override DT = 1800
+#override DT_THERM = 10800
+#override DIABATIC_FIRST = False
+THERMO_SPANS_COUPLING = True
+#override USE_RIVER_HEAT_CONTENT = True
+#override USE_CALVING_HEAT_CONTENT = True
+DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
+#override OCEAN_SURFACE_STAGGER = "C"
+#override TOPO_EDITS_FILE       = ""
+#override ENERGYSAVEDAYS = .25
+#override KD = 2.0E-05 
+#override KDML = 2.0E-05
+#override KD_KAPPA_SHEAR_0 = 2.0E-05
+#override KD_MIN_TR = 2.0E-06
+#override FOX_KEMPER_ML_RESTRAT_COEF = 20.0
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.1
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override EPBL_IS_ADDITIVE = False
+#override MLE_USE_PBL_MLD = True
+#override INT_TIDE_PROFILE = "POLZIN_09"
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+SIS_OVERRIDE_EOF
+    ]]></csh>
+
+    </input>
+    
+
+  </experiment>
+      
+
   <experiment name="ESM4_c96L32_am4g11r11_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLh" inherit="CM4_c96L32_am4g11r11_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLh">
 <description>
 Keeping our ocean from ESM4p_c96L32_am4g10r14_1860_obgc_pindco2_OMp5_H5_ndff_mke_MLE30d_ePBLh_E using Baoquing's atmosphere
