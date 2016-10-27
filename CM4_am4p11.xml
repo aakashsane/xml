@@ -980,6 +980,14 @@ NOTES:
 	       <ocn ranks="1300"   threads="1"    layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
 	     </resources>
    </freInclude>
+   <freInclude name="resourceparams_A576x2_O1300p5_production"><!--1/2 degree ocean grid Only-->
+	     <resources jobWallclock="16:00:00" segRuntime="3:00:00">
+               <atm ranks="576" threads="2"	    layout = "8,12"   io_layout = "1,4" />
+	       <lnd                            layout = "8,12"   io_layout = "1,4" />
+	       <ice                            layout = "144,4"   io_layout = "1,4" />
+	       <ocn ranks="1300"   threads="1"    layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
+	     </resources>
+   </freInclude>
    <freInclude name="resourceparams_A576x2_O1620">
 	     <resources jobWallclock="01:00:00">
                <atm ranks="576" threads="2"	    layout = "8,12"   io_layout = "1,4" />
@@ -995,6 +1003,22 @@ NOTES:
 	       <ice                            layout = "144,6"   io_layout = "1,3" />
 	       <ocn ranks="1300"   threads="1"    layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
  	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A576x2_O1441p5"><!--1/2 degree ocean grid Only-->
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="576" threads="2"	    layout = "8,12"   io_layout = "1,4" />
+	       <lnd                            layout = "8,12"   io_layout = "1,4" />
+	       <ice                            layout = "144,4"   io_layout = "1,4" />
+	       <ocn ranks="1441"   threads="1"    layout = "36,50"   io_layout = "1,5" mask_table="mask_table.359.36x50"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A576x2_O1441p5_production"><!--1/2 degree ocean grid Only-->
+             <resources jobWallclock="16:00:00" segRuntime="3:00:00">
+               <atm ranks="576" threads="2"	    layout = "8,12"   io_layout = "1,4" />
+	       <lnd                            layout = "8,12"   io_layout = "1,4" />
+	       <ice                            layout = "144,4"   io_layout = "1,4" />
+	       <ocn ranks="1441"   threads="1"    layout = "36,50"   io_layout = "1,5" mask_table="mask_table.359.36x50"/>
+	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A864x2_O1441p5"><!--1/2 degree ocean grid Only-->
 	     <resources jobWallclock="01:00:00">
@@ -3798,16 +3822,13 @@ SIS_OVERRIDE_EOF
 
   </experiment>
 
-  <experiment name="CM4_c96L32_am4g11r11_2010_OMp5_H5_ndiff_meke_MLE30d_ePBLe" inherit="CM4_c96L32_am4g11r11_2010_OMp5">
+  <experiment name="CM4_c96L32_am4g11r11_2010_OMp5_H5_ndiff_meke_MLE30d_ePBLe_2" inherit="CM4_c96L32_am4g11r11_2010_OMp5">
     <input>
       <namelist name="land_model_nml">
         layout = $lnd_layout
         io_layout = $lnd_io_layout
         tau_snow_T_adj = 604800.
         prohibit_negative_canopy_water=.false.
-        use_coast_rough = .true.,
-        use_coast_topo_rough = .false.,
-        max_coast_frac=0.67
       </namelist>
 
       <csh><![CDATA[
@@ -3847,7 +3868,7 @@ SIS_OVERRIDE_EOF
     </input>
   </experiment>
  
-  <experiment name="CM4_c96L32_am4g11r11_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLh" inherit="CM4_c96L32_am4g11r11_2010_OMp5">
+  <experiment name="CM4_c96L32_am4g11r11_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLh_2" inherit="CM4_c96L32_am4g11r11_2010_OMp5">
 <description>
 Baoquing's atmosphere #337
 </description>
@@ -3878,9 +3899,6 @@ Baoquing's atmosphere #337
         io_layout = $lnd_io_layout
         tau_snow_T_adj = 604800.
         prohibit_negative_canopy_water=.false.
-        use_coast_rough = .true.,
-        use_coast_topo_rough = .false.,
-        max_coast_frac=0.67
       </namelist>
 
      <!--AWG Input datasets -->
@@ -4492,13 +4510,14 @@ SIS_OVERRIDE_EOF
   </experiment>
       
 
-  <experiment name="ESM4_c96L32_am4g11r11_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLh" inherit="CM4_c96L32_am4g11r11_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLh">
+  <experiment name="ESM4_c96L32_am4g11r11_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLh_2" inherit="CM4_c96L32_am4g11r11_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLh_2">
 <description>
 Keeping our ocean from ESM4p_c96L32_am4g10r14_1860_obgc_pindco2_OMp5_H5_ndff_mke_MLE30d_ePBLh_E using Baoquing's atmosphere
 #337
 Making the settings for the ESM equivalent to ESM4p_c96L32_am4g10r14_1860_obgc_pindco2_OMp5_H5_ndff_mke_MLE30d_ePBLh_E
 carryover set DT_THERM to 10,800 as in _C.  Changed transmission functionsettings as Jasmin has.
 set land flx to 0 as below
+Reverting back to land defaults for coastal roughness, use_coast_topo_rough = .true., use_coast_topo_rough = .false.
 </description>
     <input>
       <namelist name="fms_io_nml">
@@ -4558,9 +4577,6 @@ set land flx to 0 as below
         io_layout = $lnd_io_layout
         tau_snow_T_adj = 604800.
         prohibit_negative_canopy_water=.false.
-        use_coast_rough = .true.,
-        use_coast_topo_rough = .false.,
-        max_coast_frac=0.67
       </namelist>
        <namelist name="radiative_gases_nml">
       use_co2_10um = .true.
@@ -4754,6 +4770,27 @@ SIS_OVERRIDE_EOF
       <xi:include xpointer="xpointer(//freInclude[@name='atmos_co2_postprocess']/postProcess/node())"/>
     </postProcess>
 
+    <runtime>
+      <production simTime="$(PROD_SIMTIME)" units="years">
+          <segment simTime="12" units="months"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5_production']/node())"/>
+      </production>
+      <regression name="basic">
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5']/node())"/> </run>
+      </regression>
+
+      <regression name="rts">
+        <run days="15 16" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5']/node())"/> </run>
+        <run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O648']/node())"/> </run>
+  	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+  	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
+      </regression>
+      <regression name="timing">
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1441p5']/node())"/> </run>
+      </regression>
+
+      <reference restart="$(REFERENCE)/archive/1x1m0d_216x2a_842x1o/restart/00010201.tar"/>
+    </runtime>
   </experiment>
 
 <!--================================-->
