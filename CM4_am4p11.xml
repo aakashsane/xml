@@ -4035,6 +4035,61 @@ SIS_OVERRIDE_EOF
   </experiment>
 
 
+  <experiment name="CM4_c96L32_am4g11r11_2010_OMp5_H5_ndiff_meke_MLE30d_ePBLn" inherit="CM4_c96L32_am4g11r11_2010_OMp5">
+    <input>
+      <namelist name="land_model_nml">
+        layout = $lnd_layout
+        io_layout = $lnd_io_layout
+        tau_snow_T_adj = 604800.
+        prohibit_negative_canopy_water=.false.
+      </namelist>
+
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FROM_FILE = True
+#override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
+#override ENERGYSAVEDAYS = .25
+#override DT = 1800
+#override DT_THERM = 10800
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+MSTAR = 1.0328
+TKE_DECAY = 5.5
+N2_DISSIPATION_NEG = 1.0
+N2_DISSIPATION_POS = 0.4
+NSTAR = 0.2
+ML_OMEGA_FRAC = 0.0
+USE_MLD_ITERATION = True
+EPBL_IS_ADDITIVE = False
+WSTAR_USTAR_COEF = 1.0
+VSTAR_SCALE_FAC = 1.0
+#override PRANDTL_TURB = 1.25
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+SIS_OVERRIDE_EOF
+     ]]></csh> 
+
+    </input>
+  </experiment>
   <experiment name="CM4_c96L32_am4g11r14b_1860_OMp5_H5_ndiff_meke_MLE30d_ePBLn" inherit="CM4_c96L32_am4g11r11_2010_OMp5">
 <description>
 Ming's atmosphere #387 + ePBLn ocean
