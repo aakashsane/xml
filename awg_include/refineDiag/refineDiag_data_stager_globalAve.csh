@@ -260,7 +260,13 @@ def dbEntry(db,varName,varSum,varAvg,fYear):
 def areaMean(varName,cellArea,cellFrac,soilFrac,geoLat,geoLon,region='global'):
   moduleDic = getWebsiteVariablesDic()
   var = MV2.concatenate((MV2.array(fdata1(varName)), MV2.array(fdata2(varName)), MV2.array(fdata3(varName)), MV2.array(fdata4(varName)), MV2.array(fdata5(varName)), MV2.array(fdata6(varName))),axis=1)
+  var = MV2.masked_where(MV2.equal(var,fdata1(varName)._FillValue), var)
   var = cdutil.YEAR(var).squeeze()
+
+  cellArea = MV2.masked_where(MV2.equal(var,fdata1(varName)._FillValue), cellArea)
+  cellFrac = MV2.masked_where(MV2.equal(var,fdata1(varName)._FillValue), cellFrac)
+  soilFrac = MV2.masked_where(MV2.equal(var,fdata1(varName)._FillValue), soilFrac)
+
   try:
     module = moduleDic[varName]
   except:
@@ -298,6 +304,11 @@ def areaMean(varName,cellArea,cellFrac,soilFrac,geoLat,geoLon,region='global'):
 
 def areaMean3D(varName,cellArea,cellFrac,cellDepth,soilFrac,geoLat,geoLon,region='global'):
   var = MV2.concatenate((MV2.array(fdata1(varName)), MV2.array(fdata2(varName)), MV2.array(fdata3(varName)), MV2.array(fdata4(varName)), MV2.array(fdata5(varName)), MV2.array(fdata6(varName))),axis=2)
+  var = MV2.masked_where(MV2.equal(var,fdata1(varName)._FillValue),var)
+
+  cellArea = MV2.masked_where(MV2.equal(var[0,0,:],fdata1(varName)._FillValue), cellArea)
+  cellFrac = MV2.masked_where(MV2.equal(var[0,0,:],fdata1(varName)._FillValue), cellFrac)
+  soilFrac = MV2.masked_where(MV2.equal(var[0,0,:],fdata1(varName)._FillValue), soilFrac)
   moduleDic = getWebsiteVariablesDic()
   try:
     module = moduleDic[varName]
