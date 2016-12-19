@@ -67,7 +67,7 @@ NOTES:
 
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="verona"/>                  <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2016.11.10"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2016.12.16"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20160914"/>           <!-- git tag for AWG source code -->
   
@@ -1569,6 +1569,9 @@ limit coredumpsize unlimited
     <platform name="gfdl.ncrc3-intel15">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
+    <platform name="gfdl.ncrc4-intel15c3exec">
+      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
+    </platform>
     <platform name="gfdl.ncrc4-intel16">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
@@ -1601,9 +1604,9 @@ Experiment to build executable.
     </description>
 
     <component name="fms" paths="shared">
-     <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid=""/>
+     <description domainName="infrastructure" communityName="FMS" communityVersion="user/z1l/data_override" communityGrid=""/>
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-            <codeBase version="$(RELEASE)"> shared.git </codeBase>
+            <codeBase version="user/z1l/data_override"> shared.git </codeBase>
       </source>
       <compile>
         <cppDefs>$(F2003_FLAGS) -Duse_libMPI -Duse_netCDF -DMAXFIELDMETHODS_=500</cppDefs>
@@ -2348,20 +2351,12 @@ endif
 #Scan auxiliary_nml for setting MOM6/SIS2 layouts
 
 cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
-#override undef NIPROC_IO
-#override undef NJPROC_IO
-#override undef NIPROC
-#override undef NJPROC
 #override IO_LAYOUT = $ocn_io_layout
 #override LAYOUT    = $ocn_layout
 #override MASKTABLE = $ocn_mask_table
 MOM_LAYOUT_EOF
 
 cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
-#override undef NIPROC_IO
-#override undef NJPROC_IO
-#override undef NIPROC
-#override undef NJPROC
 #override IO_LAYOUT = $ice_io_layout
 #override LAYOUT    = $ice_layout
 SIS_LAYOUT_EOF
@@ -3245,6 +3240,7 @@ endif
 
   </experiment>
 
+  <experiment name="CM4_c96L32_g11r11_160526_2010_baseline" inherit="CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn"/>
   <experiment name="CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn" inherit="CM4_c96L32_am4g11r11_2010">
     <input>
       <csh><![CDATA[
@@ -3255,20 +3251,90 @@ endif
 #
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override MLE_MLD_DECAY_TIME = 2.592E+06
-MSTAR = 1.0328
-TKE_DECAY = 5.5
-N2_DISSIPATION_NEG = 1.0
-N2_DISSIPATION_POS = 0.4
-NSTAR = 0.2
-ML_OMEGA_FRAC = 0.0
-USE_MLD_ITERATION = True
-EPBL_IS_ADDITIVE = False
-WSTAR_USTAR_COEF = 1.0
-VSTAR_SCALE_FAC = 1.0
-#override PRANDTL_TURB = 1.25
-
 MOM_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+  </experiment>
 
+  <experiment name="CM4_c96L32_g11r11_160526_2010_noMLE" inherit="CM4_c96L32_am4g11r11_2010">
+    <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MIXEDLAYER_RESTRAT = False
+MOM_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+  </experiment>
+
+  <experiment name="CM4_c96L32_g11r11_160526_2010_MLE5d" inherit="CM4_c96L32_am4g11r11_2010">
+    <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 4.32E+05
+MOM_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+  </experiment>
+
+  <experiment name="CM4_c96L32_g11r11_160526_2010_MLE5d_FK1" inherit="CM4_c96L32_am4g11r11_2010">
+    <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 4.32E+05
+#override FOX_KEMPER_ML_RESTRAT_COEF = 1.0
+MOM_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+  </experiment>
+
+  <experiment name="CM4_c96L32_g11r11_160526_2010_MLE5d_FKp2" inherit="CM4_c96L32_am4g11r11_2010">
+    <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 4.32E+05
+#override FOX_KEMPER_ML_RESTRAT_COEF = 0.2
+MOM_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+  </experiment>
+
+  <experiment name="CM4_c96L32_g11r11_160526_2010_MLE5d_FKp2_MEKE" inherit="CM4_c96L32_am4g11r11_2010">
+    <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 4.32E+05
+#override FOX_KEMPER_ML_RESTRAT_COEF = 0.2
+KH_RES_FN_POWER = 100
+VISC_RES_FN_POWER = 2
+MEKE_KHTH_FAC=1.
+KHTH_USE_EBT_STRUCT = True
+RESOLN_USE_EBT = True
+MOM_OVERRIDE_EOF
      ]]></csh>
     </input>
   </experiment>
@@ -3660,15 +3726,11 @@ if ( $currentSeg == 1 ) then
 endif
 #
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
-#override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
 #override CHL_FROM_FILE = True
 #override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
-DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
 #override ENERGYSAVEDAYS = 30
 #override KHTR = 300.                                                                
 #override DT = 2400
@@ -3794,15 +3856,11 @@ if ( $currentSeg == 1 ) then
 endif
 #
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
-#override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
 #override CHL_FROM_FILE = True
 #override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
-DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
 #override ENERGYSAVEDAYS = .25
 #override DT = 1800
 #override DT_THERM = 10800
@@ -4107,15 +4165,11 @@ if ( $currentSeg == 1 ) then
 endif
 #
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
-#override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
 #override CHL_FROM_FILE = FALSE
 #override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
-DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
 #override ENERGYSAVEDAYS = .25
 #override DT = 1800
 #override DT_THERM = 10800
@@ -4381,7 +4435,7 @@ SIS_OVERRIDE_EOF
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/WOA05_ptemp_salt_monthly.nc </dataSource>
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/WOA05_pottemp_salt.nc
       </dataFile>
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/ocean_static.nc</dataSource>
