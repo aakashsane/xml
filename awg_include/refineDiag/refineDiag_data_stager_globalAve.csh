@@ -503,9 +503,14 @@ except: doVmo = False
 
 try:
   vhFile = fYear+'.ocean_annual_z.nc'
-  vh  = netCDF4.Dataset(vhFile).variables['vh'][0]
-  vh  = vh.filled(0)*1e-9
-  zt  = netCDF4.Dataset(vhFile).variables['zt'][:]
+  if 'vmo' in netCDF4.Dataset(vhFile).variables:
+    vh  = netCDF4.Dataset(vhFile).variables['vmo'][0]
+    vh  = vh.filled(0)*1e-9
+    zt  = netCDF4.Dataset(vhFile).variables['z_l'][:]
+  else:
+    vh  = netCDF4.Dataset(vhFile).variables['vh'][0]
+    vh  = vh.filled(0)*1e-9
+    zt  = netCDF4.Dataset(vhFile).variables['zt'][:]
   yq_vh  = netCDF4.Dataset(vhFile).variables['yq'][:]
   doVh = True
 except: doVh = False

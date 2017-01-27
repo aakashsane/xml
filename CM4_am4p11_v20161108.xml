@@ -43,7 +43,7 @@ fremake -x CM4_am4p11_v20161108.xml -p ncrc3.intel15 -t prod-openmp cm4_compile
 SIS2:
 fremake -x CM4_am4p11_v20161108.xml -p ncrc3.intel15 -t prod-openmp cm4_sis2_compile
 
-# To run regression test (for the coupled experiment CM4_c96L32_am4g11r11_2010 ): 
+# To run regression test (for the coupled experiment CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn ): 
 
 frerun -r basic -x CM4_am4p11_v20161108.xml -p ncrc3.intel15 -t prod-openmp CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn
 
@@ -66,11 +66,11 @@ NOTES:
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"      value="verona"/>                  <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2016.12.16"/>              <!-- git tag date for MOM6 source code -->
-  <property name="SHARED_GIT_TAG"     value="user/z1l/data_override"/>
+  <property name="RELEASE"      value="verona_201701"/>                  <!-- Release tag for the shared source code -->
+  <property name="MOM6_DATE"    value="2017.01.20"/>              <!-- git tag date for MOM6 source code -->
+  <property name="SHARED_GIT_TAG"     value="$(RELEASE)"/>
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
-  <property name="AWG_GIT_TAG"  value="awg_v20161108"/>           <!-- git tag for AWG source code -->
+  <property name="AWG_GIT_TAG"  value="$(RELEASE)"/>           <!-- git tag for AWG source code -->
   
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -96,13 +96,12 @@ NOTES:
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
-
   <property name="CVDP_startyear" value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
- 
+
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
   <property name="reference_tag"   value="verona_awg_v20161108_mom6_2016.11.10_answers"/>
                           
-  <property name="DEBUGLEVEL" value="_0"/>
+  <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
                                           <!--In that case you will need to put an identifier string for the value to distinguish the /nbhome-->
 
@@ -660,12 +659,36 @@ NOTES:
 	     </resources>
    </freInclude>
    <!--c192 + 1/4 degree -->
+   <freInclude name="resourceparams_c192A432x2_O1022x1">
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="432" threads="2"    layout = "6,12"   io_layout = "1,4" />
+               <lnd                            layout = "6,12"   io_layout = "1,4" />
+               <ice                            layout = "144,3"  io_layout = "1,3" />               
+               <ocn ranks="1022" threads="1"   layout = "36,36"  io_layout = "1,4" mask_table="mask_table.274.36x36"/>
+	     </resources>
+   </freInclude>
    <freInclude name="resourceparams_c192A432x2_O1970x1">
 	     <resources jobWallclock="01:00:00">
                <atm ranks="432" threads="2"    layout = "6,12"   io_layout = "1,4" />
                <lnd                            layout = "6,12"   io_layout = "1,4" />
                <ice                            layout = "144,3"  io_layout = "1,3" />               
                <ocn ranks="1970" threads="1"   layout = "36,72"  io_layout = "1,4" mask_table="mask_table.622.36x72"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_c192A432x4_O1970x1">
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="432" threads="4"    layout = "6,12"   io_layout = "1,4" />
+               <lnd                            layout = "6,12"   io_layout = "1,4" />
+               <ice                            layout = "144,3"  io_layout = "1,3" />               
+               <ocn ranks="1970" threads="1"   layout = "36,72"  io_layout = "1,4" mask_table="mask_table.622.36x72"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_c192A432x4_O1756x1">
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="432" threads="4"    layout = "6,12"   io_layout = "1,4" />
+               <lnd                            layout = "6,12"   io_layout = "1,4" />
+               <ice                            layout = "144,3"  io_layout = "1,3" />
+               <ocn ranks="1756" threads="1"   layout = "32,72"  io_layout = "1,4" mask_table="mask_table.548.32x72"/>
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_c192A864x2_O1756x1">
@@ -791,10 +814,10 @@ NOTES:
    </freInclude>
    <freInclude name="resourceparams_A576x2_O1300p5"><!--1/2 degree ocean grid Only-->
 	     <resources jobWallclock="02:00:00">
-               <atm ranks="576" threads="2"	    layout = "8,12"   io_layout = "1,4" />
+               <atm ranks="576"  threads="2"	    layout = "8,12"   io_layout = "1,4" />
 	       <lnd                            layout = "8,12"   io_layout = "1,4" />
 	       <ice                            layout = "144,4"   io_layout = "1,4" />
-	       <ocn ranks="1300"   threads="1"    layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
+	       <ocn ranks="1300" threads="1"    layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A576x2_O1300p5_production"><!--1/2 degree ocean grid Only-->
@@ -803,6 +826,14 @@ NOTES:
 	       <lnd                            layout = "8,12"   io_layout = "1,4" />
 	       <ice                            layout = "144,4"   io_layout = "1,4" />
 	       <ocn ranks="1300"   threads="1"    layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A1152x2_O1300p5"><!--1/2 degree ocean grid Only-->
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="1152" threads="2"   layout = "8,24"   io_layout = "1,4" />
+	       <lnd                            layout = "8,24"   io_layout = "1,4" />
+	       <ice                            layout = "144,8"  io_layout = "1,4" />
+               <ocn ranks="1300" threads="1"   layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A576x2_O1620">
@@ -842,6 +873,14 @@ NOTES:
                <atm ranks="864" threads="2"	    layout = "6,24"   io_layout = "1,4" />
 	       <lnd                            layout = "6,24"   io_layout = "1,4" />
 	       <ice                            layout = "144,6"   io_layout = "1,3" />
+	       <ocn ranks="1441"   threads="1"    layout = "36,50"   io_layout = "1,5" mask_table="mask_table.359.36x50"/>
+ 	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A1152x2_O1441p5"><!--1/2 degree ocean grid Only-->
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="1152" threads="2"   layout = "8,24"   io_layout = "1,4" />
+               <lnd                            layout = "8,24"   io_layout = "1,4" />
+               <ice                            layout = "144,8"  io_layout = "1,4" />
 	       <ocn ranks="1441"   threads="1"    layout = "36,50"   io_layout = "1,5" mask_table="mask_table.359.36x50"/>
  	     </resources>
    </freInclude>
@@ -888,6 +927,92 @@ NOTES:
    </freInclude>
 
   <setup>
+    <platform name="ncrc4.intel17noovlim">
+      <freVersion>$(FRE_VERSION)</freVersion>
+      <compiler type="intel" version="17.0.0.098" />
+      <project>$(GFDL_GROUP)</project>
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
+      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
+      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Ming.Zhao/archive/mdt"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
+      <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20160517"/>
+      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/> 
+      <property name="MODEL_UPDATES_WH"     value="/ncrc/home1/Bill.Hurlin"/>
+      <property name="NCORE_PER_NODE"      value="36"/>
+
+     
+      <csh><![CDATA[
+module use -a /usw/eslogin/modulefiles-c3
+        module load git
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+      ]]></csh>
+
+    <mkmfTemplate file="/ncrc/home2/Niki.Zadeh/bin/intel17noovlim.mk"/>
+
+    </platform>
+    <platform name="ncrc4.intel17">
+      <freVersion>$(FRE_VERSION)</freVersion>
+      <compiler type="intel" version="17.0.0.098" />
+      <project>$(GFDL_GROUP)</project>
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
+      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
+      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Ming.Zhao/archive/mdt"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
+      <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20160517"/>
+      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/> 
+      <property name="MODEL_UPDATES_WH"     value="/ncrc/home1/Bill.Hurlin"/>
+      <property name="NCORE_PER_NODE"      value="36"/>
+
+     
+      <csh><![CDATA[
+module use -a /usw/eslogin/modulefiles-c3
+        module load git
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+      ]]></csh>
+
+    </platform>
     <platform name="ncrc4.intel16">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="16.0.3.210" />
@@ -1307,6 +1432,7 @@ limit coredumpsize unlimited
       <directory stem="$(FRE_STEM)">
         <archive>$ARCHIVE/$(stem)/$(name)/$(platform)-$(target)</archive>
         <postProcess>$(archiveDir)/pp</postProcess>
+        <ptmp>/ptmp/$USER</ptmp>
         <analysis>$(NB_ROOT)</analysis><!--Do not change this! frepp translates this to $out_dir. This is also the directory under which  frepp looks for mom6 clone.  -->
       </directory>
       <property name="EXEC_ROOT"         value="$(rootDir)"/>
@@ -1397,7 +1523,7 @@ Experiment to build executable.
         <codeBase version="$(RELEASE)"> atmos_shared.git atmos_param.git </codeBase>
           <csh><![CDATA[
             ( cd atmos_shared && git checkout $(AWG_GIT_TAG) )
-            ( cd atmos_shared && git checkout user/lwh/biogenic_soa )
+            ( cd atmos_shared && git merge user/lwh/biogenic_soa )
             ( cd atmos_param  && git checkout $(AWG_GIT_TAG) )
            ]]>
           </csh>
@@ -1485,6 +1611,9 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
           git submodule update #This gets the right version of submodules
           popd
 
+(cd mom6/src/SIS2 && git merge origin/user/nnz/fix_esm_dust_flux)
+
+
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
           git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
           (cd ocean_shared && git checkout user/nnz/mom6_dev)
@@ -1567,10 +1696,6 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
-        <csh><![CDATA[
-          ( cd coupler && git checkout $(AWG_GIT_TAG) )
-          ]]>
-        </csh>
         </source>
         <compile>
           <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
@@ -1608,10 +1733,6 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
-        <csh><![CDATA[
-          ( cd coupler && git checkout $(AWG_GIT_TAG) )
-          ]]>
-        </csh>
         </source>
         <compile>
           <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
@@ -2083,7 +2204,7 @@ $baseDate
   <freInclude name="c96L48_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20160112/awg_C192L32_OM4_025_grid_lm4p1_v20161202.tar</dataSource>
+        <dataSource platform="$(platform)">$CPERM/Huan.Guo/INPUT/InitCond/AWG_c96L48/awg_C96L48_LM3_OM4_025_grid_lm4p1_topo_v20160210.tar</dataSource>
       </dataFile>
     </input>
   </freInclude>
@@ -2203,18 +2324,27 @@ if ( $do_concurrent_radiation == ".true." ) then
    alias runCommand /usr/bin/time -p `which aprun` -n $atmos_npes -d $atmos_nthreads ./$executable:t  
 endif
 
+#timing runs show that nyblocks = 2 * atm_threads perform better than nyblocks = atm_threads
+set nxblock = 1
+set nyblock = $atm_threads
+@ nyblock = 2 * $atm_threads
 
 #Handle hyperthreaded cases
 set atmos_nthreads = $atm_threads
+set atm_hythr = 1
+set ocn_hythr = 1
+
 set use_hyper_thread = `awk '/use_hyper_thread/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
 if ( $use_hyper_thread == ".T." || $use_hyper_thread == ".true." ) then
    @ atmos_nthreads *= 2
+   set atm_hythr = 2
    if ( $tot_ocn_ranks == 0 ) then
-      alias runCommand /usr/bin/time -p `which aprun` -n $atm_ranks -j2 -d $atmos_nthreads ./$executable:t
+      alias runCommand /usr/bin/time -p `which aprun` -j2 -d $atmos_nthreads -n $atm_ranks ./$executable:t
    else
-      alias runCommand /usr/bin/time -p `which aprun` -n $atm_ranks -j2 -d $atmos_nthreads ./$executable:t : -n $ocn_ranks -j1 -d 1 ./$executable:t
+      alias runCommand /usr/bin/time -p `which aprun` -j2 -d $atmos_nthreads -n $atm_ranks ./$executable:t : -n $ocn_ranks -j1 -d 1 ./$executable:t
    endif
 endif
+set atmos_threads = $atmos_nthreads
 
 ###The following vars are set for the timing database ingestion tool only and are not necessary for a successful run
 set OCN_MASK_TABLE  =  $ocn_mask_table
@@ -2228,10 +2358,13 @@ set fv_layout = $atm_layout
 set fv_io_layout  = $atm_io_layout
 set land_layout   = $lnd_layout
 set land_io_layout = $lnd_io_layout
-set dummy  = `awk '/nxblocks/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-set nxblocks = $dummy
-set dummy  = `awk '/nyblocks/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-set nyblocks = $dummy
+#set dummy  = `awk '/nxblocks/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
+set nxblocks = $nxblock
+#set dummy  = `awk '/nyblocks/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
+set nyblocks = $nyblock
+set use_hyperthread = $use_hyper_thread
+set atm_hyperthread = $atm_hythr
+set ocn_hyperthread = $ocn_hythr
 
 ####COMMON ALWAYS CSH ENDS######
       ]]></csh>
@@ -2556,15 +2689,16 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         do_ocean = .false.
         ocean_npes = 0
         atmos_npes = $atm_ranks
-        atmos_nthreads = $atm_threads
+        atmos_nthreads = $atmos_threads
+        ncores_per_node = $(NCORE_PER_NODE)
       </namelist>
 
       <namelist name="flux_exchange_nml">
-        nblocks=$atm_threads
+         nblocks = $nyblock
       </namelist>
       <namelist name="atmos_model_nml">
-         nxblocks = 1
-         nyblocks = $atm_threads
+         nxblocks = $nxblock
+         nyblocks = $nyblock
       </namelist>
       <namelist name="fms_nml">
             clock_grain='ROUTINE'
@@ -2620,13 +2754,13 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       </production>
  
       <regression name="basic">
-        <run days="8"  ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
+        <run days="8"  overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
       </regression>
       <regression name="rts">
-        <run days="4 4"  ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
-        <run months="1"  ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2']/node())"/> </run>
-        <run months="1"  ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2']/node())"/> </run>
-        <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2']/node())"/> </run>
+        <run days="4 4" overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2']/node())"/> </run>
       </regression>
       <regression name="debug">
         <run days="1"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
@@ -2637,6 +2771,15 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       </regression>
       
       <regression name="timings">
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A768x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1152x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1536x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1728x2']/node())"/> </run>
         <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
         <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2']/node())"/> </run>
         <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2']/node())"/> </run>
@@ -2654,29 +2797,6 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
     <postProcess>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
     </postProcess>
-  </experiment>
-  <experiment name="c96L32_am4g11r11_2010climo_cmip6Em_hthread" inherit="c96L32_am4g11r11_2010climo_cmip6Em">
-    <input>
-    </input>
-    <runtime>
-      <regression name="timings">
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x1']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x1']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x4']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x1']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x4']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x1']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A768x1']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A768x2']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x1']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2']/node())"/> </run>
-      </regression>
-    </runtime>
   </experiment>
   
   <experiment name="c96L32_am4g11r11_1850climo" inherit="c96L32_am4g11r11_2010climo_cmip6Em">
@@ -2742,15 +2862,16 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         do_ocean = .false.
         ocean_npes = 0
         atmos_npes = $atm_ranks
-        atmos_nthreads = $atm_threads
+        atmos_nthreads = $atmos_threads
+        ncores_per_node = $(NCORE_PER_NODE)
       </namelist>
 
       <namelist name="flux_exchange_nml">
-        nblocks=$atm_threads
+         nblocks = $nyblock
       </namelist>
       <namelist name="atmos_model_nml">
-         nxblocks = 1
-         nyblocks = $atm_threads
+         nxblocks = $nxblock
+         nyblocks = $nyblock
       </namelist>
       <namelist name="fms_nml">
             clock_grain='ROUTINE'
@@ -2790,13 +2911,13 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 
     <runtime>
       <regression name="basic">
-        <run days="8"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
+        <run days="8"  overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
       </regression>
       <regression name="rts">
-        <run days="4 4" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
-        <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2']/node())"/> </run>
-        <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A576x2']/node())"/> </run>
-        <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
+        <run days="4 4" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A576x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
       </regression>
 
       <regression name="timings">
@@ -2817,19 +2938,6 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <xi:include xpointer="xpointer(//freInclude[@name='c192_climo_postprocess']/postProcess/node())"/>
     </postProcess>
 
-  </experiment>
-  <experiment name="c192L32_am4g11_2010climo_cmip6Em_hthread" inherit="c192L32_am4g11_2010climo_cmip6Em">
-    <input>
-    </input>
-    <runtime>
-      <regression name="timings">
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=36"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=36"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A576x2']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=36"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=36"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A1152x2']/node())"/> </run>
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=36"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A1728x2']/node())"/> </run>
-      </regression>
-    </runtime>
   </experiment>
 
   <experiment name="c192L32_am4g11r11_SOAv2_2010climo" inherit="cm4_compile">
@@ -2874,7 +2982,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         do_ocean = .false.
         ocean_npes = 0
         atmos_npes = $atm_ranks
-        atmos_nthreads = $atm_threads
+        atmos_nthreads = $atmos_threads
         use_hyper_thread = $ht
         ncores_per_node = $(NCORE_PER_NODE)
       </namelist>
@@ -2940,13 +3048,12 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 	terpene_SOA_yield = 0.10
       </namelist>
 
-
-       <namelist name="flux_exchange_nml">
-        nblocks=$atm_threads
+      <namelist name="flux_exchange_nml">
+         nblocks = $nyblock
       </namelist>
       <namelist name="atmos_model_nml">
-         nxblocks = 1
-         nyblocks = $atm_threads
+         nxblocks = $nxblock
+         nyblocks = $nyblock
       </namelist>
       <namelist name="fms_nml">
             clock_grain='ROUTINE'
@@ -2987,19 +3094,24 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 
     <runtime>
       <regression name="basic">
-        <run days="8"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
+        <run days="8"  overrideParams="coupler_nml:use_hyper_thread=.T." ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
       </regression>
       <regression name="rts">
-        <run days="4 4" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
-        <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2']/node())"/> </run>
-        <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A576x2']/node())"/> </run>
-        <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
+        <run days="4 4" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A576x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
       </regression>
 
-      <regression name="timings_hyper">
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=36"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
-      </regression>
       <regression name="timings">
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A576x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A1152x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A1728x2']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x4']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A576x4']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x4']/node())"/> </run>
         <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2']/node())"/> </run>
         <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A576x2']/node())"/> </run>
         <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2']/node())"/> </run>
@@ -3023,6 +3135,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 <!--=======================-->
 <!--= CM4 EXPERIMENTS     =-->
 <!--=======================-->
+  <experiment name="CM4_c192L32_g11r11_SOAv2_160526_2010_MLE30d_ePBLn.$(MOM6_DATE)" inherit="CM4_c192L32_g11r11_SOAv2_160526_2010_MLE30d_ePBLn"/>
   <experiment name="CM4_c192L32_g11r11_SOAv2_160526_2010_MLE30d_ePBLn" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
@@ -3051,17 +3164,19 @@ For more information please refer to the
         do_ocean = .true.
         ocean_npes = $ocn_ranks  
         atmos_npes = $atm_ranks 
-        atmos_nthreads = $atm_threads
+        atmos_nthreads = $atmos_threads
         use_hyper_thread = $ht
         ncores_per_node = $(NCORE_PER_NODE)
       </namelist>
-
       <namelist name="flux_exchange_nml">
-            nblocks=$atm_threads
-            debug_stocks = .FALSE.
-            divert_stocks_report = .TRUE.
-            do_area_weighted_flux = .FALSE.
+         nblocks = $nyblock
+         divert_stocks_report = .TRUE.
       </namelist>
+      <namelist name="atmos_model_nml">
+         nxblocks = $nxblock
+         nyblocks = $nyblock
+      </namelist>
+
       <namelist name="fms_io_nml">
             fms_netcdf_restart=.true.
             threading_read='multi'
@@ -3079,13 +3194,7 @@ For more information please refer to the
         make_exchange_reproduce = .true.
         interp_method = 'second_order'
       </namelist>
-
-      <namelist name="atmos_model_nml">
-         nxblocks = 1
-         nyblocks = $atm_threads
-      </namelist>
-
-         <namelist name="diag_manager_nml">
+      <namelist name="diag_manager_nml">
        max_axes = 200,
        max_files = 200,
        max_num_axis_sets = 200,
@@ -3094,7 +3203,7 @@ For more information please refer to the
        mix_snapshot_average_fields=.false.
        max_field_attributes=4
        max_axis_attributes=4
-         </namelist>
+      </namelist>
 
       <!--SOAv2 specific namelist overrides-->		 
       <namelist name="interpolator_nml">
@@ -3203,15 +3312,17 @@ MOM_OVERRIDE_EOF
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2_O1756x1_production']/node())"/>
       </production>
        <regression name="basic">
-        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2_O1756x1']/node())"/> </run>
+        <run months="1"   overrideParams="coupler_nml:use_hyper_thread=.T."> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2_O1022x1']/node())"/> </run>
       </regression>
 
       <regression name="rts">
-        <run days="15 16"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2_O1756x1']/node())"/> </run> 
+        <run days="15 16" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2_O1022x1']/node())"/> </run> 
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2_O1022x1']/node())"/> </run>
+        <run days="10" overrideParams="coupler_nml:use_hyper_thread=.T."> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2_O1756x1']/node())"/> </run>
+        <run days="10" overrideParams="coupler_nml:use_hyper_thread=.T."> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x4_O1756x1']/node())"/> </run>
       </regression>
 
-      <regression name="timings_hyper">
-        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x4_O3782x1']/node())"/> </run>
+      <regression name="timings">
         <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x4_O3782x1']/node())"/> </run>
         <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2_O1756x1']/node())"/> </run>
       </regression>
@@ -3228,7 +3339,7 @@ MOM_OVERRIDE_EOF
 
   </experiment>
 
-  <experiment name="CM4_c96L32_g11r11_160526_2010_baseline" inherit="CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn"/>
+  <experiment name="CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn.$(MOM6_DATE)" inherit="CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn"/>
   <experiment name="CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
@@ -3257,14 +3368,18 @@ For more information please refer to the
         do_ocean = .true.
         ocean_npes = $ocn_ranks  
         atmos_npes = $atm_ranks 
-        atmos_nthreads = $atm_threads
+        atmos_nthreads = $atmos_threads
+        ncores_per_node = $(NCORE_PER_NODE)
       </namelist>
       <namelist name="flux_exchange_nml">
-            nblocks=$atm_threads
-            debug_stocks = .FALSE.
-            divert_stocks_report = .TRUE.
-            do_area_weighted_flux = .FALSE.
+         nblocks = $nyblock
+         divert_stocks_report = .TRUE.
       </namelist>
+      <namelist name="atmos_model_nml">
+         nxblocks = $nxblock
+         nyblocks = $nyblock
+      </namelist>
+
       <namelist name="fms_io_nml">
             fms_netcdf_restart=.true.
             threading_read='multi'
@@ -3280,11 +3395,6 @@ For more information please refer to the
       <namelist name="xgrid_nml">
         make_exchange_reproduce = .true.
         interp_method = 'second_order'
-      </namelist>
-
-      <namelist name="atmos_model_nml">
-         nxblocks = 1
-         nyblocks = $atm_threads
       </namelist>
 
       <namelist name="diag_manager_nml">
@@ -3346,14 +3456,14 @@ MOM_OVERRIDE_EOF
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O3782_production']/node())"/>
       </production>
       <regression name="basic">
-        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1756']/node())"/> </run>
+        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1756']/node())"/> </run>
       </regression>
 
       <regression name="rts">
-        <run days="15 16"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1756']/node())"/> </run> 
-  	<run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O2304']/node())"/> </run>
-  	<run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2304']/node())"/> </run>
-  	<run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2592']/node())"/> </run>
+        <run days="15 16" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1756']/node())"/> </run> 
+  	<run days="2" overrideParams="coupler_nml:use_hyper_thread=.T."  ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O2304']/node())"/> </run>
+  	<run days="2" overrideParams="coupler_nml:use_hyper_thread=.T."  ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2304']/node())"/> </run>
+  	<run days="2" overrideParams="coupler_nml:use_hyper_thread=.T."  ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2592']/node())"/> </run>
       </regression>
 
       <regression name="debug">
@@ -3361,6 +3471,10 @@ MOM_OVERRIDE_EOF
       </regression>
 
 	<regression name="timings">
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1970']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O3782']/node())"/> </run>
+        </regression>
+        <regression name="timings_all">
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1756']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O1756']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1970']/node())"/> </run>
@@ -3370,7 +3484,17 @@ MOM_OVERRIDE_EOF
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O2432']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O3782']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O3782']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O2997']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O2997']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1756']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O1756']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1970']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O2432']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4_O1970']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O1970']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O2432']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O3782']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O3782']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O2997']/node())"/> </run>
       	</regression>
 
       <reference restart="$(REFERENCE)/archive/1x1m0d_432x2a_2997x1o/restart/00010201.tar"/>
@@ -3508,6 +3632,7 @@ MOM_OVERRIDE_EOF
     </input>
   </experiment> 
 
+  <experiment name="CM4_c96L32_am4g11r11_2010_OMp5_H5_ndiff_meke_MLE30d_ePBLn.$(MOM6_DATE)" inherit="CM4_c96L32_am4g11r11_2010_OMp5_H5_ndiff_meke_MLE30d_ePBLn"/>
   <experiment name="CM4_c96L32_am4g11r11_2010_OMp5_H5_ndiff_meke_MLE30d_ePBLn" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
@@ -3538,14 +3663,18 @@ For more information please refer to the
         do_ocean = .true.
         ocean_npes = $ocn_ranks  
         atmos_npes = $atm_ranks 
-        atmos_nthreads = $atm_threads
+        atmos_nthreads = $atmos_threads
+        ncores_per_node = $(NCORE_PER_NODE)
       </namelist>
       <namelist name="flux_exchange_nml">
-            nblocks=$atm_threads
-            debug_stocks = .FALSE.
-            divert_stocks_report = .TRUE.
-            do_area_weighted_flux = .FALSE.
+         nblocks = $nyblock
+         divert_stocks_report = .TRUE.
       </namelist>
+      <namelist name="atmos_model_nml">
+         nxblocks = $nxblock
+         nyblocks = $nyblock
+      </namelist>
+
       <namelist name="fms_io_nml">
             fms_netcdf_restart=.true.
             threading_read='multi'
@@ -3562,52 +3691,6 @@ For more information please refer to the
         make_exchange_reproduce = .true.
         interp_method = 'second_order'
       </namelist>
-
-      <namelist name="atmos_model_nml">
-         nxblocks = 1 
-         nyblocks = $atm_threads 
-      </namelist>
-      <namelist name="fv_core_nml">
-        layout = $atm_layout
-        io_layout = $atm_io_layout
-        npx      = 97,
-        npy      = 97,
-        ntiles   = 6,
-        npz      = 32,
-        k_split  = 1,
-        n_split  = 12,
-        a2b_ord  = 4,
-        adjust_dry_mass = $adjust_dry_mass,
-        adj_mass_vmr    = .true.
-        consv_te = 0.7,
-        fill = .true.
-        print_freq = 0,
-        grid_type = 0,
-        nord = 2,
-        dddmp = 0.0,
-        d2_bg = 0.0,
-        d4_bg = 0.15,
-        tau = 0.      
-        z_tracer=.false.
-        kord_tm = -10
-        kord_mt =  10
-        kord_tr =  10
-        hord_mt =  10
-        hord_vt = -10
-        hord_tm = -10
-        hord_dp = -10
-        hord_tr = -8
-        do_uni_zfull = .true.
-        consv_am = .true.
-      </namelist>
-      <namelist name="land_model_nml">
-        layout = $lnd_layout
-        io_layout = $lnd_io_layout
-        tau_snow_T_adj = 604800.
-        prohibit_negative_canopy_water=.false.
-	min_frac = 1e-8
-      </namelist>
-
          <namelist name="diag_manager_nml">
        max_axes = 200,
        max_files = 200,
@@ -3675,14 +3758,14 @@ SIS_OVERRIDE_EOF
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5_production']/node())"/>
       </production>
       <regression name="basic">
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
       </regression>
 
       <regression name="rts">
-        <run days="15 16" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
-        <run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O648']/node())"/> </run>
-  	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
-  	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
+        <run days="15 16" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
+        <run days="2"     overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O648']/node())"/> </run>
+  	<run days="2"     overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+  	<run days="2"     overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
       </regression>
 
       <regression name="restart">
@@ -3720,25 +3803,14 @@ SIS_OVERRIDE_EOF
           <run days="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
       	</regression>
 
-	<regression name="timings_c3">
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O842p5']/node())"/> </run>
-      	</regression>
-	<regression name="timings_t1">
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O442p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O842p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1057p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1057p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1300p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1608p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1441p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1437p5']/node())"/> </run>
-       	</regression>
+        <regression name="timings">
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1300p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1152x2_O1441p5']/node())"/> </run>
+        </regression>
 
-	<regression name="timings">
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1296']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+	<regression name="timings_all">
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O842p5']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1057p5']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1300p5']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O951p5']/node())"/> </run>
@@ -3748,8 +3820,18 @@ SIS_OVERRIDE_EOF
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1300p5']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1608p5']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1441p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1296']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1057p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1300p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O951p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O951p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O2044p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1300p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1608p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1441p5']/node())"/> </run>
       	</regression>
-
       <reference restart="$(REFERENCE)/archive/1x1m0d_216x2a_842x1o/restart/00010201.tar"/>
 
     </runtime>
@@ -3815,6 +3897,53 @@ SIS_OVERRIDE_EOF
     </input>
   </experiment>
 
+  <experiment name="CM4_c96L32_am4g11r11_2010_OMp5_H5_ndiff_meke_MLE30d_ePBLn_NEMO" inherit="CM4_c96L32_am4g11r11_2010_OMp5_H5_ndiff_meke_MLE30d_ePBLn">
+    <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+#override DT = 1800         
+#override DT_THERM = 10800  
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override EQN_OF_STATE = "NEMO"
+USE_CONTEMP_ABSSAL = True
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+
+      <diagTable order="append">
+#================
+# Additional DIAGNOSTICS
+#================
+ "ocean_model", "contemp", "contemp", "ocean_annual",        "all", "mean", "none",2  
+ "ocean_model", "contemp", "contemp", "ocean_month",         "all", "mean", "none",2  
+ "ocean_model", "abssalt", "abssalt", "ocean_annual",        "all", "mean", "none",2
+ "ocean_model", "abssalt", "abssalt", "ocean_month",         "all", "mean", "none",2
+ "ocean_model", "conSST",  "conSST",  "ocean_month",         "all", "mean", "none",2  
+ "ocean_model", "absSSS",  "absSSS",  "ocean_month",         "all", "mean", "none",2  
+ "ocean_model", "conSST",  "conSST",  "ocean_annual",         "all", "mean", "none",2  
+ "ocean_model", "absSSS",  "absSSS",  "ocean_annual",         "all", "mean", "none",2  
+#
+ "ocean_model_z", "contemp", "contemp", "ocean_annual_z",        "all", "mean", "none",2  
+ "ocean_model_z", "contemp", "contemp", "ocean_month_z",         "all", "mean", "none",2  
+ "ocean_model_z", "abssalt", "abssalt", "ocean_annual_z",        "all", "mean", "none",2
+ "ocean_model_z", "abssalt", "abssalt", "ocean_month_z",         "all", "mean", "none",2
+     </diagTable>
+
+    </input>
+  </experiment>
+
   <experiment name="ESM4_c96L32_am4g11r11_1850_OMp5_H5_ndiff_meke_MLE30d_ePBLn" inherit="CM4_c96L32_am4g11r11_1850_OMp5_H5_ndiff_meke_MLE30d_ePBLn">
 <description>
 Keeping our ocean from ESM4p_c96L32_am4g10r14_1860_obgc_pindco2_OMp5_H5_ndff_mke_MLE30d_ePBLn
@@ -3836,7 +3965,8 @@ Reverting back to land defaults for coastal roughness, use_coast_topo_rough = .t
         do_ocean = .true.
         ocean_npes = $ocn_ranks  
         atmos_npes = $atm_ranks 
-        atmos_nthreads = $atm_threads
+        atmos_nthreads = $atmos_threads
+        ncores_per_node = $(NCORE_PER_NODE)
       </namelist>
       <namelist name="fms_io_nml">
         fms_netcdf_restart=.true.
@@ -4110,14 +4240,14 @@ SIS_OVERRIDE_EOF
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5_production']/node())"/>
       </production>
       <regression name="basic">
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5']/node())"/> </run>
       </regression>
 
       <regression name="rts">
-        <run days="15 16" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5']/node())"/> </run>
-        <run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O648']/node())"/> </run>
-  	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
-  	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
+        <run days="15 16" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5']/node())"/> </run>
+        <run days="2"     overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O648']/node())"/> </run>
+  	<run days="2"     overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+  	<run days="2"     overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
       </regression>
       <regression name="timing">
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1441p5']/node())"/> </run>

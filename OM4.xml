@@ -73,6 +73,13 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
    </freInclude>
    <freInclude name="resourceparams_O32">
 	     <resources jobWallclock="00:30:00">
+               <atm ranks="0" threads="2"/>
+	       <ice                        layout = "8,4"   io_layout = "1,2" mask_table="MOM_mask_table"/>
+	       <ocn ranks="32" threads="2" layout = "8,4"   io_layout = "1,2" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_O32x2">
+	     <resources jobWallclock="00:30:00">
 	       <ice                        layout = "8,4"   io_layout = "1,2" mask_table="MOM_mask_table"/>
 	       <ocn ranks="32" threads="1"   layout = "8,4"   io_layout = "1,2" mask_table="MOM_mask_table"/>
 	     </resources>
@@ -2358,10 +2365,15 @@ force_all_pes_traj = .true.
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O30']/node())"/> </run>
       </regression>
 
+      <regression name="debugomp">
+        <run days="2" >   <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O32x2']/node())"/> </run>
+      </regression>
+
       <regression name="debug">
         <run days="2" >   <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
         <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
       </regression>
+
 
        <reference restart="$(REFERENCE)/1x0m20d_128pe/restart/00010121.tar"/>
    </runtime>
