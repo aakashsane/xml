@@ -75,10 +75,9 @@ They reproduce answers provided by AWG:
 
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="verona"/>              <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2016.05.26"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2016.10.14"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20160506"/>           <!-- git tag for AWG source code -->
-  <property name="BERGS_GIT_TAG" value="dev/master"/>             <!-- git tag for icebergs source code -->
   <property name="ProjectID"    value="MDT"/>                     <!-- database top level -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
@@ -89,7 +88,10 @@ They reproduce answers provided by AWG:
 
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
   <property name="PROD_SEGTIME"     value="04:00:00"/><!--Wall clock per segment (usually 1 year)-->
-
+<!--theia values
+  <property name="PROD_RUNTIME"     value="08:00:00"/>
+  <property name="PROD_SEGTIME"     value="04:00:00"/>
+-->
   <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->   
   <property name="EXP_CPLD_START"   value="0001"/> <!--simulation start year--> 
@@ -495,7 +497,7 @@ the faster the model throughput, but also the lower the model efficiency
 	     value="
 	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
                coupler_nml:atmos_npes=864;coupler_nml:atmos_nthreads=4;flux_exchange_nml:nblocks=4;	
-               fv_core_nml:layout=6,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=4;
+               fv_core_nml:layout=6,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=6;
 	       land_model_nml:layout=6,24;land_model_nml:io_layout=1,4;
 	       ice_model_nml:layout=144,6;ice_model_nml:io_layout=1,3" />
    
@@ -508,14 +510,6 @@ the faster the model throughput, but also the lower the model efficiency
 	       land_model_nml:layout=6,24;land_model_nml:io_layout=1,4;
 	       ice_model_nml:layout=144,6;ice_model_nml:io_layout=1,3" />
 
-   <property name="domainparams_A1152x2"
-	     value="
-	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
-               coupler_nml:atmos_npes=1152;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;	
-               fv_core_nml:layout=8,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
-	       land_model_nml:layout=8,24;land_model_nml:io_layout=1,4;
-	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
-
    <property name="domainparams_A1152x1h"
              value="
                coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
@@ -524,6 +518,22 @@ the faster the model throughput, but also the lower the model efficiency
                fv_core_nml:layout=8,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=4;
                land_model_nml:layout=8,24;land_model_nml:io_layout=1,4;
                ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
+   <property name="domainparams_A1152x2h"
+             value="
+               coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
+               coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32;
+               coupler_nml:atmos_npes=1152;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;
+               fv_core_nml:layout=8,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=4;
+               land_model_nml:layout=8,24;land_model_nml:io_layout=1,4;
+               ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
+
+   <property name="domainparams_A1152x2"
+	     value="
+	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
+               coupler_nml:atmos_npes=1152;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;	
+               fv_core_nml:layout=8,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=8,24;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
 
    <property name="domainparams_A1152x2_1"
 	     value="
@@ -532,21 +542,6 @@ the faster the model throughput, but also the lower the model efficiency
                fv_core_nml:layout=8,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=4;
 	       land_model_nml:layout=8,24;land_model_nml:io_layout=1,4;
 	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
-   <property name="domainparams_A1152x2h"
-	     value="
-	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
-	       coupler_nml:use_hyper_thread=.T.;coupler_nml:ncores_per_node=32;
-               coupler_nml:atmos_npes=1152;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;	
-               fv_core_nml:layout=8,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=4;
-	       land_model_nml:layout=8,24;land_model_nml:io_layout=1,4;
-	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
-   <property name="domainparams_A1152x2_3"
-	     value="
-	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
-               coupler_nml:atmos_npes=1152;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;	
-               fv_core_nml:layout=12,16;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
-	       land_model_nml:layout=12,16;land_model_nml:io_layout=1,4;
-	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" /><!--layout=12,16 underperforms on theia-->
    <property name="domainparams_A1152x2_2"
 	     value="
 	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
@@ -554,6 +549,20 @@ the faster the model throughput, but also the lower the model efficiency
                fv_core_nml:layout=8,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=4;atmos_model_nml:nyblocks=2;
 	       land_model_nml:layout=8,24;land_model_nml:io_layout=1,4;
 	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
+   <property name="domainparams_A1152x2_3"
+	     value="
+	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
+               coupler_nml:atmos_npes=1152;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;	
+               fv_core_nml:layout=8,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=8,24;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
+   <property name="domainparams_A1152x2_4"
+	     value="
+	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
+               coupler_nml:atmos_npes=1152;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;	
+               fv_core_nml:layout=12,16;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=12,16;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" /><!--layout=12,16 underperforms on theia-->
    <property name="domainparams_A1152x2_5"
 	     value="
 	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
@@ -561,6 +570,7 @@ the faster the model throughput, but also the lower the model efficiency
                fv_core_nml:layout=8,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=2;
 	       land_model_nml:layout=8,24;land_model_nml:io_layout=1,4;
 	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
+   
    <property name="domainparams_A576x4"
 	     value="
 	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
@@ -606,6 +616,14 @@ the faster the model throughput, but also the lower the model efficiency
                fv_core_nml:layout=3,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=4;atmos_model_nml:nyblocks=2;
 	       land_model_nml:layout=3,24;land_model_nml:io_layout=1,4;
 	       ice_model_nml:layout=144,3;ice_model_nml:io_layout=1,3" />
+   <property name="domainparams_A432x8_1"
+             value="
+               coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
+               coupler_nml:atmos_npes=432;coupler_nml:atmos_nthreads=8;flux_exchange_nml:nblocks=8;     
+               fv_core_nml:layout=3,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=4;
+               land_model_nml:layout=3,24;land_model_nml:io_layout=1,4;
+               ice_model_nml:layout=144,3;ice_model_nml:io_layout=1,3" />
+
    <property name="domainparams_A1056x4"
 	     value="
 	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
@@ -620,6 +638,24 @@ the faster the model throughput, but also the lower the model efficiency
                fv_core_nml:layout=12,16;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=4;atmos_model_nml:nyblocks=2;
 	       land_model_nml:layout=12,16;land_model_nml:io_layout=1,4;
 	       ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
+   <property name="domainparams_A1152x4_1"
+             value="
+               coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
+               coupler_nml:atmos_npes=1152;coupler_nml:atmos_nthreads=4;flux_exchange_nml:nblocks=4;    
+               fv_core_nml:layout=12,16;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=6;
+               land_model_nml:layout=12,16;land_model_nml:io_layout=1,4;
+               ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
+
+
+   <property name="domainparams_A2304x2"
+             value="
+               coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
+               coupler_nml:atmos_npes=2304;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;    
+               fv_core_nml:layout=16,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+               land_model_nml:layout=16,24;land_model_nml:io_layout=1,4;
+               ice_model_nml:layout=144,16;ice_model_nml:io_layout=1,4" />
+
+
    <property name="domainparams_A960x4"
 	     value="
 	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
@@ -628,7 +664,7 @@ the faster the model throughput, but also the lower the model efficiency
 	       land_model_nml:layout=10,16;land_model_nml:io_layout=1,4;
 	       ice_model_nml:layout=120,8;ice_model_nml:io_layout=1,4" />
 
-   
+   <!--Concurrent radiation-->
    <property name="domainparams_A432x1_R432x1"
 	     value="
 	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
@@ -653,6 +689,8 @@ the faster the model throughput, but also the lower the model efficiency
 	       land_model_nml:layout=6,24;land_model_nml:io_layout=1,4;
 	       ice_model_nml:layout=144,6;ice_model_nml:io_layout=1,3" />
 
+   <!--c192 configs-->
+   
    <property name="domainparams_c192A432x2"
 	     value="
 	       coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
@@ -724,6 +762,24 @@ the faster the model throughput, but also the lower the model efficiency
                atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=2;
                land_model_nml:layout=12,24;land_model_nml:io_layout=1,4;
                ice_model_nml:layout=144,12;ice_model_nml:io_layout=1,3" />
+
+   <property name="domainparams_c192A1152x4"
+             value="
+               coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
+               coupler_nml:atmos_npes=1152;coupler_nml:atmos_nthreads=4;flux_exchange_nml:nblocks=4; 
+               fv_core_nml:layout=12,16;fv_core_nml:io_layout=1,4;
+               atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=4;
+               land_model_nml:layout=12,16;land_model_nml:io_layout=1,4;
+               ice_model_nml:layout=144,8;ice_model_nml:io_layout=1,4" />
+   
+   <property name="domainparams_c192A2304x2"
+             value="
+               coupler_nml:do_ocean=.false.;coupler_nml:ocean_npes=0;
+               coupler_nml:atmos_npes=2304;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2; 
+               fv_core_nml:layout=12,32;fv_core_nml:io_layout=1,4;
+               atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=2;
+               land_model_nml:layout=12,32;land_model_nml:io_layout=1,4;
+               ice_model_nml:layout=144,16;ice_model_nml:io_layout=1,4" />
 
    <!--CM4 configurations-->
    <property name="domainparams_A216x1_O216"
@@ -1004,6 +1060,18 @@ the faster the model throughput, but also the lower the model efficiency
 	       dummy_ocean_nml:ocean_layout=36,72;dummy_ocean_nml:ocean_io_layout=1,4;
                dummy_ocean_nml:ocean_mask_table=mask_table.622.36x72"/>
 
+   <property name="domainparams_A288x2_O2997"
+             value="
+               coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=2997;
+               coupler_nml:atmos_npes=288;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;
+               fv_core_nml:layout=4,12;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+               land_model_nml:layout=4,12;land_model_nml:io_layout=1,4;
+               ice_model_nml:layout=72,4;ice_model_nml:io_layout=1,4;
+               dummy_ice_nml:ice_layout=72,4;dummy_ice_nml:ice_io_layout=1,4;
+	       icebergs_nml:make_calving_reproduce=.true.;
+               dummy_ocean_nml:ocean_layout=90,45;dummy_ocean_nml:ocean_io_layout=9,5;
+               dummy_ocean_nml:ocean_mask_table=mask_table.1053.90x45"/>
+   
    <property name="domainparams_A432x2_O2997"
 	     value="
 	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=2997;
@@ -1274,7 +1342,43 @@ the faster the model throughput, but also the lower the model efficiency
 	       dummy_ocean_nml:ocean_layout=32,36;dummy_ocean_nml:ocean_io_layout=1,4;
                dummy_ocean_nml:ocean_mask_table=mask_table.201.32x36"/><!--1/2 degree ocean grid Only-->
 
-    <property name="domainparams_A864x2_O951p5"
+   <property name="domainparams_A864x2_O842p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=842;
+               coupler_nml:atmos_npes=864;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;	
+               fv_core_nml:layout=6,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=1;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=6,24;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=144,6;ice_model_nml:io_layout=1,3;
+	       dummy_ice_nml:ice_layout=144,6;dummy_ice_nml:ice_io_layout=1,3;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=32,32;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.182.32x32"/><!--1/2 degree ocean grid Only-->
+
+   <property name="domainparams_A432x4_O842p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=842;
+               coupler_nml:atmos_npes=432;coupler_nml:atmos_nthreads=4;flux_exchange_nml:nblocks=4;
+               fv_core_nml:layout=3,24;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=2;
+	       land_model_nml:layout=3,24;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=144,3;ice_model_nml:io_layout=1,3;
+	       dummy_ice_nml:ice_layout=144,3;dummy_ice_nml:ice_io_layout=1,3;
+	       icebergs_nml:make_calving_reproduce=.true.;
+	       dummy_ocean_nml:ocean_layout=32,32;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.182.32x32"/><!--1/2 degree ocean grid Only-->
+
+   <property name="domainparams_A576x4_O951p5"
+	     value="
+	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=951;
+               coupler_nml:atmos_npes=576;coupler_nml:atmos_nthreads=4;flux_exchange_nml:nblocks=4;	
+               fv_core_nml:layout=6,16;fv_core_nml:io_layout=1,4;atmos_model_nml:nxblocks=2;atmos_model_nml:nyblocks=6;
+	       land_model_nml:layout=6,16;land_model_nml:io_layout=1,4;
+	       ice_model_nml:layout=72,8;ice_model_nml:io_layout=1,4;
+	       dummy_ice_nml:ice_layout=72,8;dummy_ice_nml:ice_io_layout=1,4;
+	       icebergs_nml:make_calving_reproduce=.true.;
+               dummy_ocean_nml:ocean_layout=32,36;dummy_ocean_nml:ocean_io_layout=1,4;
+               dummy_ocean_nml:ocean_mask_table=mask_table.201.32x36"/><!--1/2 degree ocean grid Only-->
+
+   <property name="domainparams_A864x2_O951p5"
 	     value="
 	       coupler_nml:do_ocean=.true.;coupler_nml:ocean_npes=951;
                coupler_nml:atmos_npes=864;coupler_nml:atmos_nthreads=2;flux_exchange_nml:nblocks=2;	
@@ -1314,15 +1418,105 @@ the faster the model throughput, but also the lower the model efficiency
   <property name="OCN_PROD_LAYOUT"      value="90,45"/>
   <property name="OCN_PROD_IO_LAYOUT"   value="1,5"/>
   <property name="OCN_PROD_MASK_TABLE"  value="mask_table.1053.90x45"/>
+
   <setup>
 
     <platform name="ncrc3.default">
       <xi:include xpointer="xpointer(//setup/platform[@name='ncrc3.intel15']/node())" />
     </platform>
     
-    <platform name="ncrc3.intel15">
+    <platform name="ncrc4.intel16">
 <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
       <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
+      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
+      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Ming.Zhao/archive/mdt"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
+      <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20160517"/>
+      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     
+      <csh><![CDATA[
+module use -a /usw/eslogin/modulefiles-c3
+        source $MODULESHOME/init/csh
+        module use -a /ncrc/home2/fms/local/modulefiles
+        module unload cray-netcdf fre
+        module swap PrgEnv-intel PrgEnv-intel/6.0.3
+module load PrgEnv-intel
+        module swap intel intel/16.0.3.210
+        module load fre/bronx-10
+
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+
+      ]]></csh>
+
+    </platform>
+    <platform name="ncrc4.intel15">
+<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
+      <project>gfdl_f</project>
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
+      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
+      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Ming.Zhao/archive/mdt"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
+      <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20160517"/>
+      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+     
+      <csh><![CDATA[
+        source $MODULESHOME/init/csh
+        module use -a /ncrc/home2/fms/local/modulefiles
+        module unload cray-netcdf fre
+        module swap PrgEnv-intel PrgEnv-intel/6.0.3
+module load PrgEnv-intel
+        module swap intel intel/15.0.2.164
+        module load fre/bronx-10
+
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+ 
+      ]]></csh>
+
+    </platform>
+    <platform name="ncrc3.intel15">
+<!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
+      <project>gfdl_YOURGROUPLETTER</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
         <root>$CPERM/$USER/$(FRE_STEM)</root>
@@ -1535,7 +1729,7 @@ module load nco/4.5.2
       <property name="AWG_ARCHIVE_ROOT"  value="/scratch4/GFDL/gfdlscr/Niki.Zadeh/awg/mdt"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/LWH"/>
       <property name="MIZ_ARCHIVE_ROOT"  value="/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
       <property name="CWG_HOME"          value="/scratch4/GFDL/gfdlscr/John.Krasting/cwg"/>
       <property name="REFERENCE"         value=""/>
       <property name="ARCHIVE_INPUT_NZ"  value="/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input"/>
@@ -1583,7 +1777,7 @@ module load nco/4.5.2
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/CM4/input"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_M"/>
       <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/CM4/input"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)/$(name)"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
       <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
       <property name="ARCHIVE_INPUT_NZ"  value="/lustre/atlas/proj-shared/cli061/pdata/fms"/>
       <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20160517"/>
@@ -1635,7 +1829,7 @@ limit coredumpsize unlimited
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/CM4/input"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_M"/>
       <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/CM4/input"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)/$(name)"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
       <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
 
       <property name="FMS_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/fms" />
@@ -1707,6 +1901,9 @@ limit coredumpsize unlimited
       </csh>
     </platform>
     <platform name="gfdl.ncrc3-intel15">
+      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
+    </platform>
+    <platform name="gfdl.ncrc4-intel16">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
     <platform name="gfdl.olcf-eos_intel15">
@@ -1789,7 +1986,7 @@ Experiment to build executable.
 
 <csh> <![CDATA[
 sed -e 's/<TAB>/\t/' >${bld_dir}/land_lad2/Makefile-cpp <<EOF
-CPPDEFS = -DINTERNAL_FILE_NML -g -Dintel14_bug -D_FILE_VERSION="\`git-version-string \$<\`"
+CPPDEFS = -nostdinc -DINTERNAL_FILE_NML -g -Dintel14_bug -D_FILE_VERSION="\`git-version-string \$<\`"
 FRETARGET = $(target)
 
 ifneq (\$(findstring hdf5,\${FRETARGET}),)
@@ -1832,7 +2029,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
 
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
           git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
-          (cd ocean_shared && git checkout origin/user/nnz/verona_dev_merge)
+          (cd ocean_shared && git checkout $(MOM6_GIT_TAG))
 
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
@@ -1863,6 +2060,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+            <makeOverrides>OPENMP=""</makeOverrides> <!-- SIS2 does not compile with -openmp in dev/master/2016.10.14-->
          </compile>
     </component>
 
@@ -2054,7 +2252,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c192L32_newLand20160112/awg_C192L32_OM4_025_grid_lm4p1_v20160305.tar</dataSource>
-        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/</dataSource>
+        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/awg_C192L32_OM4_025_grid_lm4p1_v20160305.tar</dataSource>
         <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/</dataSource>
       </dataFile>
     </input>
@@ -2319,7 +2517,7 @@ $baseDate
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fre/tikal/LM3/LM3p2_C96_CM2G_historical_HC1_quick/ncrc2.default-prod/static_veg/19810101.static_veg.lm3p2.remapped_to_c96_OM4_05_720x576.v20151120.tar</dataSource>
-        <dataSource site="theia"></dataSource>
+        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/awg/mdt/awg/input/lm3/19810101.static_veg.lm3p2.remapped_to_c96_OM4_05_720x576.v20151120.tar</dataSource>
         <dataSource site="olcf"></dataSource>
        </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -2484,7 +2682,7 @@ set nyblocks = $dummy
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Huan.Guo/INPUT/static_veg/19810101.static_veg_LM3p2sosn_HWSD5min_C192_OM4_025.v20160304.tar</dataSource>
-        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/</dataSource>
+        <dataSource site="theia">/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/19810101.static_veg_LM3p2sosn_HWSD5min_C192_OM4_025.v20160304.tar</dataSource>
         <dataSource site="olcf">/lustre/atlas/proj-shared/cli061/pdata/CM4/input/</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -2920,11 +3118,12 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         <run months="1" npes="432"  overrideParams="$(domainparams_c192A432x4)" runTimePerJob="01:00:00"/>
         <run months="1" npes="576"  overrideParams="$(domainparams_c192A576x4)" runTimePerJob="01:00:00"/>
         <run months="1" npes="864"  overrideParams="$(domainparams_c192A864x4)" runTimePerJob="01:00:00"/>
-      </regression>
-
-      <regression name="timings2">
         <run months="1" npes="1152"  overrideParams="$(domainparams_c192A1152x2)" runTimePerJob="00:30:00"/>
         <run months="1" npes="1728"  overrideParams="$(domainparams_c192A1728x2)" runTimePerJob="00:30:00"/>
+      </regression>
+      <regression name="timings2">
+        <run months="1" npes="2304"  overrideParams="$(domainparams_c192A2304x2)" runTimePerJob="00:30:00"/>
+        <run months="1" npes="1152"  overrideParams="$(domainparams_c192A1152x4)" runTimePerJob="00:30:00"/>
       </regression>
 
       <reference restart="$(REFERENCE)/archive/1x0m8d_864pe/restart/19800109.tar"/>
@@ -3107,6 +3306,12 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         <run months="1" npes="1536" runTimePerJob="00:30:00" overrideParams="$(domainparams_A1536x2)"/>
         <run months="1" npes="1728" runTimePerJob="00:30:00" overrideParams="$(domainparams_A1728x2)"/>
       </regression>
+      <regression name="timings2">
+        <run months="1" npes="1152" runTimePerJob="00:30:00" overrideParams="$(domainparams_A1152x4)"/>
+        <run months="1" npes="1152" runTimePerJob="00:30:00" overrideParams="$(domainparams_A1152x4_1)"/>
+        <run months="1" npes="2304" runTimePerJob="00:30:00" overrideParams="$(domainparams_A2304x2)"/>
+      </regression>
+
       <regression name="timingsALL">
         <run months="1" npes="216"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A216x2)"/>
         <run months="1" npes="432"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A432x2)"/>
@@ -3155,6 +3360,30 @@ configuration with present-day climatological SSTs, but pre-industrial GHGs and 
     </input>
 </experiment>
 
+<experiment name="c96L48_am4g10_fullchem_2000climo_hthread" inherit="c96L48_am4g10_fullchem_2000climo"> 
+    <runtime>
+      <regression name="basic">
+        <run days="8"   npes="216"  overrideParams="$(domainparams_A216x2h)" runTimePerJob="00:20:00"/>
+      </regression>
+      <regression name="rts">
+        <run days="4 4"  npes="216" overrideParams="$(domainparams_A216x2h)"  runTimePerJob="00:40:00"/>
+        <run days="8"   npes="216"  overrideParams="$(domainparams_A216x4h)" runTimePerJob="00:20:00"/>
+      </regression>
+
+      <regression name="timing">
+        <run months="1" npes="216"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2h)"/>
+        <run months="1" npes="288"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2h)"/>
+        <run months="1" npes="432"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2h)"/>
+        <run months="1" npes="576"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2h)"/>
+        <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2h)"/>
+        <run months="1" npes="1152" runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2h)"/>
+        <run months="1" npes="768"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A768x4h)"/>
+        <run months="1" npes="1536" runTimePerJob="01:00:00" overrideParams="$(domainparams_A1536x2h)"/>
+        <run months="1" npes="1728" runTimePerJob="01:00:00" overrideParams="$(domainparams_A1728x2h)"/>
+      </regression>
+
+    </runtime>
+</experiment>
 <experiment name="c96L48_am4g10_fullchem_2000climo" inherit="cm4_compile">
     <description>
 Same model as c96L48_am4g9_fullchem,
@@ -3280,7 +3509,11 @@ Chemistry changes from am4g7:
       </regression>
 
       <regression name="timing">
-        <run months="1" npes="1728" runTimePerJob="01:00:00" overrideParams="$(domainparams_A1728x2)"/>
+        <run months="1" npes="768"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A768x4_1)"/>
+        <run months="1" npes="864"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A864x4_1)"/>
+        <run months="1" npes="576"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x4_1)"/>
+        <run months="1" npes="576"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x4)"/>
+        <run months="1" npes="432"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x8_1)"/>
       </regression>
       <regression name="timings">
         <run months="1" npes="216"  runTimePerJob="02:00:00" overrideParams="$(domainparams_A216x2)"/>
@@ -3294,6 +3527,17 @@ Chemistry changes from am4g7:
         <run months="1" npes="576"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x4)"/>
         <run months="1" npes="432"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x8)"/>
 
+        <run months="1" npes="1152" runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2_1)"/>
+        <run months="1" npes="1152" runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2_2)"/>
+        <run months="1" npes="1152" runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2_3)"/>
+        <run months="1" npes="1152" runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2_4)"/>
+        <run months="1" npes="1152" runTimePerJob="01:00:00" overrideParams="$(domainparams_A1152x2_5)"/>
+        <run months="1" npes="576"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x4_1)"/>
+      </regression>
+      <regression name="timings2">
+        <run months="1" npes="1152" runTimePerJob="00:30:00" overrideParams="$(domainparams_A1152x4)"/>
+        <run months="1" npes="1152" runTimePerJob="00:30:00" overrideParams="$(domainparams_A1152x4_1)"/>
+        <run months="1" npes="2304" runTimePerJob="00:30:00" overrideParams="$(domainparams_A2304x2)"/>
       </regression>
 
       <reference restart="$(REFERENCE)/archive/1x0m8d_216x2a/restart/00010109.tar"/>
@@ -3477,6 +3721,12 @@ endif
       <regression name="debug">
         <run days="1"   npes="1972" runTimePerJob="01:30:00" overrideParams="$(domainparams_A216x2_O1756)"/>
       </regression>
+
+        <regression name="timings_c4">
+          <run months="1" npes="2258" runTimePerJob="01:00:00" overrideParams="$(domainparams_A288x2_O1970)"/>
+          <run months="1" npes="4358" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O3782)"/>
+          <run months="1" npes="3429" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O2997)"/>	  
+        </regression>
 
 	<regression name="timings">
           <run months="1" npes="1972" runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O1756)"/>
@@ -3830,7 +4080,7 @@ endif
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/All_edits.nc</dataSource>
       </dataFile>
-      <dataFile label="input" target="INPUT/WOA05_pottemp_salt.nc" chksum="" size="" timestamp="">
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/WOA05_ptemp_salt_monthly.nc </dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
@@ -4089,7 +4339,7 @@ endif
             ocean_albedo_option = 5
       </namelist>
       <namelist name="ocean_rough_nml">
-            rough_scheme = 'COARE3.5'
+            rough_scheme = 'coare3.5'
       </namelist>
      </input>
   </experiment>
@@ -4153,8 +4403,404 @@ SIS_OVERRIDE_EOF
      ]]></csh>
 </input>
 </experiment>
+<experiment name="CM4_g10r8_160526_MLE30d.$(MOM6_DATE)" inherit="CM4_g10r8_160526_MLE30d"/>
+<experiment name="CM4_g10r8_160526_MLE30d" inherit="CM4_c96L32_am4g10r8_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
 
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+MOM_OVERRIDE_EOF
 
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+</input>
+</experiment>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLb.$(MOM6_DATE)" inherit="CM4_g10r8_160526_MLE30d_ePBLb"/>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLb" inherit="CM4_c96L32_am4g10r8_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 1.0
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+</input>
+</experiment>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLc.$(MOM6_DATE)" inherit="CM4_g10r8_160526_MLE30d_ePBLc"/>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLc" inherit="CM4_c96L32_am4g10r8_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 1.0
+#override MKE_TO_TKE_EFFIC = 0.1
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+</input>
+</experiment>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLd.$(MOM6_DATE)" inherit="CM4_g10r8_160526_MLE30d_ePBLd"/>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLd" inherit="CM4_c96L32_am4g10r8_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.02
+#override TKE_DECAY = 16.0
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+</input>
+</experiment>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLe.$(MOM6_DATE)" inherit="CM4_g10r8_160526_MLE30d_ePBLe"/>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLe" inherit="CM4_c96L32_am4g10r8_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.02
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override EPBL_IS_ADDITIVE = False
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+</input>
+</experiment>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLf.$(MOM6_DATE)" inherit="CM4_g10r8_160526_MLE30d_ePBLf"/>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLf" inherit="CM4_c96L32_am4g10r8_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override FOX_KEMPER_ML_RESTRAT_COEF = 2.0
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.02
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override EPBL_IS_ADDITIVE = False
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+</input>
+</experiment>
+
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLg.$(MOM6_DATE)" inherit="CM4_g10r8_160526_MLE30d_ePBLg"/>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLg" inherit="CM4_c96L32_am4g10r8_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.2
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override EPBL_IS_ADDITIVE = False
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+</input>
+</experiment>
+
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLh_theia_intel15" inherit="CM4_g10r8_160526_MLE30d_ePBLh"/>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLh.$(MOM6_DATE)" inherit="CM4_g10r8_160526_MLE30d_ePBLh"/>
+<experiment name="CM4_g10r8_160526_MLE30d_ePBLh" inherit="CM4_c96L32_am4g10r8_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.1
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override EPBL_IS_ADDITIVE = False
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+</input>
+</experiment>
+
+<experiment name="CM4_c96L32_am4g10r14_2000" inherit="CM4_c96L32_am4g10r8_2000">
+<input>
+    <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.4,
+        parcel_option = 2,
+        beta_rad      = 0.33,
+        Ashear        = 20.0, 
+        beta_surf     = 0.23,
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+    </namelist>
+      <namelist name="strat_cloud_nml">
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 10.0,
+        Dmin = 1.0e-07,
+        n_land = 150.e6,
+        n_ocean = 50.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 2.0e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-5,
+        eros_scale_t = 5.e-5,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.0
+        U_evap_snow = 1.0
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 0.3
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
+        aerosol_activation_scheme = "total"
+      </namelist>
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.5e-3,
+        tcrit    = -25.15,
+        peff_l   = 5.0e-5
+        peff_i   = 11.0e-5
+        frac_drs = 0.0
+        rpen     = 4.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 2
+        do_pevap = .true.
+        do_new_pblfac = .true.
+        include_emf_s = .false.
+        cfrac    = 0.15
+        hcevap   = 0.8
+        hcevappbl = 1.0
+        pblfac   = 1.0
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+        bigc = 0.0
+      </namelist>
+      <namelist name="deep_conv_nml">
+        crh_th_ocean = 0.4
+        crh_th_land  = 0.4
+        auto_th0_d = 0.5e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 5.0e-5
+        peff_i_d   = 11.0e-5
+        rkm_dp1 = 2.
+        rkm_dp2 = 0.1
+        crh_max = 0.95
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        rpen_d     = 4.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.8
+        hcevappbl_d = 1.0
+        pblfac_d   = 1.0
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 1.0
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+        include_emf_d = .false.
+      </namelist>
+</input>
+</experiment>
+
+<experiment name="CM4_g10r14_160526_MLE30d_ePBLh.$(MOM6_DATE)" inherit="CM4_g10r14_160526_MLE30d_ePBLh"/>
+<experiment name="CM4_g10r14_160526_MLE30d_ePBLh" inherit="CM4_c96L32_am4g10r14_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.1
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override EPBL_IS_ADDITIVE = False
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+</input>
+</experiment>
+
+<experiment name="CM4_g10r14_160526_MLE30d_ePBLh_NH.$(MOM6_DATE)" inherit="CM4_g10r14_160526_MLE30d_ePBLh_NH"/>
+<experiment name="CM4_g10r14_160526_MLE30d_ePBLh_NH" inherit="CM4_c96L32_am4g10r14_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.1
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override EPBL_IS_ADDITIVE = False
+#override HENYEY_IGW_BACKGROUND = False
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+</input>
+</experiment>
+
+<experiment name="CM4_g10r14_160526_MLE30d_ePBLj.$(MOM6_DATE)" inherit="CM4_g10r14_160526_MLE30d_ePBLj"/>
+<experiment name="CM4_g10r14_160526_MLE30d_ePBLj" inherit="CM4_c96L32_am4g10r14_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.2
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override WSTAR_USTAR_COEF = 1.0
+#override USE_MLD_ITERATION = True
+#override EPBL_IS_ADDITIVE = False
+#override TKE_SHEAR_DECAY_CONST = 0.55
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+</input>
+</experiment>
+
+<experiment name="CM4_g10r14_160526_MLE30d_ePBLm" inherit="CM4_c96L32_am4g10r14_2000">
+<input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.2
+#override WSTAR_USTAR_COEF = 1.0
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override USE_MLD_ITERATION = True
+#override EPBL_TRANSITION_SCALE = 0.1
+#override EPBL_IS_ADDITIVE = False
+#override PRANDTL_TURB = 1.25
+MOM_OVERRIDE_EOF
+
+     ]]></csh>
+</input>
+</experiment>
 <experiment name="CM4_c96L32_am4g10r8_2000_OMp5" inherit="cm4_sis2_compile">
     <description
 communityProject="$(ProjectID)" 
@@ -4330,16 +4976,16 @@ SIS_OVERRIDE_EOF
     </input>
 
     <runtime>
-        <production simTime="$(PROD_SIMTIME)" units="years" npes="1418" runTime="$(PROD_RUNTIME)">
-          <segment simTime="12" units="months" runTime="$(PROD_SEGTIME)"/>
+        <production simTime="$(PROD_SIMTIME)" units="years" npes="1418" runTime="04:00:00">
+          <segment simTime="12" units="months" runTime="02:00:00"/>
         </production>
       <regression name="basic">
           <run months="1" npes="1058"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O842p5)"/>
       </regression>
 
       <regression name="rts">
-        <run days="15 16" npes="1058"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O842p5)"/>
-        <run days="2"     npes="1418" runTimePerJob="00:30:00" overrideParams="$(domainparams_A576x2_O842p5)"/>
+        <run days="15 16" npes="1058"  runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O842p5)"/>
+        <run days="2"     npes="1058"  runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O842p5)"/>
   	<run days="2"     npes="864"  runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O648)"/>
   	<run days="2"     npes="1080" runTimePerJob="00:30:00" overrideParams="$(domainparams_A216x2_O864)"/>
       </regression>
@@ -4368,7 +5014,7 @@ SIS_OVERRIDE_EOF
       	</regression>
 
 	<regression name="timings_c3">
-          <run months="1" npes="1633" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1057p5)"/>
+          <run months="1" npes="1418" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O842p5)"/>
           <run months="1" npes="1274" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O842p5)"/>
       	</regression>
 	<regression name="timings_t1">
@@ -4384,6 +5030,11 @@ SIS_OVERRIDE_EOF
        	</regression>
 
 	<regression name="timings">
+          <run months="1" npes="1418" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O842p5)"/>
+          <run months="1" npes="1876" runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x2_O1300p5)"/>
+       	</regression>
+
+	<regression name="timings2">
           <run months="1" npes="1728" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O1296)"/>
           <run months="1" npes="864"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A216x2_O648)"/>
           <run months="1" npes="1489" runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x2_O1057p5)"/>
@@ -4526,7 +5177,7 @@ if ( $currentSeg == 1 ) then
 endif
 #
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE  = "tidal_amplitude.nc"
@@ -4726,17 +5377,104 @@ SIS_OVERRIDE_EOF
  </input>
 </experiment>
 
-<experiment name="CM4_c96L32_am4g10r8_2000_OMp5_lmix_H5_nmle_ndiff_meke_KHTH200_KDE-5" inherit="CM4_c96L32_am4g10r8_2000_OMp5">
-  <input>
-      <namelist name="land_model_nml">
-        layout = 8,12
-        io_layout = 1,4
-        tau_snow_T_adj = 604800.
-        prohibit_negative_canopy_water=.false.
-        min_frac = 1e-8
-        use_coast_rough = .true.,
-        use_coast_topo_rough = .false.,
-        max_coast_frac=0.67
+<experiment name="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLe_c4_intel16" inherit="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLe"/>
+<experiment name="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLe_theia_intel15" inherit="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLe"/>
+<experiment name="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLe" inherit="CM4_c96L32_am4g10r13_2000_OMp5_lmix_H5_nmle_ndiff_meke_KHTH200">
+<input>
+    <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.4,
+        parcel_option = 2,
+        beta_rad      = 0.33,
+        Ashear        = 20.0, 
+        beta_surf     = 0.23,
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+    </namelist>
+      <namelist name="strat_cloud_nml">
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 10.0,
+        Dmin = 1.0e-07,
+        n_land = 150.e6,
+        n_ocean = 50.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 2.0e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-5,
+        eros_scale_t = 5.e-5,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.0
+        U_evap_snow = 1.0
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 0.3
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
+        aerosol_activation_scheme = "total"
+      </namelist>
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.5e-3,
+        tcrit    = -25.15,
+        peff_l   = 5.0e-5
+        peff_i   = 11.0e-5
+        frac_drs = 0.0
+        rpen     = 4.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 2
+        do_pevap = .true.
+        do_new_pblfac = .true.
+        include_emf_s = .false.
+        cfrac    = 0.15
+        hcevap   = 0.8
+        hcevappbl = 1.0
+        pblfac   = 1.0
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+        bigc = 0.0
+      </namelist>
+      <namelist name="deep_conv_nml">
+        crh_th_ocean = 0.4
+        crh_th_land  = 0.4
+        auto_th0_d = 0.5e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 5.0e-5
+        peff_i_d   = 11.0e-5
+        rkm_dp1 = 2.
+        rkm_dp2 = 0.1
+        crh_max = 0.95
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        rpen_d     = 4.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.8
+        hcevappbl_d = 1.0
+        pblfac_d   = 1.0
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 1.0
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+        include_emf_d = .false.
       </namelist>
 
       <csh><![CDATA[
@@ -4746,130 +5484,9 @@ if ( $currentSeg == 1 ) then
 endif
 #
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
-#override Z_INIT_FILE_SALT_VAR  = "salt"
-#override TIDEAMP_FILE  = "tidal_amplitude.nc"
-#override CHL_FROM_FILE = True
-#override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
-Z_INIT_REMAP_GENERAL = True                                                          
-Z_INIT_REMAP_FULL_COLUMN = True                                                      
-MEKE_KHTH_FAC = 1.0                                                                  
-VISC_RES_FN_POWER = 100 
-#override DIABATIC_FIRST = False
-#override OCEAN_SURFACE_STAGGER = "C"
-#override TOPO_EDITS_FILE       = ""
-DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
-#override ENERGYSAVEDAYS = 30
-
-#override KHTR = 500.
-#override KHTH = 200.                                                                
-#override DT = 1800
-#override DT_THERM = 7200
-#override KD = 2.0E-5
-
-MOM_OVERRIDE_EOF
-
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override MIN_OCN_INTERTIAL_H = 2.
-
-SIS_OVERRIDE_EOF
-     ]]></csh>
-
-    </input>
-</experiment>
-
-<experiment name="CM4_c96L32_am4g10r8_1860_OMp5_lmix_H5_nmle_ndiff_meke_KHTH200_KDE-5" inherit="CM4_c96L32_am4g10r8_2000_OMp5">
-  <input>
-      <namelist name="land_model_nml">
-        layout = 8,12
-        io_layout = 1,4
-        tau_snow_T_adj = 604800.
-        prohibit_negative_canopy_water=.false.
-        min_frac = 1e-8
-        use_coast_rough = .true.,
-        use_coast_topo_rough = .false.,
-        max_coast_frac=0.67
-      </namelist>
-    <namelist name="radiative_gases_nml">
-      use_co2_10um = .true.
-
-      verbose = 3
-      gas_printout_freq = 240
-
-      time_varying_co2 = .false.,
-      co2_variation_type = 'linear',
-      co2_dataset_entry = 1860,1,1,0,0,
-      co2_specification_type = 'time_series',
-      co2_floor = 100.0E-06,
-      co2_ceiling = 1600.0E-06,
-      co2_data_source = 'input'
-
-      time_varying_ch4 = .false.,
-      ch4_variation_type = 'linear'
-      ch4_dataset_entry = 1860,1,1,0,0,
-      ch4_specification_type = 'time_series'
-      ch4_data_source = 'input'
-
-      time_varying_n2o = .false.,
-      n2o_variation_type = 'linear'
-      n2o_dataset_entry = 1860,1,1,0,0,
-      n2o_specification_type = 'time_series'
-      n2o_data_source = 'input'
-
-      time_varying_f11 = .false.,
-      f11_variation_type = 'linear'
-      f11_dataset_entry = 1860,1,1,0,0,
-      f11_specification_type = 'time_series'
-      f11_data_source = 'input'
-
-      time_varying_f12 = .false.,
-      f12_variation_type = 'linear'
-      f12_dataset_entry = 1860,1,1,0,0,
-      f12_specification_type = 'time_series'
-      f12_data_source = 'input'
-
-      time_varying_f113 = .false.,
-      f113_variation_type = 'linear'
-      f113_dataset_entry = 1860,1,1,0,0,
-      f113_specification_type = 'time_series'
-      f113_data_source = 'input'
-
-      time_varying_f22 = .false.,
-      f22_variation_type = 'linear'
-      f22_dataset_entry = 1860,1,1,0,0,
-      f22_specification_type = 'time_series'
-      f22_data_source = 'input'
-
-      calc_co2_tfs_on_first_step = .false.,
-      calc_co2_tfs_monthly = .true.,
-      co2_tf_time_displacement = 0.0,
-
-      calc_ch4_tfs_on_first_step = .true.,
-      calc_ch4_tfs_monthly = .false.,
-      ch4_tf_time_displacement = 0.0,
-
-      calc_n2o_tfs_on_first_step = .true.,
-      calc_n2o_tfs_monthly = .false.,
-      n2o_tf_time_displacement = 0.0,
-     </namelist>
-     <namelist name="shortwave_driver_nml">
-      do_cmip_diagnostics = .true.,
-      swform = 'esfsw99'
-      solar_dataset_entry = 1860,1,1,0,0,
-      time_varying_solar_constant = .false.,
-     </namelist>
-
-      <csh><![CDATA[
-#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
-if ( $currentSeg == 1 ) then
-\rm -f $work/INPUT/ice_model.res.nc
-endif
-#
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
@@ -4877,32 +5494,315 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
-MEKE_KHTH_FAC = 1.0                                                                  
-VISC_RES_FN_POWER = 100 
-#override DIABATIC_FIRST = False
-#override OCEAN_SURFACE_STAGGER = "C"
-#override TOPO_EDITS_FILE       = ""
 DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
-#override ENERGYSAVEDAYS = 30
-
-#override KHTR = 500.
-#override KHTH = 200.                                                                
-#override DT = 1800
-#override DT_THERM = 7200
-#override KD = 2.0E-5
+#override ENERGYSAVEDAYS = .25
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.02
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override EPBL_IS_ADDITIVE = False
 
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-
 #override MIN_OCN_INTERTIAL_H = 2.
 
 SIS_OVERRIDE_EOF
      ]]></csh>
 
-    </input>
+</input>
+</experiment>
+
+<experiment name="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLj_c4_intel16_norough" inherit="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLj">
+<input>
+      <namelist name="ocean_rough_nml">
+            rough_scheme = 'COARE3.5'
+      </namelist>
+</input>
+</experiment>
+
+<experiment name="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLj_c4_intel16" inherit="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLj"/>
+<experiment name="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLj" inherit="CM4_c96L32_am4g10r13_2000_OMp5_lmix_H5_nmle_ndiff_meke_KHTH200">
+<input>
+    <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.4,
+        parcel_option = 2,
+        beta_rad      = 0.33,
+        Ashear        = 20.0, 
+        beta_surf     = 0.23,
+        radperturb    = 0.10, 
+        critjump      = 0.10,
+    </namelist>
+      <namelist name="strat_cloud_nml">
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 10.0,
+        Dmin = 1.0e-07,
+        n_land = 150.e6,
+        n_ocean = 50.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 2.0e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-5,
+        eros_scale_t = 5.e-5,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.0
+        U_evap_snow = 1.0
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 0.3
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
+        aerosol_activation_scheme = "total"
+      </namelist>
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.5e-3,
+        tcrit    = -25.15,
+        peff_l   = 5.0e-5
+        peff_i   = 11.0e-5
+        frac_drs = 0.0
+        rpen     = 4.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3 
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 2
+        do_pevap = .true.
+        do_new_pblfac = .true.
+        include_emf_s = .false.
+        cfrac    = 0.15
+        hcevap   = 0.8
+        hcevappbl = 1.0
+        pblfac   = 1.0
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+        bigc = 0.0
+      </namelist>
+      <namelist name="deep_conv_nml">
+        crh_th_ocean = 0.4
+        crh_th_land  = 0.4
+        auto_th0_d = 0.5e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 5.0e-5
+        peff_i_d   = 11.0e-5
+        rkm_dp1 = 2.
+        rkm_dp2 = 0.1
+        crh_max = 0.95
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        rpen_d     = 4.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.8
+        hcevappbl_d = 1.0
+        pblfac_d   = 1.0
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 1.0
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+        include_emf_d = .false.
+      </namelist>
+
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FROM_FILE = True
+#override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
+#override ENERGYSAVEDAYS = .25
+#override MLE_MLD_DECAY_TIME = 2.592E+06
+#override MSTAR = 2.9
+#override NSTAR = 0.2
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override WSTAR_USTAR_COEF = 1.0
+#override USE_MLD_ITERATION = True
+#override EPBL_IS_ADDITIVE = False
+#override TKE_SHEAR_DECAY_CONST = 0.55
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override MIN_OCN_INTERTIAL_H = 2.
+
+SIS_OVERRIDE_EOF
+     ]]></csh>
+
+</input>
+</experiment>
+
+<experiment name="CM4_c96L32_am4g10r14_2000_OMp5_H5_ndiff_meke_MLE30d_ePBLl" inherit="CM4_c96L32_am4g10r13_2000_OMp5_lmix_H5_nmle_ndiff_meke_KHTH200">
+<input>
+    <namelist name="entrain_nml">
+        convect_shutoff = .true.,
+        apply_entrain = .true.,
+        parcel_buoy   = 0.4,
+        parcel_option = 2,
+        beta_rad      = 0.33,
+        Ashear        = 20.0,
+        beta_surf     = 0.23,
+        radperturb    = 0.10,
+        critjump      = 0.10,
+    </namelist>
+      <namelist name="strat_cloud_nml">
+        use_online_aerosol = .true.,
+        U00 = 0.80,
+        U00_profile = .true.,
+        rthresh = 10.0,
+        Dmin = 1.0e-07,
+        n_land = 150.e6,
+        n_ocean = 50.e6,
+        diff_thresh = 0.1,
+        mc_thresh = 0.001,
+        eros_scale = 2.0e-6,
+        eros_choice = .true.,
+        eros_scale_c = 3.e-5,
+        eros_scale_t = 5.e-5,
+        super_choice = .true.,
+        tracer_advec = .true.
+        vfact = 1.0
+        U_evap_snow = 1.0
+        cfact = 1.0
+        do_liq_num = .true.
+        use_kk_auto = .false.
+        var_limit = 0.3
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        use_sub_seasalt = .false.
+        aerosol_activation_scheme = "total"
+      </namelist>
+      <namelist name="uw_plume_nml">
+        auto_th0 = 0.5e-3,
+        tcrit    = -25.15,
+        peff_l   = 5.0e-5
+        peff_i   = 11.0e-5
+        frac_drs = 0.0
+        rpen     = 4.0
+        wmin     = 0.5
+        deltaqc0 = 0.5e-3
+        do_pdfpcp= .false.
+        do_pmadjt= .true.
+        do_emmax = .true.
+        do_pnqv  = .true.
+        mixing_assumption = 2
+        mp_choice = 2
+        do_pevap = .true.
+        do_new_pblfac = .true.
+        include_emf_s = .false.
+        cfrac    = 0.15
+        hcevap   = 0.8
+        hcevappbl = 1.0
+        pblfac   = 1.0
+        emfrac_max = 0.25
+        rmaxfrac = 0.1
+        do_limit_wmax = .true.
+        wmax = 20.
+        do_tten_max = .false.
+        tten_max = 1000
+        bigc = 0.0
+      </namelist>
+      <namelist name="deep_conv_nml">
+        crh_th_ocean = 0.4
+        crh_th_land  = 0.4
+        auto_th0_d = 0.5e-3
+        tcrit_d    = -25.15,
+        peff_l_d   = 5.0e-5
+        peff_i_d   = 11.0e-5
+        rkm_dp1 = 2.
+        rkm_dp2 = 0.1
+        crh_max = 0.95
+        cwfn_th = 10.
+        tau_dp = 28800.
+        mixing_assumption_d = 4
+        do_ppen_d  = .true.
+        rpen_d     = 4.0
+        do_pevap_d = .true.
+        cfrac_d    = 0.15
+        hcevap_d   = 0.8
+        hcevappbl_d = 1.0
+        pblfac_d   = 1.0
+        frac_limit_d = 0.25
+        dcwfndm_th = 100
+        lofactor_d = 1.0
+        do_cgust_dp  = .true.
+        cgust_choice = 1
+        include_emf_d = .false.
+      </namelist>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp"
+#override Z_INIT_FILE_SALT_VAR  = "salt"
+#override TIDEAMP_FILE          = "tidal_amplitude.nc"
+#override CHL_FROM_FILE = True
+#override CHL_FILE      = "seawifs_1998-2006_smoothed_2X.nc"
+Z_INIT_REMAP_GENERAL = True
+Z_INIT_REMAP_FULL_COLUMN = True
+DIAG_REMAP_Z_GRID_DEF = "FILE:analysis_vgrid_lev35.v1.nc,zw"
+#override ENERGYSAVEDAYS = .25
+#override USE_MLD_ITERATION = True
+#override MSTAR = 2.9
+#override NSTAR = 0.2
+#override TKE_DECAY = 16.0
+#override ML_OMEGA_FRAC = 0.1
+#override EPBL_IS_ADDITIVE = False
+#override USE_MLD_ITERATION = True
+#override PRANDTL_TURB = 1.25
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+SIS_OVERRIDE_EOF
+     ]]></csh>
+
+</input>
 </experiment>
 
 
@@ -5002,7 +5902,7 @@ endif
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
@@ -5216,7 +6116,7 @@ endif
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
@@ -5629,7 +6529,7 @@ endif
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_ptemp_salt_monthly.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp"
 #override Z_INIT_FILE_SALT_VAR  = "salt"
 #override TIDEAMP_FILE          = "tidal_amplitude.nc"
@@ -5695,8 +6595,16 @@ SIS_OVERRIDE_EOF
       </regression>
 
 	<regression name="timings">
-          <run months="1" npes="1815"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O951p5)"/>
+          <run months="1" npes="1706"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O842p5)"/>
+          <run months="1" npes="1274"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A432x4_O842p5)"/>
+          <run months="1" npes="1527"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A576x4_O951p5)"/>
       	</regression>
+        <regression name="timings2">
+          <run months="1" npes="1921"  runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O1057p5)"/>
+          <run months="1" npes="2164" runTimePerJob="01:00:00" overrideParams="$(domainparams_A864x2_O1300p5)"/>
+          <run months="12 12" npes="1921"  runTimePerJob="16:00:00" overrideParams="$(domainparams_A864x2_O1057p5)"/>
+        </regression>
+
 
       <reference restart="$(REFERENCE)/archive/1x1m0d_864x2a_1057x1o/restart/00010201.tar"/>
     </runtime>

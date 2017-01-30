@@ -27,6 +27,23 @@ echo "  ---------- begin refineDiag_data_stager.csh ----------  "
 cd $work/$hsmdate
 pwd
 
+#-- This block is to run the refactored diagnostics and ingest them 
+#-- into the mySQL database det_analysis currently running on Cobweb.
+if ( $?tripleID  ) then
+    if ( ${tripleID} != "" ) then
+        python /home/fms/local/opt/fre-analysis/test/eem/code/detVitals/atmos_analysis.py -t ${tripleID} -y ${oname}
+        python /home/fms/local/opt/fre-analysis/test/eem/code/detVitals/ocean_analysis.py -t ${tripleID} -y ${oname}
+        python /home/fms/local/opt/fre-analysis/test/eem/code/detVitals/land_analysis.py -t ${tripleID} -y ${oname}
+        python /home/fms/local/opt/fre-analysis/test/eem/code/detVitals/cobalt_analysis.py -t ${tripleID} -y ${oname}
+        python /home/fms/local/opt/fre-analysis/test/eem/code/detVitals/detVitalsAverager.py -t ${tripleID} 
+    else
+        echo "tripleID for the experiment ${name} is not properly set... skipping detVitals diagnostics."
+    endif
+else
+    echo "tripleID for the experiment ${name} is not properly set... skipping detVitals diagnostics."
+endif
+
+
 #-- Unload any previous versions of Python and load the system default
 module unload python
 module unload cdat
@@ -243,7 +260,13 @@ def dbEntry(db,varName,varSum,varAvg,fYear):
 def areaMean(varName,cellArea,cellFrac,soilFrac,geoLat,geoLon,region='global'):
   moduleDic = getWebsiteVariablesDic()
   var = MV2.concatenate((MV2.array(fdata1(varName)), MV2.array(fdata2(varName)), MV2.array(fdata3(varName)), MV2.array(fdata4(varName)), MV2.array(fdata5(varName)), MV2.array(fdata6(varName))),axis=1)
+  var = MV2.masked_where(MV2.equal(var,fdata1(varName)._FillValue), var)
   var = cdutil.YEAR(var).squeeze()
+
+  cellArea = MV2.masked_where(MV2.equal(var,fdata1(varName)._FillValue), cellArea)
+  cellFrac = MV2.masked_where(MV2.equal(var,fdata1(varName)._FillValue), cellFrac)
+  soilFrac = MV2.masked_where(MV2.equal(var,fdata1(varName)._FillValue), soilFrac)
+
   try:
     module = moduleDic[varName]
   except:
@@ -281,6 +304,11 @@ def areaMean(varName,cellArea,cellFrac,soilFrac,geoLat,geoLon,region='global'):
 
 def areaMean3D(varName,cellArea,cellFrac,cellDepth,soilFrac,geoLat,geoLon,region='global'):
   var = MV2.concatenate((MV2.array(fdata1(varName)), MV2.array(fdata2(varName)), MV2.array(fdata3(varName)), MV2.array(fdata4(varName)), MV2.array(fdata5(varName)), MV2.array(fdata6(varName))),axis=2)
+  var = MV2.masked_where(MV2.equal(var,fdata1(varName)._FillValue),var)
+
+  cellArea = MV2.masked_where(MV2.equal(var[0,0,:],fdata1(varName)._FillValue), cellArea)
+  cellFrac = MV2.masked_where(MV2.equal(var[0,0,:],fdata1(varName)._FillValue), cellFrac)
+  soilFrac = MV2.masked_where(MV2.equal(var[0,0,:],fdata1(varName)._FillValue), soilFrac)
   moduleDic = getWebsiteVariablesDic()
   try:
     module = moduleDic[varName]
@@ -475,9 +503,14 @@ except: doVmo = False
 
 try:
   vhFile = fYear+'.ocean_annual_z.nc'
-  vh  = netCDF4.Dataset(vhFile).variables['vh'][0]
-  vh  = vh.filled(0)*1e-9
-  zt  = netCDF4.Dataset(vhFile).variables['zt'][:]
+  if 'vmo' in netCDF4.Dataset(vhFile).variables:
+    vh  = netCDF4.Dataset(vhFile).variables['vmo'][0]
+    vh  = vh.filled(0)*1e-9
+    zt  = netCDF4.Dataset(vhFile).variables['z_l'][:]
+  else:
+    vh  = netCDF4.Dataset(vhFile).variables['vh'][0]
+    vh  = vh.filled(0)*1e-9
+    zt  = netCDF4.Dataset(vhFile).variables['zt'][:]
   yq_vh  = netCDF4.Dataset(vhFile).variables['yq'][:]
   doVh = True
 except: doVh = False
@@ -714,6 +747,7 @@ def areaMean(varName,cellArea,geoLat,geoLon,region='global'):
   elif (region == 'global'):
     var  = var
     cellArea = cellArea
+  cellArea.mask[:] = var.mask[:]
   res = MV2.array(var*cellArea).sum()/cellArea.sum()
   return res, cellArea.sum()
 
