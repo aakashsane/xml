@@ -432,6 +432,46 @@ module use -a /usw/eslogin/modulefiles-c3
         setenv F_UFMTENDIAN big
       ]]></csh>
     </platform>
+    <platform name="ncrc4.intel16noovlim">
+      <freVersion>$(FRE_VERSION)</freVersion>
+      <compiler type="intel" version="16.0.3.210" />
+      <project>$(GFDL_GROUP)</project>
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
+      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
+      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Ming.Zhao/archive/mdt"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
+      <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20160517"/>
+      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/> 
+      <property name="MODEL_UPDATES_WH"     value="/ncrc/home1/Bill.Hurlin"/>
+      <csh><![CDATA[
+module use -a /usw/eslogin/modulefiles-c3
+        module load git
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+      ]]></csh>
+    <mkmfTemplate file="/ncrc/home2/Niki.Zadeh/bin/intel17noovlim.mk"/>
+
+    </platform>
     <platform name="ncrc4.intel17noovlim">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="17.0.0.098" />
@@ -1050,7 +1090,7 @@ Make the executable for ocean-ice experiments.
            ]]>  </csh>
        </source>
        <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -DMAX_FIELDS_=100 -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
+            <cppDefs><![CDATA[$(F2003_FLAGS) -DMAX_FIELDS_=100 -DNOT_SET_AFFINITY -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
 <!--            <makeOverrides>OPENMP=""</makeOverrides>  openmp switch for MOM6 may cause crash -->
        </compile>
       </component>
@@ -1907,7 +1947,7 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
          <!--the following should reproduce eachother but not the basic because basic uses mask_table-->
          <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O2304']/node())"/> </run>
          <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1152']/node())"/> </run>
-         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
+         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512x2']/node())"/> </run>
       </regression>
       <regression name="debugomp">
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512x2']/node())"/> </run>
@@ -2362,7 +2402,7 @@ force_all_pes_traj = .true.
         <run days="15 16" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O64']/node())"/> </run>
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O32']/node())"/> </run>
-        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O30']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O32x2']/node())"/> </run>
       </regression>
 
       <regression name="debugomp">
@@ -2760,7 +2800,7 @@ SIS_OVERRIDE_EOF
       <regression name="rts">
         <run days="15 16" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O432']/node())"/> </run>
         <!--the following should reproduce eachother but not the basic because basic uses mask_table-->
-        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
+        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512x2']/node())"/> </run>
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O648']/node())"/> </run>
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O864']/node())"/> </run>
       </regression>
@@ -2968,6 +3008,10 @@ touch $work/INPUT/SIS_override
        use_lag_fluxes=.false.
        atmos_nthreads = $atm_threads
        ocean_nthreads = $ocean_nthreads
+debug_affinity =.true.
+ncores_per_node = 36
+use_hyper_thread = .false.
+
      </namelist>
 
 
@@ -3018,7 +3062,7 @@ SIS_OVERRIDE_EOF
       <regression name="rts">
         <run days="15 16" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1057p5']/node())"/> </run>
         <!--the following should reproduce eachother but not the basic because basic uses mask_table-->
-        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
+        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512x2']/node())"/> </run>
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O648']/node())"/> </run>
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O864']/node())"/> </run>
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>

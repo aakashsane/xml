@@ -91,7 +91,7 @@ NOTES:
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
 
-  <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="FRE_STEM"  value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <property name="FRE_VERSION"     value="bronx-11"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
@@ -656,6 +656,22 @@ NOTES:
 	       <lnd                            layout = "8,12"   io_layout = "1,4" />
 	       <ice                            layout = "144,4"  io_layout = "1,4" />
 	       <ocn ranks="3782" threads="1"   layout = "72,72"  io_layout = "1,4" mask_table="mask_table.1402.72x72"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A864x2_O6122_production"><!--17 year/day on c4-->
+	     <resources jobWallclock="16:00:00" segRuntime="2:00:00">
+               <atm ranks="864" threads="2"    layout = "6,24"   io_layout = "1,4" />
+               <lnd                            layout = "6,24"   io_layout = "1,4" />
+               <ice                            layout = "72,12"  io_layout = "1,4" />
+	       <ocn ranks="6122" threads="1"   layout = "90,95"  io_layout = "1,5" mask_table="mask_table.2428.90x95"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A864x2_O6122">
+	     <resources jobWallclock="00:30:00">
+               <atm ranks="864" threads="2"    layout = "6,24"   io_layout = "1,4" />
+               <lnd                            layout = "6,24"   io_layout = "1,4" />
+               <ice                            layout = "72,12"  io_layout = "1,4" />
+	       <ocn ranks="6122" threads="1"   layout = "90,95"  io_layout = "1,5" mask_table="mask_table.2428.90x95"/>
 	     </resources>
    </freInclude>
    <!--c192 + 1/4 degree -->
@@ -1639,7 +1655,7 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
         ]]></csh>
       </source>
       <compile>
-        <cppDefs><![CDATA[ $(F2003_FLAGS) -DMAX_FIELDS_=100 -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
+        <cppDefs><![CDATA[ $(F2003_FLAGS) -DMAX_FIELDS_=100 -DNOT_SET_AFFINITY -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
         <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for MOM6 may cause crash -->
       </compile>
     </component>
@@ -3473,6 +3489,7 @@ MOM_OVERRIDE_EOF
 	<regression name="timings">
           <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1970']/node())"/> </run>
           <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O3782']/node())"/> </run>
+          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O6122']/node())"/> </run>
         </regression>
         <regression name="timings_all">
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1756']/node())"/> </run>
@@ -4445,6 +4462,7 @@ SIS_OVERRIDE_EOF
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1809.90x72
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1309.90x54     
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1402.72x72
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.2428.90x95
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.3785.90x144
      </dataFile>
 <!--
