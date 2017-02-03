@@ -79,6 +79,7 @@ endif
 #-- If db exists, copy it for safe keeping and prevent file locks in the 
 foreach reg (global nh sh tropics)
   cp -f ${localRoot}/db/${reg}AveAtmos.db ${localRoot}/db/.${reg}AveAtmos.db
+  cp -f ${localRoot}/db/${reg}AveAtmosAer.db ${localRoot}/db/.${reg}AveAtmosAer.db
   cp -f ${localRoot}/db/${reg}AveOcean.db ${localRoot}/db/.${reg}AveOcean.db
   cp -f ${localRoot}/db/${reg}AveLand.db ${localRoot}/db/.${reg}AveLand.db  
   cp -f ${localRoot}/db/${reg}AveCOBALT.db ${localRoot}/db/.${reg}AveCOBALT.db  
@@ -181,6 +182,116 @@ for varName in varDict:
     conn.close()
     
     conn = sqlite3.connect("${localRoot}/db/.shAveAtmos.db")
+    c = conn.cursor()
+    globalMeanDic[varName] = areaMean(varName,cellArea,geoLat,geoLon,region='sh')
+    sql = 'create table if not exists ' + varName + ' (year integer primary key, value float)'
+    sqlres = c.execute(sql)
+    sql = 'insert or replace into ' + varName + ' values(' + fYear[:4] + ',' + str(globalMeanDic[varName]) + ')'
+    try:
+      sqlres = c.execute(sql)
+      conn.commit()
+    except:
+      pass
+    c.close()
+    conn.close()
+
+EOF
+
+cat > global_atmos_aer_ave.py <<EOF
+import sqlite3, cdms2, cdutil, MV2, numpy, cdtime
+import sys
+
+# Set current year
+fYear = "${oname}"
+
+fgs1 = cdms2.open(fYear + '.grid_spec.tile1.nc')
+fgs2 = cdms2.open(fYear + '.grid_spec.tile2.nc')
+fgs3 = cdms2.open(fYear + '.grid_spec.tile3.nc')
+fgs4 = cdms2.open(fYear + '.grid_spec.tile4.nc')
+fgs5 = cdms2.open(fYear + '.grid_spec.tile5.nc')
+fgs6 = cdms2.open(fYear + '.grid_spec.tile6.nc')
+
+geoLat   = MV2.concatenate((MV2.array(fgs1('grid_latt')), MV2.array(fgs2('grid_latt')), MV2.array(fgs3('grid_latt')), MV2.array(fgs4('grid_latt')), MV2.array(fgs5('grid_latt')), MV2.array(fgs6('grid_latt'))),axis=0)
+geoLon   = MV2.concatenate((MV2.array(fgs1('grid_lont')), MV2.array(fgs2('grid_lont')), MV2.array(fgs3('grid_lont')), MV2.array(fgs4('grid_lont')), MV2.array(fgs5('grid_lont')), MV2.array(fgs6('grid_lont'))),axis=0)
+cellArea = MV2.concatenate((MV2.array(fgs1('area')), MV2.array(fgs2('area')), MV2.array(fgs3('area')), MV2.array(fgs4('area')), MV2.array(fgs5('area')), MV2.array(fgs6('area'))),axis=0)
+
+#Read in 6 nc files
+fdata1 = cdms2.open(fYear + '.atmos_month_aer.tile1.nc')
+fdata2 = cdms2.open(fYear + '.atmos_month_aer.tile2.nc')
+fdata3 = cdms2.open(fYear + '.atmos_month_aer.tile3.nc')
+fdata4 = cdms2.open(fYear + '.atmos_month_aer.tile4.nc')
+fdata5 = cdms2.open(fYear + '.atmos_month_aer.tile5.nc')
+fdata6 = cdms2.open(fYear + '.atmos_month_aer.tile6.nc')
+
+def areaMean(varName,cellArea,geoLat,geoLon,region='global'):
+  var = MV2.concatenate((MV2.array(fdata1(varName)), MV2.array(fdata2(varName)), MV2.array(fdata3(varName)), MV2.array(fdata4(varName)), MV2.array(fdata5(varName)), MV2.array(fdata6(varName))),axis=1)
+  var = cdutil.YEAR(var).squeeze()
+  if (region == 'tropics'):
+    var = MV2.masked_where(MV2.logical_or(geoLat < -30., geoLat > 30.),var)
+    cellArea = MV2.masked_where(MV2.logical_or(geoLat < -30., geoLat > 30.),cellArea)
+  elif (region == 'nh'):
+    var  = MV2.masked_where(MV2.less_equal(geoLat,30.),var)
+    cellArea  = MV2.masked_where(MV2.less_equal(geoLat,30.),cellArea)
+  elif (region == 'sh'):
+    var  = MV2.masked_where(MV2.greater_equal(geoLat,-30.),var)
+    cellArea  = MV2.masked_where(MV2.greater_equal(geoLat,-30.),cellArea)
+  elif (region == 'global'):
+    var  = var
+    cellArea = cellArea
+  res = MV2.array(var*cellArea).sum()/cellArea.sum()
+  return res
+
+varDict = fdata1.variables
+globalMeanDic={}
+tropicsMeanDic={}
+nhMeanDic={}
+shMeanDic={}
+for varName in varDict:
+  if (len(varDict[varName].shape) == 3):
+    
+    conn = sqlite3.connect("${localRoot}/db/.globalAveAtmosAer.db")
+    c = conn.cursor()
+    globalMeanDic[varName] = areaMean(varName,cellArea,geoLat,geoLon,region='global')
+    sql = 'create table if not exists ' + varName + ' (year integer primary key, value float)'
+    sqlres = c.execute(sql)
+    sql = 'insert or replace into ' + varName + ' values(' + fYear[:4] + ',' + str(globalMeanDic[varName]) + ')'
+    try:
+      sqlres = c.execute(sql)
+      conn.commit()
+    except:
+      pass
+    c.close()
+    conn.close()
+    
+    conn = sqlite3.connect("${localRoot}/db/.tropicsAveAtmosAer.db")
+    c = conn.cursor()
+    globalMeanDic[varName] = areaMean(varName,cellArea,geoLat,geoLon,region='tropics')
+    sql = 'create table if not exists ' + varName + ' (year integer primary key, value float)'
+    sqlres = c.execute(sql)
+    sql = 'insert or replace into ' + varName + ' values(' + fYear[:4] + ',' + str(globalMeanDic[varName]) + ')'
+    try:
+      sqlres = c.execute(sql)
+      conn.commit()
+    except:
+      pass
+    c.close()
+    conn.close()
+    
+    conn = sqlite3.connect("${localRoot}/db/.nhAveAtmosAer.db")
+    c = conn.cursor()
+    globalMeanDic[varName] = areaMean(varName,cellArea,geoLat,geoLon,region='nh')
+    sql = 'create table if not exists ' + varName + ' (year integer primary key, value float)'
+    sqlres = c.execute(sql)
+    sql = 'insert or replace into ' + varName + ' values(' + fYear[:4] + ',' + str(globalMeanDic[varName]) + ')'
+    try:
+      sqlres = c.execute(sql)
+      conn.commit()
+    except:
+      pass
+    c.close()
+    conn.close()
+    
+    conn = sqlite3.connect("${localRoot}/db/.shAveAtmosAer.db")
     c = conn.cursor()
     globalMeanDic[varName] = areaMean(varName,cellArea,geoLat,geoLon,region='sh')
     sql = 'create table if not exists ' + varName + ' (year integer primary key, value float)'
@@ -797,6 +908,7 @@ EOF
 
 #-- Run the averager script
 python global_atmos_ave.py
+python global_atmos_aer_ave.py
 python global_ocean_ave.py
 python global_land_ave.py
 python amoc.py
@@ -805,6 +917,7 @@ python global_COBALT_ave.py
 #-- Copy the database back to its original location
 foreach reg (global nh sh tropics)
   cp -f ${localRoot}/db/.${reg}AveAtmos.db ${localRoot}/db/${reg}AveAtmos.db
+  cp -f ${localRoot}/db/.${reg}AveAtmosAer.db ${localRoot}/db/${reg}AveAtmosAer.db
   cp -f ${localRoot}/db/.${reg}AveOcean.db ${localRoot}/db/${reg}AveOcean.db
   cp -f ${localRoot}/db/.${reg}AveLand.db ${localRoot}/db/${reg}AveLand.db  
   cp -f ${localRoot}/db/.${reg}AveCOBALT.db ${localRoot}/db/${reg}AveCOBALT.db  
