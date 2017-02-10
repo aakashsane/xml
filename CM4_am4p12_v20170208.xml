@@ -67,7 +67,7 @@ NOTES:
 
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="verona_201701"/>                  <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2017.02.03"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2017.02.10"/>              <!-- git tag date for MOM6 source code -->
   <property name="SHARED_GIT_TAG"     value="$(RELEASE)"/>
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20170208_g12"/>           <!-- git tag for AWG source code -->
@@ -1583,9 +1583,34 @@ Experiment to build executable.
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(LAND_GIT_TAG)">land_lad2.git</codeBase>
       </source>
-      <compile doF90Cpp="yes">
-       <cppDefs>$(F2003_FLAGS) -nostdinc</cppDefs>
-       <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for LAND may cause crash -->
+      <compile>
+        <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for LAND may cause crash -->
+        <cppDefs>$(F2003_FLAGS)</cppDefs>
+
+<csh> <![CDATA[
+sed -e 's/<TAB>/\t/' >${bld_dir}/land_lad2/Makefile-cpp <<EOF
+CPPDEFS = -nostdinc -DINTERNAL_FILE_NML -g -Dintel14_bug -D_FILE_VERSION="\`git-version-string \$<\`"
+FRETARGET = $(target)
+
+ifneq (\$(findstring hdf5,\${FRETARGET}),)
+else
+  CPPDEFS += -Duse_LARGEFILE
+endif
+
+vpath %.F90 \$(shell find ${src_dir}/land_lad2 -type d)
+
+land_lad2/%.f90: %.F90
+<TAB>cpp \${CPPDEFS} -C -v -I ${src_dir}/shared/include -o \$@ \$<
+
+EOF
+
+foreach foo ( `find ${src_dir}/land_lad2 -type f -name \*.F90` )
+  make -f land_lad2/Makefile-cpp land_lad2/$foo:t:r.f90
+end
+find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
+
+        ]]></csh>
+
       </compile>
     </component>
 
