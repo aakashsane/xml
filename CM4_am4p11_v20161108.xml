@@ -43,16 +43,16 @@ fremake -x CM4_am4p11_v20161108.xml -p ncrc3.intel15 -t prod-openmp cm4_compile
 SIS2:
 fremake -x CM4_am4p11_v20161108.xml -p ncrc3.intel15 -t prod-openmp cm4_sis2_compile
 
-# To run regression test (for the coupled experiment CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn ): 
+# To run regression test (for the coupled experiment CM4_c96L32_g11r11_2010_MLE30d_ePBLn ): 
 
-frerun -r basic -x CM4_am4p11_v20161108.xml -p ncrc3.intel15 -t prod-openmp CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn
+frerun -r basic -x CM4_am4p11_v20161108.xml -p ncrc3.intel15 -t prod-openmp CM4_c96L32_g11r11_2010_MLE30d_ePBLn
 
 # To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
 
-frerun -x CM4_am4p11_v20161108.xml -p ncrc3.intel15 -t prod-openmp CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn
+frerun -x CM4_am4p11_v20161108.xml -p ncrc3.intel15 -t prod-openmp CM4_c96L32_g11r11_2010_MLE30d_ePBLn
 
 # To check what is the input data of this experiment:
-inputfiles -x CM4_am4p11_v20161108.xml -p ncrc3.intel15 CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn
+inputfiles -x CM4_am4p11_v20161108.xml -p ncrc3.intel15 CM4_c96L32_g11r11_2010_MLE30d_ePBLn
 
 NOTES:
       If the experiment name + FRESTEM is too long the post-process initiated on gaea may fail.
@@ -67,7 +67,7 @@ NOTES:
 
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="verona_201701"/>                  <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2017.01.20"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2017.02.03"/>              <!-- git tag date for MOM6 source code -->
   <property name="SHARED_GIT_TAG"     value="$(RELEASE)"/>
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="$(RELEASE)"/>           <!-- git tag for AWG source code -->
@@ -91,7 +91,7 @@ NOTES:
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
 
-  <property name="FRE_STEM"  value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <property name="FRE_VERSION"     value="bronx-11"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
@@ -3151,8 +3151,8 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 <!--=======================-->
 <!--= CM4 EXPERIMENTS     =-->
 <!--=======================-->
-  <experiment name="CM4_c192L32_g11r11_SOAv2_160526_2010_MLE30d_ePBLn.$(MOM6_DATE)" inherit="CM4_c192L32_g11r11_SOAv2_160526_2010_MLE30d_ePBLn"/>
-  <experiment name="CM4_c192L32_g11r11_SOAv2_160526_2010_MLE30d_ePBLn" inherit="cm4_sis2_compile">
+  <experiment name="CM4_c192L32_g11r11_SOAv2_2010_MLE30d_ePBLn.$(MOM6_DATE)" inherit="CM4_c192L32_g11r11_SOAv2_2010_MLE30d_ePBLn"/>
+  <experiment name="CM4_c192L32_g11r11_SOAv2_2010_MLE30d_ePBLn" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"CM4_c96L32_am4p11"</model>
@@ -3355,8 +3355,8 @@ MOM_OVERRIDE_EOF
 
   </experiment>
 
-  <experiment name="CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn.$(MOM6_DATE)" inherit="CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn"/>
-  <experiment name="CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn" inherit="cm4_sis2_compile">
+  <experiment name="CM4_c96L32_g11r11_2010_MLE30d_ePBLn.$(MOM6_DATE)" inherit="CM4_c96L32_g11r11_2010_MLE30d_ePBLn"/>
+  <experiment name="CM4_c96L32_g11r11_2010_MLE30d_ePBLn" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"CM4_c96L32_am4p11"</model>
@@ -3525,7 +3525,7 @@ MOM_OVERRIDE_EOF
 
   </experiment>
 
-  <experiment name="CM4_c96L32_g11r11_160526_1850_MLE30d_ePBLn" inherit="CM4_c96L32_g11r11_160526_2010_MLE30d_ePBLn">
+  <experiment name="CM4_c96L32_g11r11_1850_MLE30d_ePBLn" inherit="CM4_c96L32_g11r11_2010_MLE30d_ePBLn">
     <input>
       <namelist name="diag_manager_nml">
        max_axes = 200,
@@ -3578,7 +3578,7 @@ MOM_OVERRIDE_EOF
   </experiment>
 
 
-  <experiment name="CM4_c96L32_g11r11_160526_1850_MLE30d_ePBLn_4XCO2" inherit="CM4_c96L32_g11r11_160526_1850_MLE30d_ePBLn">
+  <experiment name="CM4_c96L32_g11r11_1850_MLE30d_ePBLn_4XCO2" inherit="CM4_c96L32_g11r11_1850_MLE30d_ePBLn">
     <input>
       <namelist name="radiative_gases_nml">
       use_co2_10um = .true.
