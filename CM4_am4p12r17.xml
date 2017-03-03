@@ -67,7 +67,7 @@ NOTES:
 
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="verona_201701"/>                  <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2017.02.10"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2017.02.23"/>              <!-- git tag date for MOM6 source code -->
   <property name="SHARED_GIT_TAG"     value="$(RELEASE)"/>
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="awg_v20170208_g12"/>           <!-- git tag for AWG source code -->
@@ -99,7 +99,7 @@ NOTES:
   <property name="CVDP_startyear" value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-  <property name="reference_tag"   value="verona_201701_awg_v20161108e_mom6_2017.01.20_answers"/>
+  <property name="reference_tag"   value="verona_201701_awg_v20170208_g12_mom6_2017.02.23_answers"/>
                           
   <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
@@ -1630,9 +1630,6 @@ find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
           git submodule update #This gets the right version of submodules
           popd
 
-(cd mom6/src/SIS2 && git merge --no-edit origin/user/nnz/fix_esm_dust_flux)
-
-
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
           git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
           (cd ocean_shared && git checkout user/nnz/mom6_dev)
@@ -3031,6 +3028,37 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 <!--=======================-->
 <!--= CM4 EXPERIMENTS     =-->
 <!--=======================-->
+  <!-- Perturbation experiments -->
+
+  <experiment name="CM4_c96L32_g12r17_2010_OM25_10d_ePBLr5" inherit="CM4_c96L32_g12r17_2010_MLE30d_ePBLn">
+    <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+! MLE 10 days
+#override MLE_MLD_DECAY_TIME = 8.64E5
+! ePBL "r" settings
+MSTAR_FIXED = False
+MSTAR_SLOPE = 0.9
+MSTAR_AT_XINT = 0.175
+NSTAR = 0.08
+#override TKE_DECAY = 0.01
+#override N2_DISSIPATION_POS = 0.0
+#override N2_DISSIPATION_NEG = 0.0
+EPBL_TRANSITION_SCALE = 0.01
+ORIG_MLD_ITERATION = False
+MIX_LEN_EXPONENT = 1.0
+MSTAR_CAP = 5.
+MSTAR_FLATCAP=False
+MOM_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+  </experiment>
+
   <experiment name="CM4_c96L32_g12r17_2010_MLE30d_ePBLn.$(MOM6_DATE)" inherit="CM4_c96L32_g12r17_2010_MLE30d_ePBLn"/>
   <experiment name="CM4_c96L32_g12r17_2010_MLE30d_ePBLn" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
@@ -3371,7 +3399,7 @@ MOM_OVERRIDE_EOF
           <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O2997']/node())"/> </run>
       	</regression>
 
-      <reference restart="$(REFERENCE)/archive/1x1m0d_432x2a_2997x1o/restart/00010201.tar"/>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_216x2a_1756x1o/restart/00010201.tar"/>
 
     </runtime>
 
@@ -4073,7 +4101,7 @@ SIS_OVERRIDE_EOF
           <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1608p5']/node())"/> </run>
           <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1441p5']/node())"/> </run>
       	</regression>
-      <reference restart="$(REFERENCE)/archive/1x1m0d_216x2a_842x1o/restart/00010201.tar"/>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_576x2a_842x1o/restart/00010201.tar"/>
 
     </runtime>
 
@@ -4320,6 +4348,56 @@ SIS_OVERRIDE_EOF
     </input>
   </experiment>
 
+  <experiment name="CM4_c96L32_am4g12r17_1850_OMp5_H5_ndiff_meke_MLE30d_ePBLr" inherit="CM4_c96L32_am4g12r17_1850_OMp5_H5_ndiff_meke_MLE30d_ePBLn">
+    <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+#override DT = 1800         
+#override DT_THERM = 10800  
+
+! ePBL "r" settings
+MSTAR_FIXED = False
+MSTAR_SLOPE = 0.9
+MSTAR_AT_XINT = 0.175
+NSTAR = 0.08
+#override TKE_DECAY = 0.01
+#override N2_DISSIPATION_POS = 0.0
+#override N2_DISSIPATION_NEG = 0.0
+EPBL_TRANSITION_SCALE = 0.01
+ORIG_MLD_ITERATION = False
+MIX_LEN_EXPONENT = 1.0
+MSTAR_CAP = 5.
+MSTAR_FLATCAP=False
+! Sub-meso
+#override FOX_KEMPER_ML_RESTRAT_COEF = 20.0
+! MLE 10 days
+#override MLE_MLD_DECAY_TIME = 2.592E6
+! Vertical structure for KHTH
+KHTH_USE_EBT_STRUCT = False
+#override KHTH = 500
+! Ferrari stremfunction
+KHTH_USE_FGNV_STREAMFUNCTION = True
+FGNV_FILTER_SCALE = 0.5
+FGNV_C_MIN = 0.01
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+
+    </input>
+  </experiment>
 
   <experiment name="ESM4_c96L32_am4g12r17_1850_OMp5_H5_ndiff_meke_MLE30d_ePBLn" inherit="CM4_c96L32_am4g12r17_1850_OMp5_H5_ndiff_meke_MLE30d_ePBLn">
 <description>
@@ -4684,7 +4762,7 @@ SIS_OVERRIDE_EOF
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1441p5']/node())"/> </run>
       </regression>
 
-      <reference restart="$(REFERENCE)/archive/1x1m0d_216x2a_842x1o/restart/00010201.tar"/>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_576x2a_1300x1o/restart/00010201.tar"/>
     </runtime>
   </experiment>
   
