@@ -4112,6 +4112,56 @@ SIS_OVERRIDE_EOF
 
   </experiment>
 
+  <experiment name="CM4_c96L32_am4g12r17_2010_OMp5_H5_ndiff_meke_MLE30d_ePBLr" inherit="CM4_c96L32_am4g12r17_2010_OMp5_H5_ndiff_meke_MLE30d_ePBLn">
+    <input>
+      <csh><![CDATA[
+#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
+if ( $currentSeg == 1 ) then
+\rm -f $work/INPUT/ice_model.res.nc
+endif
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+#override DT = 1800         
+#override DT_THERM = 10800  
+
+! ePBL "r" settings
+MSTAR_FIXED = False
+MSTAR_SLOPE = 0.9
+MSTAR_AT_XINT = 0.175
+NSTAR = 0.08
+#override TKE_DECAY = 0.01
+#override N2_DISSIPATION_POS = 0.0
+#override N2_DISSIPATION_NEG = 0.0
+EPBL_TRANSITION_SCALE = 0.01
+ORIG_MLD_ITERATION = False
+MIX_LEN_EXPONENT = 1.0
+MSTAR_CAP = 5.
+MSTAR_FLATCAP=False
+! Sub-meso
+#override FOX_KEMPER_ML_RESTRAT_COEF = 20.0
+! MLE 10 days
+#override MLE_MLD_DECAY_TIME = 2.592E6
+! Vertical structure for KHTH
+KHTH_USE_EBT_STRUCT = False
+#override KHTH = 500
+! Ferrari stremfunction
+KHTH_USE_FGNV_STREAMFUNCTION = True
+FGNV_FILTER_SCALE = 0.5
+FGNV_C_MIN = 0.01
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override MIN_OCN_INTERTIAL_H = 2.
+SIS_OVERRIDE_EOF
+     ]]></csh>
+
+    </input>
+  </experiment>
 
   <experiment name="CM4_c96L32_am4g12r17_1850_OMp5_H5_ndiff_meke_MLE30d_ePBLn" inherit="CM4_c96L32_am4g12r17_2010_OMp5_H5_ndiff_meke_MLE30d_ePBLn">
     <input>
@@ -4580,18 +4630,18 @@ Reverting back to land defaults for coastal roughness, use_coast_topo_rough = .t
  "ocean_model","temp","temp","ocean_cobalt_sample","all",.false.,"none",2
  "ocean_model","salt","salt","ocean_cobalt_sample","all",.false.,"none",2
 "ocean_cobalt_sample_z",       0,  "days", 1, "days", "time",
- "generic_cobalt_z_new","def_fe_Sm",       "def_fe_Sm",          "ocean_cobalt_sample_z","all",.false.,"none",2
- "generic_cobalt_z_new","chl",                "chl",                "ocean_cobalt_sample_z","all",.false.,"none",2
- "generic_cobalt_z_new","htotal",             "htotal",             "ocean_cobalt_sample_z","all",.false.,"none",2
- "generic_cobalt_z_new","alk",                "alk",                "ocean_cobalt_sample_z","all",.false.,"none",2
- "generic_cobalt_z_new","dic",                "dic",                "ocean_cobalt_sample_z","all",.false.,"none",2
- "generic_cobalt_z_new","o2",                 "o2",                 "ocean_cobalt_sample_z","all",.false.,"none",2
- "generic_cobalt_z_new","lith",                 "lith",                 "ocean_cobalt_sample_z","all",.false.,"none",2
- "generic_cobalt_z_new","dep_dry_lith",                 "dep_dry_lith",                 "ocean_cobalt_sample_z","all",.false.,"none",2
- "generic_cobalt_z_new","dep_wet_lith",                 "dep_wet_lith",                 "ocean_cobalt_sample_z","all",.false.,"none",2
+ "generic_cobalt_z","def_fe_Sm",       "def_fe_Sm",          "ocean_cobalt_sample_z","all",.false.,"none",2
+ "generic_cobalt_z","chl",                "chl",                "ocean_cobalt_sample_z","all",.false.,"none",2
+ "generic_cobalt_z","htotal",             "htotal",             "ocean_cobalt_sample_z","all",.false.,"none",2
+ "generic_cobalt_z","alk",                "alk",                "ocean_cobalt_sample_z","all",.false.,"none",2
+ "generic_cobalt_z","dic",                "dic",                "ocean_cobalt_sample_z","all",.false.,"none",2
+ "generic_cobalt_z","o2",                 "o2",                 "ocean_cobalt_sample_z","all",.false.,"none",2
+ "generic_cobalt_z","lith",                 "lith",                 "ocean_cobalt_sample_z","all",.false.,"none",2
+ "generic_cobalt_z","dep_dry_lith",                 "dep_dry_lith",                 "ocean_cobalt_sample_z","all",.false.,"none",2
+ "generic_cobalt_z","dep_wet_lith",                 "dep_wet_lith",                 "ocean_cobalt_sample_z","all",.false.,"none",2
 ##                                                                                                                                                             11
- "ocean_model_z_new","temp","temp","ocean_cobalt_sample_z","all",.false.,"none",2
- "ocean_model_z_new","salt","salt","ocean_cobalt_sample_z","all",.false.,"none",2
+ "ocean_model_z","temp","temp","ocean_cobalt_sample_z","all",.false.,"none",2
+ "ocean_model_z","salt","salt","ocean_cobalt_sample_z","all",.false.,"none",2
 "atmos_dust_sample",       0,  "days", 1, "days", "time",
 "tracer" , "dust_ddep", "dust_ddep", "atmos_dust_sample","all",.false.,"none",2
 "tracer" , "dust_emis", "dust_emis", "atmos_dust_sample","all",.false.,"none",2

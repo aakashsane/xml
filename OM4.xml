@@ -13,9 +13,9 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="verona_201701"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2017.01.20"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2017.02.23"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
-   <property name="SHARED_GIT_TAG"     value="verona_201701"/>
+   <property name="SHARED_GIT_TAG"     value="$(RELEASE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
    <property name="BERGS_GIT_TAG" value="dev/master"/>
    <property name="FRE_VERSION"  value="bronx-11"/>
@@ -1064,8 +1064,6 @@ Make the executable for ocean-ice experiments.
           git submodule update #This gets the right version of submodules
           popd
 
-(cd mom6/src/SIS2 && git merge origin/user/nnz/fix_esm_dust_flux)
-
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
 	  git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git 
           (cd ocean_shared && git checkout user/nnz/mom6_dev)
@@ -1487,30 +1485,6 @@ touch $work/INPUT/SIS_override
         <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
      </dataFile>
-      <diagTable order="append">
-#================
-# Additional DIAGNOSTICS
-#================
-#
-#==================
-# Ice_model
-#==================
-#
-  "ice_model", "siu",        "siu",          "ice_month", "all", "mean", "none", 2
-  "ice_model", "siv",        "siv",          "ice_month", "all", "mean", "none", 2
-  "ice_model", "sispeed",    "sispeed",      "ice_month", "all", "mean", "none", 2
-  "ice_model", "STRENGTH_hf","STRENGTH_hf",  "ice_month", "all", "mean", "none", 2
-  "ice_model", "sitimefrac", "sitimefrac",   "ice_month", "all", "mean", "none", 2
-  "ice_model", "sitemptop",  "sitemptop",    "ice_month", "all", "mean", "none", 2
-  "ice_model", "siconc",     "siconc",       "ice_month", "all", "mean", "none", 2
-  "ice_model", "sisnconc",   "sisnconc",     "ice_month", "all", "mean", "none", 2
-  "ice_model", "simass",     "simass",       "ice_month", "all", "mean", "none", 2
-  "ice_model", "sisnmass",   "sisnmass",     "ice_month", "all", "mean", "none", 2
-  "ice_model", "sisnthick",  "sisnthick",    "ice_month", "all", "mean", "none", 2
-  "ice_model", "sithick",    "sithick",      "ice_month", "all", "mean", "none", 2
-  "ice_model", "sivol",      "sivol",        "ice_month", "all", "mean", "none", 2
-  "ice_model", "MIB",        "MIB",          "ice_month", "all", "mean", "none", 2
- </diagTable>  
 
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/SIS_input</dataSource>
