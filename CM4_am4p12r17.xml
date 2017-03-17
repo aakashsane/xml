@@ -36,23 +36,23 @@ from integrations with these models.
 # Change the occcurances of YOURGROUPLETTER in this file to your group letter (small), such as f, w, o, g+,...
 
 # To check out codes and compile:
-module load fre/bronx-11
-fremake -x CM4_am4p11_v20170106.xml -p ncrc3.intel15 -t prod-openmp cm4_libs_compile -nolink
+module load fre/bronx-12
+fremake -x CM4_am4p12r17.xml -p ncrc4.intel16 -t prod-openmp cm4_libs_compile -nolink
 SIS:
-fremake -x CM4_am4p11_v20170106.xml -p ncrc3.intel15 -t prod-openmp cm4_compile
+fremake -x CM4_am4p12r17.xml -p ncrc4.intel16 -t prod-openmp cm4_compile
 SIS2:
-fremake -x CM4_am4p11_v20170106.xml -p ncrc3.intel15 -t prod-openmp cm4_sis2_compile
+fremake -x CM4_am4p12r17.xml -p ncrc4.intel16 -t prod-openmp cm4_sis2_compile
 
-# To run regression test (for the coupled experiment CM4_c96L32_g11r17_2010_MLE30d_ePBLn ): 
+# To run regression test (for the coupled experiment CM4_c96L32_g12r17_2010_MLE30d_ePBLn ): 
 
-frerun -r basic -x CM4_am4p11_v20170106.xml -p ncrc3.intel15 -t prod-openmp CM4_c96L32_g11r17_2010_MLE30d_ePBLn
+frerun -r basic -x CM4_am4p12r17.xml -p ncrc4.intel16 -t prod-openmp CM4_c96L32_g12r17_2010_MLE30d_ePBLn
 
 # To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
 
-frerun -x CM4_am4p11_v20170106.xml -p ncrc3.intel15 -t prod-openmp CM4_c96L32_g11r17_2010_MLE30d_ePBLn
+frerun -x CM4_am4p12r17.xml -p ncrc4.intel16 -t prod-openmp CM4_c96L32_g12r17_2010_MLE30d_ePBLn
 
 # To check what is the input data of this experiment:
-inputfiles -x CM4_am4p11_v20170106.xml -p ncrc3.intel15 CM4_c96L32_g11r17_2010_MLE30d_ePBLn
+inputfiles -x CM4_am4p12r17.xml -p ncrc4.intel16 CM4_c96L32_g12r17_2010_MLE30d_ePBLn
 
 NOTES:
       If the experiment name + FRESTEM is too long the post-process initiated on gaea may fail.
@@ -66,12 +66,12 @@ NOTES:
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"      value="verona_201701"/>                  <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2017.02.23"/>              <!-- git tag date for MOM6 source code -->
+  <property name="RELEASE"      value="prerelease_warsaw_20170316"/> <!-- Release tag for the shared source code -->
+  <property name="MOM6_DATE"    value="2017.02.23"/>                 <!-- git tag date for MOM6 source code -->
   <property name="SHARED_GIT_TAG"     value="$(RELEASE)"/>
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
-  <property name="AWG_GIT_TAG"  value="awg_v20170208_g12"/>           <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG" value="lad2_20170118_slm"/>       <!-- git tag for LAND_LAD2 source code -->  
+  <property name="AWG_GIT_TAG"  value="$(RELEASE)"/>           <!-- git tag for AWG source code -->
+  <property name="LAND_GIT_TAG" value="$(RELEASE)"/>       <!-- git tag for LAND_LAD2 source code -->  
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
@@ -91,8 +91,8 @@ NOTES:
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
 
-  <property name="FRE_STEM"  value="$(RELEASE)_$(AWG_GIT_TAG)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
-  <property name="FRE_VERSION"     value="bronx-11"/> <!-- fre version to be used -->
+  <property name="FRE_STEM"  value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="FRE_VERSION"     value="bronx-12"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
@@ -958,7 +958,7 @@ NOTES:
         <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
       <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g"/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
@@ -1002,7 +1002,7 @@ module use -a /usw/eslogin/modulefiles-c3
         <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
       <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
@@ -1044,7 +1044,7 @@ module use -a /usw/eslogin/modulefiles-c3
         <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
       <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
@@ -1060,8 +1060,6 @@ module use -a /usw/eslogin/modulefiles-c3
       <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/> 
       <property name="MODEL_UPDATES_WH"     value="/ncrc/home1/Bill.Hurlin"/>
       <property name="NCORE_PER_NODE"      value="36"/>
-
-     
       <csh><![CDATA[
 module use -a /usw/eslogin/modulefiles-c3
         module load git
@@ -1069,7 +1067,6 @@ module use -a /usw/eslogin/modulefiles-c3
         setenv NC_BLKSZ 1M
         setenv F_UFMTENDIAN big
       ]]></csh>
-
     </platform>
     <platform name="ncrc4.intel15c3exec">
       <freVersion>$(FRE_VERSION)</freVersion>
@@ -1086,7 +1083,7 @@ module use -a /usw/eslogin/modulefiles-c3
         <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
       <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
@@ -1128,7 +1125,7 @@ module use -a /usw/eslogin/modulefiles-c3
         <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
       <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
@@ -1169,7 +1166,7 @@ module load nco/4.5.2
         <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
       <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
@@ -1211,7 +1208,7 @@ module load nco/4.5.2
         <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
       <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
@@ -1252,7 +1249,7 @@ module load nco/4.5.2
         <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
       <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
@@ -1296,7 +1293,7 @@ module load nco/4.5.2
       </directory>
 
       <property name="EXEC_ROOT"         value="$(rootDir)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_NESCC)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/scratch4/GFDL/gfdlscr/Niki.Zadeh/awg/mdt"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/scratch4/GFDL/gfdlscr/Niki.Zadeh/archive/input/ulm/LWH"/>
@@ -1345,7 +1342,7 @@ module load nco/4.5.2
         <work>$CPERM/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
       <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_NESCC)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/CM4/input"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_M"/>
@@ -1401,7 +1398,7 @@ limit coredumpsize unlimited
         <work>$CPERM/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
       <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_NESCC)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/CM4/input"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_M"/>
@@ -1540,8 +1537,6 @@ Experiment to build executable.
           <csh><![CDATA[
             ( cd atmos_shared && git checkout $(AWG_GIT_TAG) )
             ( cd atmos_param  && git checkout $(AWG_GIT_TAG) )
-            #( cd atmos_shared && git checkout user/h1g/time_depend_initFix_20170124 )
-            #( cd atmos_param  && git checkout user/h1g/merge_atmos_param_20170118)
            ]]>
           </csh>
       </source>
@@ -1554,18 +1549,18 @@ Experiment to build executable.
                                        atmos_cubed_sphere/driver/coupled
                                        atmos_cubed_sphere/model
                                        atmos_cubed_sphere/model_nh_null
+                                       atmos_cubed_sphere/GFDL_tools
                                        atmos_cubed_sphere/tools" requires="fms atmos_phys">
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)">atmos_drivers.git atmos_cubed_sphere.git</codeBase>
         <csh><![CDATA[
           ( cd atmos_drivers && git checkout $(AWG_GIT_TAG) )
           ( cd atmos_cubed_sphere && git checkout $(AWG_GIT_TAG) )
-          #( cd atmos_cubed_sphere && git checkout user/h1g/fix_adj_mass_vmr_20170208 )
          ]]>
         </csh>
       </source>
       <compile>
-        <cppDefs>$(F2003_FLAGS) -DSPMD</cppDefs>
+        <cppDefs>$(F2003_FLAGS) -DCLIMATE_NUDGE -DSPMD</cppDefs>
       </compile>
     </component>
 
@@ -1579,38 +1574,12 @@ Experiment to build executable.
     </component>
 
     <component name="land_lad2" requires="fms" paths="land_lad2">
-      <description domainName="LM3" communityName="land_lad2" communityVersion="lad2_20170118_slm" communityGrid=""/>
+      <description domainName="LM3" communityName="land_lad2" communityVersion="$(LAND_GIT_TAG)" communityGrid=""/>
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(LAND_GIT_TAG)">land_lad2.git</codeBase>
       </source>
-      <compile>
-        <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for LAND may cause crash -->
-        <cppDefs>$(F2003_FLAGS)</cppDefs>
-
-<csh> <![CDATA[
-sed -e 's/<TAB>/\t/' >${bld_dir}/land_lad2/Makefile-cpp <<EOF
-CPPDEFS = -nostdinc -DINTERNAL_FILE_NML -g -Dintel14_bug -D_FILE_VERSION="\`git-version-string \$<\`"
-FRETARGET = $(target)
-
-ifneq (\$(findstring hdf5,\${FRETARGET}),)
-else
-  CPPDEFS += -Duse_LARGEFILE
-endif
-
-vpath %.F90 \$(shell find ${src_dir}/land_lad2 -type d)
-
-land_lad2/%.f90: %.F90
-<TAB>cpp \${CPPDEFS} -C -v -I ${src_dir}/shared/include -o \$@ \$<
-
-EOF
-
-foreach foo ( `find ${src_dir}/land_lad2 -type f -name \*.F90` )
-  make -f land_lad2/Makefile-cpp land_lad2/$foo:t:r.f90
-end
-find ${bld_dir}/land_lad2 -type f -name \*.f90 > land_lad2/pathnames_land_lad2
-
-        ]]></csh>
-
+      <compile doF90Cpp="yes">
+       <cppDefs>$(F2003_FLAGS) -nostdinc </cppDefs>
       </compile>
     </component>
 
@@ -2142,7 +2111,7 @@ $baseDate
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_atmos_simpleSO4</dataSource>
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land</dataSource>
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land_ug</dataSource>
       </dataFile>
     </input>
   </freInclude>
@@ -2161,7 +2130,7 @@ $baseDate
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_atmos_simpleSO4</dataSource>
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land</dataSource>
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land_ug</dataSource>
       </dataFile>
     </input>
   </freInclude>
@@ -2180,7 +2149,7 @@ $baseDate
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_atmos_fullchemOnly_v20140325</dataSource>
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land</dataSource>
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land_ug</dataSource>
       </dataFile>
     </input>
   </freInclude>
@@ -2745,197 +2714,12 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
        max_axis_attributes=4
          </namelist>
 
-      <!--r17 perturbation relative to r13-->
-      <namelist name="moist_processes_nml">
-        do_lsc=.false., 
-        do_strat=.true.,
-        do_mca=.false., 
-        do_ras=.false., 
-        do_uw_conv=.true.,
-        do_donner_deep = .false.,
-        do_diag_clouds = .false.,
-        do_cmt=.true., 
-        cmt_mass_flux_source='uw',
-        do_rh_clouds = .false., 
-        do_gust_cv = .false.,
-        do_gust_cv_new = .false.,
-        do_liq_num = .true.,
-        force_donner_moist_conserv = .false.,
-        do_donner_conservation_checks = .false.,
-        do_limit_donner = .false.,
-        do_limit_uw = .false.,
-        limit_conv_cloud_frac = .false.,
-        do_donner_before_uw = .false.,
-        do_legacy_strat_cloud = .false.,
-        do_height_adjust = .true.
-   </namelist>
-    <namelist name="strat_cloud_nml">
-        use_online_aerosol = .true.,
-        U00 = 0.80,
-        U00_profile = .true.,
-        rthresh = 8.5,
-        Dmin = 1.0e-07,
-        n_land = 300.e6,
-        n_ocean = 100.e6,
-        diff_thresh = 0.1,
-        mc_thresh = 0.001,
-        eros_scale = 1.e-6,
-        eros_choice = .true.,
-        eros_scale_c = 4.e-5,
-        eros_scale_t = 5.e-5,
-        super_choice = .true.,
-        tracer_advec = .true.
-        vfact = 0.9
-        U_evap_snow = 1.0
-        cfact = 1.0
-        do_liq_num = .true.
-        use_kk_auto = .false.
-        var_limit = 0.7
-        num_mass_ratio1 = 1.0
-        num_mass_ratio2 = 0.
-        use_sub_seasalt = .false.
-        aerosol_activation_scheme = "total"
-    </namelist>
-      <namelist name="cloud_generator_nml">
-      do_inhomogeneous_clouds = .true.
-      defaultOverlap = 4
-      overlapLengthScale = 2.0
-      </namelist>
-      <namelist name="uw_conv_nml">
-        use_online_aerosol = .true.,
-        rkm_sh1         = 7.0,
-        rkm_sh          = 3.0,
-        do_deep         = .true.,
-        idpchoice       = 2
-        do_rescale      = .true.
-        do_rescale_t    = .true.
-        use_sub_seasalt = .false.
-        use_new_let     = .true.
-        do_new_subflx   = .true.
-        do_new_pevap    = .false.
-        plev_cin        = 60000.
-        plev_for        = 60000.
-        src_choice      = 1
-        wrel_min        = 1.
-        do_new_qnact    = .true.
-        do_prog_gust    = .true.
-        cgust0          = 2.
-        cgust_max       = 4.
-        tracer_check_type = 2
-        stop_at_let     = .true.
-        lofactor0       = 0.5
-        do_umf_pbl      = .true.
-        do_new_convcld  = .true.
-        do_minmse       = .true.
-        reproduce_old_version = .false.
-        do_conv_micro_N = .false.
-        N0 = 100.e6
-        do_eis_limit = .true.
-        eis_max = 8.
-      </namelist>
-      <namelist name="deep_conv_nml">
-        crh_th_ocean = 0.4
-        crh_th_land  = 0.4
-        auto_th0_d = 0.2e-3
-        tcrit_d    = -25.15,
-        peff_l_d   = 6.0e-5
-        peff_i_d   = 11.e-5
-        rkm_dp1 = 1.0
-        rkm_dp2 = 0.1
-        crh_max = 1.0
-        cwfn_th = 10.
-        tau_dp = 28800.
-        mixing_assumption_d = 6
-        do_ppen_d  = .true.
-        rpen_d     = 4.0
-        do_pevap_d = .true.
-        cfrac_d    = 0.15
-        hcevap_d   = 0.85
-        hcevappbl_d = 0.95
-        pblfac_d   = 1.0
-        frac_limit_d = 0.25
-        dcwfndm_th = 100
-        lofactor_d = 1.0
-        do_cgust_dp  = .true.
-        cgust_choice = 1
-        include_emf_d = .false.
-      </namelist>
-      <namelist name="uw_plume_nml">
-        r_thresh = 10.
-        auto_th0 = 0.2e-3,
-        tcrit    = -25.15,
-        peff_l   = 6.0e-5
-        peff_i   = 11.e-5
-        frac_drs = 0.5
-        rpen     = 4.0
-        wmin     = 0.5
-        deltaqc0 = 0.5e-3 
-        do_pdfpcp= .false.
-        do_pmadjt= .true.
-        do_emmax = .true.
-        do_pnqv  = .true.
-        mixing_assumption = 6
-	scaleh0  = 1000.
-        beta = 0.0
-        rkm_max = 15
-        mp_choice = 3
-        do_pevap = .true.
-        do_new_pblfac = .true.
-        include_emf_s = .false.
-        cfrac    = 0.15
-        hcevap   = 0.85
-        hcevappbl = 0.95
-        pblfac   = 1.0
-        emfrac_max = 0.25
-        rmaxfrac = 0.1
-        do_limit_wmax = .true.
-        do_limit_fdr  = .true.
-        wmax = 20.
-        do_tten_max = .false.
-        tten_max = 1000
-        bigc = 0.0
-        nom_ratio = 0.7
-      </namelist>
-      <namelist name="fv_core_nml">
-        layout   = $atm_layout
-        io_layout = $atm_io_layout
-        npx      = 97,
-        npy      = 97,
-        ntiles   = 6,
-        npz      = 32,
-        k_split  = 1,
-        n_split  = 12,
-        a2b_ord  = 4,
-        adjust_dry_mass = $adjust_dry_mass,
-        adj_mass_vmr    = .true.
-        retain_mass_vmr_bug  = .false.
-        consv_te = 0.6,
-        fill = .true.
-        print_freq = 0,
-        grid_type = 0,
-        nord = 2,
-        dddmp = 0.0,
-        d2_bg = 0.0,
-        d4_bg = 0.15,
-        tau = 0.      
-        z_tracer=.false.
-        kord_tm = -10
-        kord_mt =  10
-        kord_tr =  10
-        hord_mt =  10
-        hord_vt = -10
-        hord_tm = -10
-        hord_dp = -10
-        hord_tr = -8
-        do_uni_zfull = .true.
-        consv_am = .true.
-      </namelist>
 
       <!-- Namelist -->
       <namelist file="$(AWG_INPUT_HOME)/nml/ocean_g12.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p12r13_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r13_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r13_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p12r17_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r17_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r17_c96L32.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p12_2010climo.nml"/>
 
       <!-- Input datasets -->
@@ -3028,37 +2812,6 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 <!--=======================-->
 <!--= CM4 EXPERIMENTS     =-->
 <!--=======================-->
-  <!-- Perturbation experiments -->
-
-  <experiment name="CM4_c96L32_g12r17_2010_OM25_10d_ePBLr5" inherit="CM4_c96L32_g12r17_2010_MLE30d_ePBLn">
-    <input>
-      <csh><![CDATA[
-#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
-if ( $currentSeg == 1 ) then
-\rm -f $work/INPUT/ice_model.res.nc
-endif
-#
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-! MLE 10 days
-#override MLE_MLD_DECAY_TIME = 8.64E5
-! ePBL "r" settings
-MSTAR_FIXED = False
-MSTAR_SLOPE = 0.9
-MSTAR_AT_XINT = 0.175
-NSTAR = 0.08
-#override TKE_DECAY = 0.01
-#override N2_DISSIPATION_POS = 0.0
-#override N2_DISSIPATION_NEG = 0.0
-EPBL_TRANSITION_SCALE = 0.01
-ORIG_MLD_ITERATION = False
-MIX_LEN_EXPONENT = 1.0
-MSTAR_CAP = 5.
-MSTAR_FLATCAP=False
-MOM_OVERRIDE_EOF
-     ]]></csh>
-    </input>
-  </experiment>
-
   <experiment name="CM4_c96L32_g12r17_2010_MLE30d_ePBLn.$(MOM6_DATE)" inherit="CM4_c96L32_g12r17_2010_MLE30d_ePBLn"/>
   <experiment name="CM4_c96L32_g12r17_2010_MLE30d_ePBLn" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
@@ -3127,196 +2880,11 @@ For more information please refer to the
        max_field_attributes=4
        max_axis_attributes=4
       </namelist>
-      <!--r17 perturbation relative to r13-->
-      <namelist name="moist_processes_nml">
-        do_lsc=.false., 
-        do_strat=.true.,
-        do_mca=.false., 
-        do_ras=.false., 
-        do_uw_conv=.true.,
-        do_donner_deep = .false.,
-        do_diag_clouds = .false.,
-        do_cmt=.true., 
-        cmt_mass_flux_source='uw',
-        do_rh_clouds = .false., 
-        do_gust_cv = .false.,
-        do_gust_cv_new = .false.,
-        do_liq_num = .true.,
-        force_donner_moist_conserv = .false.,
-        do_donner_conservation_checks = .false.,
-        do_limit_donner = .false.,
-        do_limit_uw = .false.,
-        limit_conv_cloud_frac = .false.,
-        do_donner_before_uw = .false.,
-        do_legacy_strat_cloud = .false.,
-        do_height_adjust = .true.
-   </namelist>
-    <namelist name="strat_cloud_nml">
-        use_online_aerosol = .true.,
-        U00 = 0.80,
-        U00_profile = .true.,
-        rthresh = 8.5,
-        Dmin = 1.0e-07,
-        n_land = 300.e6,
-        n_ocean = 100.e6,
-        diff_thresh = 0.1,
-        mc_thresh = 0.001,
-        eros_scale = 1.e-6,
-        eros_choice = .true.,
-        eros_scale_c = 4.e-5,
-        eros_scale_t = 5.e-5,
-        super_choice = .true.,
-        tracer_advec = .true.
-        vfact = 0.9
-        U_evap_snow = 1.0
-        cfact = 1.0
-        do_liq_num = .true.
-        use_kk_auto = .false.
-        var_limit = 0.7
-        num_mass_ratio1 = 1.0
-        num_mass_ratio2 = 0.
-        use_sub_seasalt = .false.
-        aerosol_activation_scheme = "total"
-    </namelist>
-      <namelist name="cloud_generator_nml">
-      do_inhomogeneous_clouds = .true.
-      defaultOverlap = 4
-      overlapLengthScale = 2.0
-      </namelist>
-      <namelist name="uw_conv_nml">
-        use_online_aerosol = .true.,
-        rkm_sh1         = 7.0,
-        rkm_sh          = 3.0,
-        do_deep         = .true.,
-        idpchoice       = 2
-        do_rescale      = .true.
-        do_rescale_t    = .true.
-        use_sub_seasalt = .false.
-        use_new_let     = .true.
-        do_new_subflx   = .true.
-        do_new_pevap    = .false.
-        plev_cin        = 60000.
-        plev_for        = 60000.
-        src_choice      = 1
-        wrel_min        = 1.
-        do_new_qnact    = .true.
-        do_prog_gust    = .true.
-        cgust0          = 2.
-        cgust_max       = 4.
-        tracer_check_type = 2
-        stop_at_let     = .true.
-        lofactor0       = 0.5
-        do_umf_pbl      = .true.
-        do_new_convcld  = .true.
-        do_minmse       = .true.
-        reproduce_old_version = .false.
-        do_conv_micro_N = .false.
-        N0 = 100.e6
-        do_eis_limit = .true.
-        eis_max = 8.
-      </namelist>
-      <namelist name="deep_conv_nml">
-        crh_th_ocean = 0.4
-        crh_th_land  = 0.4
-        auto_th0_d = 0.2e-3
-        tcrit_d    = -25.15,
-        peff_l_d   = 6.0e-5
-        peff_i_d   = 11.e-5
-        rkm_dp1 = 1.0
-        rkm_dp2 = 0.1
-        crh_max = 1.0
-        cwfn_th = 10.
-        tau_dp = 28800.
-        mixing_assumption_d = 6
-        do_ppen_d  = .true.
-        rpen_d     = 4.0
-        do_pevap_d = .true.
-        cfrac_d    = 0.15
-        hcevap_d   = 0.85
-        hcevappbl_d = 0.95
-        pblfac_d   = 1.0
-        frac_limit_d = 0.25
-        dcwfndm_th = 100
-        lofactor_d = 1.0
-        do_cgust_dp  = .true.
-        cgust_choice = 1
-        include_emf_d = .false.
-      </namelist>
-      <namelist name="uw_plume_nml">
-        r_thresh = 10.
-        auto_th0 = 0.2e-3,
-        tcrit    = -25.15,
-        peff_l   = 6.0e-5
-        peff_i   = 11.e-5
-        frac_drs = 0.5
-        rpen     = 4.0
-        wmin     = 0.5
-        deltaqc0 = 0.5e-3 
-        do_pdfpcp= .false.
-        do_pmadjt= .true.
-        do_emmax = .true.
-        do_pnqv  = .true.
-        mixing_assumption = 6
-	scaleh0  = 1000.
-        beta = 0.0
-        rkm_max = 15
-        mp_choice = 3
-        do_pevap = .true.
-        do_new_pblfac = .true.
-        include_emf_s = .false.
-        cfrac    = 0.15
-        hcevap   = 0.85
-        hcevappbl = 0.95
-        pblfac   = 1.0
-        emfrac_max = 0.25
-        rmaxfrac = 0.1
-        do_limit_wmax = .true.
-        do_limit_fdr  = .true.
-        wmax = 20.
-        do_tten_max = .false.
-        tten_max = 1000
-        bigc = 0.0
-        nom_ratio = 0.7
-      </namelist>
-      <namelist name="fv_core_nml">
-        layout   = $atm_layout
-        io_layout = $atm_io_layout
-        npx      = 97,
-        npy      = 97,
-        ntiles   = 6,
-        npz      = 32,
-        k_split  = 1,
-        n_split  = 12,
-        a2b_ord  = 4,
-        adjust_dry_mass = $adjust_dry_mass,
-        adj_mass_vmr    = .true.
-        retain_mass_vmr_bug  = .false.
-        consv_te = 0.6,
-        fill = .true.
-        print_freq = 0,
-        grid_type = 0,
-        nord = 2,
-        dddmp = 0.0,
-        d2_bg = 0.0,
-        d4_bg = 0.15,
-        tau = 0.      
-        z_tracer=.false.
-        kord_tm = -10
-        kord_mt =  10
-        kord_tr =  10
-        hord_mt =  10
-        hord_vt = -10
-        hord_tm = -10
-        hord_dp = -10
-        hord_tr = -8
-        do_uni_zfull = .true.
-        consv_am = .true.
-      </namelist>
  
       <!--AWG Input namelists -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p12r13_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r13_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r13_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p12r17_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r17_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r17_c96L32.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p12_2010climo.nml"/>
       <!--AWG Input datasets -->
       <xi:include xpointer="xpointer(//freInclude[@name='common_LM4']/input/node())"/>
@@ -3434,196 +3002,11 @@ MOM_OVERRIDE_EOF
             domains_stack_size = 5000000
             stack_size =0
       </namelist>
-      <!--r17 perturbation relative to r13-->
-      <namelist name="moist_processes_nml">
-        do_lsc=.false., 
-        do_strat=.true.,
-        do_mca=.false., 
-        do_ras=.false., 
-        do_uw_conv=.true.,
-        do_donner_deep = .false.,
-        do_diag_clouds = .false.,
-        do_cmt=.true., 
-        cmt_mass_flux_source='uw',
-        do_rh_clouds = .false., 
-        do_gust_cv = .false.,
-        do_gust_cv_new = .false.,
-        do_liq_num = .true.,
-        force_donner_moist_conserv = .false.,
-        do_donner_conservation_checks = .false.,
-        do_limit_donner = .false.,
-        do_limit_uw = .false.,
-        limit_conv_cloud_frac = .false.,
-        do_donner_before_uw = .false.,
-        do_legacy_strat_cloud = .false.,
-        do_height_adjust = .true.
-   </namelist>
-    <namelist name="strat_cloud_nml">
-        use_online_aerosol = .true.,
-        U00 = 0.80,
-        U00_profile = .true.,
-        rthresh = 8.5,
-        Dmin = 1.0e-07,
-        n_land = 300.e6,
-        n_ocean = 100.e6,
-        diff_thresh = 0.1,
-        mc_thresh = 0.001,
-        eros_scale = 1.e-6,
-        eros_choice = .true.,
-        eros_scale_c = 4.e-5,
-        eros_scale_t = 5.e-5,
-        super_choice = .true.,
-        tracer_advec = .true.
-        vfact = 0.9
-        U_evap_snow = 1.0
-        cfact = 1.0
-        do_liq_num = .true.
-        use_kk_auto = .false.
-        var_limit = 0.7
-        num_mass_ratio1 = 1.0
-        num_mass_ratio2 = 0.
-        use_sub_seasalt = .false.
-        aerosol_activation_scheme = "total"
-    </namelist>
-      <namelist name="cloud_generator_nml">
-      do_inhomogeneous_clouds = .true.
-      defaultOverlap = 4
-      overlapLengthScale = 2.0
-      </namelist>
-      <namelist name="uw_conv_nml">
-        use_online_aerosol = .true.,
-        rkm_sh1         = 7.0,
-        rkm_sh          = 3.0,
-        do_deep         = .true.,
-        idpchoice       = 2
-        do_rescale      = .true.
-        do_rescale_t    = .true.
-        use_sub_seasalt = .false.
-        use_new_let     = .true.
-        do_new_subflx   = .true.
-        do_new_pevap    = .false.
-        plev_cin        = 60000.
-        plev_for        = 60000.
-        src_choice      = 1
-        wrel_min        = 1.
-        do_new_qnact    = .true.
-        do_prog_gust    = .true.
-        cgust0          = 2.
-        cgust_max       = 4.
-        tracer_check_type = 2
-        stop_at_let     = .true.
-        lofactor0       = 0.5
-        do_umf_pbl      = .true.
-        do_new_convcld  = .true.
-        do_minmse       = .true.
-        reproduce_old_version = .false.
-        do_conv_micro_N = .false.
-        N0 = 100.e6
-        do_eis_limit = .true.
-        eis_max = 8.
-      </namelist>
-      <namelist name="deep_conv_nml">
-        crh_th_ocean = 0.4
-        crh_th_land  = 0.4
-        auto_th0_d = 0.2e-3
-        tcrit_d    = -25.15,
-        peff_l_d   = 6.0e-5
-        peff_i_d   = 11.e-5
-        rkm_dp1 = 1.0
-        rkm_dp2 = 0.1
-        crh_max = 1.0
-        cwfn_th = 10.
-        tau_dp = 28800.
-        mixing_assumption_d = 6
-        do_ppen_d  = .true.
-        rpen_d     = 4.0
-        do_pevap_d = .true.
-        cfrac_d    = 0.15
-        hcevap_d   = 0.85
-        hcevappbl_d = 0.95
-        pblfac_d   = 1.0
-        frac_limit_d = 0.25
-        dcwfndm_th = 100
-        lofactor_d = 1.0
-        do_cgust_dp  = .true.
-        cgust_choice = 1
-        include_emf_d = .false.
-      </namelist>
-      <namelist name="uw_plume_nml">
-        r_thresh = 10.
-        auto_th0 = 0.2e-3,
-        tcrit    = -25.15,
-        peff_l   = 6.0e-5
-        peff_i   = 11.e-5
-        frac_drs = 0.5
-        rpen     = 4.0
-        wmin     = 0.5
-        deltaqc0 = 0.5e-3 
-        do_pdfpcp= .false.
-        do_pmadjt= .true.
-        do_emmax = .true.
-        do_pnqv  = .true.
-        mixing_assumption = 6
-	scaleh0  = 1000.
-        beta = 0.0
-        rkm_max = 15
-        mp_choice = 3
-        do_pevap = .true.
-        do_new_pblfac = .true.
-        include_emf_s = .false.
-        cfrac    = 0.15
-        hcevap   = 0.85
-        hcevappbl = 0.95
-        pblfac   = 1.0
-        emfrac_max = 0.25
-        rmaxfrac = 0.1
-        do_limit_wmax = .true.
-        do_limit_fdr  = .true.
-        wmax = 20.
-        do_tten_max = .false.
-        tten_max = 1000
-        bigc = 0.0
-        nom_ratio = 0.7
-      </namelist>
-      <namelist name="fv_core_nml">
-        layout   = $atm_layout
-        io_layout = $atm_io_layout
-        npx      = 97,
-        npy      = 97,
-        ntiles   = 6,
-        npz      = 32,
-        k_split  = 1,
-        n_split  = 12,
-        a2b_ord  = 4,
-        adjust_dry_mass = $adjust_dry_mass,
-        adj_mass_vmr    = .true.
-        retain_mass_vmr_bug  = .false.
-        consv_te = 0.6,
-        fill = .true.
-        print_freq = 0,
-        grid_type = 0,
-        nord = 2,
-        dddmp = 0.0,
-        d2_bg = 0.0,
-        d4_bg = 0.15,
-        tau = 0.      
-        z_tracer=.false.
-        kord_tm = -10
-        kord_mt =  10
-        kord_tr =  10
-        hord_mt =  10
-        hord_vt = -10
-        hord_tm = -10
-        hord_dp = -10
-        hord_tr = -8
-        do_uni_zfull = .true.
-        consv_am = .true.
-      </namelist>
       
       <!--AWG Input datasets -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p12r13_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r13_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r13_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p12r17_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r17_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r17_c96L32.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p12_1850climo.nml"/>
 
       <!-- Input datasets -->
@@ -3789,196 +3172,11 @@ For more information please refer to the
        max_field_attributes=4
        max_axis_attributes=4
          </namelist>
-      <!--r17 perturbation relative to r13-->
-      <namelist name="moist_processes_nml">
-        do_lsc=.false., 
-        do_strat=.true.,
-        do_mca=.false., 
-        do_ras=.false., 
-        do_uw_conv=.true.,
-        do_donner_deep = .false.,
-        do_diag_clouds = .false.,
-        do_cmt=.true., 
-        cmt_mass_flux_source='uw',
-        do_rh_clouds = .false., 
-        do_gust_cv = .false.,
-        do_gust_cv_new = .false.,
-        do_liq_num = .true.,
-        force_donner_moist_conserv = .false.,
-        do_donner_conservation_checks = .false.,
-        do_limit_donner = .false.,
-        do_limit_uw = .false.,
-        limit_conv_cloud_frac = .false.,
-        do_donner_before_uw = .false.,
-        do_legacy_strat_cloud = .false.,
-        do_height_adjust = .true.
-   </namelist>
-    <namelist name="strat_cloud_nml">
-        use_online_aerosol = .true.,
-        U00 = 0.80,
-        U00_profile = .true.,
-        rthresh = 8.5,
-        Dmin = 1.0e-07,
-        n_land = 300.e6,
-        n_ocean = 100.e6,
-        diff_thresh = 0.1,
-        mc_thresh = 0.001,
-        eros_scale = 1.e-6,
-        eros_choice = .true.,
-        eros_scale_c = 4.e-5,
-        eros_scale_t = 5.e-5,
-        super_choice = .true.,
-        tracer_advec = .true.
-        vfact = 0.9
-        U_evap_snow = 1.0
-        cfact = 1.0
-        do_liq_num = .true.
-        use_kk_auto = .false.
-        var_limit = 0.7
-        num_mass_ratio1 = 1.0
-        num_mass_ratio2 = 0.
-        use_sub_seasalt = .false.
-        aerosol_activation_scheme = "total"
-    </namelist>
-      <namelist name="cloud_generator_nml">
-      do_inhomogeneous_clouds = .true.
-      defaultOverlap = 4
-      overlapLengthScale = 2.0
-      </namelist>
-      <namelist name="uw_conv_nml">
-        use_online_aerosol = .true.,
-        rkm_sh1         = 7.0,
-        rkm_sh          = 3.0,
-        do_deep         = .true.,
-        idpchoice       = 2
-        do_rescale      = .true.
-        do_rescale_t    = .true.
-        use_sub_seasalt = .false.
-        use_new_let     = .true.
-        do_new_subflx   = .true.
-        do_new_pevap    = .false.
-        plev_cin        = 60000.
-        plev_for        = 60000.
-        src_choice      = 1
-        wrel_min        = 1.
-        do_new_qnact    = .true.
-        do_prog_gust    = .true.
-        cgust0          = 2.
-        cgust_max       = 4.
-        tracer_check_type = 2
-        stop_at_let     = .true.
-        lofactor0       = 0.5
-        do_umf_pbl      = .true.
-        do_new_convcld  = .true.
-        do_minmse       = .true.
-        reproduce_old_version = .false.
-        do_conv_micro_N = .false.
-        N0 = 100.e6
-        do_eis_limit = .true.
-        eis_max = 8.
-      </namelist>
-      <namelist name="deep_conv_nml">
-        crh_th_ocean = 0.4
-        crh_th_land  = 0.4
-        auto_th0_d = 0.2e-3
-        tcrit_d    = -25.15,
-        peff_l_d   = 6.0e-5
-        peff_i_d   = 11.e-5
-        rkm_dp1 = 1.0
-        rkm_dp2 = 0.1
-        crh_max = 1.0
-        cwfn_th = 10.
-        tau_dp = 28800.
-        mixing_assumption_d = 6
-        do_ppen_d  = .true.
-        rpen_d     = 4.0
-        do_pevap_d = .true.
-        cfrac_d    = 0.15
-        hcevap_d   = 0.85
-        hcevappbl_d = 0.95
-        pblfac_d   = 1.0
-        frac_limit_d = 0.25
-        dcwfndm_th = 100
-        lofactor_d = 1.0
-        do_cgust_dp  = .true.
-        cgust_choice = 1
-        include_emf_d = .false.
-      </namelist>
-      <namelist name="uw_plume_nml">
-        r_thresh = 10.
-        auto_th0 = 0.2e-3,
-        tcrit    = -25.15,
-        peff_l   = 6.0e-5
-        peff_i   = 11.e-5
-        frac_drs = 0.5
-        rpen     = 4.0
-        wmin     = 0.5
-        deltaqc0 = 0.5e-3 
-        do_pdfpcp= .false.
-        do_pmadjt= .true.
-        do_emmax = .true.
-        do_pnqv  = .true.
-        mixing_assumption = 6
-	scaleh0  = 1000.
-        beta = 0.0
-        rkm_max = 15
-        mp_choice = 3
-        do_pevap = .true.
-        do_new_pblfac = .true.
-        include_emf_s = .false.
-        cfrac    = 0.15
-        hcevap   = 0.85
-        hcevappbl = 0.95
-        pblfac   = 1.0
-        emfrac_max = 0.25
-        rmaxfrac = 0.1
-        do_limit_wmax = .true.
-        do_limit_fdr  = .true.
-        wmax = 20.
-        do_tten_max = .false.
-        tten_max = 1000
-        bigc = 0.0
-        nom_ratio = 0.7
-      </namelist>
-      <namelist name="fv_core_nml">
-        layout   = $atm_layout
-        io_layout = $atm_io_layout
-        npx      = 97,
-        npy      = 97,
-        ntiles   = 6,
-        npz      = 32,
-        k_split  = 1,
-        n_split  = 12,
-        a2b_ord  = 4,
-        adjust_dry_mass = $adjust_dry_mass,
-        adj_mass_vmr    = .true.
-        retain_mass_vmr_bug  = .false.
-        consv_te = 0.6,
-        fill = .true.
-        print_freq = 0,
-        grid_type = 0,
-        nord = 2,
-        dddmp = 0.0,
-        d2_bg = 0.0,
-        d4_bg = 0.15,
-        tau = 0.      
-        z_tracer=.false.
-        kord_tm = -10
-        kord_mt =  10
-        kord_tr =  10
-        hord_mt =  10
-        hord_vt = -10
-        hord_tm = -10
-        hord_dp = -10
-        hord_tr = -8
-        do_uni_zfull = .true.
-        consv_am = .true.
-      </namelist>
 
       <!--AWG Input namelists -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p12r13_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r13_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r13_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p12r17_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r17_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r17_c96L32.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p12_2010climo.nml"/>
 
       <!-- Input datasets -->
@@ -4137,196 +3335,11 @@ SIS_OVERRIDE_EOF
        max_field_attributes=4
        max_axis_attributes=4
       </namelist>
-      <!--r17 perturbation relative to r13-->
-      <namelist name="moist_processes_nml">
-        do_lsc=.false., 
-        do_strat=.true.,
-        do_mca=.false., 
-        do_ras=.false., 
-        do_uw_conv=.true.,
-        do_donner_deep = .false.,
-        do_diag_clouds = .false.,
-        do_cmt=.true., 
-        cmt_mass_flux_source='uw',
-        do_rh_clouds = .false., 
-        do_gust_cv = .false.,
-        do_gust_cv_new = .false.,
-        do_liq_num = .true.,
-        force_donner_moist_conserv = .false.,
-        do_donner_conservation_checks = .false.,
-        do_limit_donner = .false.,
-        do_limit_uw = .false.,
-        limit_conv_cloud_frac = .false.,
-        do_donner_before_uw = .false.,
-        do_legacy_strat_cloud = .false.,
-        do_height_adjust = .true.
-   </namelist>
-    <namelist name="strat_cloud_nml">
-        use_online_aerosol = .true.,
-        U00 = 0.80,
-        U00_profile = .true.,
-        rthresh = 8.5,
-        Dmin = 1.0e-07,
-        n_land = 300.e6,
-        n_ocean = 100.e6,
-        diff_thresh = 0.1,
-        mc_thresh = 0.001,
-        eros_scale = 1.e-6,
-        eros_choice = .true.,
-        eros_scale_c = 4.e-5,
-        eros_scale_t = 5.e-5,
-        super_choice = .true.,
-        tracer_advec = .true.
-        vfact = 0.9
-        U_evap_snow = 1.0
-        cfact = 1.0
-        do_liq_num = .true.
-        use_kk_auto = .false.
-        var_limit = 0.7
-        num_mass_ratio1 = 1.0
-        num_mass_ratio2 = 0.
-        use_sub_seasalt = .false.
-        aerosol_activation_scheme = "total"
-    </namelist>
-      <namelist name="cloud_generator_nml">
-      do_inhomogeneous_clouds = .true.
-      defaultOverlap = 4
-      overlapLengthScale = 2.0
-      </namelist>
-      <namelist name="uw_conv_nml">
-        use_online_aerosol = .true.,
-        rkm_sh1         = 7.0,
-        rkm_sh          = 3.0,
-        do_deep         = .true.,
-        idpchoice       = 2
-        do_rescale      = .true.
-        do_rescale_t    = .true.
-        use_sub_seasalt = .false.
-        use_new_let     = .true.
-        do_new_subflx   = .true.
-        do_new_pevap    = .false.
-        plev_cin        = 60000.
-        plev_for        = 60000.
-        src_choice      = 1
-        wrel_min        = 1.
-        do_new_qnact    = .true.
-        do_prog_gust    = .true.
-        cgust0          = 2.
-        cgust_max       = 4.
-        tracer_check_type = 2
-        stop_at_let     = .true.
-        lofactor0       = 0.5
-        do_umf_pbl      = .true.
-        do_new_convcld  = .true.
-        do_minmse       = .true.
-        reproduce_old_version = .false.
-        do_conv_micro_N = .false.
-        N0 = 100.e6
-        do_eis_limit = .true.
-        eis_max = 8.
-      </namelist>
-      <namelist name="deep_conv_nml">
-        crh_th_ocean = 0.4
-        crh_th_land  = 0.4
-        auto_th0_d = 0.2e-3
-        tcrit_d    = -25.15,
-        peff_l_d   = 6.0e-5
-        peff_i_d   = 11.e-5
-        rkm_dp1 = 1.0
-        rkm_dp2 = 0.1
-        crh_max = 1.0
-        cwfn_th = 10.
-        tau_dp = 28800.
-        mixing_assumption_d = 6
-        do_ppen_d  = .true.
-        rpen_d     = 4.0
-        do_pevap_d = .true.
-        cfrac_d    = 0.15
-        hcevap_d   = 0.85
-        hcevappbl_d = 0.95
-        pblfac_d   = 1.0
-        frac_limit_d = 0.25
-        dcwfndm_th = 100
-        lofactor_d = 1.0
-        do_cgust_dp  = .true.
-        cgust_choice = 1
-        include_emf_d = .false.
-      </namelist>
-      <namelist name="uw_plume_nml">
-        r_thresh = 10.
-        auto_th0 = 0.2e-3,
-        tcrit    = -25.15,
-        peff_l   = 6.0e-5
-        peff_i   = 11.e-5
-        frac_drs = 0.5
-        rpen     = 4.0
-        wmin     = 0.5
-        deltaqc0 = 0.5e-3 
-        do_pdfpcp= .false.
-        do_pmadjt= .true.
-        do_emmax = .true.
-        do_pnqv  = .true.
-        mixing_assumption = 6
-	scaleh0  = 1000.
-        beta = 0.0
-        rkm_max = 15
-        mp_choice = 3
-        do_pevap = .true.
-        do_new_pblfac = .true.
-        include_emf_s = .false.
-        cfrac    = 0.15
-        hcevap   = 0.85
-        hcevappbl = 0.95
-        pblfac   = 1.0
-        emfrac_max = 0.25
-        rmaxfrac = 0.1
-        do_limit_wmax = .true.
-        do_limit_fdr  = .true.
-        wmax = 20.
-        do_tten_max = .false.
-        tten_max = 1000
-        bigc = 0.0
-        nom_ratio = 0.7
-      </namelist>
-      <namelist name="fv_core_nml">
-        layout   = $atm_layout
-        io_layout = $atm_io_layout
-        npx      = 97,
-        npy      = 97,
-        ntiles   = 6,
-        npz      = 32,
-        k_split  = 1,
-        n_split  = 12,
-        a2b_ord  = 4,
-        adjust_dry_mass = $adjust_dry_mass,
-        adj_mass_vmr    = .true.
-        retain_mass_vmr_bug  = .false.
-        consv_te = 0.6,
-        fill = .true.
-        print_freq = 0,
-        grid_type = 0,
-        nord = 2,
-        dddmp = 0.0,
-        d2_bg = 0.0,
-        d4_bg = 0.15,
-        tau = 0.      
-        z_tracer=.false.
-        kord_tm = -10
-        kord_mt =  10
-        kord_tr =  10
-        hord_mt =  10
-        hord_vt = -10
-        hord_tm = -10
-        hord_dp = -10
-        hord_tr = -8
-        do_uni_zfull = .true.
-        consv_am = .true.
-      </namelist>
  
       <!--AWG Input namelists -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p12r13_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r13_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r13_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p12r17_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r17_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r17_c96L32.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p12_1850climo.nml"/>
 
       <!-- Input datasets -->
@@ -4348,7 +3361,7 @@ SIS_OVERRIDE_EOF
     </input>
   </experiment>
 
-  <experiment name="CM4_c96L32_am4g12r17_1850_OMp5_H5_ndiff_meke_MLE30d_ePBLr" inherit="CM4_c96L32_am4g12r17_1850_OMp5_H5_ndiff_meke_MLE30d_ePBLn">
+  <experiment name="CM4_c96L32_am4g12r17_1850_OMp5_H5_ndiff_meke_MLE10d_ePBLr" inherit="CM4_c96L32_am4g12r17_1850_OMp5_H5_ndiff_meke_MLE30d_ePBLn">
     <input>
       <csh><![CDATA[
 #amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
@@ -4376,12 +3389,11 @@ MIX_LEN_EXPONENT = 1.0
 MSTAR_CAP = 5.
 MSTAR_FLATCAP=False
 ! Sub-meso
-#override FOX_KEMPER_ML_RESTRAT_COEF = 20.0
+#override FOX_KEMPER_ML_RESTRAT_COEF = 10.0
 ! MLE 10 days
-#override MLE_MLD_DECAY_TIME = 2.592E6
+#override MLE_MLD_DECAY_TIME = 8.64E5
 ! Vertical structure for KHTH
-KHTH_USE_EBT_STRUCT = False
-#override KHTH = 500
+KHTH_USE_EBT_STRUCT = True
 ! Ferrari stremfunction
 KHTH_USE_FGNV_STREAMFUNCTION = True
 FGNV_FILTER_SCALE = 0.5
@@ -4608,9 +3620,9 @@ Reverting back to land defaults for coastal roughness, use_coast_topo_rough = .t
 
       </diagTable> 
      <!--AWG Input datasets -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p12r04_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r04_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r04_c96L32.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p12r17_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r17_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4g12r17_c96L32.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p12_1850climo.nml"/>
 
       <!-- Input datasets -->
@@ -5412,14 +4424,642 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
       </dataFile>
     </input>
   </freInclude>
-  <freInclude name="OBGC_COBALT_diag_table">
+<freInclude name="OBGC_COBALT_diag_table">
     <input>
-      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/diag_table.COBALT_with_z_20160610</dataSource>
-        <dataSource site="gfdl">$(OBGC_MODEL_UPDATES)/fre/input/retrospective/diag_table.COBALT_with_z_20160610</dataSource>
-      </dataFile>
+     <diagTable order="append">
+#==========================================================================================
+# MOM4p1 GENERIC OCEAN COBALT DIAGNOSTICS (from CAS 2013/07/01)
+#      2013/06/01 jgj activate monthly chl, htotal for JPD, RRR
+#      2013/07/02 jgj turn off ocean_cobalt_tracers_year and ocean_cobalt_zoo_diags
+#      2013/07/17 jgj add dic_stf_gas, o2_stf_gas to ocean_cobalt_misc, but save monthly
+#                     add z_sat_arag, z_sat_calc to ocean_cobalt_btm
+#      2014/12/12 jgj correct nmdz_100 in cobalt_1day and add other cobalt_1day diagnostics, but comment out
+#======================
+#output files
+"ocean_cobalt_1day",           24, "hours", 1, "days", "time",
+"ocean_cobalt_tracers_month",   1, "months", 1, "days", "time",
+"ocean_cobalt_tracers_year",   12, "months", 1, "days", "time",
+"ocean_cobalt_sfc",             1, "months", 1, "days", "time",
+"ocean_cobalt_btm",             1, "months", 1, "days", "time",
+"ocean_cobalt_phytolim_sfc",    1, "months", 1, "days", "time", 
+"ocean_cobalt_fdet_100",        1, "months", 1, "days", "time",
+"ocean_cobalt_biomass_100",     1, "months", 1, "days", "time", 
+"ocean_cobalt_prod_100",        1, "months", 1, "days", "time",
+"ocean_cobalt_miscflux_100",    1, "months", 1, "days", "time", 
+"ocean_cobalt_phyto_diags",    12, "months", 1, "days", "time",
+"ocean_cobalt_bact_diags",     12, "months", 1, "days", "time",
+"ocean_cobalt_zoo_diags",      12, "months", 1, "days", "time",
+"ocean_cobalt_misc",           12, "months", 1, "days", "time",
+#
+#======================
+# GENERIC OCEAN COBALT DIAGNOSTICS
+#======================
+#
+#===========================
+# ocean_cobalt_1day
+#===========================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_1day","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_1day","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_1day","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_1day","all",.false.,"none",2
+ "generic_cobalt","jprod_allphytos_100", "jprod_allphytos_100", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","sfc_chl",          "sfc_chl",            "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","sfc_no3",          "sfc_no3",            "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","sfc_temp",         "sfc_temp",           "ocean_cobalt_1day","all",.true.,"none",2
+## jgj: added 2014/11/25
+# "generic_cobalt","sfc_htotal",       "sfc_htotal",          "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","dic_deltap",       "dic_deltap",          "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","dic_stf_gas",      "dic_stf_gas",         "ocean_cobalt_1day","all",.true.,"none",2
+## additional 2D biomasses and biogeochemical fluxes
+# "generic_cobalt","fndet_100",        "fndet_100",   "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","nsmp_100",         "nsmp_100",    "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","nlgp_100",         "nlgp_100",    "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","ndi_100",          "ndi_100",     "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","nsmz_100",         "nsmz_100",    "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","nmdz_100",         "nmdz_100",    "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","nlgz_100",         "nlgz_100",    "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","nbact_100",        "nbact_100",   "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","mesozoo_200",      "mesozoo_200", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_nsmp_100",   "jprod_nsmp_100", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_nlgp_100",   "jprod_nlgp_100", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_ndi_100",    "jprod_ndi_100",  "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_nsmz_100",   "jprod_nsmz_100", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_nmdz_100",   "jprod_nmdz_100", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_nlgz_100",   "jprod_nlgz_100", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_nbact_100",  "jprod_nbact_100","ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","hploss_100",       "hploss_100",     "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_mesozoo_200","jprod_mesozoo_200","ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","btm_temp",         "btm_temp"        ,"ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","btm_o2",           "btm_o2"          ,"ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","fndet_btm",        "fndet_btm"       ,"ocean_cobalt_1day","all",.true.,"none",2
+#=============================================
+# ocean_cobalt_tracers_month
+# 2013/06/01 jgj activate chl, htotal for JPD, RRR
+#=============================================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_tracers_month","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_tracers_month","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_tracers_month","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_tracers_month","all",.false.,"none",2
+ "generic_cobalt","chl",                "chl",                "ocean_cobalt_tracers_month","all",.true.,"none",2
+# "generic_cobalt","co3_ion",            "co3_ion",            "ocean_cobalt_tracers_month","all",.true.,"none",2
+# "generic_cobalt","co3_sol_arag",       "co3_sol_arag",       "ocean_cobalt_tracers_month","all",.true.,"none",2
+# "generic_cobalt","co3_sol_calc",       "co3_sol_calc",       "ocean_cobalt_tracers_month","all",.true.,"none",2
+# "generic_cobalt","fed",                "fed",                "ocean_cobalt_tracers_month","all",.true.,"none",2
+ "generic_cobalt","htotal",             "htotal",             "ocean_cobalt_tracers_month","all",.true.,"none",2
+  "generic_cobalt","no3",                "no3",                "ocean_cobalt_tracers_month","all",.true.,"none",2
+  "generic_cobalt","o2",                 "o2",                 "ocean_cobalt_tracers_month","all",.true.,"none",2
+#=======================================
+# ocean_cobalt_tracers_year
+#=======================================
+ "ocean_model","geolat_c","geolat_c"                ,"ocean_cobalt_tracers_year","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                ,"ocean_cobalt_tracers_year","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                    ,"ocean_cobalt_tracers_year","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                    ,"ocean_cobalt_tracers_year","all",.false.,"none",2
+# "generic_cobalt","ndi",                "ndi",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","nlg",                "nlg",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","nsm",                "nsm",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","nbact",              "nbact",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","nsmz",               "nsmz",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+## "generic_cobalt","nmdz",               "nmdz",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+## "generic_cobalt","nlgz",               "nlgz",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+ "generic_cobalt","alk",                "alk",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+ "generic_cobalt","cadet_arag",         "cadet_arag",         "ocean_cobalt_tracers_year","all",.true.,"none",2
+ "generic_cobalt","cadet_calc",         "cadet_calc",         "ocean_cobalt_tracers_year","all",.true.,"none",2
+ "generic_cobalt","dic",                "dic",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","fed",                "fed",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","fedi",               "fedi",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","felg",               "felg",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","fesm",               "fesm",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","fedet",              "fedet",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","ldon",               "ldon",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","ldop",               "ldop",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","lith",               "lith",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","lithdet",            "lithdet",            "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","ndet",               "ndet",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+ "generic_cobalt","nh4",                "nh4",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","no3",                "no3",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","o2",                 "o2",                 "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","pdet",               "pdet",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","po4",                "po4",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","srdon",              "srdon",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","srdop",              "srdop",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","sldon",              "sldon",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","sldop",              "sldop",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","sidet",              "sidet",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","silg",               "silg",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","sio4",               "sio4",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","co3_sol_arag",       "co3_sol_arag",       "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","co3_sol_calc",       "co3_sol_calc",       "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","tot_layer_int_c",    "tot_layer_int_c",    "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","tot_layer_int_fe",   "tot_layer_int_fe",   "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","tot_layer_int_n",    "tot_layer_int_n",    "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","tot_layer_int_p",    "tot_layer_int_p",    "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","tot_layer_int_si",   "tot_layer_int_si",   "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","cased",              "cased",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","chl",                "chl",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","co3_ion",            "co3_ion",            "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","htotal",             "htotal",             "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","irr_mem",            "irr_mem",            "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","pco2surf",           "pco2surf",           "ocean_cobalt_tracers_year","all",.true.,"none",2
+#===================
+# Generic COBALT surface fields:
+#==================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_sfc","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_sfc","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_sfc","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_sfc","all",.false.,"none",2
+ "generic_cobalt","dic_csurf",               "dic_csurf",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","dic_deltap",              "dic_deltap",       "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","dic_kw",                  "dic_kw",           "ocean_cobalt_sfc","all",.true.,"none",2
+## "generic_cobalt","dic_sc_no",               "dic_sc_no",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","pco2surf",                "pco2surf",         "ocean_cobalt_sfc","all",.true.,"none",2
+## "generic_cobalt","o2_alpha",                 "o2_alpha",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","o2_csurf",                "o2_csurf",         "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","o2_deltap",               "o2_deltap",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","o2_kw",                   "o2_kw",            "ocean_cobalt_sfc","all",.true.,"none",2
+## "generic_cobalt","o2_sc_no",                 "o2_sc_no",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_alk",                 "sfc_alk",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_cadet_arag",          "sfc_cadet_arag",   "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_cadet_calc",          "sfc_cadet_calc",   "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_dic",                 "sfc_dic",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_fed",                 "sfc_fed",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_ldon",                "sfc_ldon",         "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_sldon",               "sfc_sldon",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_srdon",               "sfc_srdon",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_no3",                 "sfc_no3",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_nh4",                 "sfc_nh4",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_po4",                 "sfc_po4",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_sio4",                "sfc_sio4",         "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_htotal",              "sfc_htotal",       "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_o2",                  "sfc_o2",           "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_chl",                 "sfc_chl",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_nsmp",                "sfc_nsmp",         "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_nlgp",                "sfc_nlgp",         "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_ndi",                 "sfc_ndi",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_chl_smp",             "sfc_chl_smp",      "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_chl_lgp",             "sfc_chl_lgp",      "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_chl_di",              "sfc_chl_di",       "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_irr",                 "sfc_irr",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_irr_mem",             "sfc_irr_mem",      "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_temp",                "sfc_temp",         "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_co3_ion",             "sfc_co3_ion",      "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_co3_sol_arag",        "sfc_co3_sol_arag", "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_co3_sol_calc",        "sfc_co3_sol_calc", "ocean_cobalt_sfc","all",.true.,"none",2
+#===================
+# Generic COBALT bottom fields:
+#==================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_btm","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_btm","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_btm","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_btm","all",.false.,"none",2
+ "generic_cobalt","btm_temp",         "btm_temp"        ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","btm_o2",           "btm_o2"          ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","ffedet_btm",       "ffedet_btm"      ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","flithdet_btm",     "flithdet_btm"    ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fndet_btm",        "fndet_btm"       ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fpdet_btm",        "fpdet_btm"       ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fsidet_btm",       "fsidet_btm"      ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fcadet_arag_btm",  "fcadet_arag_btm" ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fcadet_calc_btm",  "fcadet_calc_btm" ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fcased_burial",    "fcased_burial"   ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fcased_redis",     "fcased_redis"    ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fcased_input",     "fcased_input"    ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fnfeso4red_sed",   "fnfeso4red_sed"  ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fno3denit_sed",    "fno3denit_sed"   ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fnoxic_sed",       "fnoxic_sed"      ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","frac_burial",      "frac_burial"     ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fndet_burial",     "fndet_burial"    ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fpdet_burial",     "fpdet_burial"    ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","z_sat_arag",       "z_sat_arag"      ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","z_sat_calc",       "z_sat_calc"      ,"ocean_cobalt_btm","all",.true.,"none",2
+#======================
+# Surface phytoplankton limitation diagnostics
+#======================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_phytolim_sfc","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_phytolim_sfc","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_phytolim_sfc","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_phytolim_sfc","all",.false.,"none",2
+ "generic_cobalt","sfc_def_fe_di",       "sfc_def_fe_di",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_def_fe_lgp",      "sfc_def_fe_lgp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_def_fe_smp",      "sfc_def_fe_smp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_felim_di",        "sfc_felim_di",           "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_felim_lgp",       "sfc_felim_lgp",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_felim_smp",       "sfc_felim_smp",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_irrlim_di",       "sfc_irrlim_di",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_irrlim_lgp",      "sfc_irrlim_lgp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_irrlim_smp",      "sfc_irrlim_smp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_theta_di",        "sfc_theta_di",           "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_theta_lgp",       "sfc_theta_lgp",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_theta_smp",       "sfc_theta_smp",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_mu_di",           "sfc_mu_di",              "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_mu_lgp",          "sfc_mu_lgp",             "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_mu_smp",          "sfc_mu_smp",             "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_nh4lim_lgp",      "sfc_nh4lim_lgp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_nh4lim_smp",      "sfc_nh4lim_smp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_no3lim_lgp",      "sfc_no3lim_lgp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_no3lim_smp",      "sfc_no3lim_smp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_po4lim_di",       "sfc_po4lim_di",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_po4lim_lgp",      "sfc_po4lim_lgp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_po4lim_smp",      "sfc_po4lim_smp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_q_fe_2_n_di",     "sfc_q_fe_2_n_di",        "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_q_fe_2_n_lgp",    "sfc_q_fe_2_n_lgp",       "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_q_fe_2_n_smp",    "sfc_q_fe_2_n_smp",       "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+#======================
+# Generic COBALT downward fluxes at 100 meters
+#======================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_fdet_100","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_fdet_100","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_fdet_100","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_fdet_100","all",.false.,"none",2
+ "generic_cobalt","fndet_100",               "fndet_100",        "ocean_cobalt_fdet_100","all",.true.,"none",2
+ "generic_cobalt","fpdet_100",               "fpdet_100",        "ocean_cobalt_fdet_100","all",.true.,"none",2
+ "generic_cobalt","ffedet_100",              "ffedet_100",       "ocean_cobalt_fdet_100","all",.true.,"none",2
+ "generic_cobalt","fsidet_100",              "fsidet_100",       "ocean_cobalt_fdet_100","all",.true.,"none",2
+ "generic_cobalt","fcadet_calc_100",         "fcadet_calc_100",  "ocean_cobalt_fdet_100","all",.true.,"none",2
+ "generic_cobalt","fcadet_arag_100",         "fcadet_arag_100",  "ocean_cobalt_fdet_100","all",.true.,"none",2
+ "generic_cobalt","flithdet_100",            "flithdet_100",     "ocean_cobalt_fdet_100","all",.true.,"none",2
+#=======================
+# Generic COBALT 100m integrated biomass variables
+#=======================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_biomass_100","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_biomass_100","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_biomass_100","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_biomass_100","all",.false.,"none",2
+ "generic_cobalt","nsmp_100",                "nsmp_100", "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","nlgp_100",                "nlgp_100", "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","ndi_100",                 "ndi_100",  "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","silgp_100",               "silgp_100","ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","nsmz_100",                "nsmz_100", "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","nmdz_100",                "nmdz_100", "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","nlgz_100",                "nlgz_100", "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","nbact_100",               "nbact_100","ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","don_100",                 "don_100",  "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","ndet_100",                "ndet_100", "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","mesozoo_200",          "mesozoo_200", "ocean_cobalt_biomass_100","all",.true.,"none",2
+#=======================
+# Generic COBALT 100m integrated plankton production variables
+#=======================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_prod_100","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_prod_100","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_prod_100","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_prod_100","all",.false.,"none",2
+ "generic_cobalt","jprod_allphytos_100",     "jprod_allphytos_100",      "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nsmp_100",          "jprod_nsmp_100",           "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nlgp_100",          "jprod_nlgp_100",           "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_ndi_100",           "jprod_ndi_100",            "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nsmp_new_100",      "jprod_nsmp_new_100",       "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nlgp_new_100",      "jprod_nlgp_new_100",       "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_ndi_new_100",       "jprod_ndi_new_100",        "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_ndi_n2_100",        "jprod_ndi_n2_100",         "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nsmz_100",          "jprod_nsmz_100",           "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nmdz_100",          "jprod_nmdz_100",           "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nlgz_100",          "jprod_nlgz_100",           "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nbact_100",         "jprod_nbact_100",          "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_mesozoo_200",       "jprod_mesozoo_200",        "ocean_cobalt_prod_100","all",.true.,"none",2
+#=======================
+# Generic COBALT other 100m integrated foodweb fluxes
+#=======================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_miscflux_100","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_miscflux_100","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_miscflux_100","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_miscflux_100","all",.false.,"none",2
+ "generic_cobalt","jzloss_nsmp_100",         "jzloss_nsmp_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jzloss_nlgp_100",         "jzloss_nlgp_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jzloss_ndi_100",          "jzloss_ndi_100",           "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jaggloss_nsmp_100",       "jaggloss_nsmp_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jaggloss_nlgp_100",       "jaggloss_nlgp_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jvirloss_nsmp_100",       "jvirloss_nsmp_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jexuloss_nsmp_100",       "jexuloss_nsmp_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jexuloss_nlgp_100",       "jexuloss_nlgp_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jexuloss_ndi_100",        "jexuloss_ndi_100",         "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jingest_n_nsmz_100",      "jingest_n_nsmz_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jingest_n_nmdz_100",      "jingest_n_nmdz_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jingest_n_nlgz_100",      "jingest_n_nlgz_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jingest_n_hp_100",        "jingest_n_hp_100",         "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jzloss_nsmz_100",         "jzloss_nsmz_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jzloss_nmdz_100",         "jzloss_nmdz_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jhploss_nmdz_100",        "jhploss_nmdz_100",         "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jhploss_nlgz_100",        "jhploss_nlgz_100",         "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_ndet_nmdz_100",     "jprod_ndet_nmdz_100",      "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_ndet_nlgz_100",     "jprod_ndet_nlgz_100",      "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_ndet_hp_100",       "jprod_ndet_hp_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_don_nsmz_100",      "jprod_don_nsmz_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_don_nmdz_100",      "jprod_don_nmdz_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jremin_n_nsmz_100",       "jremin_n_nsmz_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jremin_n_nmdz_100",       "jremin_n_nmdz_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jremin_n_nlgz_100",       "jremin_n_nlgz_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jremin_n_hp_100",         "jremin_n_hp_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","juptake_ldon_nbact_100",  "juptake_ldon_nbact_100",   "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jvirloss_nbact_100",      "jvirloss_nbact_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jzloss_nbact_100",        "jzloss_nbact_100",         "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jremin_n_nbact_100",      "jremin_n_nbact_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_lithdet_100",       "jprod_lithdet_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_sidet_100",         "jprod_sidet_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_cadet_calc_100",    "jprod_cadet_calc_100",     "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_cadet_arag_100",    "jprod_cadet_arag_100",     "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jremin_ndet_100",         "jremin_ndet_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+## "generic_cobalt","jdic_100",                "jdic_100",                 "ocean_cobalt_miscflux_100","all",.true.,"none",2
+## "generic_cobalt","jdin_100",                "jdin_100",                 "ocean_cobalt_miscflux_100","all",.true.,"none",2
+## "generic_cobalt","jpo4_100",                "jpo4_100",                 "ocean_cobalt_miscflux_100","all",.true.,"none",2
+## "generic_cobalt","jfed_100",                "jfed_100",                 "ocean_cobalt_miscflux_100","all",.true.,"none",2
+## "generic_cobalt","jsio4_100",               "jsio4_100",                "ocean_cobalt_miscflux_100","all",.true.,"none",2
+## "generic_cobalt","jalk_100",                "jalk_100",                 "ocean_cobalt_miscflux_100","all",.true.,"none",2
+#=======================
+# Miscellaneous 2D and 3D COBALT diagnostics, saved yearly by default
+#=======================   
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_misc","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_misc","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_misc","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_misc","all",.false.,"none",2
+# "generic_cobalt","fcadet_arag",      "fcadet_arag",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","fcadet_calc",      "fcadet_calc",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","ffedet",           "ffedet",             "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","flithdet",         "flithdet",           "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","fndet",            "fndet",              "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","fpdet",            "fpdet",              "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","fsidet",           "fsidet",             "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jdiss_sidet",      "jdiss_sidet",        "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jdiss_cadet_arag", "jdiss_cadet_arag",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jdiss_cadet_calc", "jdiss_cadet_calc",   "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jremin_ndet",      "jremin_ndet",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jremin_pdet",      "jremin_pdet",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jremin_fedet",     "jremin_fedet",       "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_dry_fed",      "dep_dry_fed",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_dry_nh4",      "dep_dry_nh4",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_dry_no3",      "dep_dry_no3",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_dry_po4",      "dep_dry_po4",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_dry_lith",     "dep_dry_lith",       "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_wet_fed",      "dep_wet_fed",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_wet_nh4",      "dep_wet_nh4",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_wet_no3",      "dep_wet_no3",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_wet_po4",      "dep_wet_po4",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_wet_lith",     "dep_wet_lith",       "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_alk",  "runoff_flux_alk",    "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_dic",  "runoff_flux_dic",    "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_fed",  "runoff_flux_fed",    "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_lith", "runoff_flux_lith",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_no3",  "runoff_flux_no3",    "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_ldon", "runoff_flux_ldon",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_sldon", "runoff_flux_sldon",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_srdon", "runoff_flux_srdon",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_ndet", "runoff_flux_ndet",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_po4",  "runoff_flux_po4",    "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_ldop", "runoff_flux_ldop",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_sldop", "runoff_flux_sldop",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_srdop", "runoff_flux_srdop",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jprod_cadet_arag", "jprod_cadet_arag",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jprod_cadet_calc", "jprod_cadet_calc",   "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","omega_arag",       "omega_arag",         "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","omega_calc",       "omega_calc",         "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jprod_lithdet",    "jprod_lithdet",      "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jfe_ads",          "jfe_ads",            "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jfe_coast",        "jfe_coast",          "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","kfe_eq_lig",       "kfe_eq_lig",          "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jalk",     "jalk",       "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jdic",     "jdic",       "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jnh4",     "jnh4",       "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jno3denit_wc",     "jno3denit_wc",       "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jnitrif",          "jnitrif",            "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dic_stf",          "dic_stf",            "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","dic_stf_gas",      "dic_stf_gas",        "ocean_cobalt_misc","all",.true.,"none",2
+## "generic_cobalt","o2_stf",           "o2_stf",              "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","o2_stf_gas",       "o2_stf_gas",          "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","alk_stf",         "alk_stf",                "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","fed_stf",         "fed_stf",                "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","lith_stf",        "lith_stf",               "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","nh4_stf",         "nh4_stf",                "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","no3_stf",         "no3_stf",                "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jalk_plus_btm",   "jalk_plus_btm",          "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jdic_plus_btm",   "jdic_plus_btm",          "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jdin_plus_btm",   "jdin_plus_btm",          "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jfed_plus_btm",   "jfed_plus_btm",          "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jnh4_plus_btm",   "jnh4_plus_btm",          "ocean_cobalt_misc","all",.true.,"none",2
+#
+#========================
+# 2D and 3D phytoplankton diagnostics, saved yearly by default
+#========================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_phyto_diags","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_phyto_diags","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_phyto_diags","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_phyto_diags","all",.false.,"none",2
+# "generic_cobalt","expkT",           "expkT",              "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","def_fe_Di",       "def_fe_Di",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","def_fe_Lg",       "def_fe_Lg",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","def_fe_Sm",       "def_fe_Sm",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","felim_Di",        "felim_Di",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","felim_Lg",        "felim_Lg",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","felim_Sm",        "felim_Sm",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","irrlim_Di",       "irrlim_Di",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","irrlim_Lg",       "irrlim_Lg",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","irrlim_Sm",       "irrlim_Sm",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","theta_Di",        "theta_Di",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","theta_Lg",        "theta_Lg",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","theta_Sm",        "theta_Sm",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","mu_Di",           "mu_Di",              "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","mu_Lg",           "mu_Lg",              "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","mu_Sm",           "mu_Sm",              "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","nh4lim_Lg",       "nh4lim_Lg",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","nh4lim_Sm",       "nh4lim_Sm",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","no3lim_Lg",       "no3lim_Lg",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","no3lim_Sm",       "no3lim_Sm",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","po4lim_Di",       "po4lim_Di",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","po4lim_Lg",       "po4lim_Lg",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","po4lim_Sm",       "po4lim_Sm",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","q_fe_2_n_Di",     "q_fe_2_n_Di",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","q_fe_2_n_Lg",     "q_fe_2_n_Lg",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","q_fe_2_n_Sm",     "q_fe_2_n_Sm",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","silim_Lg",        "silim_Lg",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jzloss_n_Di",     "jzloss_n_Di",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jzloss_n_Lg",     "jzloss_n_Lg",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jzloss_n_Sm",     "jzloss_n_Sm",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jvirloss_n_Di",   "jvirloss_n_Di",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jvirloss_n_Lg",   "jvirloss_n_Lg",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jvirloss_n_Sm",   "jvirloss_n_Sm",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jexuloss_n_Di",   "jexuloss_n_Di",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jexuloss_n_Lg",   "jexuloss_n_Lg",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jexuloss_n_Sm",   "jexuloss_n_Sm",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jaggloss_n_Di",   "jaggloss_n_Di",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jaggloss_n_Lg",   "jaggloss_n_Lg",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jaggloss_n_Sm",   "jaggloss_n_Sm",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_n2_Di",   "juptake_n2_Di",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_fe_Di",   "juptake_fe_Di",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_fe_Lg",   "juptake_fe_Lg",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_fe_Sm",   "juptake_fe_Sm",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+ "generic_cobalt","juptake_nh4_Di",  "juptake_nh4_Di",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+ "generic_cobalt","juptake_nh4_Lg",  "juptake_nh4_Lg",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+ "generic_cobalt","juptake_nh4_Sm",  "juptake_nh4_Sm",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+ "generic_cobalt","juptake_no3_Di",  "juptake_no3_Di",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+ "generic_cobalt","juptake_no3_Lg",  "juptake_no3_Lg",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+ "generic_cobalt","juptake_no3_Sm",  "juptake_no3_Sm",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_po4_Di",  "juptake_po4_Di",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_po4_Lg",  "juptake_po4_Lg",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_po4_Sm",  "juptake_po4_Sm",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_sio4_Lg", "juptake_sio4_Lg",    "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_nsmp",      "jprod_nsmp",         "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_nlgp",      "jprod_nlgp",         "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ndi",       "jprod_ndi",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","irr_inst",           "irr_inst",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","irr_mix",            "irr_mix",         "ocean_cobalt_phyto_diags","all",.true.,"none",2
+#===================================
+# 2D and 3D bacteria diagnostics, saved yearly by default
+#===================================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_bact_diags","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_bact_diags","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_bact_diags","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_bact_diags","all",.false.,"none",2
+# "generic_cobalt","jzloss_n_Bact",   "jzloss_n_Bact",         "ocean_cobalt_bact_diags","all",.true.,"none",2
+# "generic_cobalt","jvirloss_n_Bact", "jvirloss_n_Bact",       "ocean_cobalt_bact_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_ldon",    "juptake_ldon",          "ocean_cobalt_bact_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_ldop",    "juptake_ldop",          "ocean_cobalt_bact_diags","all",.true.,"none",2
+"generic_cobalt","jprod_nh4_Bact",  "jprod_nh4_Bact",        "ocean_cobalt_bact_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_po4_Bact",  "jprod_po4_Bact",        "ocean_cobalt_bact_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_nbact",     "jprod_nbact",            "ocean_cobalt_bact_diags","all",.true.,"none",2
+# "generic_cobalt","temp_lim_Bact",   "temp_lim_Bact",         "ocean_cobalt_bact_diags","all",.true.,"none",2
+#
+## zoo_diags: zooplankton diagnostics
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_zoo_diags","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_zoo_diags","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_zoo_diags","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_zoo_diags","all",.false.,"none",2
+# "generic_cobalt","jzloss_n_Smz",    "jzloss_n_Smz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jzloss_n_Mdz",    "jzloss_n_Mdz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jzloss_n_Lgz",    "jzloss_n_Lgz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jhploss_n_Smz",   "jhploss_n_Smz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jhploss_n_Mdz",   "jhploss_n_Mdz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jhploss_n_Lgz",   "jhploss_n_Lgz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_n_Smz",   "jingest_n_Smz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_n_Mdz",   "jingest_n_Mdz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_n_Lgz",   "jingest_n_Lgz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_sio2_Smz","jingest_sio2_Smz",      "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_sio2_Mdz","jingest_sio2_Mdz",      "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_sio2_Lgz","jingest_sio2_Lgz",      "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","total_filter_feeding","total_filter_feeding","ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_fe_Smz",  "jingest_fe_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_fe_Mdz",  "jingest_fe_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_fe_Lgz",  "jingest_fe_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ndet_Smz",  "jprod_ndet_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ndet_Mdz",  "jprod_ndet_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ndet_Lgz",  "jprod_ndet_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_pdet_Smz",  "jprod_pdet_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_pdet_Mdz",  "jprod_pdet_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_pdet_Lgz",  "jprod_pdet_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sidet_Smz", "jprod_sidet_Smz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sidet_Mdz", "jprod_sidet_Mdz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sidet_Lgz", "jprod_sidet_Lgz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sio4_Smz", "jprod_sio4_Smz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sio4_Mdz", "jprod_sio4_Mdz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sio4_Lgz", "jprod_sio4_Lgz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_fedet_Smz", "jprod_fedet_Smz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_fedet_Mdz", "jprod_fedet_Mdz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_fedet_Lgz", "jprod_fedet_Lgz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ldon_Smz",  "jprod_ldon_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ldon_Mdz",  "jprod_ldon_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ldon_Lgz",  "jprod_ldon_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ldop_Smz",  "jprod_ldop_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ldop_Mdz",  "jprod_ldop_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ldop_Lgz",  "jprod_ldop_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_srdon_Smz",  "jprod_srdon_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_srdon_Mdz",  "jprod_srdon_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_srdon_Lgz",  "jprod_srdon_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_srdop_Smz",  "jprod_srdop_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_srdop_Mdz",  "jprod_srdop_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_srdop_Lgz",  "jprod_srdop_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sldon_Smz",  "jprod_sldon_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sldon_Mdz",  "jprod_sldon_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sldon_Lgz",  "jprod_sldon_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sldop_Smz",  "jprod_sldop_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sldop_Mdz",  "jprod_sldop_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sldop_Lgz",  "jprod_sldop_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_fed_Smz",   "jprod_fed_Smz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_fed_Mdz",   "jprod_fed_Mdz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_fed_Lgz",   "jprod_fed_Lgz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_po4_Smz",   "jprod_po4_Smz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_po4_Mdz",   "jprod_po4_Mdz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_po4_Lgz",   "jprod_po4_Lgz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+ "generic_cobalt","jprod_nh4_Smz",   "jprod_nh4_Smz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+ "generic_cobalt","jprod_nh4_Mdz",   "jprod_nh4_Mdz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+ "generic_cobalt","jprod_nh4_Lgz",   "jprod_nh4_Lgz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_nsmz",       "jprod_nsmz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+## "generic_cobalt","jprod_nmdz",       "jprod_nmdz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+## "generic_cobalt","jprod_nlgz",       "jprod_nlgz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","temp_lim_Smz",    "temp_lim_Smz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","temp_lim_Mdz",    "temp_lim_Mdz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","temp_lim_Lgz",    "temp_lim_Lgz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","hp_temp_lim",     "hp_temp_lim",           "ocean_cobalt_zoo_diags","all",.true.,"none",2
+#
+#===================================================================================================================
+# GENERIC OCEAN COBALT_z DIAGNOSTICS   JGJ 2016/05/05
+#      2016/05/05 jgj add _z diagnostics
+#===================================================================
+## add _z diagnostics to COBALT
+#"ocean_cobalt_1day_z",         24, "hours", 1, "days", "time",
+"ocean_cobalt_tracers_month_z", 1, "months", 1, "days", "time",
+"ocean_cobalt_tracers_year_z", 12, "months", 1, "days", "time",
+"ocean_cobalt_phyto_diags_z",  12, "months", 1, "days", "time",
+"ocean_cobalt_bact_diags_z",   12, "months", 1, "days", "time",
+"ocean_cobalt_zoo_diags_z",    12, "months", 1, "days", "time",
+"ocean_cobalt_misc_z",         12, "months", 1, "days", "time",
+#
+#===========================
+# ocean_cobalt_1day_z
+#===========================
+# "generic_cobalt_z","no3", "no3", "ocean_cobalt_1day_z","all","mean","none",2
+#
+#=============================================
+# ocean_cobalt_tracers_month_z
+#=============================================
+ "generic_cobalt_z","chl",                "chl",                "ocean_cobalt_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","dic",                "dic",                "ocean_cobalt_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","htotal",             "htotal",             "ocean_cobalt_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","no3",                "no3",                "ocean_cobalt_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","o2",                 "o2",                 "ocean_cobalt_tracers_month_z","all","mean","none",2
+#
+#=======================================
+# ocean_cobalt_tracers_year_z
+#=======================================
+ "generic_cobalt_z","alk",                "alk",                "ocean_cobalt_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","cadet_arag",         "cadet_arag",         "ocean_cobalt_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","cadet_calc",         "cadet_calc",         "ocean_cobalt_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","nh4",                "nh4",                "ocean_cobalt_tracers_year_z","all","mean","none",2
+#
+#=======================================
+# Miscellaneous 3D COBALT_z diagnostics, saved yearly by default
+#=======================================
+ "generic_cobalt_z","jdiss_cadet_arag", "jdiss_cadet_arag",   "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jprod_cadet_arag", "jprod_cadet_arag",   "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jprod_cadet_calc", "jprod_cadet_calc",   "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jalk",             "jalk",               "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jdic",             "jdic",               "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jnh4",             "jnh4",               "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jno3denit_wc",     "jno3denit_wc",       "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jnitrif",          "jnitrif",            "ocean_cobalt_misc_z","all","mean","none",2
+#
+#========================
+# phytoplankton_z diagnostics, saved yearly by default
+#========================
+ "generic_cobalt_z","juptake_nh4_Di",  "juptake_nh4_Di",     "ocean_cobalt_phyto_diags_z","all","mean","none",2
+ "generic_cobalt_z","juptake_nh4_Lg",  "juptake_nh4_Lg",     "ocean_cobalt_phyto_diags_z","all","mean","none",2
+ "generic_cobalt_z","juptake_nh4_Sm",  "juptake_nh4_Sm",     "ocean_cobalt_phyto_diags_z","all","mean","none",2
+ "generic_cobalt_z","juptake_no3_Di",  "juptake_no3_Di",     "ocean_cobalt_phyto_diags_z","all","mean","none",2
+ "generic_cobalt_z","juptake_no3_Lg",  "juptake_no3_Lg",     "ocean_cobalt_phyto_diags_z","all","mean","none",2
+ "generic_cobalt_z","juptake_no3_Sm",  "juptake_no3_Sm",     "ocean_cobalt_phyto_diags_z","all","mean","none",2
+#
+#===================================
+# bacteria_z diagnostics, saved yearly by default
+#===================================
+ "generic_cobalt_z","jprod_nh4_Bact",  "jprod_nh4_Bact",        "ocean_cobalt_bact_diags_z","all","mean","none",2
+#
+#===================================
+## zoo_diags: zooplankton_z diagnostics
+#===================================
+ "generic_cobalt_z","jprod_nh4_Smz",   "jprod_nh4_Smz",         "ocean_cobalt_zoo_diags_z","all","mean","none",2
+ "generic_cobalt_z","jprod_nh4_Mdz",   "jprod_nh4_Mdz",         "ocean_cobalt_zoo_diags_z","all","mean","none",2
+ "generic_cobalt_z","jprod_nh4_Lgz",   "jprod_nh4_Lgz",         "ocean_cobalt_zoo_diags_z","all","mean","none",2
+#
+#===================================================================================================================
+      </diagTable>
     </input>
-  </freInclude>
+</freInclude>
 
   <!-- Atmos co2 diagnostics: note atmos_month and atmos_scalar already in awg diag table -->
   <freInclude name="ESM4_atmos_co2_diag_table">
