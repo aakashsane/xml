@@ -82,7 +82,7 @@ NOTES:
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
   <property name="PP_START_YEAR"    value="1860" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
-  <property name="PROD_SEGTIME"     value="04:00:00"/><!--Wall clock per segment (usually 1 year)-->
+  <property name="PROD_SEGTIME"     value="03:00:00"/><!--Wall clock per segment (usually 1 year)-->
 
   <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->   
@@ -5108,6 +5108,10 @@ SIS_OVERRIDE_EOF
         <timeSeries freq="120hr" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_5daily"/>
       </component>
       
+      <component type="ocean_daily"   source="ocean_daily" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_daily"/>
+      </component>
+
       <component type="ocean_monthly"   source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>
