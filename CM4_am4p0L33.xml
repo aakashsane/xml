@@ -67,7 +67,7 @@ NOTES:
 
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"      value="prerelease_warsaw_20170330"/> <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2017.03.17"/>                 <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"    value="2017.04.17"/>                 <!-- git tag date for MOM6 source code -->
   <property name="SHARED_GIT_TAG"     value="$(RELEASE)"/>
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="$(RELEASE)"/>           <!-- git tag for AWG source code -->
@@ -1863,6 +1863,14 @@ $baseDate
   <freInclude name="c96L33_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$CPERM/Ming.Zhao/archive/mdt/awg/input/ic/CM4/awg_C96L33_LM3_OM4_025_grid_lm4p1_topo_no_ice_res_v20170407.tar</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+
+  <freInclude name="c96L33_amip_initCond">
+    <input>
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$CPERM/Ming.Zhao/archive/mdt/awg/input/ic/AM4/awg_C96L33_LM3_OM4_025_grid_lm4p1_topo_v20170309.tar</dataSource>
       </dataFile>
     </input>
@@ -2282,7 +2290,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <xi:include xpointer="xpointer(//freInclude[@name='climo_sst_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='data_table_AM4']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_grid']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='c96L33_initCond']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96L33_amip_initCond']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
@@ -2474,11 +2482,6 @@ For more information please refer to the
       <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
 
       <csh><![CDATA[
-#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
-if ( $currentSeg == 1 ) then
-\rm -f $work/INPUT/ice_model.res.nc
-endif
-#
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override MLE_MLD_DECAY_TIME = 2.592E+06
 
@@ -2823,11 +2826,6 @@ For more information please refer to the
       <!--SIS Input datasets-->
       <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
       <csh><![CDATA[
-#amip initCond tar file inludes ice_model.res.nc not suitable for the coupled model
-if ( $currentSeg == 1 ) then
-\rm -f $work/INPUT/ice_model.res.nc
-endif
-#
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
@@ -3393,11 +3391,6 @@ SIS_OVERRIDE_EOF
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/SIS_input</dataSource>
      </dataFile>
 
-<!-- No init ice yet
-     <dataFile label="input" target="INPUT/ice_model.res.nc" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/.datasets/OM4_025/INPUT/ice_model.res.v20140620.nc</dataSource>
-     </dataFile>
--->
      <namelist name="SIS_input_nml" >
          output_directory = './',
          input_filename = '$restart_flag'
