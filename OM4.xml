@@ -20,7 +20,7 @@ frerun  -x OM4.xml -p ncrc3.intel15 -t prod OM4_SIS2_baseline -r basic
    <property name="BERGS_GIT_TAG" value="dev/master"/>
    <property name="FRE_VERSION"  value="bronx-12"/>
    <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-   <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+   <property name="GFDL_GROUP"   value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
 
    <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
@@ -1943,6 +1943,7 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1756']/node())"/> </run>
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O2432']/node())"/> </run>
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1756']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O2997']/node())"/> </run>
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O3782']/node())"/> </run>
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O4671']/node())"/> </run>
       </regression>
@@ -2188,6 +2189,14 @@ $baseDate
        max_files_r = 200
        max_files_w = 200
 !       checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+     </namelist>
+     <namelist name="diag_manager_nml">
+       max_axes = 150,
+       max_files = 100,
+       max_num_axis_sets = 100,
+       max_input_fields = 699
+       max_output_fields = 699
+       mix_snapshot_average_fields=.false.
      </namelist>
      <namelist name="xgrid_nml">
        make_exchange_reproduce = .false.
@@ -3035,6 +3044,16 @@ use_hyper_thread = .false.
 
      </namelist>
 
+     <namelist name="diag_manager_nml">
+            flush_nc_files=.false.
+            max_axes = 100,
+            max_files = 63,
+            max_num_axis_sets = 100,
+            max_input_fields = 699
+            max_output_fields = 699
+            mix_snapshot_average_fields=.false.
+     </namelist>
+
 
      <diagTable>
 $name
@@ -3147,9 +3166,11 @@ SIS_OVERRIDE_EOF
 cat > $work/INPUT/MOM_override << OVERRIDE_EOF
 #override EQN_OF_STATE = "NEMO"
 USE_CONTEMP_ABSSAL = True
-#override TFREEZE_FORM = "TEOS10"
 
 OVERRIDE_EOF
+
+#add the following after merge user/nnz/use_teos10_tfreeze
+#override TFREEZE_FORM = "TEOS10"
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
@@ -4195,7 +4216,7 @@ Switch to Preind DIC from GLODAP v1
      </namelist>
      <namelist name="diag_manager_nml">
        max_files = 400
-       conserve_water=.false.
+       flush_nc_files=.false.
        max_axes = 400,
        max_num_axis_sets = 400,
        max_input_fields = 800
