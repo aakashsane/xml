@@ -36,23 +36,28 @@ from integrations with these models.
 # Change the occcurances of YOURGROUPLETTER in this file to your group letter (small), such as f, w, o, g+,...
 
 # To check out codes and compile:
+cd XML_DIR
 module load fre/bronx-12
-fremake -x CM4_am4p0L33.xml -p ncrc4.intel16 -t prod-openmp cm4_libs_compile -nolink
+fremake -x XML_NAME -p ncrc4.intel16 -t prod-openmp cm4_libs_compile -nolink
 SIS:
-fremake -x CM4_am4p0L33.xml -p ncrc4.intel16 -t prod-openmp cm4_compile
+fremake -x XML_NAME -p ncrc4.intel16 -t prod-openmp cm4_compile
 SIS2:
-fremake -x CM4_am4p0L33.xml -p ncrc4.intel16 -t prod-openmp cm4_sis2_compile
+fremake -x XML_NAME -p ncrc4.intel16 -t prod-openmp cm4_sis2_compile
 
-# To run regression test (for the coupled experiment CM4_c96L33_am4p0_2010_MLE30d_ePBLn ): 
+# To list avaliable experiments in this xml
 
-frerun -r basic -x CM4_am4p0L33.xml -p ncrc4.intel16 -t prod-openmp CM4_c96L33_am4p0_2010_MLE30d_ePBLn
+frelist -x XML_NAME
+
+# To run a basic test for one of these experiments : 
+
+frerun -r basic -x XML_NAME -p ncrc4.intel16 -t prod-openmp EXP_NAME
 
 # To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
 
-frerun -x CM4_am4p0L33.xml -p ncrc4.intel16 -t prod-openmp CM4_c96L33_am4p0_2010_MLE30d_ePBLn
+frerun -x XML_NAME -p ncrc4.intel16 -t prod-openmp EXP_NAME
 
 # To check what is the input data of this experiment:
-inputfiles -x CM4_am4p0L33.xml -p ncrc4.intel16 CM4_c96L33_am4p0_2010_MLE30d_ePBLn
+inputfiles -x XML_NAME -p ncrc4.intel16 EXP_NAME
 
 NOTES:
       If the experiment name + FRESTEM is too long the post-process initiated on gaea may fail.
@@ -1218,7 +1223,8 @@ $baseDate
   <freInclude name="c192_grid">
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$CDATA/gfdl_M/Huan.Guo/archive/mdt/awg/input/grid/c192_OM4_025_grid_No_mg_drag_v20160808.tar</dataSource>
+         <dataSource site="ncrc">$CDATA/gfdl_M/Huan.Guo/archive/mdt/awg/input/grid/c192_OM4_025_grid_No_mg_drag_v20160808.tar</dataSource>
+         <dataSource site="gfdl">/archive/h1g/INPUT/c192_awg/c192_OM4_025_grid_No_mg_drag_v20160808.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/land_domain.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$CDATA/gfdl_F/Thomas.Robinson/land/c192/land_domain.nc</dataSource>
@@ -1661,8 +1667,8 @@ set ocn_hyperthread = $ocn_hythr
 <!--=======================-->
 <!--= CM4 EXPERIMENTS     =-->
 <!--=======================-->
-  <experiment name="CM4_c192L33_am4p0_2010_30d5_tlt.$(MOM6_DATE)" inherit="CM4_c192L33_am4p0_2010_30d5_tlt"/>
-  <experiment name="CM4_c192L33_am4p0_2010_30d5_tlt" inherit="cm4_sis2_compile">
+  <experiment name="CM4_c192L33_am4p0_2010_30d15_tlt.$(MOM6_DATE)" inherit="CM4_c192L33_am4p0_2010_30d15_tlt"/>
+  <experiment name="CM4_c192L33_am4p0_2010_30d15_tlt" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"CM4_c192L33_am4p0"</model>

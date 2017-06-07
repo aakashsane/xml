@@ -5,7 +5,7 @@
 <!--
 Quick start guide
 
-module load fre/bronx-11
+module load fre/bronx-12
 fremake -x OM4.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
 frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic 
 
@@ -57,11 +57,11 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 
 
    <!--Users need not change the following properties -->
-   <property name="reference_tag"  value="verona_mom6_2016.06.29_answers"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
+   <property name="reference_tag"  value="warsaw_mom6_2017.05.26_answers"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
-   <property name="DEBUGLEVEL"   value="_2"/>
+   <property name="DEBUGLEVEL"   value=""/>
    <property name="STATIC"       value=""/>  
 
 
@@ -1795,6 +1795,7 @@ touch $work/INPUT/SIS_override
       </regression>
       <regression name="debugomp">
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512x2']/node())"/> </run>
+        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O256x2']/node())"/> </run>
       </regression>
  
       <regression name="basic2">
@@ -3106,10 +3107,6 @@ $baseDate
 
   
       <csh><![CDATA[
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override KHTH_USE_EBT_STRUCT = False
-
-MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
@@ -3174,6 +3171,26 @@ SIS_OVERRIDE_EOF
     <postProcess>
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
     </postProcess>
+   </experiment>
+
+   <experiment name="OMp5_baseline_noebt" inherit="OMp5_baseline">
+    <input>
+      <csh><![CDATA[
+cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+! Vertical structure for KHTH
+! ****Note**** KHTH_USE_EBT_STRUCT is set to false
+! only to avoid a restart issue
+#override KHTH_USE_EBT_STRUCT = False
+
+OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+
+SIS_OVERRIDE_EOF
+     ]]></csh>
+    </input>
    </experiment>
 
    <experiment name="OMp5_baseline_ens2" inherit="OMp5_baseline">

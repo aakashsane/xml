@@ -36,23 +36,28 @@ from integrations with these models.
 # Change the occcurances of YOURGROUPLETTER in this file to your group letter (small), such as f, w, o, g+,...
 
 # To check out codes and compile:
+cd XML_DIR
 module load fre/bronx-12
-fremake -x CM4_am4p0L33.xml -p ncrc4.intel16 -t prod-openmp cm4_libs_compile -nolink
+fremake -x XML_NAME -p ncrc4.intel16 -t prod-openmp cm4_libs_compile -nolink
 SIS:
-fremake -x CM4_am4p0L33.xml -p ncrc4.intel16 -t prod-openmp cm4_compile
+fremake -x XML_NAME -p ncrc4.intel16 -t prod-openmp cm4_compile
 SIS2:
-fremake -x CM4_am4p0L33.xml -p ncrc4.intel16 -t prod-openmp cm4_sis2_compile
+fremake -x XML_NAME -p ncrc4.intel16 -t prod-openmp cm4_sis2_compile
 
-# To run regression test (for the coupled experiment CM4_c96L33_am4p0_2010_MLE30d_ePBLn ): 
+# To list avaliable experiments in this xml
 
-frerun -r basic -x CM4_am4p0L33.xml -p ncrc4.intel16 -t prod-openmp CM4_c96L33_am4p0_2010_MLE30d_ePBLn
+frelist -x XML_NAME
+
+# To run a basic test for one of these experiments : 
+
+frerun -r basic -x XML_NAME -p ncrc4.intel16 -t prod-openmp EXP_NAME
 
 # To run a complete coupled experiment (with automated database entry if MDBIswitch in "on"):
 
-frerun -x CM4_am4p0L33.xml -p ncrc4.intel16 -t prod-openmp CM4_c96L33_am4p0_2010_MLE30d_ePBLn
+frerun -x XML_NAME -p ncrc4.intel16 -t prod-openmp EXP_NAME
 
 # To check what is the input data of this experiment:
-inputfiles -x CM4_am4p0L33.xml -p ncrc4.intel16 CM4_c96L33_am4p0_2010_MLE30d_ePBLn
+inputfiles -x XML_NAME -p ncrc4.intel16 EXP_NAME
 
 NOTES:
       If the experiment name + FRESTEM is too long the post-process initiated on gaea may fail.
@@ -99,7 +104,7 @@ NOTES:
   <property name="CVDP_startyear" value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-  <property name="reference_tag"   value="prerelease_warsaw_20170331_mom6_2017.04.22_answers"/>
+  <property name="reference_tag"   value="warsaw_mom6_2017.05.26_answers"/>
                           
   <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
@@ -1878,14 +1883,14 @@ Experiment to build executable.
   <freInclude name="c96_grid">
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CDATA/gfdl_M/Huan.Guo/archive/mdt/awg/input/grid/c96_OM4_025_grid_No_mg_drag_v20160808.tar</dataSource>
+        <dataSource site="ncrc">$CDATA/gfdl_M/Huan.Guo/archive/mdt/awg/input/grid/c96_OM4_025_grid_No_mg_drag_v20160808.tar</dataSource>
+        <dataSource site="gfdl">/archive/h1g/INPUT/c96_awg/c96_OM4_025_grid_No_mg_drag_v20160808.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/land_domain.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$CDATA/gfdl_F/Thomas.Robinson/land/c96/land_domain.nc</dataSource>
       </dataFile>
     </input>
   </freInclude>
-
 
   <freInclude name="field_table_am4p11">
     <input>
@@ -2602,8 +2607,8 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 <!--=======================-->
 <!--= CM4 EXPERIMENTS     =-->
 <!--=======================-->
-  <experiment name="CM4_c96L33_am4p0_2010_30d5_tlt.$(MOM6_DATE)" inherit="CM4_c96L33_am4p0_2010_30d5_tlt"/>
-  <experiment name="CM4_c96L33_am4p0_2010_30d5_tlt" inherit="cm4_sis2_compile">
+  <experiment name="CM4_c96L33_am4p0_2010_30d15_tlt.$(MOM6_DATE)" inherit="CM4_c96L33_am4p0_2010_30d15_tlt"/>
+  <experiment name="CM4_c96L33_am4p0_2010_30d15_tlt" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"CM4_c96L33_am4p0"</model>
@@ -2786,7 +2791,7 @@ For more information please refer to the
 
   </experiment>
 
-  <experiment name="CM4_c96L33_am4p0_1850_30d5_tlt" inherit="CM4_c96L33_am4p0_2010_30d5_tlt">
+  <experiment name="CM4_c96L33_am4p0_1850_30d15_tlt" inherit="CM4_c96L33_am4p0_2010_30d15_tlt">
     <input>
       <namelist name="diag_manager_nml">
        max_axes = 200,
@@ -2868,7 +2873,7 @@ For more information please refer to the
   </experiment>
 
 
-  <experiment name="CM4_c96L33_am4p0_1850_30d5_tlt_4XCO2" inherit="CM4_c96L33_am4p0_1850_30d5_tlt">
+  <experiment name="CM4_c96L33_am4p0_1850_30d15_tlt_4XCO2" inherit="CM4_c96L33_am4p0_1850_30d15_tlt">
     <input>
       <namelist name="radiative_gases_nml">
       use_co2_10um = .true.
