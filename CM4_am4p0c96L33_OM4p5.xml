@@ -317,6 +317,14 @@ NOTES:
 	       <ocn ranks="1300"   threads="1"    layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
 	     </resources>
    </freInclude>
+   <freInclude name="resourceparams_A432x2_O1300p5_production"><!--1/2 degree ocean grid Only-->
+             <resources jobWallclock="16:00:00" segRuntime="3:00:00">
+               <atm ranks="432" threads="2"	    layout = "3,24"   io_layout = "1,4" />
+	       <lnd                            layout = "3,24"   io_layout = "1,4" />
+	       <ice                            layout = "144,3"   io_layout = "1,3" />
+	       <ocn ranks="1300"   threads="1"    layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
+	     </resources>
+   </freInclude>
    <freInclude name="resourceparams_A576x2_O1300p5"><!--1/2 degree ocean grid Only-->
 	     <resources jobWallclock="02:00:00">
                <atm ranks="576"  threads="2"	    layout = "8,12"   io_layout = "1,4" />
@@ -1773,6 +1781,62 @@ set ocn_hyperthread = $ocn_hythr
     </postProcess>
   </freInclude>
 
+  <freInclude name="c96_climo_cmip6_postprocess">
+    <postProcess>
+      <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_atmos_cmip6.csh"/>
+      
+      <component type="atmos_cmip" source="atmos_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="yes">
+        <timeSeries freq="3hr" source="atmos_8xdaily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos8xDailyTScmip/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeSeries>
+
+        <timeSeries freq="3hr" source="atmos_8xdaily_inst" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+
+        <timeSeries freq="6hr" source="atmos_4xdaily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+
+        <timeSeries freq="daily" source="atmos_daily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosDailyTScmip/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeSeries>
+
+        <timeSeries freq="daily" source="atmos_daily_refined" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+
+        <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTScmip/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeSeries>
+
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAvecmip/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeAverage>
+
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="aerosol_cmip" source="aerosol_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
+        <timeSeries freq="daily" source="aerosol_daily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="aerosol_month_refined"/>
+        <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="land_cmip" source="land_month_cmip" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
+        <timeSeries freq="daily" source="land_daily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+    </postProcess>
+  </freInclude>
 <!--================================-->
 <!--= OCEAN-ICE DATA (0.5 degree) =-->
 <!--================================-->
@@ -1974,6 +2038,7 @@ make_calving_reproduce=.true.
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
         </timeAverage>
+        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_annual"/>
         <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_annual"/>
       </component>
 
@@ -1985,6 +2050,7 @@ make_calving_reproduce=.true.
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
 
+        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_annual_z"/>
         <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_annual_z"/>	
       </component>
 
@@ -2302,6 +2368,7 @@ SIS_OVERRIDE_EOF
 
     <postProcess>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
     </postProcess>
 
@@ -2811,6 +2878,7 @@ SIS_OVERRIDE_EOF
     
     <postProcess>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='COBALT_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='COBALT_z_postprocess']/postProcess/node())"/>
@@ -2820,7 +2888,7 @@ SIS_OVERRIDE_EOF
     <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
-          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5_production']/node())"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1300p5_production']/node())"/>
       </production>
       <regression name="basic">
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5']/node())"/> </run>
