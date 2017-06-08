@@ -82,7 +82,7 @@ NOTES:
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
-  <property name="PROD_SIMTIME"     value="1"/>  <!--simulation length in years-->
+  <property name="PROD_SIMTIME"     value="100"/>  <!--simulation length in years-->
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
   <property name="PP_START_YEAR"    value="1860" />
@@ -1551,6 +1551,57 @@ $baseDate
     </input>
   </freInclude>
 
+  <freInclude name="diag_table_lm3p2_fullaero_cmip6">
+    <input>
+      <diagTable>
+$name
+$baseDate
+
+      </diagTable>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_atmos_cmip6</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_atmos_simpleSO4</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_3hr</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_6hrPlev</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_day</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_AERday</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_Amon</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_AERmon</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_AERhr</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_Lmon</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_AUXmon</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_check</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_global_avg</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
   <freInclude name="c96L33_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
@@ -1708,7 +1759,6 @@ set ocn_hyperthread = $ocn_hythr
 <!--================================-->
   <freInclude name="c96_climo_postprocess">
     <postProcess>
-
       <component type="atmos" zInterp="era40" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
         <timeSeries freq="3hr" source="atmos_8xdaily" chunkLength="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos8xDailyTS/*)">
@@ -1837,6 +1887,63 @@ set ocn_hyperthread = $ocn_hythr
 
       <component type="land_instant_cubic" source="land_month_inst" sourceGrid="land-cubedsphere">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+      </component>
+
+    </postProcess>
+  </freInclude>
+  
+  <freInclude name="c96_climo_cmip6_postprocess">
+    <postProcess>
+      <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_atmos_cmip6.csh"/>
+      
+      <component type="atmos_cmip" source="atmos_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="yes">
+        <timeSeries freq="3hr" source="atmos_8xdaily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos8xDailyTScmip/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeSeries>
+
+        <timeSeries freq="3hr" source="atmos_8xdaily_inst" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+
+        <timeSeries freq="6hr" source="atmos_4xdaily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+
+        <timeSeries freq="daily" source="atmos_daily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosDailyTScmip/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeSeries>
+
+        <timeSeries freq="daily" source="atmos_daily_refined" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+
+        <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTScmip/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeSeries>
+
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAvecmip/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeAverage>
+
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="aerosol_cmip" source="aerosol_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
+        <timeSeries freq="daily" source="aerosol_daily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="aerosol_month_refined"/>
+        <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="land_cmip" source="land_month_cmip" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
+        <timeSeries freq="daily" source="land_daily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
     </postProcess>
@@ -2026,6 +2133,8 @@ set ocn_hyperthread = $ocn_hythr
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
         </timeAverage>
+
+        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_annual"/>
         <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_annual"/>
       </component>
 
@@ -2037,7 +2146,8 @@ set ocn_hyperthread = $ocn_hythr
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
 
-        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_annual_z"/>	
+        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_annual_z"/>	
+        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_annual_z"/>
       </component>
 
       <!--Ocean scalars-->
@@ -2853,6 +2963,7 @@ MOM6 code update was needed to make the initialization from souce work
         atmos_npes = $atm_ranks 
         atmos_nthreads = $atmos_threads
         ncores_per_node = $(NCORE_PER_NODE)
+        use_hyper_thread=.T.
       </namelist>
       <namelist name="flux_exchange_nml">
          nblocks = $nyblock
@@ -3147,7 +3258,7 @@ MOM6 code update was needed to make the initialization from souce work
       <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20161213']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_grid']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
       <!--MOM6 Input datasets-->
@@ -3193,14 +3304,14 @@ MOM_OVERRIDE_EOF
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O4671_production']/node())"/>
       </production>
       <regression name="basic">
-        <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O2997']/node())"/> </run>
+        <run months="1"> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O2997']/node())"/> </run>
       </regression>
 
       <regression name="rts">
-        <run days="15 16" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O2997']/node())"/> </run> 
-  	<run days="2" overrideParams="coupler_nml:use_hyper_thread=.T."  ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O2304']/node())"/> </run>
-  	<run days="2" overrideParams="coupler_nml:use_hyper_thread=.T."  ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2304']/node())"/> </run>
-  	<run days="2" overrideParams="coupler_nml:use_hyper_thread=.T."  ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2592']/node())"/> </run>
+        <run days="15 16"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O2997']/node())"/> </run> 
+  	<run days="2"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O2304']/node())"/> </run>
+  	<run days="2"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2304']/node())"/> </run>
+  	<run days="2" overrideParams="coupler_nml:use_hyper_thread=.F."  ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2592']/node())"/> </run>
       </regression>
 
       <regression name="debug">
@@ -3210,20 +3321,20 @@ MOM_OVERRIDE_EOF
 
 
       <regression name="timings">
-          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2432']/node())"/> </run>
-          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O3782']/node())"/> </run>
-          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O4671']/node())"/> </run>
-          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O2997']/node())"/> </run>
-          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O4671']/node())"/> </run>
-          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O3782']/node())"/> </run>
-          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2997']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2432']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O3782']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O4671']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O2997']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O4671']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O3782']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2997']/node())"/> </run>
         </regression>
 	
       <regression name="timing">
-          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1970']/node())"/> </run>
-          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2997']/node())"/> </run>
-          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O3782']/node())"/> </run>
-          <run months="1" overrideParams="coupler_nml:use_hyper_thread=.T."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O4671']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1970']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2997']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O3782']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O4671']/node())"/> </run>
       </regression>
 
       <reference restart="$(REFERENCE)/archive/1x1m0d_216x2a_2997x1o/restart/00010201.tar"/>
@@ -3231,6 +3342,7 @@ MOM_OVERRIDE_EOF
     </runtime>
     <postProcess>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='atmos_co2_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_postprocess']/postProcess/node())"/>
