@@ -96,7 +96,7 @@ NOTES:
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
 
-  <property name="FRE_STEM"  value="$(RELEASE)_mom6_$(MOM6_DATE)_plus"/> <!-- customize as needed -->
+  <property name="FRE_STEM"  value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <property name="FRE_VERSION"     value="bronx-12"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
@@ -2304,63 +2304,17 @@ For more information please refer to the
          nxblocks = $nxblock
          nyblocks = $nyblock
       </namelist>
-
-      <namelist name="fms_io_nml">
-            fms_netcdf_restart=.true.
-            threading_read='multi'
-            max_files_r = 200
-            max_files_w = 200
-      </namelist>
-      <namelist name="fms_nml">
-            clock_grain='ROUTINE'
-            clock_flags='NONE'
-            domains_stack_size = 7000000
-            stack_size =0
-      </namelist>
       <namelist name="xgrid_nml">
         make_exchange_reproduce = .true.
         interp_method = 'second_order'
       </namelist>
-         <namelist name="diag_manager_nml">
-       max_axes = 200,
-       max_files = 200,
-       max_num_axis_sets = 200,
-       max_input_fields = 1000
-       max_output_fields = 1000
-       mix_snapshot_average_fields=.false.
-       max_field_attributes=4
-       max_axis_attributes=4
-         </namelist>
-
-      <!--AWG perturb-->
-      <namelist name="deep_conv_nml">
-        crh_th_ocean = 0.4
-        crh_th_land  = 0.4
-        auto_th0_d = 0.2e-3
-        tcrit_d    = -25.15,
-        peff_l_d   = 6.0e-5
-        peff_i_d   = 11.e-5
-        rkm_dp1 = 0.9
-        rkm_dp2 = 0.1
-        crh_max = 1.0
-        cwfn_th = 10.
-        tau_dp = 28800.
-        mixing_assumption_d = 6
-        do_ppen_d  = .true.
-        rpen_d     = 4.0
-        do_pevap_d = .true.
-        cfrac_d    = 0.15
-        hcevap_d   = 0.85
-        hcevappbl_d = 0.95
-        pblfac_d   = 1.0
-        frac_limit_d = 0.25
-        dcwfndm_th = 100
-        lofactor_d = 1.0
-        do_cgust_dp  = .true.
-        cgust_choice = 1
-        include_emf_d = .false.
+      <namelist name="atmos_cmip_diag_nml">
+verbose=3
       </namelist>
- 
+
+      <namelist name="mpp_io_nml">
+        cf_compliance = .true.
+      </namelist>
       <!--AWG Input namelists -->
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_physics.nml"/>
@@ -2399,6 +2353,9 @@ SIS_OVERRIDE_EOF
           <segment simTime="12" units="months"/>
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1057p5_production']/node())"/>
       </production>
+      <regression name="2months">
+          <run months="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
+      </regression>
       <regression name="basic">
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
       </regression>
@@ -2487,57 +2444,6 @@ SIS_OVERRIDE_EOF
 
   <experiment name="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me" inherit="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me">
     <input>
-      <namelist name="fms_io_nml">
-            fms_netcdf_restart=.true.
-            threading_read='multi'
-            max_files_r = 200
-            max_files_w = 200
-      </namelist>
-      <namelist name="fms_nml">
-            clock_grain='ROUTINE'
-            clock_flags='NONE'
-            domains_stack_size = 7000000
-            stack_size =0
-      </namelist>
-      <namelist name="diag_manager_nml">
-       max_axes = 200,
-       max_files = 200,
-       max_num_axis_sets = 200,
-       max_input_fields = 1000
-       max_output_fields = 1000
-       mix_snapshot_average_fields=.false.
-       max_field_attributes=4
-       max_axis_attributes=4
-      </namelist>
-      <!--AWG perturb-->
-      <namelist name="deep_conv_nml">
-        crh_th_ocean = 0.4
-        crh_th_land  = 0.4
-        auto_th0_d = 0.2e-3
-        tcrit_d    = -25.15,
-        peff_l_d   = 6.0e-5
-        peff_i_d   = 11.e-5
-        rkm_dp1 = 0.9
-        rkm_dp2 = 0.1
-        crh_max = 1.0
-        cwfn_th = 10.
-        tau_dp = 28800.
-        mixing_assumption_d = 6
-        do_ppen_d  = .true.
-        rpen_d     = 4.0
-        do_pevap_d = .true.
-        cfrac_d    = 0.15
-        hcevap_d   = 0.85
-        hcevappbl_d = 0.95
-        pblfac_d   = 1.0
-        frac_limit_d = 0.25
-        dcwfndm_th = 100
-        lofactor_d = 1.0
-        do_cgust_dp  = .true.
-        cgust_choice = 1
-        include_emf_d = .false.
-      </namelist>
- 
       <!--AWG Input namelists -->
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_physics.nml"/>
@@ -2719,8 +2625,16 @@ Reverting back to land defaults for coastal roughness, use_coast_topo_rough = .t
         mix_snapshot_average_fields=.false.
         max_field_attributes=4
         max_axis_attributes=4
-        !! conserve_water=.false.         ! jgj check
       </namelist>
+
+      <namelist name="atmos_cmip_diag_nml">
+verbose=3
+      </namelist>
+
+      <namelist name="mpp_io_nml">
+        cf_compliance = .true.
+      </namelist>
+
        <namelist name="radiative_gases_nml">
       use_co2_10um = .true.
 
@@ -2824,13 +2738,15 @@ Reverting back to land defaults for coastal roughness, use_coast_topo_rough = .t
 "generic_cobalt_z","dep_wet_lith", "dep_wet_lith", "ocean_cobalt_dust_z","all",.true.,"none",2
 #
 "atmos_dust_sample",       1,  "months", 1, "days", "time",
-"tracer" , "dust_ddep", "dust_ddep", "atmos_dust_sample","all",.true.,"none",2
-"tracer" , "dust_emis", "dust_emis", "atmos_dust_sample","all",.true.,"none",2
-"tracer" , "dust1_setl", "dust1_setl", "atmos_dust_sample","all",.true.,"none",2
-"tracer" , "dust2_setl", "dust2_setl", "atmos_dust_sample","all",.true.,"none",2
-"tracer" , "dust3_setl", "dust3_setl", "atmos_dust_sample","all",.true.,"none",2
-"tracer" , "dust4_setl", "dust4_setl", "atmos_dust_sample","all",.true.,"none",2
-"tracer" , "dust5_setl", "dust5_setl", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "dust_ddep", "dust_ddep", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "dust_emis", "dust_emis", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "drydust", "drydust", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "emidust", "emidust", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "dust1_setl", "dust1_setl", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "dust2_setl", "dust2_setl", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "dust3_setl", "dust3_setl", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "dust4_setl", "dust4_setl", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "dust5_setl", "dust5_setl", "atmos_dust_sample","all",.true.,"none",2
 "dynamics",  "dust1",  "dust1",  "atmos_dust_sample", "all", .true.,  "none", 2
 "dynamics",  "dust2",  "dust2",  "atmos_dust_sample", "all", .true.,  "none", 2
 "dynamics",  "dust3",  "dust3",  "atmos_dust_sample", "all", .true.,  "none", 2
@@ -2986,7 +2902,7 @@ SIS_OVERRIDE_EOF
   	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
       </regression>
       <regression name="debug">
-  	<run days="1"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
+  	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
       </regression>
       <regression name="timing">
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1441p5']/node())"/> </run>
@@ -3001,7 +2917,7 @@ SIS_OVERRIDE_EOF
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1441p5']/node())"/> </run>
       </regression>
 
-      <reference restart="$(REFERENCE)/archive/1x1m0d_576x2a_1300x1o/restart/00010201.tar"/>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_432x2a_1300x1o/restart/00010201.tar"/>
     </runtime>
   </experiment>
   
