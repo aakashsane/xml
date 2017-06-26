@@ -13,7 +13,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
    <property name="RELEASE"      value="warsaw"/> <!-- CVS tag for shared source code -->
-   <property name="MOM6_DATE"    value="2017.05.26"/>     <!-- git tag date for MOM6 source code -->
+   <property name="MOM6_DATE"    value="2017.06.12"/>     <!-- git tag date for MOM6 source code -->
    <property name="FRE_STEM"     value="$(RELEASE)_mom6_$(MOM6_DATE)"/>
    <property name="SHARED_GIT_TAG"     value="$(RELEASE)"/>
    <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
@@ -45,19 +45,8 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
    <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
    <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
 
-
-   <property name="PROD_RUNTIME"         value="16:00:00"/><!--Maximum wall clock per simulation-->
-   <property name="PROD_SEGTIME"         value="04:00:00"/><!--Wall clock per segment (usually 1 year)-->
-   <property name="PROD_NPES"            value="1756"/> 
-   <property name="PROD_MASK_TABLE"      value="mask_table.548.32x72"/>
-   <property name="OCN_PROD_LAYOUT"      value="32,72"/>
-   <property name="OCN_PROD_IO_LAYOUT"   value="1,4"/>
-   <property name="ICE_PROD_LAYOUT"      value="32,72"/>
-   <property name="ICE_PROD_IO_LAYOUT"   value="1,4"/>
-
-
    <!--Users need not change the following properties -->
-   <property name="reference_tag"  value="warsaw_mom6_2017.05.26_answers"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
+   <property name="reference_tag"  value="warsaw_mom6_2017.06.12_answers"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
@@ -1006,7 +995,7 @@ limit coredumpsize unlimited
       ]]>
       </csh>
     </platform>
-    <platform name="gfdl.ncrc3-intel15">
+    <platform name="gfdl.ncrc3-intel16">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
     <platform name="gfdl.ncrc4-intel16">
@@ -1071,11 +1060,6 @@ Make the executable for ocean-ice experiments.
           git submodule update #This gets the right version of submodules
           popd
 
-######################################################
-#####Bug fix. Remove this after bug fix is tagged
-(cd mom6/src/MOM6; git pull https://github.com/adcroft/MOM6.git fix-meke)
-######################################################
-	  
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
           git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
           pushd ocean_shared
