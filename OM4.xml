@@ -130,6 +130,19 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 	     </resources>
    </freInclude>
 
+   <freInclude name="resourceparams_O288">
+	     <resources jobWallclock="00:30:00">
+	       <ice                           layout = "72,4"    io_layout = "1,4" mask_table="MOM_mask_table"/>
+	       <ocn ranks="288" threads="1"   layout = "18,16"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_O288_1">
+             <resources jobWallclock="00:30:00">
+               <ice                           layout = "96,3"    io_layout = "1,3" mask_table="MOM_mask_table"/>
+               <ocn ranks="288" threads="1"   layout = "18,16"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+             </resources>
+   </freInclude>
+
    <freInclude name="resourceparams_O360">
 	     <resources jobWallclock="01:30:00">
 	       <ice                           layout = "36,10"   io_layout = "1,5" mask_table="MOM_mask_table"/>
@@ -328,6 +341,13 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 
    <freInclude name="resourceparams_O1300p5">
 	     <resources jobWallclock="01:30:00">
+	       <ocn ranks="1300" layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45" threads="1"/>
+	       <ice              layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
+	     </resources>
+   </freInclude>
+
+   <freInclude name="resourceparams_O1300p5_production">
+             <resources jobWallclock="16:00:00"  segRuntime="4:00:00">
 	       <ocn ranks="1300" layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45" threads="1"/>
 	       <ice              layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
 	     </resources>
@@ -1782,8 +1802,9 @@ touch $work/INPUT/SIS_override
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O256x2']/node())"/> </run>
       </regression>
  
-      <regression name="basic2">
-        <run months="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1756']/node())"/> </run>
+      <regression name="ice_layouts">
+        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O288']/node())"/> </run>
+        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O288_1']/node())"/> </run>
       </regression>
 
       <regression name="debug">
@@ -1818,6 +1839,43 @@ touch $work/INPUT/SIS_override
 
    </experiment>
 
+  <experiment name="OM4_initCond5_nobergs" inherit="OM4_SIS2_baseline">
+    <input>
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override','INPUT/SIS_diurnal'
+     </namelist>
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <!--This initCond is the 225 years restart of Bill's #723 and has so many  bergs that caused the model to crash and uncovered a bug in icebergs-->
+      <!--/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4_c96L33_am4p0_1850_30d15_tlt_dyn_veg_SAI_combined_02250101.tar-->
+      <!-- 
+      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4_c96L33_am4p0_1850_30d15_tlt_dyn_veg_SAI_combined_02250101.tar</dataSource> FAIL
+      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/answers/warsaw_mom6_2017.06.12_answers/CM4_c96L33_am4p0_2010_30d15_tlt.2017.06.12/ncrc3.intel16-prod-openmp/archive/1x1m0d_216x2a_1756x1o/restart/00010201.tar</dataSource> PASS
+      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4_c96L33_am4p0_1850_30d15_tlt_dyn_veg_SAI_combined_01410101.tar</dataSource> FAIL
+      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4_c96L33_am4p0_2010_30d15_tlt_725_01210101.tar</dataSource> FAIL
+      -->
+      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4_c96L33_am4p0_2010_30d15_tlt_725_01210101.tar</dataSource>
+     </dataFile>
+
+     <csh><![CDATA[
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override DO_ICEBERGS = False
+SIS_OVERRIDE_EOF
+     ]]></csh>
+
+    </input>
+  </experiment>
    <experiment name="OM4_SIS2_baseline.$(MOM6_DATE)" inherit="OM4_SIS2_baseline"/>
    <experiment name="OM4_SIS2_baseline$(STATIC)" inherit="OM4_SIS2_baseline_config">
      <input>
@@ -3101,6 +3159,11 @@ SIS_OVERRIDE_EOF
 
    </input>
    <runtime>   
+      <production simTime="$(PROD_SIMTIME)" units="years">
+          <segment simTime="12" units="months"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5_production']/node())"/>
+      </production>
+
       <regression name="basic">
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1057p5']/node())"/> </run>
       </regression>
