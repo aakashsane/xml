@@ -76,7 +76,7 @@ NOTES:
   <property name="SHARED_GIT_TAG"     value="$(RELEASE)"/>
   <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"  value="$(RELEASE)"/>           <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG" value="$(RELEASE)"/>       <!-- git tag for LAND_LAD2 source code -->  
+  <property name="LAND_GIT_TAG" value="warsaw_20170619_slm"/>       <!-- git tag for LAND_LAD2 source code -->  
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
@@ -106,7 +106,7 @@ NOTES:
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
   <property name="reference_tag"   value="warsaw_mom6_2017.05.26_answers"/>
                           
-  <property name="DEBUGLEVEL" value=""/>
+  <property name="DEBUGLEVEL" value="_1"/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
                                           <!--In that case you will need to put an identifier string for the value to distinguish the /nbhome-->
 
@@ -2280,8 +2280,8 @@ make_calving_reproduce=.true.
     </postProcess>
   </freInclude> 
 
-  <experiment name="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me.$(MOM6_DATE)" inherit="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me"/>
-  <experiment name="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me" inherit="cm4_sis2_compile">
+  <experiment name="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me_F.$(MOM6_DATE)" inherit="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me_F"/>
+  <experiment name="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me_F" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"CM4_c96L33_am4p0_OMp5"</model>
@@ -2461,7 +2461,7 @@ SIS_OVERRIDE_EOF
   </experiment>
 
 
-  <experiment name="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me" inherit="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me">
+  <experiment name="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_F" inherit="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me_F">
     <input>
       <!--AWG Input namelists -->
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
@@ -2489,7 +2489,7 @@ SIS_OVERRIDE_EOF
     </input>
   </experiment>
 
-  <experiment name="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_dveg_lai" inherit="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me">
+  <experiment name="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_F_dveg" inherit="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_F">
     <!--This experiment needs a code update from land and does not work properly without it.-->
     <input>
 
@@ -2497,13 +2497,6 @@ SIS_OVERRIDE_EOF
         <dataSource platform="$(platform)">$CPERM/Bill.Hurlin/CM4_input/c96L33_Op5_initCond_plus_land_only_c96_720x576_grid_lm3p2_017100101.remapped.v20170406.tar</dataSource>
       </dataFile>
 
-      <namelist name="photosynthesis_nml">
-       photosynthesis_to_use = 'leuning'
-       co2_to_use_for_photosynthesis ='prescribed'
-       co2_for_photosynthesis = 284.65e-6
-       respiration_to_use = 'Gauthier'
-       Kok_effect = .TRUE.
-      </namelist>
       <namelist name="static_veg_nml">
        use_static_veg = .FALSE.                
        timeline   = 'loop'
@@ -2513,65 +2506,10 @@ SIS_OVERRIDE_EOF
        write_static_veg = .FALSE.
       </namelist>
 
-      <namelist name="vegn_data_nml">
-       vegn_to_use = 'uniform'
-       K1=10,
-       K2=0.1,
-       fsc_liv=0.9,
-       fsc_wood=0.45,
-       c1(4) = 0.3
-       c2(4) = 0.3
-       Vmax = 2.0E-5, 2.0E-5, 2.0E-5, 2.0E-5, 1.50E-5,
-       m_cond = 4., 9., 9., 7., 7.,
-       alpha_phot = 0.05, 0.06, 0.06, 0.06, 0.06,
-       gamma_resp = 0.03, 0.02, 0.02, 0.02, 0.02,
-       tc_crit(0:2) = 3*273.16
-       fact_crit_phen(0:4) = 0., 0., 0., 0., 0.
-       fact_crit_fire(0:4) = 0., 0., 0., 0., 0.
-       cnst_crit_phen(0:4) = 0.30, 0.15, 0.15, 0.30, 0.30
-       cnst_crit_fire(0:4) = 0.15,  0.40, 0.15, 0.15, 0.15
-       wet_leaf_dreg(0:4)  = .3, .3, .3, .3, .3
-       ksi =  0, 0, 0, 0, 0,
-       leaf_refl(0:4,1) = 0.11, 0.11, 0.10, 0.10, 0.10
-       leaf_refl(0:4,2) = 0.58, 0.58, 0.45, 0.45, 0.39,
-       dat_root_zeta(0:4) =   0.35212, 0.17039, 0.28909, 0.25813, 0.17039
-       critical_root_density = 0.0,
-       tau_drip_s     = 259200.0
-       cmc_lai(0:4) = 0.02, 0.02, 0.02, 0.02, 0.02
-       csc_lai(0:4) = 0.30, 0.30, 0.30, 0.30, 0.2
-       dat_snow_crit = 2*1.e7, .1, 1.e7, .1
-       t_transp_min = 268.
-       srl(0:1) = 112.0e3, 150.0e3
-       root_perm = 14*5e-7
-       alpha(1,3) = 4
-       leaf_age_tau(2) = 150
-       smoke_fraction = 0.9, 0.9, 0.6, 0.6, 0.6
-       tg_c3_thresh = 1
-       phen_ev1 = 0.2
-       phen_ev2 = 0.7
-       cmc_eps = 0.01
-       alpha(0:4,6) = 0.0, 0.0, 0.012, 0.012, 0.012
-       treefall_disturbance_rate = 0.175, 0.185, 0.025, 0.0275, 0.027
-       use_light_saber = .TRUE.
-      </namelist>
-
-      <namelist name="vegn_nml">
-       init_Tv = 288.0
-       rad_to_use = 'two-stream'
-       snow_rad_to_use = 'paint-leaves'
-       do_cohort_dynamics   = .TRUE.,              
-       do_patch_disturbance = .TRUE.,              
-       do_phenology         = .TRUE.,              
-       do_biogeography      = .TRUE.,              
-       do_seed_transport    = .TRUE.,
-       tau_smooth_ncm = 22.0
-       rav_lit_bwood = 300.
-      </namelist>
-
     </input>
   </experiment>
 
-<experiment name="dust_ESM4p_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me" inherit="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me">
+<experiment name="dust_ESM4p_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_F" inherit="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_F">
 <description>
 This experiment is here only to test the ESM4 flow and regression with the new am4p0 setup. The initCond is not scientifically evaluated.
 Use at your own risk.
