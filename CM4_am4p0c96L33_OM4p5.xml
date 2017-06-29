@@ -78,7 +78,7 @@ NOTES:
   <property name="AWG_GIT_TAG"  value="$(RELEASE)"/>           <!-- git tag for AWG source code -->
   <property name="LAND_GIT_TAG" value="warsaw_20170619_slm"/>       <!-- git tag for LAND_LAD2 source code -->  
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
@@ -96,7 +96,7 @@ NOTES:
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
 
-  <property name="FRE_STEM"  value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="FRE_STEM"  value="mdt/20170628"/> <!-- customize as needed -->
   <property name="FRE_VERSION"     value="bronx-12"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
@@ -106,7 +106,7 @@ NOTES:
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
   <property name="reference_tag"   value="warsaw_mom6_2017.05.26_answers"/>
                           
-  <property name="DEBUGLEVEL" value="_1"/>
+  <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
                                           <!--In that case you will need to put an identifier string for the value to distinguish the /nbhome-->
 
@@ -2030,6 +2030,10 @@ set ocn_hyperthread = $ocn_hythr
         <dataSource site="ncrc">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/ocean_static.nc</dataSource>
       </dataFile>
 
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_025/INPUT/geothermal_davies2013_v1.nc</dataSource>
+      </dataFile>
+
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
@@ -2280,8 +2284,8 @@ make_calving_reproduce=.true.
     </postProcess>
   </freInclude> 
 
-  <experiment name="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me_F.$(MOM6_DATE)" inherit="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me_F"/>
-  <experiment name="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me_F" inherit="cm4_sis2_compile">
+  <experiment name="CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1_kdmin200_F.$(MOM6_DATE)" inherit="CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1_kdmin200_F"/>
+  <experiment name="CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1_kdmin200_F" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"CM4_c96L33_am4p0_OMp5"</model>
@@ -2358,6 +2362,18 @@ verbose=3
       <!--SIS Input datasets-->
       <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
       <csh><![CDATA[
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override KD = 1.45e-5
+#override KHTH_MIN = 200.
+#override FGNV_FILTER_SCALE = 0.1
+! Geothermal heating
+DO_GEOTHERMAL = True
+GEOTHERMAL_FILE = "geothermal_davies2013_v1.nc"
+GEOTHERMAL_SCALE = 1.0
+GEOTHERMAL_VARNAME = "geothermal_hf"
+MOM_OVERRIDE_EOF
+
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
@@ -2461,7 +2477,7 @@ SIS_OVERRIDE_EOF
   </experiment>
 
 
-  <experiment name="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_F" inherit="CM4_c96L33_am4p0_OMp5_2010_ndiff_khtr200_fk30_30d_tlt_me_F">
+  <experiment name="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_kdmin200_F" inherit="CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1_kdmin200_F">
     <input>
       <!--AWG Input namelists -->
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
@@ -2489,7 +2505,7 @@ SIS_OVERRIDE_EOF
     </input>
   </experiment>
 
-  <experiment name="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_F_dveg" inherit="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_F">
+  <experiment name="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_kdmin200_F_dveg" inherit="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_kdmin200_F">
     <!--This experiment needs a code update from land and does not work properly without it.-->
     <input>
 
@@ -2509,7 +2525,7 @@ SIS_OVERRIDE_EOF
     </input>
   </experiment>
 
-<experiment name="dust_ESM4p_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_F" inherit="CM4_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_F">
+<experiment name="dust_ESM4p_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_kdmin200_F" inherit="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_kdmin200_F">
 <description>
 This experiment is here only to test the ESM4 flow and regression with the new am4p0 setup. The initCond is not scientifically evaluated.
 Use at your own risk.
