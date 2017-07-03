@@ -140,12 +140,14 @@ endif
 
 
 # =============== START BODY OF SCRIPT ==============
-set argu_test1 = "-r obs -v t_surf_nino3,t_surf_nino34,t_surf_nino4,t_surf_nino12 plot_tave_spectrum"
+set shared_opt    = "-V2 -P ps.gz -s"
+
+set argu_test1 = "$shared_opt -n -r obs -v t_surf_nino3,t_surf_nino34,t_surf_nino4,t_surf_nino12 plot_tave_spectrum"
 $work_script -o $out_dir $ref_opt \
    -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk,$staticfile \
    $argu_test1  || goto err
 
-set argu_test2 = "-v t_surf_nino3,t_surf_nino34,t_surf_nino4,t_surf_nino12 plot_wavelet_density"
+set argu_test2 = "$shared_opt -n -v t_surf_nino3,t_surf_nino34,t_surf_nino4,t_surf_nino12 plot_wavelet_density"
 $work_script -o $out_dir $ref_opt \
    -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk,$staticfile \
    $argu_test2  || goto err
