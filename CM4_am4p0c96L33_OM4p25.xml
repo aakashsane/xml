@@ -71,21 +71,22 @@ NOTES:
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"      value="warsaw"/> <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2017.06.12"/>                 <!-- git tag date for MOM6 source code -->
-  <property name="SHARED_GIT_TAG"     value="$(RELEASE)"/>
-  <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
-  <property name="AWG_GIT_TAG"  value="$(RELEASE)"/>           <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG" value="$(RELEASE)"/>       <!-- git tag for LAND_LAD2 source code -->  
+  <property name="RELEASE"        value="warsaw"/>                  <!-- git tag for general component source code-->
+  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
+  <property name="MOM6_DATE"      value="2017.06.12"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
+  <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
+  <property name="LAND_GIT_TAG"   value="warsaw_20170706_slm"/>     <!-- git tag for LAND_LAD2 source code -->  
+  <property name="FRE_STEM"       value="$(RELEASE)_LND_$(LAND_GIT_TAG)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
-  <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
-                                                                 <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
+  <property name="OM4_ANALYSIS"   value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
+                                                                    <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
   <property name="PROD_SIMTIME"     value="100"/>  <!--simulation length in years-->
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
-  <property name="PP_START_YEAR"    value="1860" />
+  <property name="PP_START_YEAR"    value="1850" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
   <property name="PROD_SEGTIME"     value="03:00:00"/><!--Wall clock per segment (usually 1 year)-->
 
@@ -95,8 +96,6 @@ NOTES:
   <property name="EXP_CPLD_END"     value="0100"/> <!--simulation end   year--> 
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
-
-  <property name="FRE_STEM"  value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <property name="FRE_VERSION"     value="bronx-12"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
@@ -104,7 +103,7 @@ NOTES:
   <property name="CVDP_startyear" value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-  <property name="reference_tag"   value="warsaw_mom6_2017.05.26_answers"/>
+  <property name="reference_tag"   value="warsaw_mom6_2017.06.12_answers"/>
                           
   <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
@@ -1141,6 +1140,21 @@ Experiment to build executable.
     </input>
   </freInclude>
 
+  <freInclude name="emissions_cmip6_v20170518">
+    <input>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$CDATA/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/fast_chemistry/emissions.fastchem.0.5x0.5.1849-2017.tar</dataSource>
+      </dataFile>
+
+      <dataFile label="input" target="INPUT/anthro_so2.1849_2017.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$CDATA/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/fast_chemistry/emissions.simple.so2.0.5x0.5.1849-2017.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/co2_data.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$CDATA/gfdl_M/Huan.Guo/awg/input/cmip6/co2_data_2016.nc</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+
   <freInclude name="emissions_cmip6_v20161213">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -1155,19 +1169,6 @@ Experiment to build executable.
     </input>
   </freInclude>
 
-  <freInclude name="emissions_cmip6_v20161213_fullchem">
-    <input>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2016-12-13/1849-2016/emissions.0.5x0.5.1849-2016.tar</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/anthro_so2.1849_2016.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2016-12-13/fast_chemistry/emissions.simple.so2.0.5x0.5.1849-2016.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/co2_data.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Huan.Guo/awg/input/cmip6/co2_data_2016.nc</dataSource>
-      </dataFile>
-    </input>
-  </freInclude>
   <freInclude name="L32_gas_conc">
     <input>
       <dataFile label="input" target="INPUT/gas_conc_3D_am3p9.nc" chksum="" size="" timestamp="">
@@ -1710,12 +1711,53 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
          nxblocks = $nxblock
          nyblocks = $nyblock
       </namelist>
+
+      <namelist name="soil_data_nml">
+       geohydrology_to_use    = 'hill'
+       use_comp_for_ic        = .true.
+!       use_comp_for_push      = .true.  !Need to comment out to reproduce Huan answer !John says should be set
+       use_tau_fix            = .false.
+       use_sat_fix            = .true.
+       use_alt3_soil_hydraulics = .true.
+       gw_scale_soil_depth  = 0.1666667
+       gw_scale_perm        = 1.0
+       gw_scale_relief      = 0.5
+       aspect           = 0.01
+       k0_macro_z       = 0.0
+       k0_macro_x       = 1.0
+       freeze_factor    = 1.5
+       comp             = 1e-4
+       num_l            = 20
+       dz = 0.020, 0.040, 0.040, 0.050, 0.05, 0.100, 0.10, 0.200, 0.200, 0.2,
+            0.40,  0.40,  0.40,  0.4,   0.4,   1.0,   1.0,  1.0,  1.5,   2.5
+       soil_type_file          = "INPUT/soil_type.nc"
+       input_cover_types       =  1,       2,       3,       4,       5,       6,       7,       8,       9,       10,      11,      12,      13,       14
+       tile_names              =  'hec',   'sic',   'lic',   'sicl',  'cl',    'si',    'sil',   'sac',   'l',     'sacl',  'sal',  'ls',     's',     'u'
+       dat_w_sat               =  0.468,   0.468,   0.468,   0.464,   0.465,   0.476,   0.476,   0.406,   0.439,   0.404,   0.434,   0.421,   0.339,   0.439
+       dat_k_sat_ref           =  0.00097, 0.0013,  0.00097, 0.002,   0.0024,  0.0028,  0.0028,  0.0072,  0.0033,  0.0045,  0.0052,  0.014,   0.047,   0.0033
+       dat_psi_sat_ref         = -0.47,   -0.32,   -0.47,   -0.62,   -0.26,   -0.76,   -0.76,   -0.098,  -0.35,   -0.13,   -0.14,   -0.036   -0.069,  -0.35
+       dat_chb                 =  12.0,    10.0,    12.0,    8.7,     8.2,     5.3,     5.3,     11.0,    5.2,     6.8,     4.7,     4.3,     2.8,     5.2
+       dat_heat_capacity_dry   =  1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6
+       dat_thermal_cond_dry    =  0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.14,    0.21
+       dat_thermal_cond_sat    =  1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     2.3,     1.5
+       dat_thermal_cond_exp    =  6,       6,       6,       5,       5,       5,       5,       6,       5,       5,       5,       5,       3,       5
+       dat_thermal_cond_scale  =  10,      10,      10,      0.5,     0.5,     0.5,     0.5,     10,      0.5,     0.5,     0.5,     0.5,     15,      0.5
+       dat_thermal_cond_weight =  0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.2,     0.7
+       dat_emis_dry            =  1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0
+       dat_emis_sat            =  1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0
+       dat_tf_depr             =  2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0
+       dat_z0_momentum         =  0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01
+       Dpsi_min_const      = -1.e12
+       K_min               = 1.e-12
+       geothermal_heat_flux_constant = 0.065
+       retro_a0N1 = .true.
+      </namelist>
       <!-- Namelist -->
       <namelist file="$(AWG_INPUT_HOME)/nml/ocean_g12.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c96L33.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_2010climo.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_2010climo_missions_cmip6_v20161213.nml"/>
 
       <!-- Input datasets -->
       <xi:include xpointer="xpointer(//freInclude[@name='common_LM4']/input/node())"/>
@@ -1723,7 +1765,8 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <xi:include xpointer="xpointer(//freInclude[@name='common_AM4_v20170208']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_2010_cmip6']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20161213']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20161213']/input/node())"/><!--reproduce old answers-->
+      <!--xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20170518']/input/node())"/--><!-- This does not reproduce old answers--> 
       <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='climo_sst_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='data_table_AM4']/input/node())"/>
@@ -1822,7 +1865,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <xi:include xpointer="xpointer(//freInclude[@name='common_AM4_v20170208']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_2010_cmip6']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20161213']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20170518']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='climo_sst_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='data_table_AM4']/input/node())"/>
@@ -1847,13 +1890,108 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <xi:include xpointer="xpointer(//freInclude[@name='common_AM4_v20170208']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_1850_cmip6']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20161213']/input/node())"/>
-
+      <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20170518']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='climo_sst_cmip6']/input/node())"/>
     </input>
   </experiment>
     
+  <experiment name="c96L33_am4p0_1850climo_PotenVeg_KoK_False" inherit="c96L33_am4p0_2010climo">
+    <input>
+      <namelist name="photosynthesis_nml">
+       photosynthesis_to_use = 'leuning'
+       co2_to_use_for_photosynthesis ='prescribed'
+       co2_for_photosynthesis = 284.262e-6
+       respiration_to_use = 'LM3'
+       Kok_effect = .False.
+       lai_eps    = 1.e-10  !all other runs should use 1.e-5 which is set in am4p0_common.nml
+      </namelist>
+
+      <namelist name="static_veg_nml">
+        use_static_veg = .false.
+        write_static_veg = .false.
+        timeline   = 'loop'
+        start_loop = 1981, 1, 1, 0, 0, 0
+        end_loop   = 1982, 1, 1, 0, 0, 0
+        fill_land_mask = .TRUE.
+        input_file = 'INPUT/19810101.static_veg_out.nc'
+      </namelist>
+      <namelist name="soil_data_nml">
+       geohydrology_to_use    = 'hill'
+       use_comp_for_ic        = .true.
+!       use_comp_for_push      = .true.  !Need to comment out to reproduce Huan answer !John says should be set
+       use_tau_fix            = .false.
+       use_sat_fix            = .true.
+       use_alt3_soil_hydraulics = .true.
+       gw_scale_soil_depth  = 0.1666667
+       gw_scale_perm        = 1.0
+       gw_scale_relief      = 0.5
+       aspect           = 0.01
+       k0_macro_z       = 0.0
+       k0_macro_x       = 1.0
+       freeze_factor    = 1.5
+       comp             = 1e-4
+       num_l            = 20
+       dz = 0.020, 0.040, 0.040, 0.050, 0.05, 0.100, 0.10, 0.200, 0.200, 0.2,
+            0.40,  0.40,  0.40,  0.4,   0.4,   1.0,   1.0,  1.0,  1.5,   2.5
+       soil_type_file          = "INPUT/soil_type.nc"
+       input_cover_types       =  1,       2,       3,       4,       5,       6,       7,       8,       9,       10,      11,      12,      13,       14
+       tile_names              =  'hec',   'sic',   'lic',   'sicl',  'cl',    'si',    'sil',   'sac',   'l',     'sacl',  'sal',  'ls',     's',     'u'
+       dat_w_sat               =  0.468,   0.468,   0.468,   0.464,   0.465,   0.476,   0.476,   0.406,   0.439,   0.404,   0.434,   0.421,   0.339,   0.439
+       dat_k_sat_ref           =  0.00097, 0.0013,  0.00097, 0.002,   0.0024,  0.0028,  0.0028,  0.0072,  0.0033,  0.0045,  0.0052,  0.014,   0.047,   0.0033
+       dat_psi_sat_ref         = -0.47,   -0.32,   -0.47,   -0.62,   -0.26,   -0.76,   -0.76,   -0.098,  -0.35,   -0.13,   -0.14,   -0.036   -0.069,  -0.35
+       dat_chb                 =  12.0,    10.0,    12.0,    8.7,     8.2,     5.3,     5.3,     11.0,    5.2,     6.8,     4.7,     4.3,     2.8,     5.2
+       dat_heat_capacity_dry   =  1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6
+       dat_thermal_cond_dry    =  0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.14,    0.21
+       dat_thermal_cond_sat    =  1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     2.3,     1.5
+       dat_thermal_cond_exp    =  6,       6,       6,       5,       5,       5,       5,       6,       5,       5,       5,       5,       3,       5
+       dat_thermal_cond_scale  =  10,      10,      10,      0.5,     0.5,     0.5,     0.5,     10,      0.5,     0.5,     0.5,     0.5,     15,      0.5
+       dat_thermal_cond_weight =  0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.2,     0.7
+       dat_emis_dry            =  1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0
+       dat_emis_sat            =  1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0
+       dat_tf_depr             =  2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0
+       dat_z0_momentum         =  0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01
+       Dpsi_min_const      = -1.e12
+       K_min               = 1.e-12
+       geothermal_heat_flux_constant = 0.065
+       retro_a0N1 = .true.
+      </namelist>
+
+      <namelist file="$(AWG_INPUT_HOME)/nml/ocean_g12.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/cmip6_am4p0_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c96L33.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_1850climo.nml"/>
+
+      <xi:include xpointer="xpointer(//freInclude[@name='common_LM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_LM4']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_AM4_v20170208']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_1850_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20170518']/input/node())"/>
+
+      <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>
+
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11_cmip6']/input/node())"/>
+
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/AWG_c96L33/Potential_veg_20170629/H1G_c96L33_am4p0_1850climo_PotenVeg_test6_00720101_coupler_combined.tar</dataSource>
+      </dataFile>
+
+      <dataFile label="input" target="INPUT/hadisst_sst.data.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/PCMDI_sst/sst.climo.1870-1882.data_fixDate.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/hadisst_ice.data.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/PCMDI_sst/ice.climo.1870-1882.data_fixDate.nc</dataSource>
+      </dataFile>
+
+    </input>
+
+     <runtime>
+      <reference restart="$(REFERENCE)/archive/1x0m8d_216x2a/restart/00720109.tar"/>
+     </runtime>
+  </experiment>
 
 <!--=======================-->
 <!--= CM4 EXPERIMENTS     =-->
@@ -1945,7 +2083,7 @@ For more information please refer to the
       <xi:include xpointer="xpointer(//freInclude[@name='common_AM4_v20170208']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_2010_cmip6']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20161213']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20170518']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_grid']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96L33_initCond']/input/node())"/>
@@ -2035,7 +2173,7 @@ For more information please refer to the
       <xi:include xpointer="xpointer(//freInclude[@name='common_AM4_v20170208']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_1850_cmip6']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20161213']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20170518']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>  
       <xi:include xpointer="xpointer(//freInclude[@name='c96_grid']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96L33_initCond']/input/node())"/>

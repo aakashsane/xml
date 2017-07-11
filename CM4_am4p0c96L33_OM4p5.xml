@@ -71,14 +71,15 @@ NOTES:
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"      value="warsaw"/> <!-- Release tag for the shared source code -->
-  <property name="MOM6_DATE"    value="2017.06.12"/>                 <!-- git tag date for MOM6 source code -->
-  <property name="SHARED_GIT_TAG"     value="$(RELEASE)"/>
-  <property name="MOM6_GIT_TAG" value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
-  <property name="AWG_GIT_TAG"  value="$(RELEASE)"/>           <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG" value="warsaw_20170705_slm"/>       <!-- git tag for LAND_LAD2 source code -->  
+  <property name="RELEASE"        value="warsaw"/>                  <!-- git tag for general component source code-->
+  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
+  <property name="MOM6_DATE"      value="2017.06.12"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
+  <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
+  <property name="LAND_GIT_TAG"   value="warsaw_20170706_slm"/>     <!-- git tag for LAND_LAD2 source code -->  
+  <property name="FRE_STEM"       value="$(RELEASE)_LND_$(LAND_GIT_TAG)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"   value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
@@ -95,16 +96,14 @@ NOTES:
   <property name="EXP_CPLD_END"     value="0060"/> <!--simulation end   year--> 
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
-
-  <property name="FRE_STEM"  value="mdt/20170706"/> <!-- customize as needed -->
   <property name="FRE_VERSION"     value="bronx-12"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
-  <property name="CVDP_startyear" value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
+  <property name="CVDP_startyear"  value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-  <property name="reference_tag"   value="warsaw_mom6_2017.05.26_answers"/>
+  <property name="reference_tag"   value="warsaw_mom6_2017.06.12_answers"/>
                           
   <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
@@ -910,20 +909,6 @@ Experiment to build executable.
     </input>
   </freInclude>
 
-  <freInclude name="emissions_cmip6_v20161213">
-    <input>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2016-12-13/fast_chemistry/litechem_emission.tar</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/anthro_so2.1849_2016.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2016-12-13/fast_chemistry/emissions.simple.so2.0.5x0.5.1849-2016.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/co2_data.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Huan.Guo/awg/input/cmip6/co2_data_2016.nc</dataSource>
-      </dataFile>
-    </input>
-  </freInclude>
-
   <freInclude name="emissions_cmip6_v20170518">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -938,19 +923,6 @@ Experiment to build executable.
     </input>
   </freInclude>
 
-  <freInclude name="emissions_cmip6_v20161213_fullchem">
-    <input>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2016-12-13/1849-2016/emissions.0.5x0.5.1849-2016.tar</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/anthro_so2.1849_2016.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2016-12-13/fast_chemistry/emissions.simple.so2.0.5x0.5.1849-2016.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/co2_data.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Huan.Guo/awg/input/cmip6/co2_data_2016.nc</dataSource>
-      </dataFile>
-    </input>
-  </freInclude>
   <freInclude name="L32_gas_conc">
     <input>
       <dataFile label="input" target="INPUT/gas_conc_3D_am3p9.nc" chksum="" size="" timestamp="">
@@ -1765,12 +1737,16 @@ For more information please refer to the
         make_exchange_reproduce = .true.
         interp_method = 'second_order'
       </namelist>
-      <namelist name="atmos_cmip_diag_nml">
-verbose=3
-      </namelist>
 
-      <namelist name="mpp_io_nml">
-        cf_compliance = .true.
+      <namelist name="photosynthesis_nml">
+       photosynthesis_to_use = 'leuning'
+       co2_to_use_for_photosynthesis ='prescribed'
+       co2_for_photosynthesis = 284.262e-6
+       respiration_to_use = 'LM3'
+       Kok_effect = .False.
+       lai_eps    = 1.e-10  !all other runs should use 1.e-5 which is set in am4p0_common.nml
+      </namelist>
+      <namelist name="aerosolrad_driver_nml"><!--John ran with-->
       </namelist>
       <!--AWG Input namelists -->
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
@@ -1798,7 +1774,8 @@ verbose=3
       <csh><![CDATA[
 
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override KD = 1.5e-5
+#override KD = 1.45e-5
+#override KHTH_MIN = 200.
 #override FGNV_FILTER_SCALE = 0.1
 ! Geothermal heating
 DO_GEOTHERMAL = True
@@ -1954,6 +1931,17 @@ SIS_OVERRIDE_EOF
        fill_land_mask = .TRUE.
        write_static_veg = .FALSE.
       </namelist>
+      <namelist name="photosynthesis_nml">
+       photosynthesis_to_use = 'leuning'
+       co2_to_use_for_photosynthesis ='prescribed'
+       co2_for_photosynthesis = 284.262e-6
+       respiration_to_use = 'LM3'
+       Kok_effect = .False.
+       lai_eps    = 1.e-10  !all other runs should use 1.e-5 which is set in am4p0_common.nml
+      </namelist>
+      <namelist name="aerosolrad_driver_nml">
+      </namelist>
+
 
     </input>
   </experiment>
@@ -1987,19 +1975,6 @@ Reverting back to land defaults for coastal roughness, use_coast_topo_rough = .t
         ncores_per_node = $(NCORE_PER_NODE)
         use_hyper_thread=.T.
       </namelist>
-      <namelist name="fms_io_nml">
-        fms_netcdf_restart=.true.
-        threading_read='multi'
-        max_files_r = 800
-        max_files_w = 800
-      </namelist>
-
-       <namelist name="fms_nml">
-        clock_grain='ROUTINE'
-        clock_flags='NONE'
-        domains_stack_size = 7000000
-        stack_size =0
-      </namelist>
       <namelist name="generic_tracer_nml">
        do_generic_tracer=.true.
        do_generic_CFC=.false.
@@ -2021,24 +1996,6 @@ Reverting back to land defaults for coastal roughness, use_coast_topo_rough = .t
        use_single_lw_sw_ts = .false.,
        use_co2_tracer_field = .true.                 ! jgj added
        treat_sfc_refl_dir_as_dif = .false.           ! jgj added
-      </namelist>
-          <namelist name="diag_manager_nml">
-        max_axes = 400,
-        max_files = 400,
-        max_num_axis_sets = 400,
-        max_input_fields = 1000
-        max_output_fields = 1000
-        mix_snapshot_average_fields=.false.
-        max_field_attributes=4
-        max_axis_attributes=4
-      </namelist>
-
-      <namelist name="atmos_cmip_diag_nml">
-verbose=3
-      </namelist>
-
-      <namelist name="mpp_io_nml">
-        cf_compliance = .true.
       </namelist>
 
        <namelist name="radiative_gases_nml">
@@ -2112,22 +2069,12 @@ verbose=3
        co2_radiation_override = .true.
        do_co2_emissions = .false.
       </namelist>
-       <namelist name="vegn_nml">
-      init_Tv = 288.0
-      rad_to_use = 'two-stream'
-      photosynthesis_to_use = 'leuning'
-      snow_rad_to_use = 'paint-leaves'
-      co2_to_use_for_photosynthesis ='prescribed'
-       co2_for_photosynthesis = 285.5e-6     
-      do_cohort_dynamics   = .TRUE.,
-      do_patch_disturbance = .TRUE.,
-      do_phenology         = .TRUE.,
-      do_biogeography      = .TRUE.,
-      do_seed_transport    = .TRUE.,
-      tau_smooth_ncm = 22.0
-      rav_lit_bwood = 300.
-      </namelist>
        
+      <namelist name="photosynthesis_nml">
+       photosynthesis_to_use = 'leuning'
+       co2_to_use_for_photosynthesis ='prescribed'
+       co2_for_photosynthesis = 285.5e-6
+      </namelist>
        
       <diagTable order="append"> 
 "radiation", "vis_extopdep_vlcno_c",           "vis_exopd_vl_c",  "atmos_month_aer", "all", .true.,"none", 2

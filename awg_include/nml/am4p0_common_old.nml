@@ -4,11 +4,6 @@
       high_concen = 1.0
 /
 
- &aerosolrad_driver_nml
-      do_swaerosol_forcing = .true.
-      do_lwaerosol_forcing = .true.
-/
-
  &atmosphere_nml
 /
 
@@ -17,7 +12,6 @@
        init_co2 = 286.0e-6
        canopy_air_mass_for_tracers = 10.0
        allow_small_z0 = .true.
-       sai_turb = .true.
 /
 
  &cloud_rad_nml
@@ -66,9 +60,9 @@
 /
 
  &diag_manager_nml
-       max_axes = 400,
-       max_files = 400,
-       max_num_axis_sets = 400,
+       max_axes = 200,
+       max_files = 200,
+       max_num_axis_sets = 200,
        max_input_fields = 1000
        max_output_fields = 1000
        mix_snapshot_average_fields=.false.
@@ -113,14 +107,14 @@
  &fms_io_nml
             fms_netcdf_restart=.true.
             threading_read='multi'
-            max_files_r = 800
-            max_files_w = 800
+            max_files_r = 200
+            max_files_w = 200
 /
 
  &fms_nml
             clock_grain='ROUTINE'
             clock_flags='NONE'
-            domains_stack_size = 7000000
+            domains_stack_size = 5000000
             stack_size = 0
 /
 
@@ -165,10 +159,8 @@
 
  &harvesting_nml
        do_harvesting          = .FALSE.
-       grazing_intensity      = 3.65 ! roughly 1% of biomass per day
+       grazing_intensity      = 0.25
        grazing_residue        = 0.1
-       grazing_frequency      = 'daily'
-       min_lai_for_grazing    = 1.0
        frac_wood_wasted_harv  = 0.25
        frac_wood_wasted_clear = 0.25
        !frac_wood_fast         = ONETHIRD
@@ -178,18 +170,6 @@
        waste_below_ground_wood = .TRUE.
 /
 
- &hlsp_nml
-       max_num_topo_hlsps = 1
-       num_vertclusters = 10
-       use_geohydrodata = .true.
-       strm_depth_penetration = 1.5
-       use_hlsp_aspect_in_gwflow = .true.
-       diagnostics_by_cluster = .true.
-       init_wt_strmelev = .false.
-       dammed_strm_bc = .true.
-       limit_intertile_flow = .true. !.false.
-       flow_ratio_limit = 0.25
-/
 
  &lake_data_nml
        lake_to_use = 'from-rivers'
@@ -220,10 +200,6 @@
        K_z_background  = 15.e-5
 /
 
- &land_conservation_nml
-        do_check_conservation = .FALSE.
-/
-
  &land_debug_nml
       watch_point = 0, 0, 0, 1
 /
@@ -240,7 +216,6 @@
  &landuse_nml
        do_landuse_change = .FALSE.
        input_file = 'INPUT/landuse.nc'
-       distribute_transitions = 'min-n-tiles'
 /
 
  &lscale_cond_nml
@@ -265,10 +240,6 @@
       stable_option =  2,
       rich_crit = 1.0,
       zeta_trans =  0.5
-/
-
- &mpp_io_nml
-      cf_compliance = .true.
 /
 
  &my25_turb_nml
@@ -399,7 +370,6 @@
  &soil_data_nml
        geohydrology_to_use    = 'hill'
        use_comp_for_ic        = .true.
-       use_comp_for_push      = .true.
        use_tau_fix            = .false.
        use_sat_fix            = .true.
        use_alt3_soil_hydraulics = .true.
@@ -510,12 +480,12 @@
        critical_root_density = 0.0,
        tau_drip_s     = 259200.0
        cmc_lai(0:4) = 0.02, 0.02, 0.02, 0.02, 0.02
-       csc_lai(0:4) = 0.30, 0.30, 0.30, 0.30, 0.2
-       dat_snow_crit = 2*1.e7, .1, 1.e7, .1
+       csc_lai(0:4) = 0.30, 0.30, 0.30, 0.30, 0.60
+       dat_snow_crit = 4*1.e7, .1
        t_transp_min = 268.
        srl(0:1) = 112.0e3, 150.0e3
        root_perm = 14*5e-7
-       alpha(1,3) = 4
+       alpha(1,3) = 4 
        leaf_age_tau(2) = 150
        smoke_fraction = 0.9, 0.9, 0.6, 0.6, 0.6
        tg_c3_thresh = 1
@@ -524,9 +494,6 @@
        cmc_eps = 0.01
        alpha(0:4,6) = 0.0, 0.0, 0.012, 0.012, 0.012
        treefall_disturbance_rate = 0.175, 0.185, 0.025, 0.0275, 0.027
-       use_light_saber = .true.
-       sai_cover = .true.
-       sai_rad = .true.
 /
 
  &vert_diff_driver_nml
