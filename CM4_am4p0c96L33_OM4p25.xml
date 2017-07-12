@@ -1712,49 +1712,9 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
          nyblocks = $nyblock
       </namelist>
 
-      <namelist name="soil_data_nml">
-       geohydrology_to_use    = 'hill'
-       use_comp_for_ic        = .true.
-!       use_comp_for_push      = .true.  !Need to comment out to reproduce Huan answer !John says should be set
-       use_tau_fix            = .false.
-       use_sat_fix            = .true.
-       use_alt3_soil_hydraulics = .true.
-       gw_scale_soil_depth  = 0.1666667
-       gw_scale_perm        = 1.0
-       gw_scale_relief      = 0.5
-       aspect           = 0.01
-       k0_macro_z       = 0.0
-       k0_macro_x       = 1.0
-       freeze_factor    = 1.5
-       comp             = 1e-4
-       num_l            = 20
-       dz = 0.020, 0.040, 0.040, 0.050, 0.05, 0.100, 0.10, 0.200, 0.200, 0.2,
-            0.40,  0.40,  0.40,  0.4,   0.4,   1.0,   1.0,  1.0,  1.5,   2.5
-       soil_type_file          = "INPUT/soil_type.nc"
-       input_cover_types       =  1,       2,       3,       4,       5,       6,       7,       8,       9,       10,      11,      12,      13,       14
-       tile_names              =  'hec',   'sic',   'lic',   'sicl',  'cl',    'si',    'sil',   'sac',   'l',     'sacl',  'sal',  'ls',     's',     'u'
-       dat_w_sat               =  0.468,   0.468,   0.468,   0.464,   0.465,   0.476,   0.476,   0.406,   0.439,   0.404,   0.434,   0.421,   0.339,   0.439
-       dat_k_sat_ref           =  0.00097, 0.0013,  0.00097, 0.002,   0.0024,  0.0028,  0.0028,  0.0072,  0.0033,  0.0045,  0.0052,  0.014,   0.047,   0.0033
-       dat_psi_sat_ref         = -0.47,   -0.32,   -0.47,   -0.62,   -0.26,   -0.76,   -0.76,   -0.098,  -0.35,   -0.13,   -0.14,   -0.036   -0.069,  -0.35
-       dat_chb                 =  12.0,    10.0,    12.0,    8.7,     8.2,     5.3,     5.3,     11.0,    5.2,     6.8,     4.7,     4.3,     2.8,     5.2
-       dat_heat_capacity_dry   =  1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6,   1.1e6
-       dat_thermal_cond_dry    =  0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.21,    0.14,    0.21
-       dat_thermal_cond_sat    =  1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     1.5,     2.3,     1.5
-       dat_thermal_cond_exp    =  6,       6,       6,       5,       5,       5,       5,       6,       5,       5,       5,       5,       3,       5
-       dat_thermal_cond_scale  =  10,      10,      10,      0.5,     0.5,     0.5,     0.5,     10,      0.5,     0.5,     0.5,     0.5,     15,      0.5
-       dat_thermal_cond_weight =  0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.7,     0.2,     0.7
-       dat_emis_dry            =  1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0
-       dat_emis_sat            =  1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0,     1.0
-       dat_tf_depr             =  2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0,     2.0
-       dat_z0_momentum         =  0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01,    0.01
-       Dpsi_min_const      = -1.e12
-       K_min               = 1.e-12
-       geothermal_heat_flux_constant = 0.065
-       retro_a0N1 = .true.
-      </namelist>
       <!-- Namelist -->
       <namelist file="$(AWG_INPUT_HOME)/nml/ocean_g12.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common_oldLandSettings.nml"/><!--reverting soil_data_nml is NOT enough to get old answers-->
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c96L33.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_2010climo_missions_cmip6_v20161213.nml"/>
@@ -1854,7 +1814,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 
       <!-- Namelist -->
       <namelist file="$(AWG_INPUT_HOME)/nml/ocean_g12.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common_oldLandSettings.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/cmip6_am4p0_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c96L33.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_2010climo.nml"/>
@@ -1904,7 +1864,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
        co2_for_photosynthesis = 284.262e-6
        respiration_to_use = 'LM3'
        Kok_effect = .False.
-       lai_eps    = 1.e-10  !all other runs should use 1.e-5 which is set in am4p0_common.nml
+       lai_eps    = 1.e-10  !all other runs should use 1.e-5 
       </namelist>
 
       <namelist name="static_veg_nml">
@@ -1955,6 +1915,10 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
        K_min               = 1.e-12
        geothermal_heat_flux_constant = 0.065
        retro_a0N1 = .true.
+      </namelist>
+
+      <namelist name="frecheck_nml"><!--this nml is needed only for frecheck to work. It is not needed and does not affect the model run in any way-->
+          start_date =  0072,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
       </namelist>
 
       <namelist file="$(AWG_INPUT_HOME)/nml/ocean_g12.nml"/>
@@ -2073,7 +2037,7 @@ For more information please refer to the
         interp_method = 'second_order'
       </namelist>
       <!--AWG Input namelists -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common_oldLandSettings.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c96L33.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_2010climo.nml"/>
@@ -2159,10 +2123,33 @@ For more information please refer to the
 
   </experiment>
 
+  <experiment name="CM4_c96L33_am4p0_2010_30d15_tlt_geo_kd15" inherit="CM4_c96L33_am4p0_2010_base"/>
+  <experiment name="CM4_c96L33_am4p0_2010_base" inherit="CM4_c96L33_am4p0_2010_30d15_tlt">
+    <input>
+      <csh><![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+! Geothermal heating
+DO_GEOTHERMAL = True
+GEOTHERMAL_FILE = "geothermal_davies2013_v1.nc"
+GEOTHERMAL_SCALE = 1.0
+GEOTHERMAL_VARNAME = "geothermal_hf"
+! Kd = 1.5e-5
+#override KD = 1.5E-5
+MOM_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+  </experiment>
+
   <experiment name="CM4_c96L33_am4p0_1850_30d15_tlt" inherit="CM4_c96L33_am4p0_2010_30d15_tlt">
     <input>
+      <namelist name="photosynthesis_nml">
+       photosynthesis_to_use = 'leuning'
+       co2_to_use_for_photosynthesis ='prescribed'
+       co2_for_photosynthesis = 284.262e-6
+       respiration_to_use = 'LM3'
+      </namelist> 
       <!--AWG Input namelists -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common_oldLandSettings.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c96L33.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_1850climo.nml"/>
@@ -2310,6 +2297,10 @@ For more information please refer to the
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/WOA05_pottemp_salt.nc 
      </dataFile>      
+
+     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/geothermal_davies2013_v1.nc
+     </dataFile>
 
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.33.16x18     

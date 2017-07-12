@@ -253,7 +253,7 @@ NOTES:
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A576x2_O842p5"><!--1/2 degree ocean grid Only-->
-	     <resources jobWallclock="00:30:00">
+	     <resources jobWallclock="01:00:00">
                <atm ranks="576" threads="2"	    layout = "8,12"   io_layout = "1,4" />
 	       <lnd                            layout = "8,12"   io_layout = "1,4" />
 	       <ice                            layout = "144,4"   io_layout = "1,4" />
@@ -1690,8 +1690,8 @@ make_calving_reproduce=.true.
     </postProcess>
   </freInclude> 
 
-  <experiment name="CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1_G.$(MOM6_DATE)" inherit="CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1_G"/>
-  <experiment name="CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1_G" inherit="cm4_sis2_compile">
+  <experiment name="CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1.$(MOM6_DATE)" inherit="CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1"/>
+  <experiment name="CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"CM4_c96L33_am4p0_OMp5"</model>
@@ -1749,7 +1749,7 @@ For more information please refer to the
       <namelist name="aerosolrad_driver_nml"><!--John ran with-->
       </namelist>
       <!--AWG Input namelists -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common_oldLandSettings.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c96L33.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_2010climo.nml"/>
@@ -1887,10 +1887,10 @@ SIS_OVERRIDE_EOF
   </experiment>
 
 
-  <experiment name="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_G" inherit="CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1_G">
+  <experiment name="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1" inherit="CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1">
     <input>
       <!--AWG Input namelists -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common_oldLandSettings.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c96L33.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_1850climo.nml"/>
@@ -1915,7 +1915,7 @@ SIS_OVERRIDE_EOF
     </input>
   </experiment>
 
-  <experiment name="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_G_dveg" inherit="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_G">
+  <experiment name="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_G_dveg" inherit="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1">
     <!--This experiment needs a code update from land and does not work properly without it.-->
     <input>
 
@@ -1937,16 +1937,20 @@ SIS_OVERRIDE_EOF
        co2_for_photosynthesis = 284.262e-6
        respiration_to_use = 'LM3'
        Kok_effect = .False.
-       lai_eps    = 1.e-10  !all other runs should use 1.e-5 which is set in am4p0_common.nml
+       lai_eps    = 1.e-10  !all other runs should use 1.e-5 
       </namelist>
       <namelist name="aerosolrad_driver_nml">
       </namelist>
-
+      <!--AWG Input namelists -->
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_physics.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c96L33.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_1850climo.nml"/>
 
     </input>
   </experiment>
 
-<experiment name="dust_ESM4p_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_G" inherit="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_G">
+<experiment name="dust_ESM4p_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1" inherit="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1">
 <description>
 This experiment is here only to test the ESM4 flow and regression with the new am4p0 setup. The initCond is not scientifically evaluated.
 Use at your own risk.
@@ -2115,7 +2119,7 @@ Reverting back to land defaults for coastal roughness, use_coast_topo_rough = .t
 
       </diagTable> 
       <!--AWG Input namelists -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common_oldLandSettings.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c96L33.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_1850climo.nml"/>
