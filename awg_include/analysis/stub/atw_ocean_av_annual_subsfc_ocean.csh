@@ -131,12 +131,12 @@ if ($#argv) set argu = ($argv:q)
 if ($yr1_2 == "") then
    set ref_opt
 else
-   set ref_opt = (-r gfdl_model,$yr1_2,$yr2_2,$descriptor_2,$in_data_dir_2,$databegyr_2,$dataendyr_2,$datachunk_2,$staticfile_2)
+   set ref_opt = (-r gfdl_model,$yr1_2,$yr2_2,$descriptor_2,$in_data_dir_2,$databegyr_2,$dataendyr_2,$datachunk_2)
 endif
 
 
 #$work_script -o $out_dir $ref_opt \
-#   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk,$staticfile \
+#   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk \
 #   $argu:q || goto err
 
 
@@ -157,33 +157,28 @@ set dtdz_vars         = "dtdz_165e,dtdz_170w,dtdz_140w,dtdz_110w,dtdz_zmaxloc"
 
 set argu_test1 = "$shared_opt $pregrid_opt -n -r oisst_v2 -A globe -N subpolar $y_subpolar plot_clim"
 $work_script -o $out_dir $ref_opt \
-   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk,$staticfile \
-   $argu_test1 || goto err
+   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk \
+   $argu $argu_test1 || goto err
 
 set argu_test2 = "$shared_opt $pregrid_opt -n -r oisst_v2 $default_region plot_clim"
 $work_script -o $out_dir $ref_opt \
-   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk,$staticfile \
-   $argu_test2 || goto err
+   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk \
+   $argu $argu_test2 || goto err
 
 set argu_test3 = "$shared_opt $pregrid_opt -n -r oscar_v2009 -v u_top30m $default_region plot_clim"
 $work_script -o $out_dir $ref_opt \
-   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk,$staticfile \
-   $argu_test3 || goto err
-
-set argu_test4 = "$shared_opt $pregrid_opt -n -r tropflux_v1 -v sst,netflx,tau_x,tau_y,tau_curl,tau_div,u_ekman,v_ekman,w_ekman,v_sverdrup,vdiv_sverdrup $default_region plot_clim"
-$work_script -o $out_dir $ref_opt \
-   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk,$staticfile \
-   $argu_test4 || goto err
+   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk \
+   $argu $argu_test3 || goto err
 
 set argu_test5 = "$shared_opt $pregrid_opt -n -r woa13 -v sst,sst_m_t50,d20,d15,ild_0p5,ild_1,mld_0p125,temp_diff0_eq,temp_top50m,temp_xav,temp_zav,temp_eq,$temp_yslice_vars,dtdx_surf,dtdx_eq,dtdy_surf,dtdz_eq,$dtdz_vars,dtdz_xav,dtdz_zmax,sss,sss_m_s50,salt_eq,$salt_yslice_vars,sigma0_eq,$sigma_vars,dsigma0dz_zmax $default_region plot_clim"
 $work_script -o $out_dir $ref_opt \
-   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk,$staticfile \
-   $argu_test5 || goto err
+   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk \
+   $argu $argu_test5 || goto err
 
-set argu_test6 = "$shared_opt $pregrid_opt -n -r oras4_orca1_era_interim -x -v dtdx_zav,dtdy_eq,dtdy_xav,dtdy_zav,salt_xav,salt_zav,dtdt_surf,dtdt_eq,dtdt_xav,dtdt_top50m,dtdt_zav $default_region plot_clim"
+set argu_test6 = "$shared_opt $pregrid_opt -n -r oras4_orca1_era_interim -v sst,sst_m_t50,d20,d15,ild_0p5,ild_1,mld_0p125,temp_eq,temp_diff0_eq,temp_top50m,temp_xav,temp_zav,$temp_yslice_vars,dtdx_surf,dtdx_eq,dtdx_xav,dtdy_surf,dtdz_eq,dtdz_xav,$dtdz_vars,dtdz_zmax,sss,sss_m_s50,salt_eq,$salt_yslice_vars,sigma0_eq,$sigma_vars,dsigma0dz_zmax,u_surf,u_top30m,u_eq,u_xav,u_zav,u_165e,u_170w,u_140w,u_110w,v_surf,v_top30m,v_eq,v_xav,v_zav,v_165e,v_170w,v_140w,v_110w,tadv_x_eq,tadv_x_xav,tadv_x_top50m,tadv_x_zav,tadv_y_eq,tadv_y_xav,tadv_y_top50m,tadv_y_zav $default_region plot_clim"
 $work_script -o $out_dir $ref_opt \
-   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk,$staticfile \
-   $argu_test6 || goto err
+   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk \
+   $argu $argu_test6 || goto err
 
 # ================ END BODY OF SCRIPT ===============
 unset echo
