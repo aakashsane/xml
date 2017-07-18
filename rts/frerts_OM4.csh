@@ -4,7 +4,7 @@ XML_FILE=OM4.xml                               #The xml to test
 RELEASE='dev\\\/master'                        #The FMS release to test
 MOM6_DATE='2017.07.05'                         #The MOM6 tag date to test
 MOM6_GIT_TAG="dev\\\/master\\\/$MOM6_DATE"     #The MOM6 tag to test
-FRESTEM="dev_master_20170714_$MOM6_DATE"       #The FRESTEM to use
+FRESTEM="dev_master_20170714_mom6_$MOM6_DATE"       #The FRESTEM to use
 
 #List of the experiments in the xml to run regression for
 EXPERIMENT_LIST="OM4_SIS2_baseline.$MOM6_DATE OM4_initCond5_nobergs OM4_SIS2_033_baseline.$MOM6_DATE MOM6_GOLD_SIS2_bergs OMp5_baseline.$MOM6_DATE OM4_SIS2_COBALT_initFromSrc OM4_SIS2_05_CORE2_COBALT_combined_cfc_sf6_abio2  OM4_SIS2_CORE2_IAF_baseline OMp5_baseline_NEMO"
