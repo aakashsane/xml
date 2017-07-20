@@ -185,7 +185,7 @@ NOTES:
 
    <!--c192 + 1/4 degree -->
    <freInclude name="resourceparams_c192A432x2_O1022x1">
-	     <resources jobWallclock="01:00:00">
+	     <resources jobWallclock="02:00:00">
                <atm ranks="432" threads="2"    layout = "6,12"   io_layout = "1,4" />
                <lnd                            layout = "6,12"   io_layout = "1,4" />
                <ice                            layout = "144,3"  io_layout = "1,3" />               
@@ -776,7 +776,7 @@ Experiment to build executable.
       </compile>
     </component>
 
-    <component paths="ice_sis ice_param" requires="fms" name="ice_sis">
+    <component paths="ice_sis ice_param" requires="fms mom6" name="ice_sis">
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
             <codeBase version="$(RELEASE)"> ice_sis.git ice_param.git </codeBase>
          </source>
@@ -795,7 +795,7 @@ Experiment to build executable.
       </compile>
     </component>
 
-    <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared">
+    <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared/generic_tracers ocean_shared/mocsy/src">
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
@@ -813,8 +813,19 @@ Experiment to build executable.
 
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
           git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
-          #(cd ocean_shared && git checkout user/nnz/mom6_dev)
-          (cd ocean_shared && git checkout $(MOM6_GIT_TAG))
+          pushd ocean_shared
+          #git checkout user/nnz/mom6_dev
+          git checkout $(MOM6_GIT_TAG)
+          git submodule init mocsy
+          git submodule update
+	  #Have to rename *.f90 to *.F90 so that we can pass cpp def  -DUSE_PRECISION=2 to them.
+          #Alternatively, we could build mocsy as a library by itself without renaming the files,
+          #but then we have to add a mocsy lib to link with.
+          cd mocsy/src
+          foreach f (*.f90)
+            mv ${f} "`basename ${f} .f90`.F90"
+          end
+          popd
 
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
@@ -836,7 +847,7 @@ Experiment to build executable.
         ]]></csh>
       </source>
       <compile>
-        <cppDefs><![CDATA[ $(F2003_FLAGS) -DMAX_FIELDS_=100 -DNOT_SET_AFFINITY -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
+        <cppDefs><![CDATA[ $(F2003_FLAGS) -DMAX_FIELDS_=100 -DNOT_SET_AFFINITY -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER  -DUSE_PRECISION=2 -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
         <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for MOM6 may cause crash -->
       </compile>
     </component>
@@ -1720,43 +1731,6 @@ For more information please refer to the
       <!--SIS Input datasets-->
       <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
 
-      <csh><![CDATA[
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-! MLE 30 days
-#override MLE_MLD_DECAY_TIME = 2.592E+06
-! ePBL "s4" settings (LES tunings + ePBL at nearer equator)
-MSTAR_MODE = 2
-#override MSTAR=0.0
-MSTAR2_COEF1 = 0.29
-MSTAR2_COEF2 = 0.152
-MSTAR_CONV_ADJ = 0.667
-ML_OMEGA_FRAC = 0.001
-NSTAR = 0.06
-#override TKE_DECAY = 0.01
-#override N2_DISSIPATION_POS = 0.0
-#override N2_DISSIPATION_NEG = 0.0
-USE_MLD_ITERATION = True
-WSTAR_USTAR_COEF = 1.0
-VSTAR_SCALE_FACTOR = 1.0
-EPBL_TRANSITION_SCALE = 0.01
-ORIG_MLD_ITERATION = False
-MIX_LEN_EXPONENT = 1.0
-MSTAR_CAP = 10.
-! No background gustiness
-GUST_CONST = 0.0
-! Langmuir turbulence
-USE_LA_LI2016 = True
-LT_ENHANCE = 3
-LT_ENHANCE_EXP=-1.5
-LT_ENHANCE_COEF=0.044
-LT_MOD_LAC1=0.0
-LT_MOD_LAC2=0.0
-LT_MOD_LAC3=0.0
-LT_MOD_LAC4=0.0
-LT_MOD_LAC5=0.22
-MOM_OVERRIDE_EOF
-     ]]></csh>
-
     </input>
 
     <runtime>
@@ -1770,7 +1744,7 @@ MOM_OVERRIDE_EOF
 
       <regression name="rts">
         <run days="15 16" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2_O1022x1']/node())"/> </run> 
-        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2_O1022x1']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x2_O1970x1']/node())"/> </run>
         <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A864x2_O1756x1']/node())"/> </run>
         <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_c192A432x4_O1756x1']/node())"/> </run>
       </regression>
