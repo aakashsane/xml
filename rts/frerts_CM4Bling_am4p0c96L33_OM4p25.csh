@@ -1,11 +1,10 @@
 set -v
 # Automatic Build and Run on Gaea using fre
 XML_FILE=CM4Bling_am4p0c96L33_OM4p25.xml       #The xml to test
-RELEASE='dev\\\/master'                        #The FMS release to test
+RELEASE='warsaw_201707'                        #The FMS release to test
 MOM6_DATE='2017.07.05'                         #The MOM6 tag date to test
 MOM6_GIT_TAG="dev\\\/master\\\/$MOM6_DATE"     #The MOM6 tag to test
-FRESTEM="dev_master_20170724_mom6_$MOM6_DATE"       #The FRESTEM to use
-
+FRESTEM="warsaw_201707_mom6_$MOM6_DATE"       #The FRESTEM to use
 #List of the experiments in the xml to run regression for
 EXPERIMENT_LIST="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8 CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F"
 
