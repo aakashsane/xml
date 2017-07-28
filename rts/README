@@ -1,0 +1,22 @@
+This directory contains one scipt per xml that can be called directly from gaea or from a Jenkins instance.
+The script uses a tool (see below) to automatically build executable and run regression tests and check their consistency
+for the specified xml/experiments in the script. 
+
+Please report issues to Niki.Zadeh@noaa.gov and/or submit an issue to https://gitlab.gfdl.noaa.gov/niki.zadeh/nnz_tools
+
+Here are a few examples of how to run regression tests using the frerts tool directly.
+
+cd YOUR_XML_DIR
+
+#The following will build and run regression tests for experiments CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1 and CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_G_dveg in the CM4_am4p0c96L33_OM4p5.xml
+
+/ncrc/home2/Niki.Zadeh/nnz_tools/frerts_test/frerts_batch.csh -x CM4_am4p0c96L33_OM4p5.xml -p ncrc4.intel16 -t prod-openmp --release warsaw --fre_stem warsaw_LND_20170706_slm_mom6_2017.06.12 --fre_version bronx-12 --mom_git_tag 'dev\\/master\\/2017.06.12' --mom_date_tag 2017.06.12 --debuglevel _0 --project gfdl_f --frerts_ops '--compile,-l,cm4_libs_compile,--res_num,6,--fre_ops,-u;--no-transfer;--no-combine-history,--do_frecheck' CM4_c96L33_am4p0_OMp5_2010_30d30_me_tlt_geo_kd15_fgnv0p1 CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1_G_dveg
+
+#The following won't try to build (assuming the executable already exists in the frestem path) but will run regressions for the specified  experiments
+
+/ncrc/home2/Niki.Zadeh/nnz_tools/frerts_test/frerts_batch.csh -x CM4_am4p0c96L33_OM4p25.xml -p ncrc3.intel16 -t prod-openmp --release warsaw --fre_stem warsaw_LND_20170706_slm_mom6_2017.06.12 --fre_version bronx-12 --mom_git_tag 'dev\\/master\\/2017.06.12' --mom_date_tag 2017.06.12 --debuglevel _BTund --project gfdl_f --interactive --frerts_ops '--res_num,6,--fre_ops,-u;--no-transfer;--no-combine-history,--do_frecheck' c96L33_am4p0_2010climo CM4_c96L33_am4p0_2010_30d15_tlt CM4_c96L33_am4p0_1850_30d15_tlt
+
+#The following won't try to build (assuming the executable already exists in the frestem path) and will run just the "basic" regression (note --no_rts)  for the specified experiments
+
+/ncrc/home2/Niki.Zadeh/nnz_tools/frerts_test/frerts_batch.csh -x CM4Bling_am4p0c96L33_OM4p25.xml -p ncrc4.intel16 -t prod-openmp --release warsaw --fre_stem warsaw_LND_20170706_slm_mom6_2017.06.12 --fre_version bronx-12 --mom_git_tag 'dev\\/master\\/2017.06.12' --mom_date_tag 2017.06.12 --debuglevel _emissions2017 --project gfdl_f --frerts_ops '--no_rts,--fre_ops,-u;--no-transfer;--no-combine-history,--do_frecheck' CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F
+

@@ -71,13 +71,13 @@ NOTES:
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="warsaw"/>                  <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="warsaw_201707"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="MOM6_DATE"      value="2017.07.05"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG"   value="warsaw_20170706_slm"/>     <!-- git tag for LAND_LAD2 source code -->  
-  <property name="FRE_STEM"       value="$(RELEASE)_LND_$(LAND_GIT_TAG)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>     <!-- git tag for LAND_LAD2 source code -->  
+  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
@@ -103,7 +103,7 @@ NOTES:
   <property name="CVDP_startyear" value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-  <property name="reference_tag"   value="warsaw_mom6_2017.06.12_answers"/>
+  <property name="reference_tag"   value="warsaw_201707_mom6_2017.07.05_answers"/>
                           
   <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
@@ -683,6 +683,22 @@ NOTES:
                <ocn ranks="4671" threads="1"   layout = "90,72"  io_layout = "1,4" mask_table="mask_table.1809.90x72"/>
              </resources>
    </freInclude>
+   <freInclude name="resourceparams_A768x2_O4671">
+             <resources jobWallclock="00:30:00">
+               <atm ranks="768" threads="2"    layout = "8,16"   io_layout = "1,4" />
+               <lnd                            layout = "8,16"   io_layout = "1,4" />
+               <ice                            layout = "96,8"   io_layout = "1,4" />
+               <ocn ranks="4671" threads="1"   layout = "90,72"  io_layout = "1,4" mask_table="mask_table.1809.90x72"/>
+             </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A768x2_O4671_production">
+             <resources jobWallclock="16:00:00" segRuntime="3:00:00">
+               <atm ranks="768" threads="2"    layout = "8,16"   io_layout = "1,4" />
+               <lnd                            layout = "8,16"   io_layout = "1,4" />
+               <ice                            layout = "96,8"   io_layout = "1,4" />
+               <ocn ranks="4671" threads="1"   layout = "90,72"  io_layout = "1,4" mask_table="mask_table.1809.90x72"/>
+             </resources>
+   </freInclude>
    <freInclude name="resourceparams_A864x2_O6122_production"><!--17 year/day on c4-->
 	     <resources jobWallclock="16:00:00" segRuntime="2:00:00">
                <atm ranks="864" threads="2"    layout = "6,24"   io_layout = "1,4" />
@@ -898,7 +914,7 @@ Experiment to build executable.
       </compile>
     </component>
 
-    <component paths="ice_sis ice_param" requires="fms" name="ice_sis">
+    <component paths="ice_sis ice_param" requires="fms mom6" name="ice_sis">
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
             <codeBase version="$(RELEASE)"> ice_sis.git ice_param.git </codeBase>
          </source>
@@ -1931,6 +1947,30 @@ set ocn_hyperthread = $ocn_hythr
   </freInclude>
   <freInclude name="BLING_postprocess">
       <postProcess> 
+      <component type="ocean_bling_month" source="ocean_bling_month" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="ocean_bling_month_z" source="ocean_bling_month_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="ocean_bling_year" source="ocean_bling_year" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="ocean_bling_year_z" source="ocean_bling_year_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+  <freInclude name="BLING_postprocess_old">
+      <postProcess> 
       <!--REFINE DIAG SCRIP -->
       <!--By default a refineDiag script causes the annual data to be unpacked and saved in /ptmp/$USER-->
       <!--MOM6_refineDiag.csh is currently empty and is here only to cause the unpack annual history files in /ptmp-->
@@ -2702,7 +2742,7 @@ biomass_p_valid_min = 0.0
       </fieldTable>  
     </input>
   </freInclude>
-  <freInclude name="BLING_diag_table">
+  <freInclude name="BLING_diag_table_old">
     <input>
       <diagTable order="append"> 
 "radiation", "vis_extopdep_vlcno_c",        "vis_exopd_vl_c",  "atmos_month_aer", "all", .true.,"none", 2
@@ -2865,6 +2905,142 @@ biomass_p_valid_min = 0.0
  "generic_bling_z","jca_uptake", "jca_uptake",      "ocean_bling_z","all","mean","none",2
 #
 #==========================================================================================
+      </diagTable> 
+     </input>
+  </freInclude>
+  <freInclude name="BLING_diag_table">
+    <input>
+      <diagTable order="append"> 
+"radiation", "vis_extopdep_vlcno_c",        "vis_exopd_vl_c",  "atmos_month_aer", "all", .true.,"none", 2
+"land",     "fco2"                 ,        "fco2",            "land_month",      "all", .true.,"none", 2
+"land",     "qco2_dvmr"            ,        "qco2_dvmr",       "land_month",      "all", .true.,"none", 2
+"land",     "Ctot"                 ,        "Ctot",            "land_month",      "all", .true.,"none", 2
+## 2016/12/19 add in land fields for conservation checking
+"land",     "water_cons"           ,        "water_cons",      "land_month",      "all", .true.,"none", 2
+"land",     "carbon_cons"          ,        "carbon_cons",     "land_month",      "all", .true.,"none", 2
+      </diagTable> 
+
+      <!--Atmos co2 diag table (concentration run with restoring) -->
+      <diagTable order="append"> 
+#
+#===============================================================================
+## ESM ATM output           2010/05/14 jgj, updated sep 2010, jan 2011, feb 2012
+## for co2 budget calculations, save concentration instantaneously also
+## 2016/03/04: note atmos_month and atmos_scalar already in awg diag table
+## 2016/11/29: TO DO: check Data Request for co2 name convention/units
+#===============================================================================
+"atmos_level",                 1,  "months", 1, "days", "time",
+"atmos_level_instant",         1,  "months", 1, "days", "time",
+#"atmos_month",      1,  "months", 1, "days", "time",
+#"atmos_scalar",     1,  "months", 1, "days", "Time",
+#
+## globally averaged ghg - already in atmos_scalar section above 
+# "radiation",                "rrvco2",             "rrvco2",             "atmos_scalar", "all", .true., "none", 2
+#
+ "radiation",                "co2_tf",             "co2_tf",             "atmos_scalar", "all", .true., "none", 2
+## instantaneous
+# concentration
+# jgj: add co2 and pwt back as single precision
+ "atmos_co2",                "pwt",                "pwt",                "atmos_level_instant", "all", .false.,  "none", 2
+ "dynamics",                 "co2",                "co2",                "atmos_level_instant", "all", .false.,  "none", 2
+# "dynamics",                 "co2_dmmr",           "co2_dmmr",           "atmos_level_instant", "all", .false.,  "none", 1
+# "dynamics",                 "co2_dvmr",           "co2_dvmr",           "atmos_level_instant", "all", .false.,  "none", 1
+# "dynamics",                 "ps",                 "ps",                 "atmos_level_instant", "all", .false.,  "none", 1
+# "dynamics",                 "sphum",              "sphum",              "atmos_level_instant", "all", .false.,  "none", 1
+#
+ "atmos_co2",                "pwt",                "pwt",                "atmos_level", "all", .true.,  "none", 2
+# emissions not activated
+# "atmos_co2_emissions",      "co2_mol_emission",   "co2_mol_emission",   "atmos_level", "all", .true.,  "none", 2
+# restoring activated
+ "atmos_co2_restoring",      "co2_restore",        "co2_restore",        "atmos_level", "all", .true.,  "none", 2
+#
+ "dynamics",                 "area",               "area",               "atmos_level", "all", .false.,  "none", 2
+ "dynamics",                 "co2",                "co2",                "atmos_level", "all", .true.,  "none", 2
+ "dynamics",                 "co2_dvmr",           "co2_dvmr",           "atmos_level", "all", .true.,  "none", 2
+ "dynamics",                 "sphum",              "sphum",              "atmos_level", "all", .true.,  "none", 2
+
+# "flux",                     "co2_atm",            "co2_atm",            "atmos_level", "all", .true.,  "none", 2
+# "flux",                     "co2_surf",           "co2_surf",           "atmos_level", "all", .true.,  "none", 2
+ "flux",                     "co2_flux",           "co2_flux",           "atmos_level", "all", .true.,  "none", 2
+ "flux",                     "co2_mol_flux",       "co2_mol_flux",       "atmos_level", "all", .true.,  "none", 2
+ "flux",                     "co2_atm_dvmr",       "co2_atm_dvmr",       "atmos_level", "all", .true.,  "none", 2
+ "flux",                     "co2_surf_dvmr",      "co2_surf_dvmr",      "atmos_level", "all", .true.,  "none", 2
+#
+## 
+ "atmos_co2",                "pwt",                "pwt",                "atmos_month", "all", .true.,  "none", 2
+# emissions not activated
+# "atmos_co2_emissions"       "co2_mol_emission",   "co2_mol_emission",   "atmos_month", "all", .true.,  "none", 2    
+# restoring activated
+ "atmos_co2_restoring",      "co2_restore",        "co2_restore",        "atmos_month", "all", .true.,  "none", 2
+# "dynamics",                 "area",               "area",               "atmos_month", "all", .false.,  "none", 2
+ "dynamics",                 "co2",                "co2",                "atmos_month", "all", .true.,  "none", 2
+ "dynamics",                 "co2_dvmr",           "co2_dvmr",           "atmos_month", "all", .true.,  "none", 2 
+ "flux",                     "co2_mol_flux",       "co2_mol_flux",       "atmos_month", "all", .true.,  "none", 2
+#
+#==========================================================================================
+      </diagTable> 
+
+      <!-- BLING diag table samll Dunne 2017/07/21-->
+      <diagTable order="append"> 
+#
+#==========================================================================================
+# GENERIC OCEAN BLING DIAGNOSTICS  jgj 2017/07/21
+# Inclides only minimal suite for spinup/testing DOES NOT INCLUDE CMIP6 diagnostics
+#==========================================================================================
+#
+ "ocean_bling_month",           1,  "months", 1, "days", "time",
+#
+ "generic_bling","dic_stf_gas",     "dic_stf_gas",           "ocean_bling_month","all",.true.,"none",2
+ "generic_bling","frac_lg",         "frac_lg",               "ocean_bling_month","all",.true.,"none",2
+ "generic_bling","intpp",           "intpp",                 "ocean_bling_month","all",.true.,"none",2
+ "generic_bling","intjalk",         "intjalk",               "ocean_bling_month","all",.true.,"none",2
+ "generic_bling","intjdic",         "intjdic",               "ocean_bling_month","all",.true.,"none",2
+ "generic_bling","intjdop",         "intjdop",               "ocean_bling_month","all",.true.,"none",2
+ "generic_bling","intjpo4",         "intjpo4",               "ocean_bling_month","all",.true.,"none",2
+ "generic_bling","o2_stf_gas",      "o2_stf_gas",            "ocean_bling_month","all",.true.,"none",2
+ "generic_bling","pco2_surf",       "pco2_surf",             "ocean_bling_month","all",.true.,"none",2
+#
+ "ocean_bling_year",           12,  "months", 1, "days", "time",
+#
+ "generic_bling","alk_stf",         "alk_stf",               "ocean_bling_year","all",.true.,"none",2
+ "generic_bling","cased_top",       "cased_top",            "ocean_bling_year","all",.true.,"none",2
+ "generic_bling","fcaco3_to_sed",   "fcaco3_to_sed",         "ocean_bling_year","all",.true.,"none",2
+ "generic_bling","fcased_burial",   "fcased_burial",         "ocean_bling_year","all",.true.,"none",2
+ "generic_bling","fcased_redis",    "fcased_redis",          "ocean_bling_year","all",.true.,"none",2
+ "generic_bling","fe_burial",       "fe_burial",             "ocean_bling_year","all",.true.,"none",2
+ "generic_bling","fed_stf",         "fed_stf",               "ocean_bling_year","all",.true.,"none",2
+ "generic_bling","fpop_burial",     "fpop_burial",           "ocean_bling_year","all",.true.,"none",2
+ "generic_bling","runoff_flux_alk", "runoff_flux_alk",       "ocean_bling_year","all",.true.,"none",2
+ "generic_bling","runoff_flux_dic", "runoff_flux_dic",       "ocean_bling_year","all",.true.,"none",2
+ "generic_bling","runoff_flux_po4", "runoff_flux_po4",       "ocean_bling_year","all",.true.,"none",2
+#
+ "ocean_bling_month_z",           1,  "months", 1, "days", "time",
+#
+ "generic_bling_z", "chl",     "chl",               "ocean_bling_month_z","all","mean","none",2
+ "generic_bling_z", "dic",     "dic",               "ocean_bling_month_z","all","mean","none",2
+ "generic_bling_z", "htotal",  "htotal",            "ocean_bling_month_z","all","mean","none",2
+ "generic_bling_z", "o2",      "o2",                "ocean_bling_month_z","all","mean","none",2
+ "generic_bling_z", "po4",     "po4",               "ocean_bling_month_z","all","mean","none",2
+#
+ "ocean_bling_year_z",           12,  "months", 1, "days", "time",
+#
+ "generic_bling_z", "alk",     "alk",               "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "biomass_p","biomass_p",        "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "co3_ion", "co3_ion",           "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "co3_solubility","co3_solubility","ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "dop",     "dop",               "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "fed",     "fed",               "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "fcaco3",   "fcaco3",           "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "fpofe",    "fpofe",            "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "fpop",     "fpop",             "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "frac_pop", "frac_pop",         "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "irr_inst", "irr_inst",         "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "irr_mem",  "irr_mem",          "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "jdop",     "jdop",             "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "jo2",      "jo2",              "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "jp_recycle", "jp_recycle",     "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "jp_reminp", "jp_reminp",       "ocean_bling_year_z","all","mean","none",2
+ "generic_bling_z", "jp_uptake", "jp_uptake",       "ocean_bling_year_z","all","mean","none",2
       </diagTable> 
      </input>
   </freInclude>
@@ -3264,7 +3440,6 @@ MOM_OVERRIDE_EOF
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='atmos_co2_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='BLING_z_postprocess']/postProcess/node())"/>
     </postProcess>
   </experiment>
   
