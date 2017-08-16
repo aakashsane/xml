@@ -79,14 +79,15 @@ NOTES:
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>     <!-- git tag for LAND_LAD2 source code -->  
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"   value="gfdl_m"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
   <property name="PROD_SIMTIME"     value="100"/>  <!--simulation length in years-->
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
-  <property name="PP_START_YEAR"    value="1860" />
+  <property name="PP_START_YEAR"    value="0201" />
+  <property name="PP_CPLD_START"    value="0201" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
   <property name="PROD_SEGTIME"     value="03:00:00"/><!--Wall clock per segment (usually 1 year)-->
 
@@ -736,7 +737,8 @@ NOTES:
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M/cjg/archive/mdt"/>
       <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
-      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Ming.Zhao/archive/mdt"/>
+      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_W/Ming.Zhao/archive/mdt"/>
+      <property name="H1G_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M/Huan.Guo/archive/mdt"/>
       <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
       <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
       <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
@@ -748,7 +750,6 @@ NOTES:
       <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
       <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/> 
       <property name="MODEL_UPDATES_WH"     value="/ncrc/home1/Bill.Hurlin"/>
-      <property name="H1G_ARCHIVE_ROOT"    value="$CPERM/Huan.Guo/archive/mdt"/>
       <property name="NCORE_PER_NODE"      value="36"/>
       <csh><![CDATA[
 module use -a /usw/eslogin/modulefiles-c3
@@ -1462,7 +1463,7 @@ set ocn_hyperthread = $ocn_hythr
     <postProcess>
       <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_atmos_cmip6.csh"/>
 
-      <component type="atmos_cmip" source="atmos_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="yes">
+      <component type="atmos_cmip"  start="$(PP_CPLD_START)" source="atmos_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="yes">
         <timeSeries freq="3hr" source="atmos_8xdaily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos8xDailyTScmip/*)">
             <xi:fallback/>
@@ -1498,7 +1499,7 @@ set ocn_hyperthread = $ocn_hythr
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
-      <component type="atmos" zInterp="era40" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+      <component type="atmos"  start="$(PP_CPLD_START)" zInterp="era40" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
         <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos4xDailyTS/*)">
             <xi:fallback/>
@@ -1529,7 +1530,7 @@ set ocn_hyperthread = $ocn_hythr
         </timeAverage>
       </component>
 
-      <component type="atmos_level" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+      <component type="atmos_level"  start="$(PP_CPLD_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeSeries freq="annual"  chunkLength="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosLevelAnnualTS/*)">
@@ -1544,28 +1545,29 @@ set ocn_hyperthread = $ocn_hythr
         </timeAverage>
       </component>
 
-      <component type="atmos_month_aer" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+      <component type="atmos_month_aer" start="$(PP_CPLD_START)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAerAve/*)">
             <xi:fallback/>
           </xi:include>
         </timeAverage>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
-      <component type="atmos_diurnal" source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+      <component type="atmos_diurnal" start="$(PP_CPLD_START)"  source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)"/>
       </component>
 
-      <component type="atmos_scalar" source="atmos_scalar" cmip="yes">
+      <component type="atmos_scalar" start="$(PP_CPLD_START)" source="atmos_scalar" cmip="yes">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeSeries freq="monthly" source="atmos_global_cmip" chunkLength="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
 <!-- FULL CHEMISTRY -->
-      <component type="tracer_level" source="atmos_tracer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+      <component type="tracer_level" start="$(PP_CPLD_START)" source="atmos_tracer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/tracerAnnualTS/*)">
@@ -1579,7 +1581,7 @@ set ocn_hyperthread = $ocn_hythr
           </xi:include>
         </timeAverage>
       </component>
-      <component type="aerosol_cmip" source="aerosol_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
+      <component type="aerosol_cmip" start="$(PP_CPLD_START)" source="aerosol_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
         <timeSeries freq="daily" source="aerosol_daily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="aerosol_month_refined"/>
@@ -1588,7 +1590,7 @@ set ocn_hyperthread = $ocn_hythr
       </component>
 
 <!-- LAND -->
-      <component type="land" source="land_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+      <component type="land" start="$(PP_CPLD_START)" source="land_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
         <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthTS/*)" >
@@ -1603,7 +1605,7 @@ set ocn_hyperthread = $ocn_hythr
         </timeAverage>
       </component>
 
-      <component type="land_cubic" source="land_month" sourceGrid="land-cubedsphere">
+      <component type="land_cubic" start="$(PP_CPLD_START)" source="land_month" sourceGrid="land-cubedsphere">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" >
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthTSNative/*)" >
             <xi:fallback/>
@@ -1612,23 +1614,23 @@ set ocn_hyperthread = $ocn_hythr
         <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
-      <component type="land_instant_cubic" source="land_month_inst" sourceGrid="land-cubedsphere">
+      <component type="land_instant_cubic" start="$(PP_CPLD_START)" source="land_month_inst" sourceGrid="land-cubedsphere">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
       </component>
-      <component type="land_cmip" source="land_month_cmip" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
+      <component type="land_cmip" start="$(PP_CPLD_START)" source="land_month_cmip" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
         <timeSeries freq="daily" source="land_daily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 <!-- RIVER -->
-      <component type="river" source="river_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+      <component type="river" start="$(PP_CPLD_START)" source="river_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
         <timeSeries freq="daily" source="river_daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)"/>
       </component>
 
-      <component type="river_cubic" source="river_month" sourceGrid="land-cubedsphere">
+      <component type="river_cubic" start="$(PP_CPLD_START)" source="river_month" sourceGrid="land-cubedsphere">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" >
           <xi:include href="awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/riverMonthTSNative/*)"/>
         </timeSeries>
@@ -1637,8 +1639,57 @@ set ocn_hyperthread = $ocn_hythr
         </timeSeries>
       </component>
 
-      <component type="river_instant_cubic" source="river_month_inst" sourceGrid="land-cubedsphere">
+      <component type="river_instant_cubic" start="$(PP_CPLD_START)" source="river_month_inst" sourceGrid="land-cubedsphere">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+      </component>
+
+      <component type="land_month_past" start="$(PP_CPLD_START)" source="land_month_past" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="land_month_inst_past" start="$(PP_CPLD_START)" source="land_month_inst_past" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="land_month_crop" start="$(PP_CPLD_START)" source="land_month_crop" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="land_month_inst_crop" start="$(PP_CPLD_START)" source="land_month_inst_crop" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="land_month_ntrl" start="$(PP_CPLD_START)" source="land_month_ntrl" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="land_month_inst_ntrl" start="$(PP_CPLD_START)" source="land_month_inst_ntrl" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="land_month_scnd" start="$(PP_CPLD_START)" source="land_month_scnd" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="land_month_inst_scnd" start="$(PP_CPLD_START)" source="land_month_inst_scnd" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="LUmip_month_psl" start="$(PP_CPLD_START)" source="lumip_Lmon_psl" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="LUmip_month_crp" start="$(PP_CPLD_START)" source="lumip_Lmon_crp" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="LUmip_month_pst" start="$(PP_CPLD_START)" source="lumip_Lmon_pst" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="LUmip_year_psl" start="$(PP_CPLD_START)" source="lumip_Lyr_psl" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="annual" source="lumip_Lyr"  chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="LUmip_year_crp" start="$(PP_CPLD_START)" source="lumip_Lyr_crp" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="LUmip_year_pst" start="$(PP_CPLD_START)" source="lumip_Lyr_pst" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
     </postProcess>
@@ -2165,6 +2216,47 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
       </dataTable>  
      </input>
   </freInclude>
+
+  <freInclude name="BLING_data_table_fixCO2_20170809">
+    <input>
+      <!--  BLING data table, o2 gas exchange data table (note sclae factor for bling), CMIP6 Jan 1 1850 co2 data table -->
+      <dataTable>
+# jgj 2017/01/30 BLING data table
+# h1g 2017/08/09 use fixed CO2 concentration at Jan.,1 1850 from CMIP6, i.e., 284.262e-6
+#
+"ATM", "c14o2_flux_pcair_atm",         "",  "", "none",  284.262e-06
+"ATM", "co2_flux_pcair_atm",           "",  "", "none",  284.262e-06
+"ATM", "co2_sat_flux_pcair_atm",       "",  "", "none",  284.262e-06
+
+#
+# note scale factor for o2 gas exchange
+"ATM", "o2_flux_pcair_atm",            "",     "",                                             "none",      0.21
+#
+## co2 is interactive, so comment out co2_bot
+#"ATM", "co2_bot",                      "",     "",                                             "none",      284.262e-6
+#
+# Composition of runoff includes 0.1 PgC for CaCO3 burial (0.48 Alk, 0.24DIC)
+# plus 0.3 Pg C for Org burial (0.72 DIC, 0.72/106 PO4, 0.72/106*16 Alk ) 
+"OCN", "runoff_alk_flux_ice_ocn",      "",      "",                                             "none",      0.5932e-3
+"OCN", "runoff_dic_flux_ice_ocn",      "",      "",                                             "none",      0.96e-3
+"OCN", "runoff_po4_flux_ice_ocn",      "",      "",                                             "none",      0.006792e-3
+"OCN", "dry_dep_fed_flux_ice_ocn",     "FLUX",  "./INPUT/Soluble_Fe_Flux_PI.nc",                "bilinear",  -1.0
+#
+## JGJ: add cfcs later - check scale factor
+# "ATM", "cfc_11_flux_pcair_atm","CFC_11","INPUT/cfc.bc.nc","bilinear", 1.0e-12
+# "ATM", "cfc_12_flux_pcair_atm","CFC_12","INPUT/cfc.bc.nc","bilinear", 1.0e-12
+#                                                                                                                                 
+# jgj 2016/11/29 co2 data table (Jan 1 1850 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
+#
+## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
+## radiation co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
+"ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
+"ATM" , "co2_dvmr_rad",     "",     "", "none",  284.262e-06
+#
+      </dataTable>
+     </input>
+  </freInclude>
+
 
   <freInclude name="BLING_field_table">
     <input>
@@ -3758,7 +3850,108 @@ MOM_OVERRIDE_EOF
      ]]></csh>
  
     </input>
-  </experiment>       
+  </experiment>   
+
+
+  <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500_cmip6Diag" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F">
+    <input>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1,1,1,0,0,0,
+        calendar = 'NOLEAP'
+        dt_atmos = 1800,
+        dt_cpld  = 1800,
+        use_lag_fluxes = .true.
+        concurrent = .true.
+        do_ocean = .true.
+        ocean_npes = $ocn_ranks  
+        atmos_npes = $atm_ranks 
+        atmos_nthreads = $atmos_threads
+        ncores_per_node = $(NCORE_PER_NODE)
+	use_hyper_thread=.T.
+      </namelist>
+
+      <namelist name="landuse_nml">
+       do_landuse_change = .false.
+       data_type   = 'luh2'
+       input_file  = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/extras/zero-transitions.v20170711.nc'
+       state_file  = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/extras/state-1850-nosecd.v20170711.nc'
+       static_file = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/landfrac.nc'
+       distribute_transitions = 'min-n-tiles'
+      </namelist>
+
+      <namelist name="harvesting_nml">
+       do_harvesting          =.true.
+       grazing_intensity      = 18.25 ! roughly 5% of biomass per day
+       grazing_residue        = 0.1
+       grazing_frequency      = 'daily'
+       min_lai_for_grazing    = 1.0
+       frac_wood_wasted_harv  = 0.25
+       frac_wood_wasted_clear = 0.25
+       !frac_wood_fast         = ONETHIRD
+       !frac_wood_med          = ONETHIRD
+       !frac_wood_slow         = ONETHIRD
+       crop_seed_density      = 0.1
+       waste_below_ground_wood = .TRUE.
+      </namelist>
+
+      <namelist name="diag_manager_nml">
+        mix_snapshot_average_fields = .false.,
+        max_input_fields = 1200,
+        max_output_fields = 1800
+        max_axes = 150
+        max_num_axis_sets = 100
+        max_files = 75
+        issue_oor_warnings = .false.
+        max_axis_attributes=4
+        max_field_attributes=3
+      </namelist>
+  </experiment> 
+
+      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land_byTile</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_LUmip</dataSource>
+      </dataFile>
+      <diagTable>
+        "vegn",           "SAI",           "SAI",          "land_month",          "all",  .true.,  "none", 2
+        "cmor_land",      "sai",           "sai",          "land_month_cmip",     "all",  .true.,  "none", 2
+        "vegn",           "qco2_phot",     "qco2_phot",    "land_month",          "all",  .true.,  "none", 2
+        "generic_bling",  "dic_deltap",    "dic_deltap",   "ocean_bling_month",   "all",  .true.,  "none", 2
+        "generic_bling",  "pco2_csurf",    "pco2surf",     "ocean_bling_month",   "all",  .true.,  "none", 2
+      </diagTable>
+      <xi:include xpointer="xpointer(//freInclude[@name='BLING_diag_table']/input/node())"/>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
+      </dataFile>
+
+      <xi:include xpointer="xpointer(//freInclude[@name='BLING_data_table_fixCO2_20170809']/input/node())"/>
+
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/Huan.Guo/warsaw_LND_warsaw_20170706_slm_mom6_2017.07.05/CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500/ncrc4.intel16-prod-openmp/archive/restart/03810101.tar</dataSource>
+      </dataFile>
+    </input>
+
+    <runtime>
+      <production simTime="5" units="years">
+          <segment simTime="12" units="months"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O4671_production']/node())"/>
+      </production>
+    </runtime>
+  </experiment>
+ 
 </experimentSuite>
 
 
