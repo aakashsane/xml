@@ -86,8 +86,8 @@ NOTES:
   <property name="PROD_SIMTIME"     value="100"/>  <!--simulation length in years-->
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
-  <property name="PP_START_YEAR"    value="0201" />
-  <property name="PP_CPLD_START"    value="0201" />
+  <property name="PP_START_YEAR"    value="0411" />
+  <property name="PP_CPLD_START"    value="0411" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
   <property name="PROD_SEGTIME"     value="03:00:00"/><!--Wall clock per segment (usually 1 year)-->
 
@@ -1234,6 +1234,19 @@ Experiment to build executable.
     </input>
   </freInclude>
 
+
+<!--
+  field_table with parameters for CMIP6 diagnostic output
+-->
+  <freInclude name="field_table_am4p11_cmip6">
+    <input>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p11_cmip6</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+
+
   <freInclude name="diag_table_lm3p2_fullaero">
     <input>
       <diagTable>
@@ -1301,6 +1314,12 @@ $baseDate
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_global_avg</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_AUXday</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_6hrLev</dataSource>
       </dataFile>
     </input>
   </freInclude>
@@ -1528,6 +1547,13 @@ set ocn_hyperthread = $ocn_hythr
             <xi:fallback/>
           </xi:include>
         </timeAverage>
+      </component>
+
+      <component type="atmos_level_cmip" start="$(PP_CPLD_START)" source="atmos_level_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="yes">
+        <timeSeries freq="6hr" source="atmos_4xdaily_inst" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="daily" source="atmos_daily_level" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
       <component type="atmos_level"  start="$(PP_CPLD_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
@@ -2856,7 +2882,8 @@ biomass_p_valid_min = 0.0
 ## 2016/11/29: TO DO: check Data Request for co2 name convention/units
 #===============================================================================
 "atmos_level",                 1,  "months", 1, "days", "time",
-"atmos_level_instant",         1,  "months", 1, "days", "time",
+
+#"atmos_level_instant",         1,  "months", 1, "days", "time",
 #"atmos_month",      1,  "months", 1, "days", "time",
 #"atmos_scalar",     1,  "months", 1, "days", "Time",
 #
@@ -2866,9 +2893,10 @@ biomass_p_valid_min = 0.0
  "radiation",                "co2_tf",             "co2_tf",             "atmos_scalar", "all", .true., "none", 2
 ## instantaneous
 # concentration
+
 # jgj: add co2 and pwt back as single precision
- "atmos_co2",                "pwt",                "pwt",                "atmos_level_instant", "all", .false.,  "none", 2
- "dynamics",                 "co2",                "co2",                "atmos_level_instant", "all", .false.,  "none", 2
+# "atmos_co2",                "pwt",                "pwt",                "atmos_level_instant", "all", .false.,  "none", 2
+# "dynamics",                 "co2",                "co2",                "atmos_level_instant", "all", .false.,  "none", 2
 # "dynamics",                 "co2_dmmr",           "co2_dmmr",           "atmos_level_instant", "all", .false.,  "none", 1
 # "dynamics",                 "co2_dvmr",           "co2_dvmr",           "atmos_level_instant", "all", .false.,  "none", 1
 # "dynamics",                 "ps",                 "ps",                 "atmos_level_instant", "all", .false.,  "none", 1
@@ -3530,7 +3558,7 @@ MOM_OVERRIDE_EOF
     <postProcess>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='atmos_co2_postprocess']/postProcess/node())"/>
+      <!--xi:include xpointer="xpointer(//freInclude[@name='atmos_co2_postprocess']/postProcess/node())"/-->
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_postprocess']/postProcess/node())"/>
     </postProcess>
   </experiment>
@@ -3808,7 +3836,7 @@ removeatmos_tracer co2
       <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_grid']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
       <!--MOM6 Input datasets-->
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_data']/input/node())"/>
@@ -3907,7 +3935,6 @@ MOM_OVERRIDE_EOF
         max_axis_attributes=4
         max_field_attributes=3
       </namelist>
-  </experiment> 
 
       <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
@@ -3951,6 +3978,50 @@ MOM_OVERRIDE_EOF
       </production>
     </runtime>
   </experiment>
+
+
+
+  <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500_cmip6Diag_Test2" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500_cmip6Diag">
+    <input>
+      <namelist name="diag_manager_nml">
+        mix_snapshot_average_fields = .false.,
+        max_input_fields = 1200,
+        max_output_fields = 1800
+        max_axes = 150
+        max_num_axis_sets = 100
+        max_files = 75
+        issue_oor_warnings = .false.
+        max_axis_attributes=4
+        max_field_attributes=4
+      </namelist>
+
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/Huan.Guo/warsaw_LND_warsaw_20170706_slm_mom6_2017.07.05/CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500/ncrc4.intel16-prod-openmp/archive/restart/03960101.tar</dataSource>
+      </dataFile>
+    </input>
+  </experiment>
+
+
+  <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500_cmip6Diag_Test3" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500_cmip6Diag">
+    <input>
+      <namelist name="diag_manager_nml">
+        mix_snapshot_average_fields = .false.,
+        max_input_fields = 1200,
+        max_output_fields = 1800
+        max_axes = 150
+        max_num_axis_sets = 100
+        max_files = 75
+        issue_oor_warnings = .false.
+        max_axis_attributes=4
+        max_field_attributes=4
+      </namelist>
+
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/Huan.Guo/warsaw_LND_warsaw_20170706_slm_mom6_2017.07.05/CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500/ncrc4.intel16-prod-openmp/archive/restart/04110101.tar</dataSource>
+      </dataFile>
+    </input>
+  </experiment>
+
  
 </experimentSuite>
 
