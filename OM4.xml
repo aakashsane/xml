@@ -17,22 +17,22 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="MOM6_DATE"      value="2017.07.05"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="BERGS_GIT_TAG"  value="dev/master"/>
-  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="mdt/20170828-b"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
    <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-   <property name="PROD_SIMTIME"   value="10"/>
+   <property name="PROD_SIMTIME"   value="100"/>
    <!--Post-processing  chunk lengths -->
    <property name="CHUNK_LENGTH_A" value="5yr"/>
-   <property name="CHUNK_LENGTH_B" value="10yr"/>
+   <property name="CHUNK_LENGTH_B" value="20yr"/>
 
    <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->
    <property name="PP_START_YEAR"  value="1900"/>
-   <property name="PP_END_YEAR"    value="1910"/>
+   <property name="PP_END_YEAR"    value="2300"/>
    <!--Use these values for CORE2 dynamic forcing runs -->
    <!--
    <property name="PP_START_YEAR"  value="1948"/>
@@ -1081,17 +1081,9 @@ Make the executable for ocean-ice experiments.
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
           git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
           pushd ocean_shared
-          #git checkout user/nnz/mom6_dev
-          git checkout $(MOM6_GIT_TAG)
+          git checkout user/jpk/2017.09.01
           git submodule init mocsy
           git submodule update
-	  #Have to rename *.f90 to *.F90 so that we can pass cpp def  -DUSE_PRECISION=2 to them.
-          #Alternatively, we could build mocsy as a library by itself without renaming the files,
-          #but then we have to add a mocsy lib to link with.
-          cd mocsy/src
-          foreach f (*.f90)
-            mv ${f} "`basename ${f} .f90`.F90"
-          end
           popd
 	
           pushd mom6
@@ -2564,12 +2556,12 @@ SIS_OVERRIDE_EOF
 #
 ## tracer quantities
 "generic_tracers",          1,  "days", 1, "days", "time",
-"generic_cfc","cfc_11",     "cfc_11",     "generic_tracers","all",.true.,"none",2
-"generic_cfc","cfc_12",     "cfc_12",     "generic_tracers","all",.true.,"none",2
-"generic_cfc","cfc_11_stf", "cfc_11_stf", "generic_tracers","all",.true.,"none",2
-"generic_cfc","cfc_12_stf", "cfc_12_stf", "generic_tracers","all",.true.,"none",2
-"generic_cfc","cfc_11_stf_gas", "cfc_11_stf_gas", "generic_tracers","all",.true.,"none",2
-"generic_cfc","cfc_12_stf_gas", "cfc_12_stf_gas", "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc11",     "cfc11",     "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc12",     "cfc12",     "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc11_stf", "cfc11_stf", "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc12_stf", "cfc12_stf", "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc11_stf_gas", "cfc11_stf_gas", "generic_tracers","all",.true.,"none",2
+"generic_cfc","cfc12_stf_gas", "cfc12_stf_gas", "generic_tracers","all",.true.,"none",2
 "generic_sf6","sf6",        "sf6",        "generic_tracers","all",.true.,"none",2
 "generic_sf6","sf6_stf",    "sf6_stf",    "generic_tracers","all",.true.,"none",2
 "generic_age","age",        "age",        "generic_tracers","all",.true.,"none",2
@@ -2582,10 +2574,10 @@ SIS_OVERRIDE_EOF
 
 #
 "generic_tracers_z",          1,  "days", 1, "days", "time",
-"generic_cfc_z","cfc_11",     "cfc_11",     "generic_tracers_z","all",.true.,"none",2
-"generic_cfc_z","cfc_12",     "cfc_12",     "generic_tracers_z","all",.true.,"none",2
-"generic_cfc_z","cfc_11_stf", "cfc_11_stf", "generic_tracers_z","all",.true.,"none",2
-"generic_cfc_z","cfc_12_stf", "cfc_12_stf", "generic_tracers_z","all",.true.,"none",2
+"generic_cfc_z","cfc11",     "cfc11",     "generic_tracers_z","all",.true.,"none",2
+"generic_cfc_z","cfc12",     "cfc12",     "generic_tracers_z","all",.true.,"none",2
+"generic_cfc_z","cfc11_stf", "cfc11_stf", "generic_tracers_z","all",.true.,"none",2
+"generic_cfc_z","cfc12_stf", "cfc12_stf", "generic_tracers_z","all",.true.,"none",2
 "generic_sf6_z","sf6",        "sf6",        "generic_tracers_z","all",.true.,"none",2
 "generic_sf6_z","sf6_stf",    "sf6_stf",    "generic_tracers_z","all",.true.,"none",2
 "generic_age_z","age",        "age",        "generic_tracers_z","all",.true.,"none",2
@@ -2609,7 +2601,7 @@ OVERRIDE_EOF
 
 #Add null CFC's to a restart file
 cd $work/INPUT
-#ncap -O --script 'cfc_11 = ptemp * 0.0 ; cfc_12 = ptemp * 0.0 ; sf6 = ptemp * 0.0 ; age  = ptemp * 0.0 ; argon = ptemp * 0.0 ' GOLD_IC.2010.11.15.nc MOM_GENERICS.res.nc
+#ncap -O --script 'cfc11 = ptemp * 0.0 ; cfc12 = ptemp * 0.0 ; sf6 = ptemp * 0.0 ; age  = ptemp * 0.0 ; argon = ptemp * 0.0 ' GOLD_IC.2010.11.15.nc MOM_GENERICS.res.nc
 #CFC is constant_init_tracer so the ice fluxes are not needed.
 \rm ice_ocmip2_cfc.res.nc
 
@@ -2963,11 +2955,16 @@ SIS_OVERRIDE_EOF
    <freInclude name="OM4_05grid_data">
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_c96.720x576.tar</dataSource>
+      </dataFile>
+      <!-- gridspec above should be the same as the one below. still need to check
+      <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/grid_spec.nc</dataSource>
         <dataSource site="theia">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/grid_spec.nc</dataSource>
         <dataSource site="olcf">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/grid_spec.nc</dataSource>
         <dataSource site="gfdl">/archive/jpd/OM4/OM4_05/MOM6-examples/ice_ocean_SIS2/OM4_05/preprocessing/mosaic_ocean.720x576/grid_spec.nc</dataSource> 
       </dataFile>
+      -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576/atmos_mosaic_tile1Xland_mosaic_tile1.nc</dataSource>
       </dataFile>
@@ -3510,7 +3507,7 @@ $baseDate
         <dataSource platform="$(platform)">/lustre/f1/unswept/John.Krasting/cwg/input/cfc/CFC_histories_revised_2015_20x20deg.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/MOM_GENERICS.res.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/John.Krasting/cwg/input/cfc/MOM_GENERICS_OM4p5.res.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/John.Krasting/cwg/input/cfc/MOM_GENERICS_OM4p5.20170829.res.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/init_ocean_cobalt.res.nc" chksum="" size="" timestamp="">
         <dataSource
@@ -4193,8 +4190,8 @@ dissi14cabio_valid_min = 0.0
 "LND" , "drag_q"        , ""            , ""                             , "none"  ,  0.0
 "LND" , "p_surf"        , ""            , ""                             , "none"  ,  1.e5
 #
-"ATM", "cfc_11_flux_pcair_atm","CFC11","INPUT/cfc.bc.nc","bilinear", 1.0e-12
-"ATM", "cfc_12_flux_pcair_atm","CFC12","INPUT/cfc.bc.nc","bilinear", 1.0e-12
+"ATM", "cfc11_flux_pcair_atm","CFC11","INPUT/cfc.bc.nc","bilinear", 1.0e-12
+"ATM", "cfc12_flux_pcair_atm","CFC12","INPUT/cfc.bc.nc","bilinear", 1.0e-12
 "ATM", "sf6_flux_pcair_atm",   "SF6",  "INPUT/cfc.bc.nc","bilinear", 1.0e-12
 "OCN", "delta_14catm", "D14C", "./INPUT/atm_delta_13C_14C.nc",  "bilinear", 1.0
 "ATM", "abco2_flux_pcair_atm", "" , "", "none" ,284.65e-6
@@ -4203,72 +4200,94 @@ dissi14cabio_valid_min = 0.0
 
       <diagTable order="append">
 #======================================================================================
-# Ocean CFC Diagnostics
-"generic_cfc","cfc_11",           "cfc_11",       "ocean_month","all",  .true.,"none",2
-"generic_cfc","cfc_11_stf",       "cfc_11_stf",   "ocean_month","all",  .true.,"none",2
-"generic_cfc_z","cfc_11",     "cfc_11",       "ocean_month_z","all",.true.,"none",2
-"generic_cfc","cfc_11",           "cfc_11",       "ocean_annual","all",  .true.,"none",2
-"generic_cfc","cfc_11_stf",       "cfc_11_stf",   "ocean_annual","all",  .true.,"none",2
-"generic_cfc_z","cfc_11",     "cfc_11",       "ocean_annual_z","all",.true.,"none",2
-"generic_cfc","cfc_12",           "cfc_12",       "ocean_month","all",  .true.,"none",2
-"generic_cfc","cfc_12_stf",       "cfc_12_stf",   "ocean_month","all",  .true.,"none",2
-"generic_cfc_z","cfc_12",     "cfc_12",       "ocean_month_z","all",.true.,"none",2
-"generic_cfc","cfc_12",           "cfc_12",       "ocean_annual","all",  .true.,"none",2
-"generic_cfc","cfc_12_stf",       "cfc_12_stf",   "ocean_annual","all",  .true.,"none",2
-"generic_cfc_z","cfc_12",     "cfc_12",       "ocean_annual_z","all",.true.,"none",2
-"generic_sf6","sf6",              "sf6",          "ocean_month","all",  .true.,"none",2
-"generic_sf6","sf6_stf",          "sf6_stf",      "ocean_month","all",  .true.,"none",2
-"generic_sf6_z","sf6",        "sf6",          "ocean_month_z","all",.true.,"none",2
-"generic_sf6","sf6",              "sf6",          "ocean_annual","all",  .true.,"none",2
-"generic_sf6","sf6_stf",          "sf6_stf",      "ocean_annual","all",  .true.,"none",2
-"generic_sf6_z","sf6",        "sf6",          "ocean_annual_z","all",.true.,"none",2
 
-"ocean_abiotic",      1,  "months", 1, "days", "time",
-"ocean_abiotic_z"     1,  "months", 1, "days", "time",
-"ocean_abiotic_year_z"  12, "months", 1, "days", "time",
-"generic_abiotic","dissicabio",  "dissicabio",  "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","dissi14cabio","dissi14cabio","ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","jdecay_di14c","jdecay_di14c","ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","phabio",      "phabio",      "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","ab_htotal",   "ab_htotal",   "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","ab_alk",      "ab_alk",      "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","ab_po4",      "ab_po4",      "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","ab_sio4",     "ab_sio4",     "ocean_abiotic","all",.true.,"none",2
+# Ocean Inert Chemistry Diagnostics
+"ocean_inert",           1, "months", 1, "days", "time",
+"ocean_inert_z",         1, "months", 1, "days", "time",
+"ocean_inert_annual"    12, "months", 1, "days", "time",
+"ocean_inert_annual_z"  12, "months", 1, "days", "time",
 
-#-- Surface Diagnostics
-"generic_abiotic","sfc_dissicabio",  "sfc_dissicabio",  "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","sfc_dissi14cabio","sfc_dissi14cabio","ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","sfc_ab_htotal",   "sfc_ab_htotal",   "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","sfc_ab_alk",      "sfc_ab_alk",      "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","sfc_ab_po4",      "sfc_ab_po4",      "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","sfc_ab_sio4",     "sfc_ab_sio4",     "ocean_abiotic","all",.true.,"none",2
+"generic_cfc",    "cfc11",    "cfc11",    "ocean_inert",          "all",.true.,"none",2
+"generic_cfc_z",  "cfc11",    "cfc11",    "ocean_inert_z",        "all",.true.,"none",2
+"generic_cfc",    "cfc11",    "cfc11",    "ocean_inert_annual",   "all",.true.,"none",2
+"generic_cfc_z",  "cfc11",    "cfc11",    "ocean_inert_annual_z", "all",.true.,"none",2
+"generic_cfc",    "fgcfc11",  "fgcfc11",  "ocean_inert",          "all",.true.,"none",2
 
-#-- Gas exchange
-"generic_abiotic","delta_14catm",        "delta_14catm",        "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","dissicabio_stf_gas",  "dissicabio_stf_gas",  "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","dissi14cabio_stf_gas","dissi14cabio_stf_gas","ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","dissicabio_alpha",    "dissicabio_alpha",    "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","dissi14cabio_alpha",  "dissi14cabio_alpha",  "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","dissicabio_csurf",    "dissicabio_csurf",    "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","dissi14cabio_csurf",  "dissi14cabio_csurf",  "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","dissicabio_sc_no",    "dissicabio_sc_no",    "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","dissi14cabio_sc_no",  "dissi14cabio_sc_no",  "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","ab_pco2surf",         "ab_pco2surf",         "ocean_abiotic","all",.true.,"none",2
-"generic_abiotic","ab_p14co2surf",       "ab_p14co2surf",       "ocean_abiotic","all",.true.,"none",2
+"generic_cfc",    "cfc12",    "cfc12",    "ocean_inert",          "all",.true.,"none",2
+"generic_cfc_z",  "cfc12",    "cfc12",    "ocean_inert_z",        "all",.true.,"none",2
+"generic_cfc",    "cfc12",    "cfc12",    "ocean_inert_annual",   "all",.true.,"none",2
+"generic_cfc_z",  "cfc12",    "cfc12",    "ocean_inert_annual_z", "all",.true.,"none",2
+"generic_cfc",    "fgcfc12",  "fgcfc12",  "ocean_inert",          "all",.true.,"none",2
 
-#-- Z-diagnostics
-"generic_abiotic_z","dissicabio",  "dissicabio",  "ocean_abiotic_z","all",.true.,"none",2
-"generic_abiotic_z","dissi14cabio","dissi14cabio","ocean_abiotic_z","all",.true.,"none",2
-"generic_abiotic_z","phabio",      "phabio",      "ocean_abiotic_z","all",.true.,"none",2
-"generic_abiotic_z","ab_htotal",   "ab_htotal",   "ocean_abiotic_z","all",.true.,"none",2
-"generic_abiotic_z","ab_alk",      "ab_alk",      "ocean_abiotic_z","all",.true.,"none",2
-"generic_abiotic_z","ab_po4",      "ab_po4",      "ocean_abiotic_z","all",.true.,"none",2
-"generic_abiotic_z","ab_sio4",     "ab_sio4",     "ocean_abiotic_z","all",.true.,"none",2
+"generic_sf6",    "sf6",      "sf6",      "ocean_inert",          "all",.true.,"none",2
+"generic_sf6_z",  "sf6",      "sf6",      "ocean_inert_z",        "all",.true.,"none",2
+"generic_cfc",    "sf6",      "sf6",      "ocean_inert_annual",   "all",.true.,"none",2
+"generic_sf6_z",  "sf6",      "sf6",      "ocean_inert_annual_z", "all",.true.,"none",2
+"generic_sf6",    "fgsf6",    "fgsf6",    "ocean_inert",          "all",.true.,"none",2
 
-#-- Z-diagnostics (annual)
-"generic_abiotic_z","dissicabio",  "dissicabio",  "ocean_abiotic_year_z","all",.true.,"none",2
-"generic_abiotic_z","dissi14cabio","dissi14cabio","ocean_abiotic_year_z","all",.true.,"none",2
-"generic_abiotic_z","phabio",      "phabio",      "ocean_abiotic_year_z","all",.true.,"none",2
+
+"ocean_abiotic",           1, "months", 1, "days", "time",
+"ocean_abiotic_z"          1, "months", 1, "days", "time",
+"ocean_abiotic_annual",   12, "months", 1, "days", "time",
+"ocean_abiotic_annual_z"  12, "months", 1, "days", "time",
+
+#-- CMIP Tracer Fields
+"generic_abiotic",   "dissicabio",           "dissicabio",           "ocean_abiotic","all",.true.,"none", 2
+"generic_abiotic",   "dissi14cabio",         "dissi14cabio",         "ocean_abiotic","all",.true.,"none", 2
+"generic_abiotic",   "phabio",               "phabio",               "ocean_abiotic","all",.true.,"none", 2
+"generic_abiotic_z", "dissicabio",           "dissicabio",           "ocean_abiotic_z","all",.true.,"none", 2
+"generic_abiotic_z", "dissi14cabio",         "dissi14cabio",         "ocean_abiotic_z","all",.true.,"none", 2
+"generic_abiotic_z", "phabio",               "phabio",               "ocean_abiotic_z","all",.true.,"none", 2
+"generic_abiotic",   "dissicabio",           "dissicabio",           "ocean_abiotic_annual","all",.true.,"none", 2
+"generic_abiotic",   "dissi14cabio",         "dissi14cabio",         "ocean_abiotic_annual","all",.true.,"none", 2
+"generic_abiotic",   "phabio",               "phabio",               "ocean_abiotic_annual","all",.true.,"none", 2
+"generic_abiotic_z", "dissicabio",           "dissicabio",           "ocean_abiotic_annual_z","all",.true.,"none", 2
+"generic_abiotic_z", "dissi14cabio",         "dissi14cabio",         "ocean_abiotic_annual_z","all",.true.,"none", 2
+"generic_abiotic_z", "phabio",               "phabio",               "ocean_abiotic_annual_z","all",.true.,"none", 2
+
+#-- CMIP Surface Fields
+"generic_abiotic",   "dissicabioos",         "dissicabioos",         "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "dissi14cabioos",       "dissi14cabioos",       "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "dpco2abio",            "dpco2abio",            "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "fgco2abio",            "fgco2abio",            "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "fg14co2abio",          "fg14co2abio",          "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "phabioos",             "phabioos",             "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "spco2abio",            "spco2abio",            "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "fgco2abio",            "fgco2abio",            "ocean_abiotic_annual","all",.true.,"none",2
+"generic_abiotic",   "fg14co2abio",          "fg14co2abio",          "ocean_abiotic_annual","all",.true.,"none",2
+
+#-- Non-CMIP Tracer Fields
+"generic_abiotic",   "ab_alk",               "ab_alk",               "ocean_abiotic","all",.true.,"none", 2
+"generic_abiotic",   "ab_htotal",            "ab_htotal",            "ocean_abiotic","all",.true.,"none", 2
+"generic_abiotic",   "ab_htotal14c",         "ab_htotal14c",         "ocean_abiotic","all",.true.,"none", 2
+"generic_abiotic",   "ab_po4",               "ab_po4",               "ocean_abiotic","all",.true.,"none", 2
+"generic_abiotic",   "ab_sio4",              "ab_sio4",              "ocean_abiotic","all",.true.,"none", 2
+"generic_abiotic",   "jdecay_di14c",         "jdecay_di14c",         "ocean_abiotic","all",.true.,"none", 2
+"generic_abiotic_z", "ab_alk",               "ab_alk",               "ocean_abiotic_z","all",.true.,"none",2
+"generic_abiotic_z", "ab_htotal",            "ab_htotal",            "ocean_abiotic_z","all",.true.,"none",2
+"generic_abiotic_z", "ab_htotal14c",         "ab_htotal14c",         "ocean_abiotic_z","all",.true.,"none",2
+"generic_abiotic_z", "ab_po4",               "ab_po4",               "ocean_abiotic_z","all",.true.,"none",2
+"generic_abiotic_z", "ab_sio4",              "ab_sio4",              "ocean_abiotic_z","all",.true.,"none",2
+
+#-- Non-CMIP Surface Fields
+"generic_abiotic",   "sfc_ab_alk",           "sfc_ab_alk",           "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "sfc_ab_htotal",        "sfc_ab_htotal",        "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "sfc_ab_htotal14c",     "sfc_ab_htotal14c",     "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "sfc_ab_po4",           "sfc_ab_po4",           "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "sfc_ab_sio4",          "sfc_ab_sio4",          "ocean_abiotic","all",.true.,"none",2
+
+#-- Non-CMIP Gas exchange
+"generic_abiotic",   "ab_pco2surf",          "ab_pco2surf",          "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "ab_p14co2surf",        "ab_p14co2surf",        "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "delta_14catm",         "delta_14catm",         "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "dissicabio_alpha",     "dissicabio_alpha",     "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "dissi14cabio_alpha",   "dissi14cabio_alpha",   "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "dissicabio_csurf",     "dissicabio_csurf",     "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "dissi14cabio_csurf",   "dissi14cabio_csurf",   "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "dissicabio_sc_no",     "dissicabio_sc_no",     "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "dissi14cabio_sc_no",   "dissi14cabio_sc_no",   "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "dissicabio_stf_gas",   "dissicabio_stf_gas",   "ocean_abiotic","all",.true.,"none",2
+"generic_abiotic",   "dissi14cabio_stf_gas", "dissi14cabio_stf_gas", "ocean_abiotic","all",.true.,"none",2
       </diagTable>
 
     </input>
@@ -4280,6 +4299,12 @@ dissi14cabio_valid_min = 0.0
       <xi:include xpointer="xpointer(//freInclude[@name='COBALT_z_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='abiotic_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='abiotic_z_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='inert_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='inert_z_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='abiotic_postprocess_1x1deg']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='abiotic_z_postprocess_1x1deg']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='inert_postprocess_1x1deg']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='inert_z_postprocess_1x1deg']/postProcess/node())"/>
     </postProcess>
 
     <runtime>
@@ -4457,10 +4482,76 @@ dissi14cabio_valid_min = 0.0
      </postProcess>
   </freInclude>
  
-
+  <freInclude name="abiotic_postprocess_1x1deg">
+      <postProcess> 
+      <component type="ocean_abiotic_month_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_abiotic" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+ 
   <freInclude name="abiotic_z_postprocess">
       <postProcess> 
       <component type="ocean_abiotic_z" start="$(PP_START_YEAR)" source="ocean_abiotic_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+
+  <freInclude name="abiotic_z_postprocess_1x1deg">
+      <postProcess> 
+      <component type="ocean_abiotic_z_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_abiotic_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+
+  <freInclude name="inert_postprocess">
+      <postProcess> 
+      <component type="ocean_inert_month" start="$(PP_START_YEAR)" source="ocean_inert" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+ 
+  <freInclude name="inert_postprocess_1x1deg">
+      <postProcess> 
+      <component type="ocean_inert_month_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_inert" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+ 
+
+  <freInclude name="inert_z_postprocess">
+      <postProcess> 
+      <component type="ocean_inert_z" start="$(PP_START_YEAR)" source="ocean_inert_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+
+  <freInclude name="inert_z_postprocess_1x1deg">
+      <postProcess> 
+      <component type="ocean_inert_z_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_inert_z" sourceGrid="ocean-tripolar">
          <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
          <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
          <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
