@@ -798,7 +798,6 @@ module use -a /usw/eslogin/modulefiles-c3
         setenv KMP_STACKSIZE 512m
         setenv NC_BLKSZ 1M
         setenv F_UFMTENDIAN big
-module load nco/4.5.2
       ]]></csh>
     </platform>
 
@@ -953,6 +952,9 @@ Experiment to build executable.
           pushd ocean_shared
           #git checkout user/nnz/mom6_dev
           git checkout $(MOM6_GIT_TAG)
+#John Dunne updates for BLING
+git checkout user/nnz/cmip6diags_gasfluxfixes_from_jpd
+#
           git submodule init mocsy
           git submodule update
 	  #Have to rename *.f90 to *.F90 so that we can pass cpp def  -DUSE_PRECISION=2 to them.
@@ -1448,6 +1450,45 @@ set use_hyperthread = $use_hyper_thread
 set atm_hyperthread = $atm_hythr
 set ocn_hyperthread = $ocn_hythr
 
+#Add required BLING gas flux fields if they do not exist in the restarts 
+#to be able to start from older runs that did not have these gas fluxes
+if ( $currentSeg == 1 ) then 
+   #The following values for kw and deltap fields are arbitrary and do not matter, the fields just need to exist!
+   #These kw and deltap fields do not need to be restarted as they are calculated from alpha and csurf values!    
+   #This has to be fixed in the source code in future with a new coupler flux design.
+   foreach resfile ( `ls $work/INPUT/ice_bling.res.nc*` ) 
+      ncdump -h $resfile | grep o2_flux_deltap_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_deltap_ice=co2_flux_flux_ice*0.0+1000.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_deltap_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_deltap_ice=co2_flux_flux_ice*0.0+1000.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep o2_flux_kw_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_kw_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_kw_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_kw_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   #
+   #Add Schmidt number to restart if it does not exist so that the model can use old restart files. 
+   #A value of 660 make it consistent with the old ( "non-generic") formulation that did not have a separate sc_no
+   foreach resfile ( `ls $work/INPUT/ocean_bling_airsea_flux.res.nc*` )
+      ncdump -h $resfile | grep o2_flux_sc_no_ocn > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_sc_no_ocn=o2_flux_alpha_ocn*0.0+660.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_sc_no_ocn > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_sc_no_ocn=co2_flux_alpha_ocn*0.0+660.0' $resfile $resfile
+      endif
+   end
+
+endif
 ####COMMON ALWAYS CSH ENDS######
       ]]></csh>
            
@@ -1819,6 +1860,9 @@ set ocn_hyperthread = $ocn_hythr
 	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
 	</timeAverage>
       </component>
+      <component type="ocean_monthly_z"   source="ocean_month_z" sourceGrid="ocean-tripolar">
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
 
       <component type="ocean_annual"    source="ocean_annual" sourceGrid="ocean-tripolar">
         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)">
@@ -2080,8 +2124,8 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
 
      </input>
   </freInclude>
-<!-- NOTE: Identical to common_LM4, except geohydrology.20101130.nc is different to file in common_LM4 and add in hillslope files for ESM4 -->
   <freInclude name="common_LM4_ESM4_hillslope">
+    <!-- NOTE: Identical to common_LM4, except geohydrology.20101130.nc is different to file in common_LM4 and add in hillslope files for ESM4 -->
     <input>
       <dataFile label="input" target="INPUT/soil_type.nc" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$CPERM/Krista.A.Dunne/mod_input_files/any_grid/soil_type_hwsd_5minute.nc</dataSource>
@@ -2131,7 +2175,7 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
   <freInclude name="BLING_data_table">
     <input>
       <!--  BLING data table, o2 gas exchange data table (note sclae factor for bling), CMIP6 Jan 1 1850 co2 data table -->
-      <dataTable order="append">
+      <dataTable>
 # jgj 2017/01/30 BLING data table
 #
 "ATM", "c14o2_flux_pcair_atm",         "CO2",  "INPUT/ocmip2_siple_co2_atm_am2_bc-1-9999.nc", "bilinear",  1.0e-06
@@ -2908,7 +2952,7 @@ biomass_p_valid_min = 0.0
       </diagTable> 
      </input>
   </freInclude>
-  <freInclude name="BLING_diag_table">
+  <freInclude name="BLING_diag_table_reduced">
     <input>
       <diagTable order="append"> 
 "radiation", "vis_extopdep_vlcno_c",        "vis_exopd_vl_c",  "atmos_month_aer", "all", .true.,"none", 2
@@ -3045,6 +3089,311 @@ biomass_p_valid_min = 0.0
      </input>
   </freInclude>
 
+  <freInclude name="BLING_diag_table">
+    <input>
+      <diagTable order="append"> 
+"radiation", "vis_extopdep_vlcno_c",        "vis_exopd_vl_c",  "atmos_month_aer", "all", .true.,"none", 2
+"land",     "fco2"                 ,        "fco2",            "land_month",      "all", .true.,"none", 2
+"land",     "qco2_dvmr"            ,        "qco2_dvmr",       "land_month",      "all", .true.,"none", 2
+"land",     "Ctot"                 ,        "Ctot",            "land_month",      "all", .true.,"none", 2
+## 2016/12/19 add in land fields for conservation checking
+"land",     "water_cons"           ,        "water_cons",      "land_month",      "all", .true.,"none", 2
+"land",     "carbon_cons"          ,        "carbon_cons",     "land_month",      "all", .true.,"none", 2
+      </diagTable> 
+
+      <!--Atmos co2 diag table (concentration run with restoring) -->
+      <diagTable order="append"> 
+#
+#===============================================================================
+## ESM ATM output           2010/05/14 jgj, updated sep 2010, jan 2011, feb 2012
+## for co2 budget calculations, save concentration instantaneously also
+## 2016/03/04: note atmos_month and atmos_scalar already in awg diag table
+## 2016/11/29: TO DO: check Data Request for co2 name convention/units
+#===============================================================================
+"atmos_level",                 1,  "months", 1, "days", "time",
+"atmos_level_instant",         1,  "months", 1, "days", "time",
+#"atmos_month",      1,  "months", 1, "days", "time",
+#"atmos_scalar",     1,  "months", 1, "days", "Time",
+#
+## globally averaged ghg - already in atmos_scalar section above 
+# "radiation",                "rrvco2",             "rrvco2",             "atmos_scalar", "all", .true., "none", 2
+#
+ "radiation",                "co2_tf",             "co2_tf",             "atmos_scalar", "all", .true., "none", 2
+## instantaneous
+# concentration
+# jgj: add co2 and pwt back as single precision
+ "atmos_co2",                "pwt",                "pwt",                "atmos_level_instant", "all", .false.,  "none", 2
+ "dynamics",                 "co2",                "co2",                "atmos_level_instant", "all", .false.,  "none", 2
+# "dynamics",                 "co2_dmmr",           "co2_dmmr",           "atmos_level_instant", "all", .false.,  "none", 1
+# "dynamics",                 "co2_dvmr",           "co2_dvmr",           "atmos_level_instant", "all", .false.,  "none", 1
+# "dynamics",                 "ps",                 "ps",                 "atmos_level_instant", "all", .false.,  "none", 1
+# "dynamics",                 "sphum",              "sphum",              "atmos_level_instant", "all", .false.,  "none", 1
+#
+ "atmos_co2",                "pwt",                "pwt",                "atmos_level", "all", .true.,  "none", 2
+# emissions not activated
+# "atmos_co2_emissions",      "co2_mol_emission",   "co2_mol_emission",   "atmos_level", "all", .true.,  "none", 2
+# restoring activated
+ "atmos_co2_restoring",      "co2_restore",        "co2_restore",        "atmos_level", "all", .true.,  "none", 2
+#
+ "dynamics",                 "area",               "area",               "atmos_level", "all", .false.,  "none", 2
+ "dynamics",                 "co2",                "co2",                "atmos_level", "all", .true.,  "none", 2
+ "dynamics",                 "co2_dvmr",           "co2_dvmr",           "atmos_level", "all", .true.,  "none", 2
+ "dynamics",                 "sphum",              "sphum",              "atmos_level", "all", .true.,  "none", 2
+
+# "flux",                     "co2_atm",            "co2_atm",            "atmos_level", "all", .true.,  "none", 2
+# "flux",                     "co2_surf",           "co2_surf",           "atmos_level", "all", .true.,  "none", 2
+ "flux",                     "co2_flux",           "co2_flux",           "atmos_level", "all", .true.,  "none", 2
+ "flux",                     "co2_mol_flux",       "co2_mol_flux",       "atmos_level", "all", .true.,  "none", 2
+ "flux",                     "co2_atm_dvmr",       "co2_atm_dvmr",       "atmos_level", "all", .true.,  "none", 2
+ "flux",                     "co2_surf_dvmr",      "co2_surf_dvmr",      "atmos_level", "all", .true.,  "none", 2
+#
+## 
+ "atmos_co2",                "pwt",                "pwt",                "atmos_month", "all", .true.,  "none", 2
+# emissions not activated
+# "atmos_co2_emissions"       "co2_mol_emission",   "co2_mol_emission",   "atmos_month", "all", .true.,  "none", 2    
+# restoring activated
+ "atmos_co2_restoring",      "co2_restore",        "co2_restore",        "atmos_month", "all", .true.,  "none", 2
+# "dynamics",                 "area",               "area",               "atmos_month", "all", .false.,  "none", 2
+ "dynamics",                 "co2",                "co2",                "atmos_month", "all", .true.,  "none", 2
+ "dynamics",                 "co2_dvmr",           "co2_dvmr",           "atmos_month", "all", .true.,  "none", 2 
+ "flux",                     "co2_mol_flux",       "co2_mol_flux",       "atmos_month", "all", .true.,  "none", 2
+#
+#==========================================================================================
+      </diagTable> 
+
+      <!-- BLING diag table -->
+      <diagTable order="append"> 
+##==========================================================================================
+# GENERIC OCEAN BLING_z DIAGNOSTICS  jgj 2017/01/30
+# check code to see if hooks in place to get _z diagnostics 
+# only a few fields for now - update later 
+# change frequency for debugging
+#==========================================================================================
+#
+ "ocean_bling",           1,  "months", 1, "days", "time",
+# Core model
+ "generic_bling","fe_burial",       "fe_burial",             "ocean_bling","all",.true.,"none",2
+ "generic_bling","fed_stf",         "fed_stf",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","fed_btf",         "fed_btf",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","ffe_sed",         "ffe_sed",               "ocean_bling","all",.true.,"none",2
+
+ "generic_bling","o2_btf",          "o2_btf",                "ocean_bling","all",.true.,"none",2
+ "generic_bling","o2_stf",          "o2_stf",                "ocean_bling","all",.true.,"none",2
+ "generic_bling","pco2_surf",       "pco2_surf",             "ocean_bling","all",.true.,"none",2
+ "generic_bling","po4_btf",         "po4_btf",               "ocean_bling","all",.true.,"none",2
+# Carbon cycle
+ "generic_bling","alk_btf",         "alk_btf",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","alk_stf",         "alk_stf",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","alk_triver",      "alk_triver",            "ocean_bling","all",.true.,"none",2
+ "generic_bling","b_alk",           "b_alk",                 "ocean_bling","all",.true.,"none",2
+ "generic_bling","b_di14c",         "b_di14c",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","b_dic",           "b_dic",                 "ocean_bling","all",.true.,"none",2
+ "generic_bling","cased",           "cased",                 "ocean_bling","all",.true.,"none",2
+ "generic_bling","dic_btf",         "dic_btf",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","dic_stf",         "dic_stf",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","fcaco3_to_sed",   "fcaco3_to_sed",         "ocean_bling","all",.true.,"none",2
+ "generic_bling","fcased_burial",   "fcased_burial",         "ocean_bling","all",.true.,"none",2
+ "generic_bling","fcased_redis",    "fcased_redis",          "ocean_bling","all",.true.,"none",2
+ "generic_bling","frac_lg",         "frac_lg",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","intpp",           "intpp",                 "ocean_bling","all",.true.,"none",2
+ "generic_bling","intjalk",         "intjalk",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","intjdic",         "intjdic",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","intjdop",         "intjdop",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","intjpo4",         "intjpo4",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","po4_stf",         "po4_stf",               "ocean_bling","all",.true.,"none",2
+ "generic_bling","runoff_alk",      "runoff_alk",            "ocean_bling","all",.true.,"none",2
+ "generic_bling","runoff_flux_alk", "runoff_flux_alk",       "ocean_bling","all",.true.,"none",2
+# Carbon components
+ "generic_bling","dic_stf_gas",     "dic_stf_gas",           "ocean_bling","all",.true.,"none",2
+ "generic_bling","o2_stf_gas",      "o2_stf_gas",            "ocean_bling","all",.true.,"none",2
+#
+#===================================================================================================================
+##==========================================================================================
+# GENERIC OCEAN BLING_z DIAGNOSTICS  jgj 2017/01/30
+# check code to see if hooks in place to get _z diagnostics 
+# only a few fields for now - update later 
+# change frequency for debugging
+#==========================================================================================
+#
+ "ocean_bling_z",           1,  "months", 1, "days", "time",
+#
+ "generic_bling_z", "alk",     "alk",               "ocean_bling_z","all","mean","none",2
+ "generic_bling_z", "biomass_p","biomass_p",        "ocean_bling_z","all","mean","none",2
+ "generic_bling_z", "chl",     "chl",               "ocean_bling_z","all","mean","none",2
+ "generic_bling_z", "co3_ion", "co3_ion",           "ocean_bling_z","all","mean","none",2
+ "generic_bling_z", "dic",     "dic",               "ocean_bling_z","all","mean","none",2
+ "generic_bling_z", "dop",     "dop",               "ocean_bling_z","all","mean","none",2
+ "generic_bling_z", "fed",     "fed",               "ocean_bling_z","all","mean","none",2
+ "generic_bling_z", "htotal",  "htotal",            "ocean_bling_z","all","mean","none",2
+ "generic_bling_z", "po4",     "po4",               "ocean_bling_z","all","mean","none",2
+ "generic_bling_z", "o2",      "o2",                "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","fpofe",    "fpofe",             "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","fpop",     "fpop",              "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","fpop_burial", "fpop_burial",    "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","frac_pop", "frac_pop",          "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","irr_inst", "irr_inst",          "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","irr_mem",  "irr_mem",           "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","jdop",     "jdop",              "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","jfe_uptake",  "jfe_uptake",     "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","jo2",      "jo2",               "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","jp_recycle", "jp_recycle",      "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","jp_reminp", "jp_reminp",        "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","jp_uptake", "jp_uptake",        "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","jpo4",     "jpo4",              "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","jpofe",    "jpofe",             "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","jpop",     "jpop",              "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","co3_solubility",  "co3_solubility", "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","fcaco3",   "fcaco3",            "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","jca_reminp", "jca_reminp",      "ocean_bling_z","all","mean","none",2
+ "generic_bling_z","jca_uptake", "jca_uptake",      "ocean_bling_z","all","mean","none",2
+# 
+#output files
+#=============================================================================================================================
+# Omon: 2-D Marine Biogeochemical Surface Tracer Fields: ocean_bling_cmip6_omip_daily
+#=============================================================================================================================
+"ocean_bling_cmip6_omip_daily",          24, "hours",  1, "days", "time",
+ "ocean_model","geolat_c","geolat_c",                       "ocean_bling_cmip6_omip_daily","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c",                       "ocean_bling_cmip6_omip_daily","all",.false.,"none",2
+ "ocean_model","geolat","geolat",                           "ocean_bling_cmip6_omip_daily","all",.false.,"none",2
+ "ocean_model","geolon","geolon",                           "ocean_bling_cmip6_omip_daily","all",.false.,"none",2
+ "generic_bling","chlos",        "chlos",                  "ocean_bling_cmip6_omip_daily","all",.true.,"none",2
+ "generic_bling","phycos",       "phycos",                 "ocean_bling_cmip6_omip_daily","all",.true.,"none",2
+#
+#
+#====================================================================================================================
+# Omon: 2-D Marine Biogeochemical Surface Tracer Fields:  ocean_bling_cmip6_omip_sfc
+#====================================================================================================================
+"ocean_bling_cmip6_omip_sfc",             1, "months", 1, "days", "time",
+ "ocean_model","geolat_c","geolat_c",                       "ocean_bling_cmip6_omip_sfc","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c",                       "ocean_bling_cmip6_omip_sfc","all",.false.,"none",2
+ "ocean_model","geolat","geolat",                           "ocean_bling_cmip6_omip_sfc","all",.false.,"none",2
+ "ocean_model","geolon","geolon",                           "ocean_bling_cmip6_omip_sfc","all",.false.,"none",2
+ "generic_bling","sfc_dissic",       "dissic",             "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+# "generic_bling","sfc_dissi14cabio", "dissi14cabio",       "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_dissoc",       "dissoc",             "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_phyc",         "phyc",               "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_talk",         "talk",               "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_ph",           "ph",                 "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_o2_cmip",      "o2",                 "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+# pending
+# "generic_bling","sfc_o2sat",        "o2sat",              "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_po4_cmip",     "po4",                "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_dfe",          "dfe",                "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_chl_cmip",     "chl",                "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_poc",          "poc",                "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_pop",          "pop",                "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_phyp",         "phyp",               "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_co3",          "co3",                "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","sfc_co3satcalc",   "co3satcalc",         "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+#
+#=============================================================================================================================
+# Omon: Additional 2-D Marine Biogeochemical Fields (e.g. vertically integrated, 100m, etc)
+#=============================================================================================================================
+"ocean_bling_cmip6_omip_2d",              1, "months", 1, "days", "time",
+ "ocean_model","geolat_c","geolat_c",                       "ocean_bling_cmip6_omip_2d","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c",                       "ocean_bling_cmip6_omip_2d","all",.false.,"none",2
+ "ocean_model","geolat","geolat",                           "ocean_bling_cmip6_omip_2d","all",.false.,"none",2
+ "ocean_model","geolon","geolon",                           "ocean_bling_cmip6_omip_2d","all",.false.,"none",2
+ "generic_bling","intpp",           "intpp",               "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","intpbp",          "intpbp",              "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","intpbfe",         "intpbfe",             "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","intpcalcite",     "intpcalcite",         "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","expc100",         "expc100",             "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","expp100",         "expp100",             "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","expfe100",        "expfe100",            "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","expcalc100",      "expcalc100",          "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","exparag100",      "exparag100",          "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","intdissic",       "intdissic",           "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","intdissoc",       "intdissoc",           "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","spco2",           "spco2",               "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","dpco2",           "dpco2",               "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","dpo2",            "dpo2",                "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","fgco2",           "fgco2",               "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+# "generic_bling","fg14cabio",       "fg14cabio",           "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","fgo2",            "fgo2",                "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","icfriver",        "icfriver",            "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","fric",            "fric",                "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+# pending
+# "generic_bling","ocfriver",        "ocfriver",            "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+# "generic_bling","froc",            "froc",                "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","fsfe",            "fsfe",                "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","frfe",            "frfe",                "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+#
+#
+#=============================================================================================================================
+# Omon: 3-D Marine Biogeochemical Tracer Fields:  ocean_bling_cmip6_omip_tracers_month_z
+#=============================================================================================================================
+"ocean_bling_cmip6_omip_tracers_month_z",   1, "months", 1, "days", "time",
+ "generic_bling_z","dissic",       "dissic",                 "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+# "generic_bling_z","dissi14cabio", "dissi14cabio",           "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","dissoc",       "dissoc",                 "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","phyc",         "phyc",                   "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","talk",         "talk",                   "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","ph",           "ph",                     "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","o2_cmip",      "o2",                     "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+# pending
+# "generic_bling_z","o2sat",        "o2sat",                  "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","po4_cmip",     "po4",                    "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","dfe",          "dfe",                    "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","chl_cmip",     "chl",                    "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","phyp",         "phyp",                   "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","co3",          "co3",                    "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","co3satcalc",   "co3satcalc",             "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+#=============================================================================================================================
+# Additional Omon: 3-D Marine Biogeochemical Fields:  ocean_bling_cmip6_omip_tracers_month
+#=============================================================================================================================
+ "generic_bling_z","pp",           "pp",                     "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","graz",         "graz",                   "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","expc",         "expc",                   "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+#
+#=============================================================================================================================
+# Oyr: 3-D Marine Biogeochemical Tracer Fields:  ocean_bling_cmip6_omip_tracers_year_z
+#=============================================================================================================================
+"ocean_bling_cmip6_omip_tracers_year_z",   12, "months", 1, "days", "time",
+ "generic_bling_z","dissic",       "dissic",                 "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+# "generic_bling_z","dissi14cabio", "dissi14cabio",           "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","dissoc",       "dissoc",                 "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","phyc",         "phyc",                   "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","talk",         "talk",                   "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","ph",           "ph",                     "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","o2_cmip",      "o2",                     "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+# pending
+# "generic_bling_z","o2sat",        "o2sat",                  "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","po4_cmip",     "po4",                    "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","dfe",          "dfe",                    "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","chl_cmip",    "chl",                    "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","phyp",         "phyp",                   "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","co3",          "co3",                    "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","co3satcalc",   "co3satcalc",             "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+#
+#=============================================================================================================================
+# Oyr: 3-D Marine Biogeochemical Rates of Production and Removal:  ocean_bling_cmip6_omip_rates_year_z
+#=============================================================================================================================
+"ocean_bling_cmip6_omip_rates_year_z",     12, "months", 1, "days", "time",
+ "generic_bling_z","pp",           "pp",                     "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+# not requested
+# "generic_bling_z","pphosphate",   "pphosphate",             "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","pbfe",         "pbfe",                   "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","pcalc",        "pcalc",                  "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","expc",         "expc",                   "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","expp",         "expp",                   "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","expfe",        "expfe",                  "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","expcalc",      "expcalc",                "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","remoc",        "remoc",                  "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","dcalc",        "dcalc",                  "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","bddtdic",      "bddtdic",                "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","bddtdip",      "bddtdip",                "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","bddtdife",     "bddtdife",               "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","bddtalk",      "bddtalk",                "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","fescav",       "fescav",                 "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","fediss",       "fediss",                 "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","graz",         "graz",                   "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+#
+#
+#==========================================================================================
+      </diagTable> 
+     </input>
+  </freInclude>
   <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
@@ -3423,9 +3772,6 @@ MOM_OVERRIDE_EOF
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O4671']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O3782']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2997']/node())"/> </run>
-        </regression>
-	
-      <regression name="timing">
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1970']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2997']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O3782']/node())"/> </run>
@@ -3467,6 +3813,153 @@ MOM_OVERRIDE_EOF
     </input>
 
   </experiment>
+
+    <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F">
+    <input>
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <dataSource platform="$(platform)">/lustre/f1/unswept/Huan.Guo/INPUT/InitCond/mdt/H1G_CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_bridge1849_To201_combined_NoLUres.tar</dataSource>
+     </dataFile>
+
+      <dataTable>
+# jgj 2017/01/30 BLING data table
+# h1g 2017/08/09 use fixed CO2 concentration at Jan.,1 1850 from CMIP6, i.e., 284.262e-6
+#
+"ATM", "c14o2_flux_pcair_atm",         "",  "", "none",  284.262e-06
+"ATM", "co2_flux_pcair_atm",           "",  "", "none",  284.262e-06
+"ATM", "co2_sat_flux_pcair_atm",       "",  "", "none",  284.262e-06
+#
+# note scale factor for o2 gas exchange
+"ATM", "o2_flux_pcair_atm",            "",     "",                                             "none",      0.21
+#
+## co2 is interactive, so comment out co2_bot
+#"ATM", "co2_bot",                      "",     "",                                             "none",      284.262e-6
+#
+# Composition of runoff includes 0.1 PgC for CaCO3 burial (0.48 Alk, 0.24DIC)
+# plus 0.3 Pg C for Org burial (0.72 DIC, 0.72/106 PO4, 0.72/106*16 Alk ) 
+"OCN", "runoff_alk_flux_ice_ocn",      "",      "",                                             "none",      0.5932e-3
+"OCN", "runoff_dic_flux_ice_ocn",      "",      "",                                             "none",      0.96e-3
+"OCN", "runoff_po4_flux_ice_ocn",      "",      "",                                             "none",      0.006792e-3
+"OCN", "dry_dep_fed_flux_ice_ocn",     "FLUX",  "./INPUT/Soluble_Fe_Flux_PI.nc",                "bilinear",  -1.0
+#
+## JGJ: add cfcs later - check scale factor
+# "ATM", "cfc_11_flux_pcair_atm","CFC_11","INPUT/cfc.bc.nc","bilinear", 1.0e-12
+# "ATM", "cfc_12_flux_pcair_atm","CFC_12","INPUT/cfc.bc.nc","bilinear", 1.0e-12
+#                                                                                                                                 
+# jgj 2016/11/29 co2 data table (Jan 1 1850 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
+#
+## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
+## radiation co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
+"ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
+"ATM" , "co2_dvmr_rad",     "",     "", "none",  284.262e-06
+#
+      </dataTable>  
+      <namelist name="landuse_nml">
+       do_landuse_change = .false.
+       data_type   = 'luh2'
+       input_file  = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/extras/zero-transitions.v20170711.nc'
+       state_file  = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/extras/state-1850-nosecd.v20170711.nc'
+       static_file = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/landfrac.nc'
+       distribute_transitions = 'min-n-tiles'
+      </namelist>
+      <namelist name="vegn_data_nml">
+       vegn_to_use = 'uniform'
+       K1=10,
+       K2=0.1,
+       fsc_liv=0.9,
+       fsc_wood=0.45,
+       c1(4) = 0.3
+       c2(4) = 0.3
+       Vmax = 2.0E-5, 2.0E-5, 2.0E-5, 2.0E-5, 1.50E-5,
+       m_cond = 4., 9., 9., 7., 7.,
+       alpha_phot = 0.05, 0.06, 0.06, 0.06, 0.06,
+       gamma_resp = 0.03, 0.02, 0.02, 0.02, 0.02,
+       tc_crit(0:2) = 3*273.16
+       fact_crit_phen(0:4) = 0., 0., 0., 0., 0.
+       fact_crit_fire(0:4) = 0., 0., 0., 0., 0.
+       cnst_crit_phen(0:4) = 0.30, 0.15, 0.15, 0.30, 0.30
+       cnst_crit_fire(0:4) = 0.15,  0.40, 0.15, 0.15, 0.15
+       wet_leaf_dreg(0:4)  = .3, .3, .3, .3, .3
+       ksi =  0, 0, 0, 0, 0,
+       leaf_refl(0:4,1) = 0.11, 0.11, 0.10, 0.10, 0.10
+       leaf_refl(0:4,2) = 0.58, 0.58, 0.45, 0.45, 0.39,
+       dat_root_zeta(0:4) =   0.35212, 0.17039, 0.28909, 0.25813, 0.17039
+       critical_root_density = 0.0,
+       tau_drip_s     = 259200.0
+       cmc_lai(0:4) = 0.02, 0.02, 0.02, 0.02, 0.02
+       csc_lai(0:4) = 0.30, 0.30, 0.30, 0.30, 0.2
+       dat_snow_crit = 2*1.e7, .1, 1.e7, .1
+       t_transp_min = 268.
+       srl(0:1) = 112.0e3, 150.0e3
+       root_perm = 14*5e-7
+       alpha(1,3) = 4
+       leaf_age_tau(2) = 150
+       smoke_fraction = 0.9, 0.9, 0.6, 0.6, 0.6
+       tg_c3_thresh = 1
+       phen_ev1 = 0.2
+       phen_ev2 = 0.7
+       cmc_eps = 0.01
+       alpha(0:4,6) = 0.0, 0.0, 0.012, 0.012, 0.012
+       treefall_disturbance_rate = 0.175, 0.185, 0.025, 0.0275, 0.027
+       use_light_saber = .true.
+       sai_cover = .true.
+       sai_rad = .true.
+
+!gone       min_lai = 1.e-5   ! h1g, prevent numerical instability, 2017-08-24
+      </namelist>
+      <namelist name="harvesting_nml">
+       do_harvesting          =.true.
+       grazing_intensity      = 18.25 ! roughly 5% of biomass per day
+       grazing_residue        = 0.1
+       grazing_frequency      = 'daily'
+       min_lai_for_grazing    = 1.0
+       frac_wood_wasted_harv  = 0.25
+       frac_wood_wasted_clear = 0.25
+       !frac_wood_fast         = ONETHIRD
+       !frac_wood_med          = ONETHIRD
+       !frac_wood_slow         = ONETHIRD
+       crop_seed_density      = 0.1
+       waste_below_ground_wood = .TRUE.
+      </namelist>
+
+    </input>
+    </experiment>
+    <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_fixedCO2" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F">
+    <input>
+      <dataTable>
+# jgj 2017/01/30 BLING data table
+# h1g 2017/08/09 use fixed CO2 concentration at Jan.,1 1850 from CMIP6, i.e., 284.262e-6
+#
+"ATM", "c14o2_flux_pcair_atm",         "",  "", "none",  284.262e-06
+"ATM", "co2_flux_pcair_atm",           "",  "", "none",  284.262e-06
+"ATM", "co2_sat_flux_pcair_atm",       "",  "", "none",  284.262e-06
+#
+# note scale factor for o2 gas exchange
+"ATM", "o2_flux_pcair_atm",            "",     "",                                             "none",      0.21
+#
+## co2 is interactive, so comment out co2_bot
+#"ATM", "co2_bot",                      "",     "",                                             "none",      284.262e-6
+#
+# Composition of runoff includes 0.1 PgC for CaCO3 burial (0.48 Alk, 0.24DIC)
+# plus 0.3 Pg C for Org burial (0.72 DIC, 0.72/106 PO4, 0.72/106*16 Alk ) 
+"OCN", "runoff_alk_flux_ice_ocn",      "",      "",                                             "none",      0.5932e-3
+"OCN", "runoff_dic_flux_ice_ocn",      "",      "",                                             "none",      0.96e-3
+"OCN", "runoff_po4_flux_ice_ocn",      "",      "",                                             "none",      0.006792e-3
+"OCN", "dry_dep_fed_flux_ice_ocn",     "FLUX",  "./INPUT/Soluble_Fe_Flux_PI.nc",                "bilinear",  -1.0
+#
+## JGJ: add cfcs later - check scale factor
+# "ATM", "cfc_11_flux_pcair_atm","CFC_11","INPUT/cfc.bc.nc","bilinear", 1.0e-12
+# "ATM", "cfc_12_flux_pcair_atm","CFC_12","INPUT/cfc.bc.nc","bilinear", 1.0e-12
+#                                                                                                                                 
+# jgj 2016/11/29 co2 data table (Jan 1 1850 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
+#
+## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
+## radiation co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
+"ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
+"ATM" , "co2_dvmr_rad",     "",     "", "none",  284.262e-06
+#
+      </dataTable>  
+    </input>
+    </experiment>
 
     <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8">
     <publicMetadata DBswitch="$MDBIswitch">
