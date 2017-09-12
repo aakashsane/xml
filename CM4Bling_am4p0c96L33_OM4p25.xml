@@ -882,8 +882,8 @@ Experiment to build executable.
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)"> atmos_shared.git atmos_param.git </codeBase>
           <csh><![CDATA[
-            ( cd atmos_shared && git checkout $(AWG_GIT_TAG) )
-            ( cd atmos_param  && git checkout $(AWG_GIT_TAG) )
+            ( cd atmos_shared && git checkout user/h1g/merge_lwh_aer_diag_2warsaw201707 )
+            ( cd atmos_param  && git checkout user/h1g/merge_lwh_aer_diag_2warsaw201707 )
            ]]>
           </csh>
       </source>
@@ -1294,7 +1294,7 @@ $baseDate
          <dataSource platform="$(platform)">$(includeDir)/awg/diag_table/cmip6/diag_table_Amon</dataSource>
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(includeDir)/awg/diag_table/cmip6/diag_table_AERmon</dataSource>
+         <dataSource platform="$(platform)">$(includeDir)/awg/diag_table/cmip6/diag_table_AERmon_simple</dataSource>
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(includeDir)/awg/diag_table/cmip6/diag_table_AERhr</dataSource>
@@ -1772,6 +1772,14 @@ set ocn_hyperthread = $ocn_hythr
         $(includeDir)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6
      </dataFile>
 
+     <!-- Needed until these additions are tagged in MOM6 examples and the XML uses the new tag -->
+     <diagTable order="append">
+"ocean_model",   "mlotst",       "mlotstmin",        "ocean_annual",        "all", "min",  "none",2
+"ocean_model",   "mlotst",       "mlotstmin",        "ocean_month",         "all", "min",  "none",2
+"ocean_model",   "mlotst",       "mlotstmax",        "ocean_annual",        "all", "max",  "none",2
+"ocean_model",   "mlotst",       "mlotstmax",        "ocean_month",         "all", "max",  "none",2
+     </diagTable>
+
      <namelist name="MOM_input_nml" >
          output_directory = './',
          input_filename = '$restart_flag'
@@ -1847,15 +1855,17 @@ set ocn_hyperthread = $ocn_hythr
       <!--By default a refineDiag script causes the annual history files to be unpacked and saved in /ptmp/$USER-->
       <refineDiag script="$(includeDir)/mom6/tools/analysis/MOM6_refineDiag.csh,$(includeDir)/awg/refineDiag/refineDiag_data_stager_globalAve.csh"/>
 
-      <component type="ocean_daily"   source="ocean_daily" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_daily"/>
+      <component type="ocean_daily" source="ocean_daily" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="ocean_daily_1x1deg" source="ocean_daily" sourceGrid="ocean-tripolar" xyInterp="180,360">
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_monthly"   source="ocean_month" sourceGrid="ocean-tripolar">
-        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_month">
+      <component type="ocean_monthly" source="ocean_month" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>
         </timeSeries>
-
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)" >
 	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
 	</timeAverage>
@@ -1864,19 +1874,54 @@ set ocn_hyperthread = $ocn_hythr
 	</timeAverage>
       </component>
 
-      <component type="ocean_annual"    source="ocean_annual" sourceGrid="ocean-tripolar">
-        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)">
+      <component type="ocean_monthly_1x1deg" source="ocean_month" sourceGrid="ocean-tripolar" xyInterp="180,360">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>
+        </timeSeries>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)" >
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
+        </timeAverage>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)" >
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
+        </timeAverage>
+      </component>
+
+      <component type="ocean_monthly_z" source="ocean_month_z" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)"/>
+      </component>
+
+      <component type="ocean_monthly_z_1x1deg" source="ocean_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)"/>
+      </component>
+
+      <component type="ocean_annual" source="ocean_annual" sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
         </timeAverage>
+        <timeAverage source="annual" interval="10yr"/>
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
         </timeAverage>
+      </component>
 
-        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_annual"/>
-        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_annual"/>
+      <component type="ocean_annual_1x1deg" source="ocean_annual" sourceGrid="ocean-tripolar" xyInterp="180,360">
+        <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
+        </timeAverage>
+        <timeAverage source="annual" interval="10yr"/>
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
+        </timeAverage>
       </component>
 
       <component type="ocean_annual_z" source="ocean_annual_z" sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>	
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
@@ -1884,9 +1929,17 @@ set ocn_hyperthread = $ocn_hythr
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(includeDir)/awg/analysis/stub/atw_ocean_av_annual_subsfc_ocean.csh -D ocean_annual_z.%04d-%04d."/>
         </timeAverage>
+      </component>
 
-        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_annual_z"/>	
-        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_annual_z"/>
+      <component type="ocean_annual_z_1x1deg" source="ocean_annual_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+        <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
+        </timeAverage>
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(includeDir)/awg/analysis/stub/atw_ocean_av_annual_subsfc_ocean.csh -D ocean_annual_z.%04d-%04d."/>
+        </timeAverage>
       </component>
 
       <!--Ocean scalars-->
@@ -1963,15 +2016,20 @@ set ocn_hyperthread = $ocn_hythr
 
       <!--ICE-->      
       <component type="ice"  source="ice_month" sourceGrid="ocean-tripolar">
-        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"  source="ice_month">
-	   <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
-	</timeSeries>   
-        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_B)"  source="ice_month">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)">
 	   <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
 	</timeSeries>   
         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_B)"/>
       </component>     
+
+      <component type="ice_1x1deg"  source="ice_month" sourceGrid="ocean-tripolar" xyInterp="180,360">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)">
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+        </timeSeries>
+        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_B)"/>
+      </component>
 
     </postProcess>
   </freInclude> 
@@ -1993,21 +2051,36 @@ set ocn_hyperthread = $ocn_hythr
       <postProcess> 
       <component type="ocean_bling_month" source="ocean_bling_month" sourceGrid="ocean-tripolar">
          <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
-         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
+      <component type="ocean_bling_month_1x1deg" source="ocean_bling_month" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
       <component type="ocean_bling_month_z" source="ocean_bling_month_z" sourceGrid="ocean-tripolar">
          <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
-         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
+      <component type="ocean_bling_month_z_1x1deg" source="ocean_bling_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
       <component type="ocean_bling_year" source="ocean_bling_year" sourceGrid="ocean-tripolar">
          <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
+      <component type="ocean_bling_year_1x1deg" source="ocean_bling_year" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
       <component type="ocean_bling_year_z" source="ocean_bling_year_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="ocean_bling_year_z_1x1deg" source="ocean_bling_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
          <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
@@ -3903,6 +3976,8 @@ MOM_OVERRIDE_EOF
         max_field_attributes=4
       </namelist>
 
+      <namelist file="$(includeDir)/awg/nml/cmip6_am4p0_physics.nml"/>
+
       <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(includeDir)/awg/diag_table/diag_table_land_byTile</dataSource>
@@ -3927,6 +4002,13 @@ MOM_OVERRIDE_EOF
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         $(includeDir)/mom6/ice_ocean_SIS2/OM4_025/diag_table.icebergs
       </dataFile>
+     <!-- Needed until these additions are tagged in MOM6 examples and the XML uses the new tag -->
+     <diagTable order="append">
+"ocean_model",   "mlotst",       "mlotstmin",        "ocean_annual",        "all", "min",  "none",2
+"ocean_model",   "mlotst",       "mlotstmin",        "ocean_month",         "all", "min",  "none",2
+"ocean_model",   "mlotst",       "mlotstmax",        "ocean_annual",        "all", "max",  "none",2
+"ocean_model",   "mlotst",       "mlotstmax",        "ocean_month",         "all", "max",  "none",2
+     </diagTable>
 
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_data_table_fixCO2_20170809']/input/node())"/>
 
