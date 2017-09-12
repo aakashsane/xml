@@ -139,9 +139,8 @@ endif
 #   -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk,$staticfile \
 #   $argu:q || goto err
 
-set shared_opt    = "-V2 -P ps.gz -s"
 
-set argu_test1 = "$shared_opt -n -r uea plot_koppen"
+set argu_test1 = "-r uea plot_koppen"
 $work_script -o $out_dir $ref_opt \
    -m gfdl_model,$yr1,$yr2,$descriptor,$in_data_dir,$databegyr,$dataendyr,$datachunk,$staticfile \
    $argu_test1  || goto err
