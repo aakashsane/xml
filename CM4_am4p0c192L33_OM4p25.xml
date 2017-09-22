@@ -810,17 +810,12 @@ Experiment to build executable.
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
           git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
           pushd ocean_shared
-          #git checkout user/nnz/mom6_dev
           git checkout $(MOM6_GIT_TAG)
+###Begin Updates from b group not yet tagged as $(MOM6_GIT_TAG), remove these once they are tagged
+git checkout user/nnz/ABIO_BLING_COBALT_20170922
+###End   Updates
           git submodule init mocsy
           git submodule update
-	  #Have to rename *.f90 to *.F90 so that we can pass cpp def  -DUSE_PRECISION=2 to them.
-          #Alternatively, we could build mocsy as a library by itself without renaming the files,
-          #but then we have to add a mocsy lib to link with.
-          cd mocsy/src
-          foreach f (*.f90)
-            mv ${f} "`basename ${f} .f90`.F90"
-          end
           popd
 
           pushd mom6
@@ -1937,7 +1932,7 @@ For more information please refer to the
 	</timeAverage>
       </component>
       <component type="ocean_monthly_z"   source="ocean_month_z" sourceGrid="ocean-tripolar">
-        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
       <component type="ocean_annual"    source="ocean_annual" sourceGrid="ocean-tripolar">

@@ -950,20 +950,12 @@ Experiment to build executable.
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
           git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
           pushd ocean_shared
-          #git checkout user/nnz/mom6_dev
           git checkout $(MOM6_GIT_TAG)
-#John Dunne updates for BLING
-git checkout user/nnz/cmip6diags_gasfluxfixes_from_jpd
-#
+###Begin Updates from b group not yet tagged as $(MOM6_GIT_TAG), remove these once they are tagged
+git checkout user/nnz/ABIO_BLING_COBALT_20170922
+###End   Updates
           git submodule init mocsy
           git submodule update
-	  #Have to rename *.f90 to *.F90 so that we can pass cpp def  -DUSE_PRECISION=2 to them.
-          #Alternatively, we could build mocsy as a library by itself without renaming the files,
-          #but then we have to add a mocsy lib to link with.
-          cd mocsy/src
-          foreach f (*.f90)
-            mv ${f} "`basename ${f} .f90`.F90"
-          end
           popd
 
           pushd mom6
@@ -1861,7 +1853,7 @@ endif
 	</timeAverage>
       </component>
       <component type="ocean_monthly_z"   source="ocean_month_z" sourceGrid="ocean-tripolar">
-        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
       <component type="ocean_annual"    source="ocean_annual" sourceGrid="ocean-tripolar">
@@ -3757,7 +3749,7 @@ MOM_OVERRIDE_EOF
     </postProcess>
   </experiment>
   
-  <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_initCond" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8">
+  <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_initCondBling" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8">
     <input>
      <!--There is  MOM6/SIS2 restart provided in initCond.-->
      <namelist name="MOM_input_nml" >
@@ -3782,6 +3774,53 @@ MOM_OVERRIDE_EOF
 
   </experiment>
 
+  <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_initCondNoBling" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8">
+    <input>
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
+     </namelist>
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <!--This initCond is the 75 years restart of Bill's #747 -->
+      <!--dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_C_747_comb_00750101.tar</dataSource-->
+      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_806_from450_05120101_nobling_combined.tar</dataSource>
+     </dataFile>
+
+      <csh><![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+! BLING parameters
+! Note defaults DT = 900.0 , DT_THERM = 3600.0
+#override DT_THERM = 7200.0
+#override USE_generic_tracer = True
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+
+#override CHL_FROM_FILE = False
+#override USE_RIVER_HEAT_CONTENT = True
+#override USE_CALVING_HEAT_CONTENT = True
+#override ENERGYSAVEDAYS = 30
+MOM_OVERRIDE_EOF
+
+if ( $currentSeg == 1 ) then
+cat >> $work/INPUT/MOM_override << MOM_OVERRIDE_2
+#override TRACERS_MAY_REINIT = True
+MOM_OVERRIDE_2
+endif
+     ]]></csh>
+    </input>
+
+  </experiment>
     <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F">
     <input>
      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
@@ -3887,6 +3926,9 @@ MOM_OVERRIDE_EOF
        !frac_wood_slow         = ONETHIRD
        crop_seed_density      = 0.1
        waste_below_ground_wood = .TRUE.
+      </namelist>
+      <namelist name="frecheck_nml"><!--this nml is needed only for frecheck to work. It is not needed and does not affect the model run in any way-->
+          start_date =  0201,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
       </namelist>
 
     </input>

@@ -79,7 +79,7 @@ NOTES:
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>     <!-- git tag for LAND_LAD2 source code -->  
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
@@ -676,17 +676,12 @@ Experiment to build executable.
           #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
           git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
           pushd ocean_shared
-          #git checkout user/nnz/mom6_dev
           git checkout $(MOM6_GIT_TAG)
+###Begin Updates from b group not yet tagged as $(MOM6_GIT_TAG), remove these once they are tagged
+git checkout user/nnz/ABIO_BLING_COBALT_20170922
+###End   Updates
           git submodule init mocsy
           git submodule update
-	  #Have to rename *.f90 to *.F90 so that we can pass cpp def  -DUSE_PRECISION=2 to them.
-          #Alternatively, we could build mocsy as a library by itself without renaming the files,
-          #but then we have to add a mocsy lib to link with.
-          cd mocsy/src
-          foreach f (*.f90)
-            mv ${f} "`basename ${f} .f90`.F90"
-          end
           popd
 
           pushd mom6
@@ -4266,225 +4261,42 @@ SIS_OVERRIDE_EOF
 
   </experiment>
 
-<experiment name="dust_ESM4p_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1" inherit="CM4_c96L33_am4p0_OMp5_1850_30d30_me_tlt_geo_kd15_fgnv0p1">
-<description>
-This experiment is here only to test the ESM4 flow and regression with the new am4p0 setup. The initCond is not scientifically evaluated.
-Use at your own risk.
-This is modelled after ESM4_c96L32_am4g12r17_1850_OMp5_H5_ndiff_meke_MLE30d_ePBLn in CM4_am4p12r17.xml  , please refer to that xml for the real thing.
-
-Keeping our ocean from ESM4p_c96L32_am4g10r14_1860_obgc_pindco2_OMp5_H5_ndff_mke_MLE30d_ePBLn
-Making the settings for the ESM equivalent to ESM4p_c96L32_am4g10r14_1860_obgc_pindco2_OMp5_H5_ndff_mke_MLE30d_ePBLh_E
-carryover set DT_THERM to 10,800 as in _C.  Changed transmission functionsettings as Jasmin has.
-set land flx to 0 as below
-Reverting back to land defaults for coastal roughness, use_coast_topo_rough = .true., use_coast_topo_rough = .false.
-</description>
-<input>
-      <namelist name="coupler_nml">
-        months = $months,
-        days   = $days,
-        current_date = 1,1,1,0,0,0,
-        calendar = 'NOLEAP'
-        dt_atmos = 1800,
-        dt_cpld  = 3600,
-        use_lag_fluxes = .true.
-        concurrent = .true.
-        do_ocean = .true.
-        ocean_npes = $ocn_ranks  
-        atmos_npes = $atm_ranks 
-        atmos_nthreads = $atmos_threads
-        ncores_per_node = $(NCORE_PER_NODE)
-        use_hyper_thread=.T.
-      </namelist>
-      <namelist name="generic_tracer_nml">
-       do_generic_tracer=.true.
-       do_generic_CFC=.false.
-       do_generic_COBALT=.true.
-       do_generic_TOPAZ=.false.
-       force_update_fluxes=.true. !This has to be set for THERMO_SPANS_COUPLING to work
-      </namelist>
-
-      <namelist name="radiation_driver_nml">
-       rad_time_step= 10800,
-       rad_package = 'sea_esf',
-       do_clear_sky_pass=.true.,
-       !calc_hemi_integrals = .false.,
-       renormalize_sw_fluxes=.true.,
-       zenith_spec = 'diurnally_varying',
-       using_restart_file = .false.
-       do_conserve_energy = .true.
-       sw_rad_time_step = 3600,
-       use_single_lw_sw_ts = .false.,
-       use_co2_tracer_field = .true.                 ! jgj added
-       treat_sfc_refl_dir_as_dif = .false.           ! jgj added
-      </namelist>
-
-       <namelist name="radiative_gases_nml">
-      use_co2_10um = .true.
-
-      verbose = 3
-      gas_printout_freq = 240
-
-      time_varying_co2 = .false.,
-      co2_variation_type = 'linear',
-      co2_dataset_entry = 1850,1,1,0,0,
-      co2_specification_type = 'base_and_trend',
-      co2_floor = 100.0E-06,
-      co2_ceiling = 1600.0E-06,
-      co2_data_source = 'predicted'
-
-      time_varying_ch4 = .false.,
-      ch4_variation_type = 'linear'
-      ch4_dataset_entry = 1850,1,1,0,0,
-      ch4_specification_type = 'time_series'
-      ch4_data_source = 'input'
-
-      time_varying_n2o = .false.,
-      n2o_variation_type = 'linear'
-      n2o_dataset_entry = 1850,1,1,0,0,
-      n2o_specification_type = 'time_series'
-      n2o_data_source = 'input'
-
-      time_varying_f11 = .false.,
-      f11_variation_type = 'linear'
-      f11_dataset_entry = 1850,1,1,0,0,
-      f11_specification_type = 'time_series'
-      f11_data_source = 'input'
-
-      time_varying_f12 = .false.,
-      f12_variation_type = 'linear'
-      f12_dataset_entry = 1850,1,1,0,0,
-      f12_specification_type = 'time_series'
-      f12_data_source = 'input'
-
-      time_varying_f113 = .false.,
-      f113_variation_type = 'linear'
-      f113_dataset_entry = 1850,1,1,0,0,
-      f113_specification_type = 'time_series'
-      f113_data_source = 'input'
-
-      time_varying_f22 = .false.,
-      f22_variation_type = 'linear'
-      f22_dataset_entry = 1860,1,1,0,0,
-      f22_specification_type = 'time_series'
-      f22_data_source = 'input'
-
-
-      calc_co2_tfs_on_first_step = .false.,
-      calc_co2_tfs_monthly = .true.,
-      co2_tf_time_displacement = 0.0,                 ! jgj was 360
-
-      calc_ch4_tfs_on_first_step = .true.,            ! jgj was false
-      calc_ch4_tfs_monthly = .false.,                 ! jgj was true
-      ch4_tf_time_displacement = 0.0,                 ! jgj was 360
-
-      calc_n2o_tfs_on_first_step = .true.,            ! jgj was false
-      calc_n2o_tfs_monthly = .false.,                 ! jgj was true
-      n2o_tf_time_displacement = 0.0,                 ! jgj was 360
- 
-      </namelist>
-      <namelist name="atmos_co2_nml">
-       do_co2_restore = .true.               
-       restore_tscale = 3.1536e7,
-       restore_klimit = 32
-       co2_radiation_override = .true.
-       do_co2_emissions = .false.
-      </namelist>
-       
-      <diagTable order="append"> 
-"radiation", "vis_extopdep_vlcno_c",           "vis_exopd_vl_c",  "atmos_month_aer", "all", .true.,"none", 2
-"land",     "fco2"                 ,            "fco2"            "land_month",       "all", .true.,"none", 2
-"land",     "qco2_dvmr"                 ,        "qco2_dvmr"      "land_month",       "all", .true.,"none", 2
-"land",     "Ctot"                 ,             "Ctot"           "land_month",       "all", .true.,"none", 2
-
-#===========================
-# ocean_cobalt_dust_z
-#===========================
-"ocean_cobalt_dust_z",       1,  "months", 1, "days", "time",
-"generic_cobalt_z","lith",         "lith",         "ocean_cobalt_dust_z","all",.true.,"none",2
-"generic_cobalt_z","dep_dry_lith", "dep_dry_lith", "ocean_cobalt_dust_z","all",.true.,"none",2
-"generic_cobalt_z","dep_wet_lith", "dep_wet_lith", "ocean_cobalt_dust_z","all",.true.,"none",2
-#
-"atmos_dust_sample",       1,  "months", 1, "days", "time",
-"tracers" , "dust_ddep", "dust_ddep", "atmos_dust_sample","all",.true.,"none",2
-"tracers" , "dust_emis", "dust_emis", "atmos_dust_sample","all",.true.,"none",2
-"tracers" , "drydust", "drydust", "atmos_dust_sample","all",.true.,"none",2
-"tracers" , "emidust", "emidust", "atmos_dust_sample","all",.true.,"none",2
-"tracers" , "dust1_setl", "dust1_setl", "atmos_dust_sample","all",.true.,"none",2
-"tracers" , "dust2_setl", "dust2_setl", "atmos_dust_sample","all",.true.,"none",2
-"tracers" , "dust3_setl", "dust3_setl", "atmos_dust_sample","all",.true.,"none",2
-"tracers" , "dust4_setl", "dust4_setl", "atmos_dust_sample","all",.true.,"none",2
-"tracers" , "dust5_setl", "dust5_setl", "atmos_dust_sample","all",.true.,"none",2
-"dynamics",  "dust1",  "dust1",  "atmos_dust_sample", "all", .true.,  "none", 2
-"dynamics",  "dust2",  "dust2",  "atmos_dust_sample", "all", .true.,  "none", 2
-"dynamics",  "dust3",  "dust3",  "atmos_dust_sample", "all", .true.,  "none", 2
-"dynamics",  "dust4",  "dust4",  "atmos_dust_sample", "all", .true.,  "none", 2
-"dynamics",  "dust5",  "dust5",  "atmos_dust_sample", "all", .true.,  "none", 2
-#
-"moist",     "dust_wet_dep", "dust_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
-"moist",     "ssalt_wet_dep", "ssalt_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
-"moist",     "totNH4_wet_dep", "totNH4_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
-"moist",     "so4_wet_dep", "so4_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
-"moist",     "so2_wet_dep", "so2_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
-
-
-      </diagTable> 
-      <!--AWG Input namelists -->
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common_oldLandSettings.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_physics.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c96L33.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_1850climo.nml"/>
-
-      <!-- Input datasets -->
-      <xi:include xpointer="xpointer(//freInclude[@name='common_LM4']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='c96_LM4_Op5']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='common_AM4_v20170208']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_1850_cmip6']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20170518']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
-      
-      <xi:include xpointer="xpointer(//freInclude[@name='c96L33_Op5_initCond']/input/node())"/>
-      <!--MOM6 Input datasets-->
-      <xi:include xpointer="xpointer(//freInclude[@name='OM4_05grid_data']/input/node())"/>
-      <!--SIS Input datasets-->
-      <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
-
-      <!--COBALT IC datasets-->
-      <xi:include xpointer="xpointer(//freInclude[@name='OBGC_COBALT_IC_Preind_CO2']/input/node())"/>
-      <!--COBALT BC datasets-->
-      <xi:include xpointer="xpointer(//freInclude[@name='OBGC_COBALT_BC_1860_p5']/input/node())"/>
-
-      <!--COBALT diag table-->
-      <xi:include xpointer="xpointer(//freInclude[@name='OBGC_COBALT_diag_table']/input/node())"/>
-      <!--Atmos co2 diag table-->
-      <xi:include xpointer="xpointer(//freInclude[@name='ESM4_atmos_co2_diag_table']/input/node())"/>
-      <!--co2 field table -->
-      <xi:include xpointer="xpointer(//freInclude[@name='ESM4_atmos_co2_1860_field_table']/input/node())"/>
-      <!--COBALT field table-->
-      <xi:include xpointer="xpointer(//freInclude[@name='OBGC_COBALT_Preind_field_table']/input/node())"/>       
-      <dataFile label="input" target="INPUT/co2_data.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/pdata/esm/ipcc_ar5/datasets/forcings/co2_data.1PctTo2X.nc</dataSource>
-      </dataFile>
-
+  <experiment name="ESM4p_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_kd1p45_fgnv0p1_no_Z_INIT_REMAP" inherit="ESM4p_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_kd1p45_fgnv0p1">
+     <input>
       <csh><![CDATA[
+
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override KD = 1.45e-5
+#override FGNV_FILTER_SCALE = 0.1
+
+#override DT_THERM = 10800
+#override Z_INIT_REMAP_GENERAL = False                                                          
+#override Z_INIT_REMAP_FULL_COLUMN = False                                                      
+
 #override USE_generic_tracer = True
 #override CHL_FROM_FILE = False
-#override ENERGYSAVEDAYS = 10
+#override USE_RIVER_HEAT_CONTENT = True
+#override USE_CALVING_HEAT_CONTENT = True
+
+#override ENERGYSAVEDAYS = 30
 
 MOM_OVERRIDE_EOF
+
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
 #override MIN_OCN_INTERTIAL_H = 2.
 
-SIS_OVERRIDE_EOF
-    ]]></csh>
+#override ICE_STATS_INTERVAL = 30
 
+SIS_OVERRIDE_EOF
+     ]]></csh>
+   </input>
+  </experiment>
+
+  <experiment name="ESM4p_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_kd1p45_fgnv0p1_dust" inherit="ESM4p_c96L33_am4p0_OMp5_1850_ndiff_khtr200_fk30_30d_tlt_me_kd1p45_fgnv0p1">
+    <input>
       <!--++++++++++++++++++++++trun on dust exchange+++++++++++++++++++++++++++++-->
       <namelist name="dust_nml">
        do_esm_dust_flux = .true.
@@ -4494,16 +4306,18 @@ SIS_OVERRIDE_EOF
       coef_emis = 2.0e-10
       use_sj_sedimentation_solver=.true.
       </namelist>
+
       <fieldTable order="append">      
 # land dust field table needed for dust exchange
 "TRACER", "land_mod","dust1"
           "longname","lith esm dust flux"
           "units","N/A"/
       </fieldTable>
-      <dataTable>
-###lith has wet and dry dep fluxes from dust. Do not override it in an active dust exchange experiment
-# jgj 2016/07/08 COBALT 1990 data table with TOPAZ Fe datasets
-#
+      <!--COBALT 1860 data table, o2 gas exchange data table, CMIP6 Jan 1 1850 co2 data table -->
+<!-- update to match BLING -->
+      <dataTable order="append">
+# jgj 2016/07/08 COBALT 1860 data table with TOPAZ Fe datasets                                                                    
+#                                                                                                                                 
 "OCN", "runoff_no3_flux_ice_ocn",   "NO3_CONC",   "./INPUT/news_nutrients.nc","none",1.0e-3
 "OCN", "runoff_ldon_flux_ice_ocn",  "LDON_CONC",  "./INPUT/news_nutrients.nc","none",1.0e-3
 "OCN", "runoff_sldon_flux_ice_ocn", "SLDON_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
@@ -4514,11 +4328,14 @@ SIS_OVERRIDE_EOF
 "OCN", "runoff_sldop_flux_ice_ocn", "SLDOP_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
 "OCN", "runoff_srdop_flux_ice_ocn", "SRDOP_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
 "OCN", "runoff_fed_flux_ice_ocn", ""   , ""                             , "none" ,  0.0
-"OCN", "runoff_alk_flux_ice_ocn", ""   , ""                             , "none" ,  0.48e-3
-"OCN", "runoff_dic_flux_ice_ocn", ""   , ""                             , "none" ,  0.24e-3
+# Updated settings to match BLINGv2
+# Composition of runoff includes 0.1 PgC for CaCO3 burial (0.48 Alk, 0.24DIC)
+# plus 0.3 Pg C for Org burial (0.72 DIC, 0.72/106 PO4, 0.72/106*16 Alk ) 
+"OCN", "runoff_alk_flux_ice_ocn",  "",    "",                             "none",  0.5932e-3
+"OCN", "runoff_dic_flux_ice_ocn",  "",    "",                             "none",  0.96e-3
 "OCN", "runoff_lith_flux_ice_ocn", ""  , ""                             , "none" , 13.0e-3
 "OCN", "dry_dep_fed_flux_ice_ocn",  "FLUX",        "./INPUT/Soluble_Fe_Flux_PI.nc", "bilinear", -1.0
-###lith has wet and dry dep fluxes from dust
+###lith has wet and dry dep fluxes from dust. Do not override it in an active dust exchange experiment
 ###"OCN", "dry_dep_lith_flux_ice_ocn", "FLUX_MINERAL","./INPUT/Mineral_Fe_Flux_PI.nc", "bilinear", -1.0
 "OCN", "dry_dep_po4_flux_ice_ocn",  "FLUX",        "./INPUT/Mineral_Fe_Flux_PI.nc", "bilinear", -0.0084
 "OCN", "wet_dep_no3_flux_ice_ocn",  "NO3_WET_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
@@ -4526,68 +4343,53 @@ SIS_OVERRIDE_EOF
 "OCN", "wet_dep_nh4_flux_ice_ocn",  "NH4_WET_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
 "OCN", "dry_dep_nh4_flux_ice_ocn",  "NH4_DRY_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
 #
-# jgj 2015/12/09 data table for o2 gas exchange 
+# jgj 2015/12/09 data table for o2 gas exchange
 #
 "ATM", "o2_flux_pcair_atm", ""         , ""                             , "none" , 0.21
-# jgj 2016/06/10 co2 data table 
 #
-## restoring co2 data override set to Jan 1 1850 value 284.65e-6
-## radiation co2 data override set to Jan 1 2000 value 368.10625e-6(only for 2000 runs, this now is 1860)
-## radiation co2 data override set to Jan 1 1860 value 286.15e-6 (new 1860 is 285.65)
-"ATM" , "co2_dvmr_restore", "",     "", "none",  285.65e-06
-"ATM" , "co2_dvmr_rad",     "",     "", "none",  285.65e-06
+# jgj 2016/11/29 co2 data table (Jan 1 1850 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
 #
-"LND", "ex_flux_co2",         "", "", "none", 0.0
-"LND", "ex_dfdco2_surf",      "", "", "none", 0.0
-"LND", "ex_dfdco2_atm",       "", "", "none", 0.0
-      </dataTable>
+## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
+## radiation co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
+"ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
+"ATM" , "co2_dvmr_rad",     "",     "", "none",  284.262e-06
+#
+      </dataTable>  
 
-      
-    </input>
-    
-    <postProcess>
-      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='COBALT_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='COBALT_z_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='atmos_co2_postprocess']/postProcess/node())"/>
-    </postProcess>
+      <diagTable order="append"> 
+#===========================
+# ocean_cobalt_dust
+#===========================
+"ocean_cobalt_dust",       1,  "days", 1, "days", "time",
+"generic_cobalt","lith",         "lith",         "ocean_cobalt_dust","all",.true.,"none",2
+"generic_cobalt","dep_dry_lith", "dep_dry_lith", "ocean_cobalt_dust","all",.true.,"none",2
+"generic_cobalt","dep_wet_lith", "dep_wet_lith", "ocean_cobalt_dust","all",.true.,"none",2
+#
+"atmos_dust_sample",       1,  "days", 1, "days", "time",
+"tracers" , "dust_ddep", "dust_ddep", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "dust_emis", "dust_emis", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "drydust", "drydust", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "emidust", "emidust", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "dust1_setl", "dust1_setl", "atmos_dust_sample","all",.true.,"none",2
+#"tracers" , "dust2_setl", "dust2_setl", "atmos_dust_sample","all",.true.,"none",2
+#"tracers" , "dust3_setl", "dust3_setl", "atmos_dust_sample","all",.true.,"none",2
+#"tracers" , "dust4_setl", "dust4_setl", "atmos_dust_sample","all",.true.,"none",2
+#"tracers" , "dust5_setl", "dust5_setl", "atmos_dust_sample","all",.true.,"none",2
+"dynamics",  "dust1",  "dust1",  "atmos_dust_sample", "all", .true.,  "none", 2
+#"dynamics",  "dust2",  "dust2",  "atmos_dust_sample", "all", .true.,  "none", 2
+#"dynamics",  "dust3",  "dust3",  "atmos_dust_sample", "all", .true.,  "none", 2
+#"dynamics",  "dust4",  "dust4",  "atmos_dust_sample", "all", .true.,  "none", 2
+#"dynamics",  "dust5",  "dust5",  "atmos_dust_sample", "all", .true.,  "none", 2
+#
+"moist",     "dust_wet_dep", "dust_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
+#"moist",     "ssalt_wet_dep", "ssalt_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
+#"moist",     "totNH4_wet_dep", "totNH4_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
+#"moist",     "so4_wet_dep", "so4_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
+#"moist",     "so2_wet_dep", "so2_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
+      </diagTable> 
 
-    <runtime>
-      <production simTime="$(PROD_SIMTIME)" units="years">
-          <segment simTime="12" units="months"/>
-          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1300p5_production']/node())"/>
-      </production>
-      <regression name="basic">
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1300p5']/node())"/> </run>
-      </regression>
-
-      <regression name="rts">
-        <run days="15 16" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1300p5']/node())"/> </run>
-        <run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O648']/node())"/> </run>
-  	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
-  	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
-      </regression>
-      <regression name="debug">
-  	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
-      </regression>
-      <regression name="timings">
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1441p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1057p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1300p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O951p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O951p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1300p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O2044p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1300p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1608p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1441p5']/node())"/> </run>
-      </regression>
-
-      <reference restart="$(REFERENCE)/archive/1x1m0d_432x2a_1300x1o/restart/00010201.tar"/>
-    </runtime>
+   </input>
   </experiment>
-  
 
   <freInclude name="OBGC_COBALT_IC_Preind_CO2">
     <input>
