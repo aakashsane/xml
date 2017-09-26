@@ -660,9 +660,8 @@ Experiment to build executable.
     <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared/generic_tracers ocean_shared/mocsy/src">
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
+        <codeBase version="$(MOM6_GIT_TAG)"> ocean_shared.git </codeBase>
         <csh><![CDATA[
-          \rm -rf ocean_null
           git clone -b $(MOM6_GIT_TAG) https://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
@@ -671,17 +670,6 @@ Experiment to build executable.
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
-          popd
-
-          #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
-          git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
-          pushd ocean_shared
-          git checkout $(MOM6_GIT_TAG)
-###Begin Updates from b group not yet tagged as $(MOM6_GIT_TAG), remove these once they are tagged
-git checkout user/nnz/ABIO_BLING_COBALT_20170922
-###End   Updates
-          git submodule init mocsy
-          git submodule update
           popd
 
           pushd mom6
@@ -699,7 +687,6 @@ git checkout user/nnz/ABIO_BLING_COBALT_20170922
           if ($status != 0) then
             echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
           endif
- 
  
         ]]></csh>
       </source>
@@ -1838,6 +1825,10 @@ DO_GEOTHERMAL = True
 GEOTHERMAL_FILE = "geothermal_davies2013_v1.nc"
 GEOTHERMAL_SCALE = 1.0
 GEOTHERMAL_VARNAME = "geothermal_hf"
+
+!preserve 2017.07.05 answers see MOM6 commit 970af50ff
+#override BT_USE_OLD_CORIOLIS_BRACKET_BUG=True
+
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF

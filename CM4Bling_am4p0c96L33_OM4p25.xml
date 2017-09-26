@@ -935,9 +935,8 @@ Experiment to build executable.
     <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared/generic_tracers ocean_shared/mocsy/src">
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
+        <codeBase version="$(MOM6_GIT_TAG)"> ocean_shared.git </codeBase>
         <csh><![CDATA[
-          \rm -rf ocean_null
           git clone -b $(MOM6_GIT_TAG) https://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
@@ -946,16 +945,6 @@ Experiment to build executable.
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
-          popd
-          #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
-          git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
-          pushd ocean_shared
-          git checkout $(MOM6_GIT_TAG)
-###Begin Updates from b group not yet tagged as $(MOM6_GIT_TAG), remove these once they are tagged
-git checkout user/nnz/ABIO_BLING_COBALT_20170922
-###End   Updates
-          git submodule init mocsy
-          git submodule update
           popd
 
           pushd mom6
@@ -973,7 +962,6 @@ git checkout user/nnz/ABIO_BLING_COBALT_20170922
           if ($status != 0) then
             echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
           endif
- 
  
         ]]></csh>
       </source>
@@ -1003,18 +991,6 @@ git checkout user/nnz/ABIO_BLING_COBALT_20170922
        </compile>
        <description domainName="N/A" communityName="N/A" communityVersion="$(RELEASE)" communityGrid="N/A"/>
     </component>
-
-    <!--
-    <component name="mocsy" paths="ocean_shared/mocsy/src">
-       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
-        <csh>\rm -rf ocean_null</csh>
-       </source>
-      <compile>
-            <makeOverrides>FFLAGS="-cpp -DUSE_PRECISION=2 "</makeOverrides>
-      </compile>
-    </component>
-    -->
   </experiment>
 
   <experiment name="cm4_sis2_compile" inherit="cm4_libs_compile">
@@ -3696,6 +3672,9 @@ Z_INIT_REMAP_FULL_COLUMN = True
 #override USE_CALVING_HEAT_CONTENT = True
 #override ENERGYSAVEDAYS = 30
 
+!preserve 2017.07.05 answers see MOM6 commit 970af50ff
+#override BT_USE_OLD_CORIOLIS_BRACKET_BUG=True
+
 MOM_OVERRIDE_EOF
      ]]></csh>
  
@@ -3806,6 +3785,10 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override USE_RIVER_HEAT_CONTENT = True
 #override USE_CALVING_HEAT_CONTENT = True
 #override ENERGYSAVEDAYS = 30
+
+!preserve 2017.07.05 answers see MOM6 commit 970af50ff
+#override BT_USE_OLD_CORIOLIS_BRACKET_BUG=True
+
 MOM_OVERRIDE_EOF
 
 if ( $currentSeg == 1 ) then
@@ -3848,13 +3831,6 @@ endif
 # "ATM", "cfc_11_flux_pcair_atm","CFC_11","INPUT/cfc.bc.nc","bilinear", 1.0e-12
 # "ATM", "cfc_12_flux_pcair_atm","CFC_12","INPUT/cfc.bc.nc","bilinear", 1.0e-12
 #                                                                                                                                 
-# jgj 2016/11/29 co2 data table (Jan 1 1850 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
-#
-## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
-## radiation co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
-"ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
-"ATM" , "co2_dvmr_rad",     "",     "", "none",  284.262e-06
-#
       </dataTable>  
       <namelist name="landuse_nml">
        do_landuse_change = .false.
@@ -3942,7 +3918,7 @@ endif
 # note scale factor for o2 gas exchange
 "ATM", "o2_flux_pcair_atm",            "",     "",                                             "none",      0.21
 #
-## co2 is interactive, so comment out co2_bot
+## co2 is not interactive, so comment out co2_bot
 #"ATM", "co2_bot",                      "",     "",                                             "none",      284.262e-6
 #
 # Composition of runoff includes 0.1 PgC for CaCO3 burial (0.48 Alk, 0.24DIC)
@@ -3955,13 +3931,6 @@ endif
 ## JGJ: add cfcs later - check scale factor
 # "ATM", "cfc_11_flux_pcair_atm","CFC_11","INPUT/cfc.bc.nc","bilinear", 1.0e-12
 # "ATM", "cfc_12_flux_pcair_atm","CFC_12","INPUT/cfc.bc.nc","bilinear", 1.0e-12
-#                                                                                                                                 
-# jgj 2016/11/29 co2 data table (Jan 1 1850 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
-#
-## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
-## radiation co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
-"ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
-"ATM" , "co2_dvmr_rad",     "",     "", "none",  284.262e-06
 #
       </dataTable>  
     </input>
@@ -4253,10 +4222,18 @@ GEOTHERMAL_SCALE = 1.0
 GEOTHERMAL_VARNAME = "geothermal_hf"
 ! Kd = 1.5e-5
 #override KD = 1.5E-5
+
+!preserve 2017.07.05 answers see MOM6 commit 970af50ff
+#override BT_USE_OLD_CORIOLIS_BRACKET_BUG=True
+
 MOM_OVERRIDE_EOF
      ]]></csh>
  
     </input>
+    <runtime>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_216x2a_2997x1o/restart/01010201.tar"/>
+    </runtime>
+
   </experiment>       
 </experimentSuite>
 
