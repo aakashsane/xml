@@ -950,6 +950,9 @@ Experiment to build executable.
           pushd ocean_shared
           #git checkout user/nnz/mom6_dev
           git checkout $(MOM6_GIT_TAG)
+#John Dunne updates for BLING
+git checkout user/nnz/cmip6diags_gasfluxfixes_from_jpd
+#
           git submodule init mocsy
           git submodule update
 	  #Have to rename *.f90 to *.F90 so that we can pass cpp def  -DUSE_PRECISION=2 to them.
@@ -1282,9 +1285,6 @@ $baseDate
          <dataSource platform="$(platform)">$(includeDir)/awg/diag_table/cmip6/diag_table_3hr</dataSource>
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(includeDir)/awg/diag_table/cmip6/diag_table_6hrPlev</dataSource>
-      </dataFile>
-      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(includeDir)/awg/diag_table/cmip6/diag_table_day</dataSource>
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
@@ -1320,8 +1320,167 @@ $baseDate
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(includeDir)/awg/diag_table/cmip6/diag_table_CFsite</dataSource>
       </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(includeDir)/awg/diag_table/diag_table_CFmon_aug30</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(includeDir)/awg/diag_table/diag_table_CFday_aug30</dataSource>
+      </dataFile>
+
     </input>
   </freInclude>
+
+
+  <freInclude name="cosp_lists">
+    <input>
+      <namelist name="cosp_diagnostics_nml">
+        generate_orbital_output = .false.
+        orbital_filename = 'INPUT/cloudsat_orbit_08921_14250.nc'
+        sat_begin_time = 1986, 1, 1, 0, 0, 0
+        sat_period = 10800
+        num_sat_periods = 2929
+      </namelist>
+      <namelist name="COSP_INPUT">
+   use_rh_wrt_liq = .true.
+   use_input_file = .false.
+   produce_cmor_output_fields = .false.
+   CMOR_NL='INPUT/cosp_cmor_nl.txt', ! CMOR namelist
+   NPOINTS_IT = 20000
+   OVERLAP=3,   !  overlap type: 1=max, 2=rand, 3=max/rand
+   ISCCP_TOPHEIGHT=1,  !  1 = adjust top height using both a computed
+                       !  infrared brightness temperature and the visible
+                       !  optical depth to adjust cloud top pressure. Note
+                       !  that this calculation is most appropriate to compare
+                     !  to ISCCP data during sunlit hours.
+                     !  2 = do not adjust top height, that is cloud top
+                     !  pressure is the actual cloud top pressure
+                     !  in the model
+                    !  3 = adjust top height using only the computed
+                       !  infrared brightness temperature. Note that this
+                       !  calculation is most appropriate to compare to ISCCP
+                       !  IR only algortihm (i.e. you can compare to nighttime
+                       !  ISCCP data with this option)
+  ISCCP_TOPHEIGHT_DIRECTION=2,   ! direction for finding atmosphere pressure level
+                                 ! with interpolated temperature equal to the radiance
+                                 ! determined cloud-top temperature
+                                 ! 1 = find the *lowest* altitude (highest pressure) level
+                                 ! with interpolated temperature equal to the radiance
+                                 ! determined cloud-top temperature
+                                 ! 2 = find the *highest* altitude (lowest pressure) level
+                                 ! with interpolated temperature equal to the radiance
+                                 ! determined cloud-top temperature
+                                 ! ONLY APPLICABLE IF top_height EQUALS 1 or 3
+                                 ! 1 = default setting, and matches all versions of
+                                 ! ISCCP simulator with versions numbers 3.5.1 and lower
+                                 ! 2 = experimental setting
+! USE_VGRID=.false., ! Use fixed vertical grid for outputs? (if .true. then you need to define number of levels with Nlr)
+  USE_VGRID=.true., ! Use fixed vertical grid for outputs? (if .true. then you need to define number of levels with Nlr)
+  NLR=40,       ! Number of levels in statistical outputs (only used if USE_VGRID=.true.)
+   CSAT_VGRID=.true., ! CloudSat vertical? (if .true. then the CloudSat standard grid is used for the outputs.
+! CSAT_VGRID=.false., ! CloudSat vertical? (if .true. then the CloudSat standard grid is used for the outputs.
+                     !  USE_VGRID needs also be .true.)
+!  NHYDRO=8,   ! Number of hydrometeors
+! FINPUT='cosp_input_um.nc', ! NetCDF file with 1D inputs
+  FINPUT='cosp_input_um_2d.nc', ! NetCDF file with 2D inputs
+  ! Some inputs related to radar simulations
+  RADAR_FREQ=94.0, ! CloudSat radar frequency (GHz)
+  SURFACE_RADAR=0, ! surface=1, spaceborne=0
+! SURFACE_RADAR=1, ! surface=1, spaceborne=0
+  use_mie_tables=0,! use a precomputed lookup table? yes=1,no=0
+  use_gas_abs=1,   ! include gaseous absorption? yes=1,no=0
+  do_ray=0,        ! calculate/output Rayleigh refl=1, not=0
+  melt_lay=0,      ! melting layer model off=0, on=1
+  k2=-1,           ! |K|^2, -1=use frequency dependent default
+  use_reff=.true., ! True if you want effective radius to be used by radar simulator (always used by lidar)
+  use_precipitation_fluxes=.true.,  ! True if precipitation fluxes are input to the algorithm
+  ! Some inputs related to lidar simulations
+  Nprmts_max_hydro=12, ! Max number of parameters for hydrometeor size distributions
+  Naero=1,             ! Number of aerosol species (Not used)
+  Nprmts_max_aero=1,   ! Max number of parameters for aerosol size distributions (Not used)
+  lidar_ice_type=0     ! Ice particle shape in lidar calculations (0=ice-spheres ; 1=ice-non-spherical)
+
+ !--------------------------------------------------------------------- -------------
+ !-------------- RTTOV inputs
+ !--------------------------------------------------------------------- -------------
+  Platform=1,    ! satellite platform
+  Satellite=15,  ! satellite
+  Instrument=0,  ! instrument
+  Nchannels=8,   ! Number of channels to be computed
+  Channels=1,3,5,6,8,10,11,13,        ! Channel numbers (please be sure that you supply Nchannels)
+  Surfem=0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,  ! Surface emissivity (please be sure that you supply Nchannels)
+  ZenAng=50.0, ! Satellite Zenith Angle
+  CO2=5.241e-04, ! Mixing ratios of trace gases
+  CH4=9.139e-07,
+  N2O=4.665e-07,
+  CO=2.098e-07
+      </namelist>
+
+      <namelist name="COSP_OUTPUT">
+  ! Simulator flags
+  Lradar_sim=.true.,
+  Llidar_sim=.true.,
+  Lisccp_sim=.true.,
+  Lmodis_sim=.true.,
+  Lmisr_sim=.true.
+  Lrttov_sim=.false.
+  ! Output variables
+  ! flags for isccp output
+  Lalbisccp=.true.,
+  Lboxptopisccp=.true.,
+  Lboxtauisccp=.true.,
+  Lclisccp=.true.,
+  Lpctisccp=.true.,
+  Ltauisccp=.true.,
+  Lcltisccp=.true.,
+  Lmeantbisccp=.true.
+  Lmeantbclrisccp=.true.
+  ! flags for cloudsat output
+  Lcfaddbze94=.true.,
+  Ldbze94=.true.,
+  ! flags for calipso output
+  Latb532=.true.,
+  LcfadLidarsr532=.true.,
+  Lclcalipso=.true.,
+  Lclhcalipso=.true.,
+  Lcllcalipso=.true.,
+  Lclmcalipso=.true.,
+  Lcltcalipso=.true.,
+  LparasolRefl=.true.,
+  LlidarBetaMol532=.true.
+  !
+  LclMISR=.true.
+  ! Use lidar and radar
+  Lclcalipso2=.true.,
+  Lcltlidarradar=.true.,
+  ! These aere provided for debugging or special purposes
+  Lfracout=.true.
+  Ltoffset = .true.   
+  !flags for MODIS output
+  Lcltmodis=.true.
+  Lclwmodis=.true.
+  Lclimodis=.true.
+  Lclhmodis=.true.
+  Lclmmodis=.true.
+  Lcllmodis=.true.
+  Ltautmodis=.true.
+  Ltauwmodis=.true.
+  Ltauimodis=.true.
+  Ltautlogmodis=.true.
+  Ltauwlogmodis=.true.
+  Ltauilogmodis=.true.
+  Lreffclwmodis=.true.
+  Lreffclimodis=.true.
+  Lpctmodis=.true.
+  Llwpmodis=.true.
+  Liwpmodis=.true.
+  Lclmodis=.true.
+  ! flag for RTTOV
+  Ltbrttov=.false. ! RTTOV outputs
+      </namelist>
+    </input>
+  </freInclude>
+
+
   <freInclude name="c96L33_initCond">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
@@ -1441,6 +1600,45 @@ set use_hyperthread = $use_hyper_thread
 set atm_hyperthread = $atm_hythr
 set ocn_hyperthread = $ocn_hythr
 
+#Add required BLING gas flux fields if they do not exist in the restarts 
+#to be able to start from older runs that did not have these gas fluxes
+if ( $currentSeg == 1 ) then 
+   #The following values for kw and deltap fields are arbitrary and do not matter, the fields just need to exist!
+   #These kw and deltap fields do not need to be restarted as they are calculated from alpha and csurf values!    
+   #This has to be fixed in the source code in future with a new coupler flux design.
+   foreach resfile ( `ls $work/INPUT/ice_bling.res.nc*` ) 
+      ncdump -h $resfile | grep o2_flux_deltap_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_deltap_ice=co2_flux_flux_ice*0.0+1000.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_deltap_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_deltap_ice=co2_flux_flux_ice*0.0+1000.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep o2_flux_kw_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_kw_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_kw_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_kw_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   #
+   #Add Schmidt number to restart if it does not exist so that the model can use old restart files. 
+   #A value of 660 make it consistent with the old ( "non-generic") formulation that did not have a separate sc_no
+   foreach resfile ( `ls $work/INPUT/ocean_bling_airsea_flux.res.nc*` )
+      ncdump -h $resfile | grep o2_flux_sc_no_ocn > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_sc_no_ocn=o2_flux_alpha_ocn*0.0+660.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_sc_no_ocn > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_sc_no_ocn=co2_flux_alpha_ocn*0.0+660.0' $resfile $resfile
+      endif
+   end
+
+endif
 ####COMMON ALWAYS CSH ENDS######
       ]]></csh>
            
@@ -1455,6 +1653,74 @@ set ocn_hyperthread = $ocn_hythr
     <postProcess>
       <refineDiag script="$(includeDir)/awg/refineDiag/refineDiag_atmos_cmip6.csh"/>
       <refineDiag script="$(includeDir)/awg/refineDiag/refineDiag_CFsite.csh"/>
+
+
+      <component type="atmos_month_cfmip" start="$(PP_CPLD_START)" source="atmos_month_cfmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_month_cosp" start="$(PP_CPLD_START)" source="atmos_month_cosp" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_month_plev7" start="$(PP_CPLD_START)" source="atmos_month_plev7" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_month_alt16" start="$(PP_CPLD_START)" source="atmos_month_alt16" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_month_alt40" start="$(PP_CPLD_START)" source="atmos_month_alt40" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+
+      <component type="atmos_daily_cosp" start="$(PP_CPLD_START)" source="atmos_daily_cosp" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+	<timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+	<timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_8xdaily_plev7" start="$(PP_CPLD_START)" source="atmos_8xdaily_plev7" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="3hr" source="atmos_8xdaily_plev7" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="3hr" source="atmos_8xdaily_inst_plev7" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+	<timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+	<timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_8xdaily_alt40" start="$(PP_CPLD_START)" source="atmos_8xdaily_inst_alt40" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="3hr" source="atmos_8xdaily_inst_alt40" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+	<timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+	<timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_8xdaily_alt16" start="$(PP_CPLD_START)" source="atmos_8xdaily_inst_alt16" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="3hr" source="atmos_8xdaily_inst_alt16" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+	<timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+	<timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_8xdaily_cosp" start="$(PP_CPLD_START)" source="atmos_8xdaily_cosp" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="3hr" source="atmos_8xdaily_cosp" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="3hr" source="atmos_8xdaily_inst_cosp" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+        <timeSeries freq="3hr" source="atmos_8xdaily_plev7" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+	<timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_daily_plev7" start="$(PP_CPLD_START)" source="atmos_daily_plev7" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+	<timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_daily_alt40" start="$(PP_CPLD_START)" source="atmos_daily_alt40" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+	<timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+
+
+
+
 
       <component type="atmos_cmip"  start="$(PP_CPLD_START)" source="atmos_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="yes">
         <timeSeries freq="3hr" source="atmos_8xdaily_cmip" chunkLength="$(PP_CPLD_CHUNK_A)">
@@ -1483,7 +1749,7 @@ set ocn_hyperthread = $ocn_hythr
           </xi:include>
         </timeSeries>
 
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAvecmip/*)">
             <xi:fallback/>
           </xi:include>
@@ -1506,17 +1772,14 @@ set ocn_hyperthread = $ocn_hythr
           </xi:include>
 	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/a1r/analysis/agu/Krasting/pywavelet_jpk_a1r.py -varname t_surf -comp atmos"/>
         </timeSeries>
+
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)">
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh"/>
-	</timeAverage>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
 	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh"/>
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAve/*)">
             <xi:fallback/>
           </xi:include>
         </timeAverage>
-        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosAnnualAve/*)">
             <xi:fallback/>
           </xi:include>
@@ -1537,8 +1800,7 @@ set ocn_hyperthread = $ocn_hythr
             <xi:fallback/>
           </xi:include>
         </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosLevelMonthAve/*)">
             <xi:fallback/>
           </xi:include>
@@ -1546,8 +1808,7 @@ set ocn_hyperthread = $ocn_hythr
       </component>
 
       <component type="atmos_month_aer" start="$(PP_CPLD_START)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
+         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAerAve/*)">
             <xi:fallback/>
           </xi:include>
@@ -1558,7 +1819,6 @@ set ocn_hyperthread = $ocn_hythr
       <component type="atmos_diurnal" start="$(PP_CPLD_START)"  source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)"/>
       </component>
 
       <component type="atmos_scalar" start="$(PP_CPLD_START)" source="atmos_scalar" cmip="yes">
@@ -1574,8 +1834,7 @@ set ocn_hyperthread = $ocn_hythr
             <xi:fallback/>
           </xi:include>
         </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/tracerMonthAve/*)">
             <xi:fallback/>
           </xi:include>
@@ -1597,8 +1856,7 @@ set ocn_hyperthread = $ocn_hythr
             <xi:fallback/>
 	  </xi:include>
         </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthAve/*)" >
             <xi:fallback/>
 	  </xi:include>
@@ -1627,7 +1885,6 @@ set ocn_hyperthread = $ocn_hythr
         <timeSeries freq="daily" source="river_daily" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)"/>
       </component>
 
       <component type="river_cubic" start="$(PP_CPLD_START)" source="river_month" sourceGrid="land-cubedsphere">
@@ -1877,9 +2134,6 @@ set ocn_hyperthread = $ocn_hythr
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)" >
 	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
 	</timeAverage>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)" >
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
-	</timeAverage>
       </component>
 
       <component type="ocean_monthly_1x1deg" source="ocean_month" sourceGrid="ocean-tripolar" xyInterp="180,360">
@@ -1889,41 +2143,30 @@ set ocn_hyperthread = $ocn_hythr
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)" >
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
         </timeAverage>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)" >
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.ocean.csh"/>
-        </timeAverage>
       </component>
 
       <component type="ocean_monthly_z" source="ocean_month_z" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)"/>
       </component>
 
       <component type="ocean_monthly_z_1x1deg" source="ocean_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)"/>
       </component>
 
       <component type="ocean_annual" source="ocean_annual" sourceGrid="ocean-tripolar">
         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
-        </timeAverage>
         <timeAverage source="annual" interval="10yr"/>
-        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
         </timeAverage>
       </component>
 
       <component type="ocean_annual_1x1deg" source="ocean_annual" sourceGrid="ocean-tripolar" xyInterp="180,360">
         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
-        </timeAverage>
         <timeAverage source="annual" interval="10yr"/>
-        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
+        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
         </timeAverage>
       </component>
@@ -1931,9 +2174,6 @@ set ocn_hyperthread = $ocn_hythr
       <component type="ocean_annual_z" source="ocean_annual_z" sourceGrid="ocean-tripolar">
         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>	
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
-        </timeAverage>
-        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(includeDir)/awg/analysis/stub/atw_ocean_av_annual_subsfc_ocean.csh -D ocean_annual_z.%04d-%04d."/>
         </timeAverage>
@@ -1943,83 +2183,78 @@ set ocn_hyperthread = $ocn_hythr
         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
-        </timeAverage>
-        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(includeDir)/awg/analysis/stub/atw_ocean_av_annual_subsfc_ocean.csh -D ocean_annual_z.%04d-%04d."/>
         </timeAverage>
       </component>
 
       <!--Ocean scalars-->
       <component type="ocean_scalar_monthly"   source="ocean_scalar_month" sourceGrid="ocean-tripolar">
-        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_scalar_month"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_scalar_month"/>
         <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)"/>
       </component>
       
       <component type="ocean_scalar_annual"    source="ocean_scalar_annual" sourceGrid="ocean-tripolar">
-        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_scalar_annual"/>
+        <timeSeries freq="annual"   chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_scalar_annual"/>
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_B)"/>
       </component>
 
       <!--Ocean regions-->
       <component type="ocean_Barents_opening" source="ocean_Barents_opening" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Barents_opening"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Barents_opening"/>
       </component>
       <component type="ocean_Bering_Strait" source="ocean_Bering_Strait" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Bering_Strait"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Bering_Strait"/>
       </component>
       <component type="ocean_Davis_Strait" source="ocean_Davis_Strait" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Davis_Strait"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Davis_Strait"/>
       </component>
       <component type="ocean_Windward_Passage" source="ocean_Windward_Passage" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Windward_Passage"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Windward_Passage"/>
       </component>
       <component type="ocean_Denmark_Strait" source="ocean_Denmark_Strait" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Denmark_Strait"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Denmark_Strait"/>
       </component>
       <component type="ocean_Drake_Passage" source="ocean_Drake_Passage" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Drake_Passage"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Drake_Passage"/>
       </component>
       <component type="ocean_English_Channel" source="ocean_English_Channel" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_English_Channel"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_English_Channel"/>
       </component>
       <component type="ocean_Faroe_Scotland" source="ocean_Faroe_Scotland" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Faroe_Scotland"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Faroe_Scotland"/>
       </component>
       <component type="ocean_Florida_Bahamas" source="ocean_Florida_Bahamas" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Florida_Bahamas"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Florida_Bahamas"/>
       </component>
       <component type="ocean_Fram_Strait" source="ocean_Fram_Strait" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Fram_Strait"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Fram_Strait"/>
       </component>
       <component type="ocean_Iceland_Faroe_V" source="ocean_Iceland_Faroe_V" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Iceland_Faroe_V"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Iceland_Faroe_V"/>
       </component>
       <component type="ocean_Iceland_Faroe_U" source="ocean_Iceland_Faroe_U" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Iceland_Faroe_U"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Iceland_Faroe_U"/>
       </component>
       <component type="ocean_Indonesian_Throughflow" source="ocean_Indonesian_Throughflow" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Indonesian_Throughflow"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Indonesian_Throughflow"/>
       </component>
       <component type="ocean_Mozambique_Channel" source="ocean_Mozambique_Channel" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Mozambique_Channel"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Mozambique_Channel"/>
       </component>
       <component type="ocean_Pacific_undercurrent" source="ocean_Pacific_undercurrent" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Pacific_undercurrent"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Pacific_undercurrent"/>
       </component>
       <component type="ocean_Taiwan_Luzon" source="ocean_Taiwan_Luzon" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Taiwan_Luzon"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Taiwan_Luzon"/>
       </component>
       <component type="ocean_Agulhas_section" source="ocean_Agulhas_section" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Agulhas_section"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Agulhas_section"/>
       </component>
       <component type="ocean_Gibraltar_Strait" source="ocean_Gibraltar_Strait" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Gibraltar_Strait"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Gibraltar_Strait"/>
       </component>
       <component type="ocean_Iceland_Norway" source="ocean_Iceland_Norway" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Iceland_Norway"/>
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_Iceland_Norway"/>
       </component>
 
       <!--ICE-->      
@@ -2028,7 +2263,6 @@ set ocn_hyperthread = $ocn_hythr
 	   <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
 	</timeSeries>   
         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_B)"/>
       </component>     
 
       <component type="ice_1x1deg"  source="ice_month" sourceGrid="ocean-tripolar" xyInterp="180,360">
@@ -2036,82 +2270,79 @@ set ocn_hyperthread = $ocn_hythr
            <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(includeDir)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
         </timeSeries>
         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_B)"/>
       </component>
 
     </postProcess>
   </freInclude> 
 
-  <!-- Atmos co2 post-processing: note atmos_level, atmos_month and atmos_scalar already in c96_climo_postprocess -->
-  <freInclude name="atmos_co2_postprocess">
-      <postProcess> 
-      <component type="atmos_level_instant" source="atmos_level_instant" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
-        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
-        <timeSeries freq="annual"  chunkLength="$(PP_CPLD_CHUNK_A)">
-        </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)"/>
-        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_B)">
-        </timeAverage>
-      </component>
-     </postProcess>
-  </freInclude>
   <freInclude name="BLING_postprocess">
       <postProcess> 
-      <component type="ocean_bling_month" source="ocean_bling_month" sourceGrid="ocean-tripolar">
+      <component type="ocean_bling" source="ocean_bling" sourceGrid="ocean-tripolar">
          <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
-      <component type="ocean_bling_month_1x1deg" source="ocean_bling_month" sourceGrid="ocean-tripolar" xyInterp="180,360">
-         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
-      </component>
-
-      <component type="ocean_bling_month_z" source="ocean_bling_month_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
-      </component>
-      <component type="ocean_bling_month_z_1x1deg" source="ocean_bling_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+      <component type="ocean_bling_1x1deg" source="ocean_bling" sourceGrid="ocean-tripolar" xyInterp="180,360">
          <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_bling_year" source="ocean_bling_year" sourceGrid="ocean-tripolar">
+      <component type="ocean_bling_cmip6_omip_daily" source="ocean_bling_cmip6_omip_daily" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="ocean_bling_cmip6_omip_daily_1x1deg" source="ocean_bling_cmip6_omip_daily" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_sfc" source="ocean_bling_cmip6_omip_sfc" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="ocean_bling_cmip6_omip_sfc_1x1deg" source="ocean_bling_cmip6_omip_sfc" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_2d" source="ocean_bling_cmip6_omip_2d" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="ocean_bling_cmip6_omip_2d_1x1deg" source="ocean_bling_cmip6_omip_2d" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_tracers_month_z" source="ocean_bling_cmip6_omip_tracers_month_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+      <component type="ocean_bling_cmip6_omip_tracers_month_z_1x1deg" source="ocean_bling_cmip6_omip_tracers_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_tracers_year_z" source="ocean_bling_cmip6_omip_tracers_year_z" sourceGrid="ocean-tripolar">
          <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
-      <component type="ocean_bling_year_1x1deg" source="ocean_bling_year" sourceGrid="ocean-tripolar" xyInterp="180,360">
+      <component type="ocean_bling_cmip6_omip_tracers_year_z_1x1deg" source="ocean_bling_cmip6_omip_tracers_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
          <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_bling_year_z" source="ocean_bling_year_z" sourceGrid="ocean-tripolar">
+      <component type="ocean_bling_cmip6_omip_rates_year_z" source="ocean_bling_cmip6_omip_rates_year_z" sourceGrid="ocean-tripolar">
          <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
-      <component type="ocean_bling_year_z_1x1deg" source="ocean_bling_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+      <component type="ocean_bling_cmip6_omip_rates_year_z_1x1deg" source="ocean_bling_cmip6_omip_rates_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
          <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
+
      </postProcess>
   </freInclude>
-  <freInclude name="BLING_postprocess_old">
-      <postProcess> 
-      <!--REFINE DIAG SCRIP -->
-      <!--By default a refineDiag script causes the annual data to be unpacked and saved in /ptmp/$USER-->
-      <!--MOM6_refineDiag.csh is currently empty and is here only to cause the unpack annual history files in /ptmp-->
-            <!-- wh removed the string here, left it in OM4_postprocess per Niki and Jasmin-->
-      <refineDiag script=""/>
 
-      <!--PostProcessing component models-->
-      <component type="ocean_bling" start="$(PP_START_YEAR)" source="ocean_bling" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
-         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
-      </component>
-     </postProcess>
-  </freInclude>
- 
   <freInclude name="BLING_z_postprocess">
       <postProcess> 
       <!--REFINE DIAG SCRIP -->
@@ -2254,7 +2485,7 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
   <freInclude name="BLING_data_table">
     <input>
       <!--  BLING data table, o2 gas exchange data table (note sclae factor for bling), CMIP6 Jan 1 1850 co2 data table -->
-      <dataTable order="append">
+      <dataTable>
 # jgj 2017/01/30 BLING data table
 #
 "ATM", "c14o2_flux_pcair_atm",         "CO2",  "INPUT/ocmip2_siple_co2_atm_am2_bc-1-9999.nc", "bilinear",  1.0e-06
@@ -2322,8 +2553,6 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
 #
 ## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
 ## radiation co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
-"ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
-"ATM" , "co2_dvmr_rad",     "",     "", "none",  284.262e-06
 #
       </dataTable>
      </input>
@@ -2906,7 +3135,8 @@ biomass_p_valid_min = 0.0
       </fieldTable>  
     </input>
   </freInclude>
-  <freInclude name="BLING_diag_table_old">
+
+  <freInclude name="BLING_diag_table">
     <input>
       <diagTable order="append"> 
 "radiation", "vis_extopdep_vlcno_c",        "vis_exopd_vl_c",  "atmos_month_aer", "all", .true.,"none", 2
@@ -2928,8 +3158,7 @@ biomass_p_valid_min = 0.0
 ## 2016/11/29: TO DO: check Data Request for co2 name convention/units
 #===============================================================================
 "atmos_level",                 1,  "months", 1, "days", "time",
-
-#"atmos_level_instant",         1,  "months", 1, "days", "time",
+"atmos_level_instant",         1,  "months", 1, "days", "time",
 #"atmos_month",      1,  "months", 1, "days", "time",
 #"atmos_scalar",     1,  "months", 1, "days", "Time",
 #
@@ -2939,10 +3168,9 @@ biomass_p_valid_min = 0.0
  "radiation",                "co2_tf",             "co2_tf",             "atmos_scalar", "all", .true., "none", 2
 ## instantaneous
 # concentration
-
 # jgj: add co2 and pwt back as single precision
-# "atmos_co2",                "pwt",                "pwt",                "atmos_level_instant", "all", .false.,  "none", 2
-# "dynamics",                 "co2",                "co2",                "atmos_level_instant", "all", .false.,  "none", 2
+ "atmos_co2",                "pwt",                "pwt",                "atmos_level_instant", "all", .false.,  "none", 2
+ "dynamics",                 "co2",                "co2",                "atmos_level_instant", "all", .false.,  "none", 2
 # "dynamics",                 "co2_dmmr",           "co2_dmmr",           "atmos_level_instant", "all", .false.,  "none", 1
 # "dynamics",                 "co2_dvmr",           "co2_dvmr",           "atmos_level_instant", "all", .false.,  "none", 1
 # "dynamics",                 "ps",                 "ps",                 "atmos_level_instant", "all", .false.,  "none", 1
@@ -3027,10 +3255,6 @@ biomass_p_valid_min = 0.0
  "generic_bling","o2_stf_gas",      "o2_stf_gas",            "ocean_bling","all",.true.,"none",2
 #
 #===================================================================================================================
-      </diagTable> 
-
-      <!-- BLING_z diag table -->
-      <diagTable order="append"> 
 ##==========================================================================================
 # GENERIC OCEAN BLING_z DIAGNOSTICS  jgj 2017/01/30
 # check code to see if hooks in place to get _z diagnostics 
@@ -3038,179 +3262,153 @@ biomass_p_valid_min = 0.0
 # change frequency for debugging
 #==========================================================================================
 #
- "ocean_bling_z",           1,  "months", 1, "days", "time",
+#output files
+#=============================================================================================================================
+# Omon: 2-D Marine Biogeochemical Surface Tracer Fields: ocean_bling_cmip6_omip_daily
+#=============================================================================================================================
+"ocean_bling_cmip6_omip_daily",          24, "hours",  1, "days", "time",
+ "ocean_model","geolat_c","geolat_c",                       "ocean_bling_cmip6_omip_daily","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c",                       "ocean_bling_cmip6_omip_daily","all",.false.,"none",2
+ "ocean_model","geolat","geolat",                           "ocean_bling_cmip6_omip_daily","all",.false.,"none",2
+ "ocean_model","geolon","geolon",                           "ocean_bling_cmip6_omip_daily","all",.false.,"none",2
+ "generic_bling","chlos",        "chlos",                  "ocean_bling_cmip6_omip_daily","all",.true.,"none",2
+ "generic_bling","phycos",       "phycos",                 "ocean_bling_cmip6_omip_daily","all",.true.,"none",2
 #
- "generic_bling_z", "alk",     "alk",               "ocean_bling_z","all","mean","none",2
- "generic_bling_z", "biomass_p","biomass_p",        "ocean_bling_z","all","mean","none",2
- "generic_bling_z", "chl",     "chl",               "ocean_bling_z","all","mean","none",2
- "generic_bling_z", "co3_ion", "co3_ion",           "ocean_bling_z","all","mean","none",2
- "generic_bling_z", "dic",     "dic",               "ocean_bling_z","all","mean","none",2
- "generic_bling_z", "dop",     "dop",               "ocean_bling_z","all","mean","none",2
- "generic_bling_z", "fed",     "fed",               "ocean_bling_z","all","mean","none",2
- "generic_bling_z", "htotal",  "htotal",            "ocean_bling_z","all","mean","none",2
- "generic_bling_z", "po4",     "po4",               "ocean_bling_z","all","mean","none",2
- "generic_bling_z", "o2",      "o2",                "ocean_bling_z","all","mean","none",2
- "generic_bling_z","fpofe",    "fpofe",             "ocean_bling_z","all","mean","none",2
- "generic_bling_z","fpop",     "fpop",              "ocean_bling_z","all","mean","none",2
- "generic_bling_z","fpop_burial", "fpop_burial",    "ocean_bling_z","all","mean","none",2
- "generic_bling_z","frac_pop", "frac_pop",          "ocean_bling_z","all","mean","none",2
- "generic_bling_z","irr_inst", "irr_inst",          "ocean_bling_z","all","mean","none",2
- "generic_bling_z","irr_mem",  "irr_mem",           "ocean_bling_z","all","mean","none",2
- "generic_bling_z","jdop",     "jdop",              "ocean_bling_z","all","mean","none",2
- "generic_bling_z","jfe_uptake",  "jfe_uptake",     "ocean_bling_z","all","mean","none",2
- "generic_bling_z","jo2",      "jo2",               "ocean_bling_z","all","mean","none",2
- "generic_bling_z","jp_recycle", "jp_recycle",      "ocean_bling_z","all","mean","none",2
- "generic_bling_z","jp_reminp", "jp_reminp",        "ocean_bling_z","all","mean","none",2
- "generic_bling_z","jp_uptake", "jp_uptake",        "ocean_bling_z","all","mean","none",2
- "generic_bling_z","jpo4",     "jpo4",              "ocean_bling_z","all","mean","none",2
- "generic_bling_z","jpofe",    "jpofe",             "ocean_bling_z","all","mean","none",2
- "generic_bling_z","jpop",     "jpop",              "ocean_bling_z","all","mean","none",2
- "generic_bling_z","co3_solubility",  "co3_solubility", "ocean_bling_z","all","mean","none",2
- "generic_bling_z","fcaco3",   "fcaco3",            "ocean_bling_z","all","mean","none",2
- "generic_bling_z","jca_reminp", "jca_reminp",      "ocean_bling_z","all","mean","none",2
- "generic_bling_z","jca_uptake", "jca_uptake",      "ocean_bling_z","all","mean","none",2
+#
+#====================================================================================================================
+# Omon: 2-D Marine Biogeochemical Surface Tracer Fields:  ocean_bling_cmip6_omip_sfc
+#====================================================================================================================
+"ocean_bling_cmip6_omip_sfc",             1, "months", 1, "days", "time",
+ "ocean_model","geolat_c","geolat_c",                       "ocean_bling_cmip6_omip_sfc","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c",                       "ocean_bling_cmip6_omip_sfc","all",.false.,"none",2
+ "ocean_model","geolat","geolat",                           "ocean_bling_cmip6_omip_sfc","all",.false.,"none",2
+ "ocean_model","geolon","geolon",                           "ocean_bling_cmip6_omip_sfc","all",.false.,"none",2
+ "generic_bling","dissicos",       "dissic",             "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+# "generic_bling","dissi14cabioos", "dissi14cabio",       "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","dissocos",       "dissoc",             "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","phycos",         "phyc",               "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","talkos",         "talk",               "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","phos",           "ph",                 "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","o2os_cmip",      "o2",                 "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+# pending
+# "generic_bling","o2satos",       "o2sat",              "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","po4_cmip",       "po4",                "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","dfeos",          "dfe",                "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","chlos",          "chl",                "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","pocos",          "poc",                "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","popos",          "pop",                "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","phypos",         "phyp",               "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","co3os",          "co3",                "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+ "generic_bling","co3satcalcos",   "co3satcalc",         "ocean_bling_cmip6_omip_sfc","all",.true.,"none",2
+#
+#=============================================================================================================================
+# Omon: Additional 2-D Marine Biogeochemical Fields (e.g. vertically integrated, 100m, etc)
+#=============================================================================================================================
+"ocean_bling_cmip6_omip_2d",              1, "months", 1, "days", "time",
+ "ocean_model","geolat_c","geolat_c",                       "ocean_bling_cmip6_omip_2d","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c",                       "ocean_bling_cmip6_omip_2d","all",.false.,"none",2
+ "ocean_model","geolat","geolat",                           "ocean_bling_cmip6_omip_2d","all",.false.,"none",2
+ "ocean_model","geolon","geolon",                           "ocean_bling_cmip6_omip_2d","all",.false.,"none",2
+ "generic_bling","intpp",           "intpp",               "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","intpbp",          "intpbp",              "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","intpbfe",         "intpbfe",             "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","intpcalcite",     "intpcalcite",         "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","expc100",         "expc100",             "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","expp100",         "expp100",             "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","expfe100",        "expfe100",            "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","expcalc100",      "expcalc100",          "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","exparag100",      "exparag100",          "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","intdissic",       "intdissic",           "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","intdissoc",       "intdissoc",           "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","spco2",           "spco2",               "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","dpco2",           "dpco2",               "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","dpo2",            "dpo2",                "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","fgco2",           "fgco2",               "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+# "generic_bling","fg14cabio",       "fg14cabio",           "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","fgo2",            "fgo2",                "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","icfriver",        "icfriver",            "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","fric",            "fric",                "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+# pending
+# "generic_bling","ocfriver",        "ocfriver",            "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+# "generic_bling","froc",            "froc",                "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","fsfe",            "fsfe",                "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+ "generic_bling","frfe",            "frfe",                "ocean_bling_cmip6_omip_2d","all",.true.,"none",2
+#
+#
+#=============================================================================================================================
+# Omon: 3-D Marine Biogeochemical Tracer Fields:  ocean_bling_cmip6_omip_tracers_month_z
+#=============================================================================================================================
+"ocean_bling_cmip6_omip_tracers_month_z",   1, "months", 1, "days", "time",
+ "generic_bling_z","dissic",       "dissic",                 "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+# "generic_bling_z","dissi14cabio", "dissi14cabio",           "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","dissoc",       "dissoc",                 "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","phyc",         "phyc",                   "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","talk",         "talk",                   "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","ph",           "ph",                     "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","o2_cmip",      "o2",                     "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+# pending
+# "generic_bling_z","o2sat",        "o2sat",                  "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","po4_cmip",     "po4",                    "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","dfe",          "dfe",                    "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","chl_cmip",     "chl",                    "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","phyp",         "phyp",                   "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","co3",          "co3",                    "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","co3satcalc",   "co3satcalc",             "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+#=============================================================================================================================
+# Additional Omon: 3-D Marine Biogeochemical Fields:  ocean_bling_cmip6_omip_tracers_month
+#=============================================================================================================================
+ "generic_bling_z","pp",           "pp",                     "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","graz",         "graz",                   "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+ "generic_bling_z","expc",         "expc",                   "ocean_bling_cmip6_omip_tracers_month_z","all","mean","none",2
+#
+#=============================================================================================================================
+# Oyr: 3-D Marine Biogeochemical Tracer Fields:  ocean_bling_cmip6_omip_tracers_year_z
+#=============================================================================================================================
+"ocean_bling_cmip6_omip_tracers_year_z",   12, "months", 1, "days", "time",
+ "generic_bling_z","dissic",       "dissic",                 "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+# "generic_bling_z","dissi14cabio", "dissi14cabio",           "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","dissoc",       "dissoc",                 "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","phyc",         "phyc",                   "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","talk",         "talk",                   "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","ph",           "ph",                     "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","o2_cmip",      "o2",                     "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+# pending
+# "generic_bling_z","o2sat",        "o2sat",                  "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","po4_cmip",     "po4",                    "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","dfe",          "dfe",                    "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","chl_cmip",    "chl",                    "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","phyp",         "phyp",                   "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","co3",          "co3",                    "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+ "generic_bling_z","co3satcalc",   "co3satcalc",             "ocean_bling_cmip6_omip_tracers_year_z","all","mean","none",2
+#
+#=============================================================================================================================
+# Oyr: 3-D Marine Biogeochemical Rates of Production and Removal:  ocean_bling_cmip6_omip_rates_year_z
+#=============================================================================================================================
+"ocean_bling_cmip6_omip_rates_year_z",     12, "months", 1, "days", "time",
+ "generic_bling_z","pp",           "pp",                     "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+# not requested
+# "generic_bling_z","pphosphate",   "pphosphate",             "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","pbfe",         "pbfe",                   "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","pcalc",        "pcalc",                  "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","expc",         "expc",                   "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","expp",         "expp",                   "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","expfe",        "expfe",                  "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","expcalc",      "expcalc",                "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","remoc",        "remoc",                  "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","dcalc",        "dcalc",                  "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","bddtdic",      "bddtdic",                "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","bddtdip",      "bddtdip",                "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","bddtdife",     "bddtdife",               "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","bddtalk",      "bddtalk",                "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","fescav",       "fescav",                 "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","fediss",       "fediss",                 "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+ "generic_bling_z","graz",         "graz",                   "ocean_bling_cmip6_omip_rates_year_z","all","mean","none",2
+#
 #
 #==========================================================================================
       </diagTable> 
      </input>
   </freInclude>
-  <freInclude name="BLING_diag_table">
-    <input>
-      <diagTable order="append"> 
-"radiation", "vis_extopdep_vlcno_c",        "vis_exopd_vl_c",  "atmos_month_aer", "all", .true.,"none", 2
-"land",     "fco2"                 ,        "fco2",            "land_month",      "all", .true.,"none", 2
-"land",     "qco2_dvmr"            ,        "qco2_dvmr",       "land_month",      "all", .true.,"none", 2
-"land",     "Ctot"                 ,        "Ctot",            "land_month",      "all", .true.,"none", 2
-## 2016/12/19 add in land fields for conservation checking
-"land",     "water_cons"           ,        "water_cons",      "land_month",      "all", .true.,"none", 2
-"land",     "carbon_cons"          ,        "carbon_cons",     "land_month",      "all", .true.,"none", 2
-      </diagTable> 
-
-      <!--Atmos co2 diag table (concentration run with restoring) -->
-      <diagTable order="append"> 
-#
-#===============================================================================
-## ESM ATM output           2010/05/14 jgj, updated sep 2010, jan 2011, feb 2012
-## for co2 budget calculations, save concentration instantaneously also
-## 2016/03/04: note atmos_month and atmos_scalar already in awg diag table
-## 2016/11/29: TO DO: check Data Request for co2 name convention/units
-#===============================================================================
-"atmos_level",                 1,  "months", 1, "days", "time",
-"atmos_level_instant",         1,  "months", 1, "days", "time",
-#"atmos_month",      1,  "months", 1, "days", "time",
-#"atmos_scalar",     1,  "months", 1, "days", "Time",
-#
-## globally averaged ghg - already in atmos_scalar section above 
-# "radiation",                "rrvco2",             "rrvco2",             "atmos_scalar", "all", .true., "none", 2
-#
- "radiation",                "co2_tf",             "co2_tf",             "atmos_scalar", "all", .true., "none", 2
-## instantaneous
-# concentration
-# jgj: add co2 and pwt back as single precision
- "atmos_co2",                "pwt",                "pwt",                "atmos_level_instant", "all", .false.,  "none", 2
- "dynamics",                 "co2",                "co2",                "atmos_level_instant", "all", .false.,  "none", 2
-# "dynamics",                 "co2_dmmr",           "co2_dmmr",           "atmos_level_instant", "all", .false.,  "none", 1
-# "dynamics",                 "co2_dvmr",           "co2_dvmr",           "atmos_level_instant", "all", .false.,  "none", 1
-# "dynamics",                 "ps",                 "ps",                 "atmos_level_instant", "all", .false.,  "none", 1
-# "dynamics",                 "sphum",              "sphum",              "atmos_level_instant", "all", .false.,  "none", 1
-#
- "atmos_co2",                "pwt",                "pwt",                "atmos_level", "all", .true.,  "none", 2
-# emissions not activated
-# "atmos_co2_emissions",      "co2_mol_emission",   "co2_mol_emission",   "atmos_level", "all", .true.,  "none", 2
-# restoring activated
- "atmos_co2_restoring",      "co2_restore",        "co2_restore",        "atmos_level", "all", .true.,  "none", 2
-#
- "dynamics",                 "area",               "area",               "atmos_level", "all", .false.,  "none", 2
- "dynamics",                 "co2",                "co2",                "atmos_level", "all", .true.,  "none", 2
- "dynamics",                 "co2_dvmr",           "co2_dvmr",           "atmos_level", "all", .true.,  "none", 2
- "dynamics",                 "sphum",              "sphum",              "atmos_level", "all", .true.,  "none", 2
-
-# "flux",                     "co2_atm",            "co2_atm",            "atmos_level", "all", .true.,  "none", 2
-# "flux",                     "co2_surf",           "co2_surf",           "atmos_level", "all", .true.,  "none", 2
- "flux",                     "co2_flux",           "co2_flux",           "atmos_level", "all", .true.,  "none", 2
- "flux",                     "co2_mol_flux",       "co2_mol_flux",       "atmos_level", "all", .true.,  "none", 2
- "flux",                     "co2_atm_dvmr",       "co2_atm_dvmr",       "atmos_level", "all", .true.,  "none", 2
- "flux",                     "co2_surf_dvmr",      "co2_surf_dvmr",      "atmos_level", "all", .true.,  "none", 2
-#
-## 
- "atmos_co2",                "pwt",                "pwt",                "atmos_month", "all", .true.,  "none", 2
-# emissions not activated
-# "atmos_co2_emissions"       "co2_mol_emission",   "co2_mol_emission",   "atmos_month", "all", .true.,  "none", 2    
-# restoring activated
- "atmos_co2_restoring",      "co2_restore",        "co2_restore",        "atmos_month", "all", .true.,  "none", 2
-# "dynamics",                 "area",               "area",               "atmos_month", "all", .false.,  "none", 2
- "dynamics",                 "co2",                "co2",                "atmos_month", "all", .true.,  "none", 2
- "dynamics",                 "co2_dvmr",           "co2_dvmr",           "atmos_month", "all", .true.,  "none", 2 
- "flux",                     "co2_mol_flux",       "co2_mol_flux",       "atmos_month", "all", .true.,  "none", 2
-#
-#==========================================================================================
-      </diagTable> 
-
-      <!-- BLING diag table samll Dunne 2017/07/21-->
-      <diagTable order="append"> 
-#
-#==========================================================================================
-# GENERIC OCEAN BLING DIAGNOSTICS  jgj 2017/07/21
-# Inclides only minimal suite for spinup/testing DOES NOT INCLUDE CMIP6 diagnostics
-#==========================================================================================
-#
- "ocean_bling_month",           1,  "months", 1, "days", "time",
-#
- "generic_bling","dic_stf_gas",     "dic_stf_gas",           "ocean_bling_month","all",.true.,"none",2
- "generic_bling","frac_lg",         "frac_lg",               "ocean_bling_month","all",.true.,"none",2
- "generic_bling","intpp",           "intpp",                 "ocean_bling_month","all",.true.,"none",2
- "generic_bling","intjalk",         "intjalk",               "ocean_bling_month","all",.true.,"none",2
- "generic_bling","intjdic",         "intjdic",               "ocean_bling_month","all",.true.,"none",2
- "generic_bling","intjdop",         "intjdop",               "ocean_bling_month","all",.true.,"none",2
- "generic_bling","intjpo4",         "intjpo4",               "ocean_bling_month","all",.true.,"none",2
- "generic_bling","o2_stf_gas",      "o2_stf_gas",            "ocean_bling_month","all",.true.,"none",2
- "generic_bling","pco2_surf",       "pco2_surf",             "ocean_bling_month","all",.true.,"none",2
-#
- "ocean_bling_year",           12,  "months", 1, "days", "time",
-#
- "generic_bling","alk_stf",         "alk_stf",               "ocean_bling_year","all",.true.,"none",2
- "generic_bling","cased_top",       "cased_top",            "ocean_bling_year","all",.true.,"none",2
- "generic_bling","fcaco3_to_sed",   "fcaco3_to_sed",         "ocean_bling_year","all",.true.,"none",2
- "generic_bling","fcased_burial",   "fcased_burial",         "ocean_bling_year","all",.true.,"none",2
- "generic_bling","fcased_redis",    "fcased_redis",          "ocean_bling_year","all",.true.,"none",2
- "generic_bling","fe_burial",       "fe_burial",             "ocean_bling_year","all",.true.,"none",2
- "generic_bling","fed_stf",         "fed_stf",               "ocean_bling_year","all",.true.,"none",2
- "generic_bling","fpop_burial",     "fpop_burial",           "ocean_bling_year","all",.true.,"none",2
- "generic_bling","runoff_flux_alk", "runoff_flux_alk",       "ocean_bling_year","all",.true.,"none",2
- "generic_bling","runoff_flux_dic", "runoff_flux_dic",       "ocean_bling_year","all",.true.,"none",2
- "generic_bling","runoff_flux_po4", "runoff_flux_po4",       "ocean_bling_year","all",.true.,"none",2
-#
- "ocean_bling_month_z",           1,  "months", 1, "days", "time",
-#
- "generic_bling_z", "chl",     "chl",               "ocean_bling_month_z","all","mean","none",2
- "generic_bling_z", "dic",     "dic",               "ocean_bling_month_z","all","mean","none",2
- "generic_bling_z", "htotal",  "htotal",            "ocean_bling_month_z","all","mean","none",2
- "generic_bling_z", "o2",      "o2",                "ocean_bling_month_z","all","mean","none",2
- "generic_bling_z", "po4",     "po4",               "ocean_bling_month_z","all","mean","none",2
-#
- "ocean_bling_year_z",           12,  "months", 1, "days", "time",
-#
- "generic_bling_z", "alk",     "alk",               "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "biomass_p","biomass_p",        "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "co3_ion", "co3_ion",           "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "co3_solubility","co3_solubility","ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "dop",     "dop",               "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "fed",     "fed",               "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "fcaco3",   "fcaco3",           "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "fpofe",    "fpofe",            "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "fpop",     "fpop",             "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "frac_pop", "frac_pop",         "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "irr_inst", "irr_inst",         "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "irr_mem",  "irr_mem",          "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "jdop",     "jdop",             "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "jo2",      "jo2",              "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "jp_recycle", "jp_recycle",     "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "jp_reminp", "jp_reminp",       "ocean_bling_year_z","all","mean","none",2
- "generic_bling_z", "jp_uptake", "jp_uptake",       "ocean_bling_year_z","all","mean","none",2
-      </diagTable> 
-     </input>
-  </freInclude>
-
   <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
@@ -3884,6 +4082,12 @@ removeatmos_tracer co2
       <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
+
+
+<!-- begin cosp namelist-->
+      <xi:include xpointer="xpointer(//freInclude[@name='cosp_lists']/input/node())"/>
+<!-- end cosp namelist-->
+
       <!--MOM6 Input datasets-->
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_data']/input/node())"/>
       <!--SIS Input datasets-->
@@ -3997,9 +4201,7 @@ MOM_OVERRIDE_EOF
         "vegn",           "SAI",           "SAI",          "land_month",          "all",  .true.,  "none", 2
         "cmor_land",      "sai",           "sai",          "land_month_cmip",     "all",  .true.,  "none", 2
         "vegn",           "qco2_phot",     "qco2_phot",    "land_month",          "all",  .true.,  "none", 2
-        "generic_bling",  "dic_deltap",    "dic_deltap",   "ocean_bling_month",   "all",  .true.,  "none", 2
-        "generic_bling",  "pco2_csurf",    "pco2surf",     "ocean_bling_month",   "all",  .true.,  "none", 2
-      </diagTable>
+     </diagTable>
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_diag_table']/input/node())"/>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         $(includeDir)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6
@@ -4016,6 +4218,7 @@ MOM_OVERRIDE_EOF
 "ocean_model",   "mlotst",       "mlotstmin",        "ocean_month",         "all", "min",  "none",2
 "ocean_model",   "mlotst",       "mlotstmax",        "ocean_annual",        "all", "max",  "none",2
 "ocean_model",   "mlotst",       "mlotstmax",        "ocean_month",         "all", "max",  "none",2
+"ocean_model",   "thkcello",     "thkcello",         "ocean_month_z",       "all", "mean", "none",2    # per John Dunn request
      </diagTable>
 
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_data_table_fixCO2_20170809']/input/node())"/>
@@ -4036,4 +4239,94 @@ MOM_OVERRIDE_EOF
     </runtime>
   </experiment>
  
+
+  <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500_cmip6Diag_Test5" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500_cmip6Diag">
+    <input>
+
+      <namelist name="diag_manager_nml">
+        mix_snapshot_average_fields = .false.,
+        max_input_fields = 1200,
+        max_output_fields = 1800
+        max_axes = 150
+        max_num_axis_sets = 100
+        max_files = 75
+        issue_oor_warnings = .false.
+        max_axis_attributes=6
+        max_field_attributes=4
+      </namelist>
+
+      <namelist name="physics_driver_nml">
+        n_land = 300.e6,
+        n_ocean = 100.e6,
+        donner_meso_is_largescale = .false.
+        do_cosp = .true.
+        do_modis_yim = .true.
+      </namelist> 
+
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/Huan.Guo/warsaw_LND_warsaw_20170706_slm_mom6_2017.07.05/CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500/ncrc4.intel16-prod-openmp/archive/restart/04860101.tar</dataSource>
+      </dataFile>
+    </input>
+
+    <runtime>
+      <regression name="basic">
+        <run days="2 2"> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O4671']/node())"/> </run>
+      </regression>
+
+      <production simTime="5" units="years">
+          <segment simTime="12" units="months"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O4671_production']/node())"/>
+      </production>
+    </runtime>
+  </experiment>
+
+
+
+
+
+  <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500_cmip6Diag_Test6" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500_cmip6Diag">
+    <input>
+
+      <namelist name="diag_manager_nml">
+        mix_snapshot_average_fields = .false.,
+        max_input_fields = 1200,
+        max_output_fields = 1800
+        max_axes = 150
+        max_num_axis_sets = 100
+        max_files = 75
+        issue_oor_warnings = .false.
+        max_axis_attributes=6
+        max_field_attributes=4
+      </namelist>
+
+      <namelist name="physics_driver_nml">
+        n_land = 300.e6,
+        n_ocean = 100.e6,
+        donner_meso_is_largescale = .false.
+        do_cosp = .true.
+        do_modis_yim = .true.
+      </namelist> 
+
+      <namelist name="atmos_tropopause_nml">
+        do_tropopause_diagnostics = .true.
+      </namelist> 
+
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/Huan.Guo/warsaw_LND_warsaw_20170706_slm_mom6_2017.07.05/CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_201To500/ncrc4.intel16-prod-openmp/archive/restart/04860101.tar</dataSource>
+      </dataFile>
+    </input>
+
+    <runtime>
+      <regression name="basic">
+        <run days="2 2"> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O4671']/node())"/> </run>
+      </regression>
+
+      <production simTime="5" units="years">
+          <segment simTime="12" units="months"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O4671_production']/node())"/>
+      </production>
+    </runtime>
+  </experiment>
+
+
 </experimentSuite>
