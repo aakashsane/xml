@@ -18,15 +18,11 @@
 
 # git clone the refine diag scripts
 
-# set GIT_REPOSITORY = file:///home/bw/git-repository/FMS
-# set FRE_CODE_TAG = testing_20170329
-# set PACKAGE_NAME = atmos_refine
+set GIT_REPOSITORY = file:///home/bw/git-repository/FMS
+set FRE_CODE_TAG = master
+set PACKAGE_NAME = atmos_refine
 set CODE_DIRECTORY = atmos_refine_scripts
-# git clone -b $FRE_CODE_TAG $GIT_REPOSITORY/$PACKAGE_NAME.git $CODE_DIRECTORY
-
-set xmlDir = $rtsxml:h
-set refineDiagScriptDir = $xmlDir/awg_include/refineDiag
-cp -r $refineDiagScriptDir/$CODE_DIRECTORY $CODE_DIRECTORY
+git clone -b $FRE_CODE_TAG $GIT_REPOSITORY/$PACKAGE_NAME.git $CODE_DIRECTORY
 
 set source_dir = $CODE_DIRECTORY
 
