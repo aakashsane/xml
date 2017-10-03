@@ -86,8 +86,8 @@ NOTES:
   <property name="PROD_SIMTIME"     value="100"/>  <!--simulation length in years-->
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
-  <property name="PP_START_YEAR"    value="0630" />
-  <property name="PP_CPLD_START"    value="0630" />
+  <property name="PP_START_YEAR"    value="0631" />
+  <property name="PP_CPLD_START"    value="0631" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
   <property name="PROD_SEGTIME"     value="03:00:00"/><!--Wall clock per segment (usually 1 year)-->
 
@@ -1619,7 +1619,7 @@ endif
 <!--================================-->
   <freInclude name="c96_climo_cmip6_postprocess">
     <postProcess>
-      <refineDiag script="$(AWG_INPUT_HOME_GFDL)/awg/refineDiag/refineDiag_atmos_cmip6.csh"/>
+      <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_atmos_cmip6.csh"/>
 
       <component type="atmos_month_cfmip" start="$(PP_CPLD_START)" source="atmos_month_cfmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
@@ -2149,7 +2149,7 @@ endif
         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>	
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(AWG_INPUT_HOME)/awg/analysis/stub/atw_ocean_av_annual_subsfc_ocean.csh -D ocean_annual_z.%04d-%04d."/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(AWG_INPUT_HOME)/analysis/stub/atw_ocean_av_annual_subsfc_ocean.csh -D ocean_annual_z.%04d-%04d."/>
         </timeAverage>
       </component>
 
@@ -2157,7 +2157,7 @@ endif
         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
         <timeAverage source="annual" interval="$(PP_CPLD_CHUNK_A)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(AWG_INPUT_HOME)/awg/analysis/stub/atw_ocean_av_annual_subsfc_ocean.csh -D ocean_annual_z.%04d-%04d."/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(AWG_INPUT_HOME)/analysis/stub/atw_ocean_av_annual_subsfc_ocean.csh -D ocean_annual_z.%04d-%04d."/>
         </timeAverage>
       </component>
 
@@ -2251,64 +2251,35 @@ endif
 
   <freInclude name="BLING_postprocess">
       <postProcess> 
-      <component type="ocean_bling" source="ocean_bling" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
-      </component>
       <component type="ocean_bling_1x1deg" source="ocean_bling" sourceGrid="ocean-tripolar" xyInterp="180,360">
          <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_bling_cmip6_omip_daily" source="ocean_bling_cmip6_omip_daily" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
-      </component>
       <component type="ocean_bling_cmip6_omip_daily_1x1deg" source="ocean_bling_cmip6_omip_daily" sourceGrid="ocean-tripolar" xyInterp="180,360">
-         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
+         <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)" />
       </component>
 
-      <component type="ocean_bling_cmip6_omip_sfc" source="ocean_bling_cmip6_omip_sfc" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
-      </component>
       <component type="ocean_bling_cmip6_omip_sfc_1x1deg" source="ocean_bling_cmip6_omip_sfc" sourceGrid="ocean-tripolar" xyInterp="180,360">
          <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_bling_cmip6_omip_2d" source="ocean_bling_cmip6_omip_2d" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
-      </component>
       <component type="ocean_bling_cmip6_omip_2d_1x1deg" source="ocean_bling_cmip6_omip_2d" sourceGrid="ocean-tripolar" xyInterp="180,360">
          <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_bling_cmip6_omip_tracers_month_z" source="ocean_bling_cmip6_omip_tracers_month_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
-      </component>
       <component type="ocean_bling_cmip6_omip_tracers_month_z_1x1deg" source="ocean_bling_cmip6_omip_tracers_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
          <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="monthly"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_bling_cmip6_omip_tracers_year_z" source="ocean_bling_cmip6_omip_tracers_year_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
-      </component>
       <component type="ocean_bling_cmip6_omip_tracers_year_z_1x1deg" source="ocean_bling_cmip6_omip_tracers_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
          <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_bling_cmip6_omip_rates_year_z" source="ocean_bling_cmip6_omip_rates_year_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
-         <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
-      </component>
       <component type="ocean_bling_cmip6_omip_rates_year_z_1x1deg" source="ocean_bling_cmip6_omip_rates_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
          <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
@@ -3276,7 +3247,7 @@ removeatmos_tracer co2
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 ! BLING parameters
 ! Note defaults DT = 900.0 , DT_THERM = 3600.0
-#override DT_THERM = 7200.0                             
+#override DT_THERM = 7200.0
 #override USE_generic_tracer = True
 #override USE_RIVER_HEAT_CONTENT = False
 #override USE_CALVING_HEAT_CONTENT = False
