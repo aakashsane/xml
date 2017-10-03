@@ -113,9 +113,6 @@ NOTES:
   <!--========================================-->
   <!--Do not change the rest of the properties-->
   <!--========================================-->
-  <!--========================================-->
-  <!--Do not change the rest of the properties-->
-  <!--========================================-->
 
   <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
   <property name="AWG_INPUT_HOME_NESCC" value="awg_include"/>
@@ -1179,7 +1176,6 @@ Experiment to build executable.
     </input>
   </freInclude>
 
-
 <!--
   field_table with parameters for CMIP6 diagnostic output
 -->
@@ -1270,9 +1266,9 @@ $baseDate
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_global_avg</dataSource>
       </dataFile>
-      <!--dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_CFmon_aug30</dataSource>
-      </dataFile-->
+      </dataFile>
     </input>
   </freInclude>
 
@@ -3157,6 +3153,52 @@ removeatmos_tracer co2
        waste_below_ground_wood = .TRUE.
       </namelist>
 
+      <namelist name="vegn_data_nml">
+       vegn_to_use = 'uniform'
+       K1=10,
+       K2=0.1,
+       fsc_liv=0.9,
+       fsc_wood=0.45,
+       c1(4) = 0.3
+       c2(4) = 0.3
+       Vmax = 2.0E-5, 2.0E-5, 2.0E-5, 2.0E-5, 1.50E-5,
+       m_cond = 4., 9., 9., 7., 7.,
+       alpha_phot = 0.05, 0.06, 0.06, 0.06, 0.06,
+       gamma_resp = 0.03, 0.02, 0.02, 0.02, 0.02,
+       tc_crit(0:2) = 3*273.16
+       fact_crit_phen(0:4) = 0., 0., 0., 0., 0.
+       fact_crit_fire(0:4) = 0., 0., 0., 0., 0.
+       cnst_crit_phen(0:4) = 0.30, 0.15, 0.15, 0.30, 0.30
+       cnst_crit_fire(0:4) = 0.15,  0.40, 0.15, 0.15, 0.15
+       wet_leaf_dreg(0:4)  = .3, .3, .3, .3, .3
+       ksi =  0, 0, 0, 0, 0,
+       leaf_refl(0:4,1) = 0.11, 0.11, 0.10, 0.10, 0.10
+       leaf_refl(0:4,2) = 0.58, 0.58, 0.45, 0.45, 0.39,
+       dat_root_zeta(0:4) =   0.35212, 0.17039, 0.28909, 0.25813, 0.17039
+       critical_root_density = 0.0,
+       tau_drip_s     = 259200.0
+       cmc_lai(0:4) = 0.02, 0.02, 0.02, 0.02, 0.02
+       csc_lai(0:4) = 0.30, 0.30, 0.30, 0.30, 0.2
+       dat_snow_crit = 2*1.e7, .1, 1.e7, .1
+       t_transp_min = 268.
+       srl(0:1) = 112.0e3, 150.0e3
+       root_perm = 14*5e-7
+       alpha(1,3) = 4
+       leaf_age_tau(2) = 150
+       smoke_fraction = 0.9, 0.9, 0.6, 0.6, 0.6
+       tg_c3_thresh = 1
+       phen_ev1 = 0.2
+       phen_ev2 = 0.7
+       cmc_eps = 0.01
+       alpha(0:4,6) = 0.0, 0.0, 0.012, 0.012, 0.012
+       treefall_disturbance_rate = 0.175, 0.185, 0.025, 0.0275, 0.027
+       use_light_saber = .true.
+       sai_cover = .true.
+       sai_rad = .true.
+
+       min_lai = 1.e-5   ! h1g, prevent numerical instability, 2017-08-24
+      </namelist>
+
       <namelist name="diag_manager_nml">
         mix_snapshot_average_fields = .false.,
         max_input_fields = 1200,
@@ -3227,10 +3269,6 @@ removeatmos_tracer co2
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_diag_table']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='extra_diag_table']/input/node())"/>
 
-     <diagTable order="append">
-        "ocean_model",   "thkcello",     "thkcello",         "ocean_month_z",       "all", "mean", "none",2    # per John Dunn request
-     </diagTable>
-
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/Huan.Guo/warsaw_LND_warsaw_20170706_slm_mom6_2017.07.05/CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_806_from450/ncrc4.intel16-prod-openmp/archive/restart/06300101.tar</dataSource>
       </dataFile>       
@@ -3238,20 +3276,12 @@ removeatmos_tracer co2
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 ! BLING parameters
 ! Note defaults DT = 900.0 , DT_THERM = 3600.0
-#override DT_THERM = 7200.0
-#override FOX_KEMPER_ML_RESTRAT_COEF=1.0
-#override MLE_FRONT_LENGTH=500.0                                                    
+#override DT_THERM = 7200.0                             
 #override USE_generic_tracer = True
 #override USE_RIVER_HEAT_CONTENT = False
 #override USE_CALVING_HEAT_CONTENT = False
 #override ENERGYSAVEDAYS = 30
-! Geothermal heating
-DO_GEOTHERMAL = True
-GEOTHERMAL_FILE = "geothermal_davies2013_v1.nc"
-GEOTHERMAL_SCALE = 1.0
-GEOTHERMAL_VARNAME = "geothermal_hf"
-! Kd = 1.5e-5
-#override KD = 1.5E-5
+
 MOM_OVERRIDE_EOF
      ]]></csh>
  
