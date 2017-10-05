@@ -73,13 +73,14 @@ NOTES:
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"        value="warsaw_201707"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
-  <property name="MOM6_DATE"      value="2017.07.05"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"      value="20171001"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>     <!-- git tag for LAND_LAD2 source code -->  
-  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="dev_master_20170929_mom6_2017.09.27"/> <!-- customize as needed -->
+  <!--property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/--> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"   value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS"   value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
                                                                     <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
@@ -861,9 +862,8 @@ Experiment to build executable.
     <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared/generic_tracers ocean_shared/mocsy/src">
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
+        <codeBase version="$(MOM6_GIT_TAG)"> ocean_shared.git </codeBase>
         <csh><![CDATA[
-          \rm -rf ocean_null
           git clone -b $(MOM6_GIT_TAG) https://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
@@ -872,17 +872,6 @@ Experiment to build executable.
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
-          popd
-
-          #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
-          git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
-          pushd ocean_shared
-          git checkout $(MOM6_GIT_TAG)
-###Begin Updates from b group not yet tagged as $(MOM6_GIT_TAG), remove these once they are tagged
-git checkout user/nnz/ABIO_BLING_COBALT_20170922
-###End   Updates
-          git submodule init mocsy
-          git submodule update
           popd
 
           pushd mom6
@@ -901,7 +890,6 @@ git checkout user/nnz/ABIO_BLING_COBALT_20170922
             echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
           endif
  
- 
         ]]></csh>
       </source>
       <compile>
@@ -912,7 +900,7 @@ git checkout user/nnz/ABIO_BLING_COBALT_20170922
 
     <component name="sis2" paths="mom6/src/SIS2 ice_param" requires="fms mom6 icebergs" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-           <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
+           <codeBase version="master"> ocean_null.git </codeBase>
            <csh>\rm -rf ocean_null</csh>
        </source>
        <compile>
@@ -922,7 +910,7 @@ git checkout user/nnz/ABIO_BLING_COBALT_20170922
 
     <component name="icebergs" paths="mom6/src/icebergs" requires="fms">
        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
+        <codeBase version="master"> ocean_null.git </codeBase>
         <csh>\rm -rf ocean_null</csh>
        </source>
        <compile>
@@ -1190,14 +1178,6 @@ git checkout user/nnz/ABIO_BLING_COBALT_20170922
       </dataFile>
       <dataFile label="input" target="INPUT/land_domain.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$CDATA/gfdl_F/Thomas.Robinson/land/c96/land_domain.nc</dataSource>
-      </dataFile>
-    </input>
-  </freInclude>
-
-  <freInclude name="field_table_am4p11">
-    <input>
-      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/field_table/field_table_am4p11</dataSource>
       </dataFile>
     </input>
   </freInclude>
@@ -1659,6 +1639,7 @@ set ocn_hyperthread = $ocn_hythr
 <!--= AMIP EXPERIMENTS =-->
 <!--====================-->
   
+  <experiment name="c96L33_am4p0_2010climo.$(MOM6_DATE)" inherit="c96L33_am4p0_2010climo"/>
   <experiment name="c96L33_am4p0_2010climo" inherit="cm4_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
@@ -1728,7 +1709,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <xi:include xpointer="xpointer(//freInclude[@name='c96_grid']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96L33_amip_initCond']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
     </input>
 
@@ -1772,6 +1753,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 
   </experiment>
   
+  <experiment name="c96L33_am4p0_2010climo_cmip6.$(MOM6_DATE)" inherit="c96L33_am4p0_2010climo_cmip6"/>
   <experiment name="c96L33_am4p0_2010climo_cmip6" inherit="c96L33_am4p0_2010climo">
     <input>
       <namelist name="coupler_nml">
@@ -1788,6 +1770,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
         atmos_npes = $atm_ranks
         atmos_nthreads = $atmos_threads
         ncores_per_node = $(NCORE_PER_NODE)
+        use_hyper_thread=.T.
       </namelist>
 
       <namelist name="flux_exchange_nml">
@@ -1832,6 +1815,27 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
       <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
+    </input>
+  </experiment>
+  <experiment name="c96L33_am4p0_2010climo_cmip6_nohypthr.$(MOM6_DATE)" inherit="c96L33_am4p0_2010climo_cmip6_nohypthr"/>
+  <experiment name="c96L33_am4p0_2010climo_cmip6_nohypthr" inherit="c96L33_am4p0_2010climo_cmip6">
+    <input>
+      <namelist name="coupler_nml">
+        months = $months,
+        days   = $days,
+        current_date = 1,1,1,0,0,0,
+        calendar = 'noleap'
+        dt_atmos = 1800,
+        dt_cpld  = 7200,
+        use_lag_fluxes = .true.
+        concurrent = .false.
+        do_ocean = .false.
+        ocean_npes = 0
+        atmos_npes = $atm_ranks
+        atmos_nthreads = $atmos_threads
+        ncores_per_node = $(NCORE_PER_NODE)
+        use_hyper_thread=.F.
+      </namelist>
     </input>
   </experiment>
 
@@ -2048,7 +2052,7 @@ For more information please refer to the
       <xi:include xpointer="xpointer(//freInclude[@name='c96_grid']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96L33_initCond']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
 
       <!--MOM6 Input datasets-->
@@ -2056,6 +2060,19 @@ For more information please refer to the
       <!--SIS Input datasets-->
       <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
 
+      <csh><![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+! Geothermal heating
+#override DO_GEOTHERMAL = False
+#override KD = 2.0E-05
+!preserve 2017.07.05 answers see MOM6 commit 970af50ff
+#override BT_USE_OLD_CORIOLIS_BRACKET_BUG=True
+!old parameters to reproduce 2017.07.05 answers 
+#override FOX_KEMPER_ML_RESTRAT_COEF = 15.0
+#override MLE_FRONT_LENGTH = 0.0
+
+MOM_OVERRIDE_EOF
+     ]]></csh>
     </input>
 
     <runtime>
@@ -2115,10 +2132,10 @@ For more information please refer to the
       <csh><![CDATA[
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 ! Geothermal heating
-DO_GEOTHERMAL = True
-GEOTHERMAL_FILE = "geothermal_davies2013_v1.nc"
-GEOTHERMAL_SCALE = 1.0
-GEOTHERMAL_VARNAME = "geothermal_hf"
+#override DO_GEOTHERMAL = True
+#override GEOTHERMAL_FILE = "geothermal_davies2013_v1.nc"
+#override GEOTHERMAL_SCALE = 1.0
+#override GEOTHERMAL_VARNAME = "geothermal_hf"
 ! Kd = 1.5e-5
 #override KD = 1.5E-5
 !preserve 2017.07.05 answers see MOM6 commit 970af50ff
@@ -2154,7 +2171,7 @@ MOM_OVERRIDE_EOF
       <xi:include xpointer="xpointer(//freInclude[@name='c96_grid']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96L33_initCond']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
 
       <!--MOM6 Input datasets-->
