@@ -1,27 +1,34 @@
 #################
 # Table: day
-# Version: 1.00.11
+# Version: 1.00.15
 #################
 
  "atmos_daily_cmip",        24, "hours",    1,  "days",  "time",
  "land_daily_cmip",         24, "hours",    1,  "days",  "time",
+ "landIce_daily_cmip",      24, "hours",    1,  "days",  "time",
 
 #################
 
 "land",    "geolon_t",   "geolon_t",   "land_daily_cmip", "all", .false., "none", 1
 "land",    "geolat_t",   "geolat_t",   "land_daily_cmip", "all", .false., "none", 1
 
+
+##. Auxiliary fields required for model level output
+ "cmip",          "lev_bnds",      "lev_bnds",      "atmos_daily_cmip",      "all",  .false., "none", 1
+
+
 ##. Surface pressure needed for masking pressure level fields
+
  "atmos",         "ps",            "ps",            "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ##. Near-Surface Specific Humidity, 1.0 (longitude,latitude,time,height2m)
  "flux",          "huss",          "huss",          "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ##. Daily Minimum Near-Surface Air Temperature, K (longitude,latitude,time,height2m)
- "flux",          "tas",           "tasmin",        "atmos_daily_cmip",        "all",    min,   "none", 2
+ "flux",          "tas",           "tasmin",        "atmos_daily_cmip",        "all",     min,  "none", 2
 
 ##. Daily Maximum Near-Surface Air Temperature, K (longitude,latitude,time,height2m)
- "flux",          "tas",           "tasmax",        "atmos_daily_cmip",        "all",    max,   "none", 2
+ "flux",          "tas",           "tasmax",        "atmos_daily_cmip",        "all",     max,  "none", 2
 
 ##. Near-Surface Air Temperature, K (longitude,latitude,time,height2m)
  "flux",          "tas",           "tas",           "atmos_daily_cmip",        "all",  .true.,  "none", 2
@@ -47,10 +54,10 @@
  "flux",          "hurs",          "hurs",          "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ##. Daily Minimum Near-Surface Relative Humidity, % (longitude,latitude,time,height2m)
- "flux",          "hurs",          "hursmin",       "atmos_daily_cmip",        "all",    min,   "none", 2
+ "flux",          "hurs",          "hursmin",       "atmos_daily_cmip",        "all",     min,  "none", 2
 
 ##. Daily Maximum Near-Surface Relative Humidity, % (longitude,latitude,time,height2m)
- "flux",          "hurs",          "hursmax",       "atmos_daily_cmip",        "all",    max,   "none", 2
+ "flux",          "hurs",          "hursmax",       "atmos_daily_cmip",        "all",     max,  "none", 2
 
 ##. Snow Area Fraction, % (longitude,latitude,time)
  "cmor_land",     "snc",           "snc",           "land_daily_cmip",         "all",  .true.,  "none", 2
@@ -80,7 +87,7 @@
  "flux",          "vas",           "vas",           "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ##. Daily Maximum Near-Surface Wind Speed, m s-1 (longitude,latitude,time,height10m)
- "flux",          "sfcWind",       "sfcWindmax",    "atmos_daily_cmip",        "all",    max,   "none", 2
+ "flux",          "sfcWind",       "sfcWindmax",    "atmos_daily_cmip",        "all",     max,  "none", 2
 
 ##. Surface Upward Latent Heat Flux, W m-2 (longitude,latitude,time)
  "flux",          "hfls",          "hfls",          "atmos_daily_cmip",        "all",  .true.,  "none", 2
@@ -100,31 +107,32 @@
 ##. Surface Upwelling Shortwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rsus",          "rsus",          "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
-##. TOA Outgoing Longwave Radiatio, W m-2 (longitude,latitude,time)
+##. TOA Outgoing Longwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rlut",          "rlut",          "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ##. Air Temperature, K (longitude,latitude,plev8,time)
-# on 17 plevs in table 'Eday'
-#"atmos_plev8",   "ta",            "ta_unmsk",      "atmos_daily_cmip",        "all",  .true.,  "none", 2
+# CHANGED TO "plev19" TO MATCH "Emon" TABLE
+ "atmos_plev19",   "ta",           "ta_unmsk",      "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ##. Relative Humidity, % (longitude,latitude,plev8,time)
- "atmos_plev8",   "hur",           "hur_unmsk",     "atmos_daily_cmip",        "all",  .true.,  "none", 2
+# CHANGED TO "plev19" TO MATCH "Emon" TABLE
+ "atmos_plev19",   "hur",          "hur_unmsk",     "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ##. Specific Humidity, 1.0 (longitude,latitude,plev8,time)
-# on 17 plevs in table 'Eday'
-#"atmos_plev8",   "hus",           "hus_unmsk",     "atmos_daily_cmip",        "all",  .true.,  "none", 2
+# CHANGED TO "plev19" TO MATCH "Emon" TABLE
+ "atmos_plev19",   "hus",          "hus_unmsk",     "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ##. omega (=dp/dt), Pa s-1 (longitude,latitude,plev8,time)
- "atmos_plev8",   "wap",           "wap_unmsk",     "atmos_daily_cmip",        "all",  .true.,  "none", 2
+# CHANGED TO "plev19" TO MATCH "Emon" TABLE
+ "atmos_plev19",   "wap",          "wap_unmsk",     "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ##. Northward Wind, m s-1 (longitude,latitude,plev8,time)
-# on 17 plevs in table 'Eday'
-#"atmos_plev8",   "va",            "va_unmsk",      "atmos_daily_cmip",        "all",  .true.,  "none", 2
+# CHANGED TO "plev19" TO MATCH "Emon" TABLE
+ "atmos_plev19",   "va",           "va_unmsk",      "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ##. Eastward Wind, m s-1 (longitude,latitude,plev8,time)
-# on 17 plevs in table 'Eday'
-#"atmos_plev8",   "ua",            "ua_unmsk",      "atmos_daily_cmip",        "all",  .true.,  "none", 2
+# CHANGED TO "plev19" TO MATCH "Emon" TABLE
+ "atmos_plev19",   "ua",           "ua_unmsk",      "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ##. Geopotential Height, m (longitude,latitude,plev8,time): Priority 2
-# on 17 plevs in table 'Eday'
 #"atmos_plev8",   "zg",            "zg_unmsk",      "atmos_daily_cmip",        "all",  .true.,  "none", 2
