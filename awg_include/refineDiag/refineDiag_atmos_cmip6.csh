@@ -16,52 +16,27 @@
 #                            # input directory = `cwd`
 ###################################################################
 
-# git clone the refine diag scripts
-
-# set GIT_REPOSITORY = file:///home/bw/git-repository/FMS
-# set FRE_CODE_TAG = testing_20170329
-# set PACKAGE_NAME = atmos_refine
-set CODE_DIRECTORY = atmos_refine_scripts
-# git clone -b $FRE_CODE_TAG $GIT_REPOSITORY/$PACKAGE_NAME.git $CODE_DIRECTORY
+set CODE_DIRECTORY = ./atmos_refine_scripts
 
 set xmlDir = $rtsxml:h
 set refineDiagScriptDir = $xmlDir/awg_include/refineDiag
 cp -r $refineDiagScriptDir/$CODE_DIRECTORY $CODE_DIRECTORY
 
-set source_dir = $CODE_DIRECTORY
+# check that output directory is defined
 
-# mask pressure levels below the surface (pressure)
-# atmos_month -> atmos_month_refined
-# atmos_daily -> atmos_daily_refined
-# atmos_4xdaily -> atmos_4xdaily_refined
+if ($?refineDiagDir) then
 
-foreach FILENAME ( atmos_month_cmip atmos_daily_cmip atmos_4xdaily_cmip )
-  set OFILENAME = `echo $FILENAME | sed -e 's/_cmip$//'`"_refined"
-  foreach INFILE ( `ls *.$FILENAME.*` )
-    set OUTFILE = "$refineDiagDir/"`echo $INFILE:t | sed -e "s/\.$FILENAME\./.$OFILENAME./"`
-    $source_dir/refine_fields.pl plevel_mask $INFILE $OUTFILE
-  end
-end
-    
-# compute monthly average of daily min/max near-surface temperature
-# atmos_daily -> atmos_month_refined
+# run script to create refined fields
 
-foreach INFILE ( `ls *.atmos_daily_cmip.*` )
-  set TMPFILE = $INFILE:t:s/.atmos_daily_cmip./.atmos_month_tmp./
-  set OUTFILE = $refineDiagDir/$INFILE:t:s/.atmos_daily_cmip./.atmos_month_refined./
-  $source_dir/refine_fields.pl tasminmax $INFILE $TMPFILE
-  ncks -h -A $TMPFILE $OUTFILE
-  rm -f $TMPFILE
-end
+   $CODE_DIRECTORY/refineDiag_atmos.csh $CODE_DIRECTORY $refineDiagDir
+   set return_status = $?
 
-# combining two aerosol/tracer variables into a single variable
-# aerosol_month_cmip -> aerosol_month_refined
-
-set tracer_files = `find  -name \*.aerosol_month_cmip.\* | sed -e "s/^\.\///"`
-if ($#tracer_files == 6) then
-  foreach INFILE ( $tracer_files )
-    set OUTFILE = $refineDiagDir/$INFILE:t:s/.aerosol_month_cmip./.aerosol_month_refined./
-    $source_dir/refine_fields.pl tracer_refine $INFILE $OUTFILE
-  end
+else
+   echo "ERROR: refineDiagDir is not defined - can run refineDiag scripts"
+   set return_status = 1
 endif
+
+# set the status for frepp wrapper script to access
+
+set status = $return_status
 

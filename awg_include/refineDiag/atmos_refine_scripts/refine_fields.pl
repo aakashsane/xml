@@ -32,4 +32,4 @@ my $command = "ncl -Q \'ifile=\"$ifile\"\' \'ofile=\"$ofile\"\' verbose=True $nc
 print STDOUT "NCL Version $nclversion\n"   if $Opt{VERBOSE} > 0;
 print STDOUT "$command\n"                  if $Opt{VERBOSE} > 0;
 system ($command);
-
+die "ERROR: ncl script failed" if $?;
