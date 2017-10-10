@@ -1265,6 +1265,9 @@ $baseDate
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_fx</dataSource>
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_CFsite</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_global_avg</dataSource>
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
@@ -1621,6 +1624,7 @@ endif
   <freInclude name="c96_climo_cmip6_postprocess">
     <postProcess>
       <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_atmos_cmip6.csh"/>
+      <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_CFsite.csh"/>
 
       <component type="atmos_month_cfmip" start="$(PP_CPLD_START)" source="atmos_month_cfmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
         <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)"/>
@@ -1906,6 +1910,10 @@ endif
       </component>
       <component type="LUmip_year_pst" start="$(PP_CPLD_START)" source="lumip_Lyr_pst" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
         <timeSeries freq="annual" chunkLength="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_station" start="$(PP_CPLD_START)" source="atmos_station">
+	<timeSeries freq="30min" chunkLength="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
     </postProcess>
@@ -3159,10 +3167,10 @@ removeatmos_tracer co2
       <namelist name="diag_manager_nml">
         mix_snapshot_average_fields = .false.,
         max_input_fields = 1200,
-        max_output_fields = 1800
-        max_axes = 150
-        max_num_axis_sets = 100
-        max_files = 75
+        max_output_fields = 10000
+        max_axes = 300
+        max_num_axis_sets = 300
+        max_files = 300
         issue_oor_warnings = .false.
         max_axis_attributes=6
         max_field_attributes=4
