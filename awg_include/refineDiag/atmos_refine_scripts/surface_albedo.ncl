@@ -1,3 +1,6 @@
+
+CMOR_MISSING_VALUE = 1.e20
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; find the file name (tailname) from a path name
 
@@ -40,14 +43,9 @@ begin
 
   ; get variable names in this file
   REQUIRED = 0
-  REQUIRED@emioa = (/"emipoa","chepsoa"/)
-  REQUIRED@emiaoa = (/"emiapoa","chepasoa"/)
-  REQUIRED@dryoa = (/"drypoa","drysoa"/)
-  REQUIRED@wetoa = (/"wetpoa","wetsoa"/)
-  REQUIRED@cheaqpso4 = (/"pso4_aq_kg_m2_s","pso4_aq_so2_reevap_ls"/)
+  REQUIRED@albs = (/"rsus","rsds"/)
 
-  ; count numbers of variables to process (if they have 4 dimensions and dim 1 is pressure)
-  ; quit if there are no variable (this will avoid error messages)
+  ; quit if there are no variables (this will avoid error messages)
   nfound = 0
   outvars = getvaratts(REQUIRED)
   do vo = 0, dimsizes(outvars)-1
@@ -71,7 +69,6 @@ begin
     exit
   end if
   ; update output variable list
-  delete(outvars)
   outvars = getvaratts(REQUIRED)
 
   ; if format not specified - format of the output file same as input file
@@ -89,14 +86,15 @@ begin
   setfileoption("nc","Format",format)
   setfileoption("nc","HeaderReserveSpace",16384)
 
-  ; open the output file
+  ; open the output file (overwrite if present)
   if (isfilepresent(ofile)) then
     system("/bin/rm -f "+ofile)
   end if
   fo = addfile(ofile,"c")
+
   ; define time dimension
   invars = REQUIRED@$outvars(0)$
-  print("invars(0) = "+invars(0))
+ ;print("invars(0) = "+invars(0))
   vardims = getfilevardims(fi,invars(0))
   print("Time dimension: "+vardims(0))
   filedimdef(fo,vardims(0),-1,True)
@@ -130,51 +128,35 @@ begin
   
 
   ; loop thru all variables
+  ; compute the ratio (i.e., surface albedo = rsus / rsds)
 
   do vo = 0, dimsizes(outvars)-1
     invars = REQUIRED@$outvars(vo)$
-    if (outvars(vo) .eq. "emioa") then
+    if (outvars(vo) .eq. "albs") then
       data = fi->$invars(0)$
-      data = data + fi->$invars(1)$
-     ;copy_VarMeta(fi->$invars(0)$,data)
-      data@long_name = "Rate of Emission and Production of Dry Aerosol Total Organic Matter"
-      data@units = "kg m-2 s-1"
-      data@standard_name = "tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_due_to_net_chemical_production_and_emission"
-    else if (outvars(vo) .eq. "emiaoa") then
-      data = fi->$invars(0)$
-      data = data + fi->$invars(1)$
-     ;copy_VarMeta(fi->$invars(0)$,data)
-      data@long_name = "total emission of anthropogenic organic aerosol"
-      data@units = "kg m-2 s-1"
-      data@standard_name = "tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_due_to_net_chemical_production_and_emission"
-    else if (outvars(vo) .eq. "dryoa") then
-      data = fi->$invars(0)$
-      data = data + fi->$invars(1)$
-      data@long_name = "Dry Deposition Rate of Dry Aerosol Total Organic Matter"
-      data@units = "kg m-2 s-1"
-      data@standard_name = "tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_due_to_dry_deposition"
-    else if (outvars(vo) .eq. "wetoa") then
-      data = fi->$invars(0)$
-      data = data + fi->$invars(1)$
-      data@long_name = "Wet Deposition Rate of Dry Aerosol Total Organic Matter"
-      data@units = "kg m-2 s-1"
-      data@standard_name = "tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_due_to_wet_deposition"
-    else if (outvars(vo) .eq. "cheaqpso4") then
-      data = fi->$invars(0)$
-      data = data + fi->$invars(1)$
-      data@long_name = "Aqueous-phase Production Rate of Sulfate Aerosol"
-      data@units = "kg m-2 s-1"
-      data@standard_name = "tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_aqueous_phase_net_chemical_production"
-    end if
-    end if
-    end if
-    end if
+      rsds = fi->$invars(1)$
+      rsds = where(rsds .gt. 0.0, rsds, rsds@_FillValue)
+      data = where(ismissing(rsds), CMOR_MISSING_VALUE, data/rsds)
+      data@long_name = "Surface Albedo"
+      data@units = "1.0"
+      data@standard_name = "surface_albedo"
+      data@_FillValue = CMOR_MISSING_VALUE
+      if (isatt(data,"interp_method")) then
+        delete(data@interp_method) ; temporary fix for fregrid bug
+      end if
+     ;copy_VarCoords(rsds,data)
+      delete(rsds)
+      comment = "rsus/rsds"
+      text = " = "+comment
+    else
+      continue
     end if
     if (.not.tavginfo .and. isatt(data,"time_avg_info")) then
       delete(data@time_avg_info)
     end if
-    print("output: "+outvars(vo))
+    print("output: "+outvars(vo)+text)
     fo->$outvars(vo)$ = data
+    fo->$outvars(vo)$@comment = comment
     delete([/data,invars/])
   end do
 
@@ -187,13 +169,4 @@ begin
   delete(fi)
   delete(fo)
 
-; if (ndone .gt. 0) then
-;   print(ndone+" fields processed")
-; else
-;   ; this check done earily and should not be needed here
-;   print("No fields processed, output file not created")
-;   if (isfilepresent(ofile)) then
-;     system("/bin/rm -f "+ofile)
-;   end if
-; end if
 end
