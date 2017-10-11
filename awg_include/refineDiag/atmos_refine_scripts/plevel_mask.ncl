@@ -90,7 +90,7 @@ begin
   ; surface pressure (ps) must be present in the input file
   if (.not.isfilevar(fi,"ps")) then
     print("ERROR: input file does not have surface pressure (ps), output file not created")
-    exit
+    status_exit(1)
   end if
 
   ; read surf press
