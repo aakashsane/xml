@@ -1,0 +1,1190 @@
+#==========================================================================================
+# MOM4p1 GENERIC OCEAN COBALT DIAGNOSTICS (from CAS 2013/07/01)
+#      2013/06/01 jgj activate monthly chl, htotal for JPD, RRR
+#      2013/07/02 jgj turn off ocean_cobalt_tracers_year and ocean_cobalt_zoo_diags
+#      2013/07/17 jgj add dic_stf_gas, o2_stf_gas to ocean_cobalt_misc, but save monthly
+#                     add z_sat_arag, z_sat_calc to ocean_cobalt_btm
+#      2014/12/12 jgj correct nmdz_100 in cobalt_1day and add other cobalt_1day diagnostics, but comment out
+#      2016/11/20 jgj TO DO: Switch to CMORized names and update pp section to match new component names
+#==========================================================================================
+#output files
+"ocean_cobalt_1day",           24, "hours", 1, "days", "time",
+"ocean_cobalt_tracers_month",   1, "months", 1, "days", "time",
+"ocean_cobalt_tracers_year",   12, "months", 1, "days", "time",
+"ocean_cobalt_sfc",             1, "months", 1, "days", "time",
+"ocean_cobalt_btm",             1, "months", 1, "days", "time",
+"ocean_cobalt_phytolim_sfc",    1, "months", 1, "days", "time", 
+"ocean_cobalt_fdet_100",        1, "months", 1, "days", "time",
+"ocean_cobalt_biomass_100",     1, "months", 1, "days", "time", 
+"ocean_cobalt_prod_100",        1, "months", 1, "days", "time",
+"ocean_cobalt_miscflux_100",    1, "months", 1, "days", "time", 
+"ocean_cobalt_phyto_diags",    12, "months", 1, "days", "time",
+"ocean_cobalt_bact_diags",     12, "months", 1, "days", "time",
+"ocean_cobalt_zoo_diags",      12, "months", 1, "days", "time",
+"ocean_cobalt_misc",           12, "months", 1, "days", "time",
+#
+#======================
+# GENERIC OCEAN COBALT DIAGNOSTICS
+#======================
+#
+#===========================
+# ocean_cobalt_1day
+#===========================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_1day","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_1day","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_1day","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_1day","all",.false.,"none",2
+ "generic_cobalt","jprod_allphytos_100", "jprod_allphytos_100", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","sfc_chl",          "sfc_chl",            "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","sfc_no3",          "sfc_no3",            "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","sfc_temp",         "sfc_temp",           "ocean_cobalt_1day","all",.true.,"none",2
+## jgj: added 2014/11/25
+# "generic_cobalt","sfc_htotal",       "sfc_htotal",          "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","dic_deltap",       "dic_deltap",          "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","dic_stf_gas",      "dic_stf_gas",         "ocean_cobalt_1day","all",.true.,"none",2
+## additional 2D biomasses and biogeochemical fluxes
+# "generic_cobalt","fndet_100",        "fndet_100",   "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","nsmp_100",         "nsmp_100",    "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","nlgp_100",         "nlgp_100",    "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","ndi_100",          "ndi_100",     "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","nsmz_100",         "nsmz_100",    "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","nmdz_100",         "nmdz_100",    "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","nlgz_100",         "nlgz_100",    "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","nbact_100",        "nbact_100",   "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","mesozoo_200",      "mesozoo_200", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_nsmp_100",   "jprod_nsmp_100", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_nlgp_100",   "jprod_nlgp_100", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_ndi_100",    "jprod_ndi_100",  "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_nsmz_100",   "jprod_nsmz_100", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_nmdz_100",   "jprod_nmdz_100", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_nlgz_100",   "jprod_nlgz_100", "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_nbact_100",  "jprod_nbact_100","ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","hploss_100",       "hploss_100",     "ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","jprod_mesozoo_200","jprod_mesozoo_200","ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","btm_temp",         "btm_temp"        ,"ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","btm_o2",           "btm_o2"          ,"ocean_cobalt_1day","all",.true.,"none",2
+# "generic_cobalt","fndet_btm",        "fndet_btm"       ,"ocean_cobalt_1day","all",.true.,"none",2
+#=============================================
+# ocean_cobalt_tracers_month
+# 2013/06/01 jgj activate chl, htotal for JPD, RRR
+#=============================================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_tracers_month","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_tracers_month","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_tracers_month","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_tracers_month","all",.false.,"none",2
+ "generic_cobalt","chl",                "chl",                "ocean_cobalt_tracers_month","all",.true.,"none",2
+# "generic_cobalt","co3_ion",            "co3_ion",            "ocean_cobalt_tracers_month","all",.true.,"none",2
+# "generic_cobalt","co3_sol_arag",       "co3_sol_arag",       "ocean_cobalt_tracers_month","all",.true.,"none",2
+# "generic_cobalt","co3_sol_calc",       "co3_sol_calc",       "ocean_cobalt_tracers_month","all",.true.,"none",2
+# "generic_cobalt","fed",                "fed",                "ocean_cobalt_tracers_month","all",.true.,"none",2
+ "generic_cobalt","htotal",             "htotal",             "ocean_cobalt_tracers_month","all",.true.,"none",2
+  "generic_cobalt","no3",                "no3",                "ocean_cobalt_tracers_month","all",.true.,"none",2
+  "generic_cobalt","o2",                 "o2",                 "ocean_cobalt_tracers_month","all",.true.,"none",2
+#=======================================
+# ocean_cobalt_tracers_year
+#=======================================
+ "ocean_model","geolat_c","geolat_c"                ,"ocean_cobalt_tracers_year","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                ,"ocean_cobalt_tracers_year","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                    ,"ocean_cobalt_tracers_year","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                    ,"ocean_cobalt_tracers_year","all",.false.,"none",2
+# "generic_cobalt","ndi",                "ndi",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","nlg",                "nlg",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","nsm",                "nsm",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","nbact",              "nbact",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","nsmz",               "nsmz",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+## "generic_cobalt","nmdz",               "nmdz",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+## "generic_cobalt","nlgz",               "nlgz",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+ "generic_cobalt","alk",                "alk",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+ "generic_cobalt","cadet_arag",         "cadet_arag",         "ocean_cobalt_tracers_year","all",.true.,"none",2
+ "generic_cobalt","cadet_calc",         "cadet_calc",         "ocean_cobalt_tracers_year","all",.true.,"none",2
+ "generic_cobalt","dic",                "dic",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","fed",                "fed",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","fedi",               "fedi",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","felg",               "felg",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","fesm",               "fesm",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","fedet",              "fedet",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","ldon",               "ldon",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","ldop",               "ldop",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","lith",               "lith",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","lithdet",            "lithdet",            "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","ndet",               "ndet",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+ "generic_cobalt","nh4",                "nh4",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","no3",                "no3",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","o2",                 "o2",                 "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","pdet",               "pdet",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","po4",                "po4",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","srdon",              "srdon",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","srdop",              "srdop",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","sldon",              "sldon",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","sldop",              "sldop",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","sidet",              "sidet",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","silg",               "silg",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","sio4",               "sio4",               "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","co3_sol_arag",       "co3_sol_arag",       "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","co3_sol_calc",       "co3_sol_calc",       "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","tot_layer_int_c",    "tot_layer_int_c",    "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","tot_layer_int_fe",   "tot_layer_int_fe",   "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","tot_layer_int_n",    "tot_layer_int_n",    "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","tot_layer_int_p",    "tot_layer_int_p",    "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","tot_layer_int_si",   "tot_layer_int_si",   "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","cased",              "cased",              "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","chl",                "chl",                "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","co3_ion",            "co3_ion",            "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","htotal",             "htotal",             "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","irr_mem",            "irr_mem",            "ocean_cobalt_tracers_year","all",.true.,"none",2
+# "generic_cobalt","pco2surf",           "pco2surf",           "ocean_cobalt_tracers_year","all",.true.,"none",2
+#===================
+# Generic COBALT surface fields:
+#==================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_sfc","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_sfc","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_sfc","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_sfc","all",.false.,"none",2
+ "generic_cobalt","dic_csurf",               "dic_csurf",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","dic_deltap",              "dic_deltap",       "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","dic_kw",                  "dic_kw",           "ocean_cobalt_sfc","all",.true.,"none",2
+## "generic_cobalt","dic_sc_no",               "dic_sc_no",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","pco2surf",                "pco2surf",         "ocean_cobalt_sfc","all",.true.,"none",2
+## "generic_cobalt","o2_alpha",                 "o2_alpha",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","o2_csurf",                "o2_csurf",         "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","o2_deltap",               "o2_deltap",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","o2_kw",                   "o2_kw",            "ocean_cobalt_sfc","all",.true.,"none",2
+## "generic_cobalt","o2_sc_no",                 "o2_sc_no",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_alk",                 "sfc_alk",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_cadet_arag",          "sfc_cadet_arag",   "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_cadet_calc",          "sfc_cadet_calc",   "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_dic",                 "sfc_dic",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_fed",                 "sfc_fed",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_ldon",                "sfc_ldon",         "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_sldon",               "sfc_sldon",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_srdon",               "sfc_srdon",        "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_no3",                 "sfc_no3",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_nh4",                 "sfc_nh4",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_po4",                 "sfc_po4",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_sio4",                "sfc_sio4",         "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_htotal",              "sfc_htotal",       "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_o2",                  "sfc_o2",           "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_chl",                 "sfc_chl",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_nsmp",                "sfc_nsmp",         "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_nlgp",                "sfc_nlgp",         "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_ndi",                 "sfc_ndi",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_chl_smp",             "sfc_chl_smp",      "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_chl_lgp",             "sfc_chl_lgp",      "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_chl_di",              "sfc_chl_di",       "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_irr",                 "sfc_irr",          "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_irr_mem",             "sfc_irr_mem",      "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_temp",                "sfc_temp",         "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_co3_ion",             "sfc_co3_ion",      "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_co3_sol_arag",        "sfc_co3_sol_arag", "ocean_cobalt_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_co3_sol_calc",        "sfc_co3_sol_calc", "ocean_cobalt_sfc","all",.true.,"none",2
+#===================
+# Generic COBALT bottom fields:
+#==================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_btm","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_btm","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_btm","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_btm","all",.false.,"none",2
+ "generic_cobalt","btm_temp",         "btm_temp"        ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","btm_o2",           "btm_o2"          ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","ffedet_btm",       "ffedet_btm"      ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","flithdet_btm",     "flithdet_btm"    ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fndet_btm",        "fndet_btm"       ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fpdet_btm",        "fpdet_btm"       ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fsidet_btm",       "fsidet_btm"      ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fcadet_arag_btm",  "fcadet_arag_btm" ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fcadet_calc_btm",  "fcadet_calc_btm" ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fcased_burial",    "fcased_burial"   ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fcased_redis",     "fcased_redis"    ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fcased_input",     "fcased_input"    ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fnfeso4red_sed",   "fnfeso4red_sed"  ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fno3denit_sed",    "fno3denit_sed"   ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fnoxic_sed",       "fnoxic_sed"      ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","frac_burial",      "frac_burial"     ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fndet_burial",     "fndet_burial"    ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","fpdet_burial",     "fpdet_burial"    ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","z_sat_arag",       "z_sat_arag"      ,"ocean_cobalt_btm","all",.true.,"none",2
+ "generic_cobalt","z_sat_calc",       "z_sat_calc"      ,"ocean_cobalt_btm","all",.true.,"none",2
+#======================
+# Surface phytoplankton limitation diagnostics
+#======================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_phytolim_sfc","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_phytolim_sfc","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_phytolim_sfc","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_phytolim_sfc","all",.false.,"none",2
+ "generic_cobalt","sfc_def_fe_di",       "sfc_def_fe_di",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_def_fe_lgp",      "sfc_def_fe_lgp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_def_fe_smp",      "sfc_def_fe_smp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_felim_di",        "sfc_felim_di",           "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_felim_lgp",       "sfc_felim_lgp",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_felim_smp",       "sfc_felim_smp",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_irrlim_di",       "sfc_irrlim_di",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_irrlim_lgp",      "sfc_irrlim_lgp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_irrlim_smp",      "sfc_irrlim_smp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_theta_di",        "sfc_theta_di",           "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_theta_lgp",       "sfc_theta_lgp",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_theta_smp",       "sfc_theta_smp",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_mu_di",           "sfc_mu_di",              "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_mu_lgp",          "sfc_mu_lgp",             "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_mu_smp",          "sfc_mu_smp",             "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_nh4lim_lgp",      "sfc_nh4lim_lgp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_nh4lim_smp",      "sfc_nh4lim_smp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_no3lim_lgp",      "sfc_no3lim_lgp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_no3lim_smp",      "sfc_no3lim_smp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_po4lim_di",       "sfc_po4lim_di",          "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_po4lim_lgp",      "sfc_po4lim_lgp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_po4lim_smp",      "sfc_po4lim_smp",         "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_q_fe_2_n_di",     "sfc_q_fe_2_n_di",        "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_q_fe_2_n_lgp",    "sfc_q_fe_2_n_lgp",       "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+ "generic_cobalt","sfc_q_fe_2_n_smp",    "sfc_q_fe_2_n_smp",       "ocean_cobalt_phytolim_sfc","all",.true.,"none",2
+#======================
+# Generic COBALT downward fluxes at 100 meters
+#======================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_fdet_100","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_fdet_100","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_fdet_100","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_fdet_100","all",.false.,"none",2
+ "generic_cobalt","fndet_100",               "fndet_100",        "ocean_cobalt_fdet_100","all",.true.,"none",2
+ "generic_cobalt","fpdet_100",               "fpdet_100",        "ocean_cobalt_fdet_100","all",.true.,"none",2
+ "generic_cobalt","ffedet_100",              "ffedet_100",       "ocean_cobalt_fdet_100","all",.true.,"none",2
+ "generic_cobalt","fsidet_100",              "fsidet_100",       "ocean_cobalt_fdet_100","all",.true.,"none",2
+ "generic_cobalt","fcadet_calc_100",         "fcadet_calc_100",  "ocean_cobalt_fdet_100","all",.true.,"none",2
+ "generic_cobalt","fcadet_arag_100",         "fcadet_arag_100",  "ocean_cobalt_fdet_100","all",.true.,"none",2
+ "generic_cobalt","flithdet_100",            "flithdet_100",     "ocean_cobalt_fdet_100","all",.true.,"none",2
+#=======================
+# Generic COBALT 100m integrated biomass variables
+#=======================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_biomass_100","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_biomass_100","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_biomass_100","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_biomass_100","all",.false.,"none",2
+ "generic_cobalt","nsmp_100",                "nsmp_100", "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","nlgp_100",                "nlgp_100", "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","ndi_100",                 "ndi_100",  "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","silgp_100",               "silgp_100","ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","nsmz_100",                "nsmz_100", "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","nmdz_100",                "nmdz_100", "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","nlgz_100",                "nlgz_100", "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","nbact_100",               "nbact_100","ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","don_100",                 "don_100",  "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","ndet_100",                "ndet_100", "ocean_cobalt_biomass_100","all",.true.,"none",2
+ "generic_cobalt","mesozoo_200",          "mesozoo_200", "ocean_cobalt_biomass_100","all",.true.,"none",2
+#=======================
+# Generic COBALT 100m integrated plankton production variables
+#=======================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_prod_100","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_prod_100","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_prod_100","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_prod_100","all",.false.,"none",2
+ "generic_cobalt","jprod_allphytos_100",     "jprod_allphytos_100",      "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nsmp_100",          "jprod_nsmp_100",           "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nlgp_100",          "jprod_nlgp_100",           "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_ndi_100",           "jprod_ndi_100",            "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nsmp_new_100",      "jprod_nsmp_new_100",       "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nlgp_new_100",      "jprod_nlgp_new_100",       "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_ndi_new_100",       "jprod_ndi_new_100",        "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_ndi_n2_100",        "jprod_ndi_n2_100",         "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nsmz_100",          "jprod_nsmz_100",           "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nmdz_100",          "jprod_nmdz_100",           "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nlgz_100",          "jprod_nlgz_100",           "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_nbact_100",         "jprod_nbact_100",          "ocean_cobalt_prod_100","all",.true.,"none",2
+ "generic_cobalt","jprod_mesozoo_200",       "jprod_mesozoo_200",        "ocean_cobalt_prod_100","all",.true.,"none",2
+#=======================
+# Generic COBALT other 100m integrated foodweb fluxes
+#=======================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_miscflux_100","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_miscflux_100","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_miscflux_100","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_miscflux_100","all",.false.,"none",2
+ "generic_cobalt","jzloss_nsmp_100",         "jzloss_nsmp_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jzloss_nlgp_100",         "jzloss_nlgp_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jzloss_ndi_100",          "jzloss_ndi_100",           "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jaggloss_nsmp_100",       "jaggloss_nsmp_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jaggloss_nlgp_100",       "jaggloss_nlgp_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jvirloss_nsmp_100",       "jvirloss_nsmp_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jexuloss_nsmp_100",       "jexuloss_nsmp_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jexuloss_nlgp_100",       "jexuloss_nlgp_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jexuloss_ndi_100",        "jexuloss_ndi_100",         "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jingest_n_nsmz_100",      "jingest_n_nsmz_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jingest_n_nmdz_100",      "jingest_n_nmdz_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jingest_n_nlgz_100",      "jingest_n_nlgz_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jingest_n_hp_100",        "jingest_n_hp_100",         "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jzloss_nsmz_100",         "jzloss_nsmz_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jzloss_nmdz_100",         "jzloss_nmdz_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jhploss_nmdz_100",        "jhploss_nmdz_100",         "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jhploss_nlgz_100",        "jhploss_nlgz_100",         "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_ndet_nmdz_100",     "jprod_ndet_nmdz_100",      "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_ndet_nlgz_100",     "jprod_ndet_nlgz_100",      "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_ndet_hp_100",       "jprod_ndet_hp_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_don_nsmz_100",      "jprod_don_nsmz_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_don_nmdz_100",      "jprod_don_nmdz_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jremin_n_nsmz_100",       "jremin_n_nsmz_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jremin_n_nmdz_100",       "jremin_n_nmdz_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jremin_n_nlgz_100",       "jremin_n_nlgz_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jremin_n_hp_100",         "jremin_n_hp_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","juptake_ldon_nbact_100",  "juptake_ldon_nbact_100",   "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jvirloss_nbact_100",      "jvirloss_nbact_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jzloss_nbact_100",        "jzloss_nbact_100",         "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jremin_n_nbact_100",      "jremin_n_nbact_100",       "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_lithdet_100",       "jprod_lithdet_100",        "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_sidet_100",         "jprod_sidet_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_cadet_calc_100",    "jprod_cadet_calc_100",     "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jprod_cadet_arag_100",    "jprod_cadet_arag_100",     "ocean_cobalt_miscflux_100","all",.true.,"none",2
+ "generic_cobalt","jremin_ndet_100",         "jremin_ndet_100",          "ocean_cobalt_miscflux_100","all",.true.,"none",2
+## "generic_cobalt","jdic_100",                "jdic_100",                 "ocean_cobalt_miscflux_100","all",.true.,"none",2
+## "generic_cobalt","jdin_100",                "jdin_100",                 "ocean_cobalt_miscflux_100","all",.true.,"none",2
+## "generic_cobalt","jpo4_100",                "jpo4_100",                 "ocean_cobalt_miscflux_100","all",.true.,"none",2
+## "generic_cobalt","jfed_100",                "jfed_100",                 "ocean_cobalt_miscflux_100","all",.true.,"none",2
+## "generic_cobalt","jsio4_100",               "jsio4_100",                "ocean_cobalt_miscflux_100","all",.true.,"none",2
+## "generic_cobalt","jalk_100",                "jalk_100",                 "ocean_cobalt_miscflux_100","all",.true.,"none",2
+#=======================
+# Miscellaneous 2D and 3D COBALT diagnostics, saved yearly by default
+#=======================   
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_misc","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_misc","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_misc","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_misc","all",.false.,"none",2
+# "generic_cobalt","fcadet_arag",      "fcadet_arag",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","fcadet_calc",      "fcadet_calc",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","ffedet",           "ffedet",             "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","flithdet",         "flithdet",           "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","fndet",            "fndet",              "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","fpdet",            "fpdet",              "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","fsidet",           "fsidet",             "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jdiss_sidet",      "jdiss_sidet",        "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jdiss_cadet_arag", "jdiss_cadet_arag",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jdiss_cadet_calc", "jdiss_cadet_calc",   "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jremin_ndet",      "jremin_ndet",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jremin_pdet",      "jremin_pdet",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jremin_fedet",     "jremin_fedet",       "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_dry_fed",      "dep_dry_fed",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_dry_nh4",      "dep_dry_nh4",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_dry_no3",      "dep_dry_no3",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_dry_po4",      "dep_dry_po4",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_dry_lith",     "dep_dry_lith",       "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_wet_fed",      "dep_wet_fed",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_wet_nh4",      "dep_wet_nh4",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_wet_no3",      "dep_wet_no3",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_wet_po4",      "dep_wet_po4",        "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dep_wet_lith",     "dep_wet_lith",       "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_alk",  "runoff_flux_alk",    "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_dic",  "runoff_flux_dic",    "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_fed",  "runoff_flux_fed",    "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_lith", "runoff_flux_lith",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_no3",  "runoff_flux_no3",    "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_ldon", "runoff_flux_ldon",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_sldon", "runoff_flux_sldon",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_srdon", "runoff_flux_srdon",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_ndet", "runoff_flux_ndet",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_po4",  "runoff_flux_po4",    "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_ldop", "runoff_flux_ldop",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_sldop", "runoff_flux_sldop",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","runoff_flux_srdop", "runoff_flux_srdop",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jprod_cadet_arag", "jprod_cadet_arag",   "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jprod_cadet_calc", "jprod_cadet_calc",   "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","omega_arag",       "omega_arag",         "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","omega_calc",       "omega_calc",         "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jprod_lithdet",    "jprod_lithdet",      "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jfe_ads",          "jfe_ads",            "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jfe_coast",        "jfe_coast",          "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","kfe_eq_lig",       "kfe_eq_lig",          "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jalk",     "jalk",       "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jdic",     "jdic",       "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jnh4",     "jnh4",       "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jno3denit_wc",     "jno3denit_wc",       "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","jnitrif",          "jnitrif",            "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","dic_stf",          "dic_stf",            "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","dic_stf_gas",      "dic_stf_gas",        "ocean_cobalt_misc","all",.true.,"none",2
+## "generic_cobalt","o2_stf",           "o2_stf",              "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","o2_stf_gas",       "o2_stf_gas",          "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","alk_stf",         "alk_stf",                "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","fed_stf",         "fed_stf",                "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","lith_stf",        "lith_stf",               "ocean_cobalt_misc","all",.true.,"none",2
+ "generic_cobalt","nh4_stf",         "nh4_stf",                "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","no3_stf",         "no3_stf",                "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jalk_plus_btm",   "jalk_plus_btm",          "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jdic_plus_btm",   "jdic_plus_btm",          "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jdin_plus_btm",   "jdin_plus_btm",          "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jfed_plus_btm",   "jfed_plus_btm",          "ocean_cobalt_misc","all",.true.,"none",2
+# "generic_cobalt","jnh4_plus_btm",   "jnh4_plus_btm",          "ocean_cobalt_misc","all",.true.,"none",2
+#
+#========================
+# 2D and 3D phytoplankton diagnostics, saved yearly by default
+#========================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_phyto_diags","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_phyto_diags","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_phyto_diags","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_phyto_diags","all",.false.,"none",2
+# "generic_cobalt","expkT",           "expkT",              "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","def_fe_Di",       "def_fe_Di",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","def_fe_Lg",       "def_fe_Lg",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","def_fe_Sm",       "def_fe_Sm",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","felim_Di",        "felim_Di",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","felim_Lg",        "felim_Lg",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","felim_Sm",        "felim_Sm",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","irrlim_Di",       "irrlim_Di",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","irrlim_Lg",       "irrlim_Lg",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","irrlim_Sm",       "irrlim_Sm",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","theta_Di",        "theta_Di",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","theta_Lg",        "theta_Lg",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","theta_Sm",        "theta_Sm",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","mu_Di",           "mu_Di",              "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","mu_Lg",           "mu_Lg",              "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","mu_Sm",           "mu_Sm",              "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","nh4lim_Lg",       "nh4lim_Lg",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","nh4lim_Sm",       "nh4lim_Sm",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","no3lim_Lg",       "no3lim_Lg",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","no3lim_Sm",       "no3lim_Sm",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","po4lim_Di",       "po4lim_Di",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","po4lim_Lg",       "po4lim_Lg",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","po4lim_Sm",       "po4lim_Sm",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","q_fe_2_n_Di",     "q_fe_2_n_Di",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","q_fe_2_n_Lg",     "q_fe_2_n_Lg",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","q_fe_2_n_Sm",     "q_fe_2_n_Sm",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","silim_Lg",        "silim_Lg",           "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jzloss_n_Di",     "jzloss_n_Di",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jzloss_n_Lg",     "jzloss_n_Lg",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jzloss_n_Sm",     "jzloss_n_Sm",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jvirloss_n_Di",   "jvirloss_n_Di",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jvirloss_n_Lg",   "jvirloss_n_Lg",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jvirloss_n_Sm",   "jvirloss_n_Sm",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jexuloss_n_Di",   "jexuloss_n_Di",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jexuloss_n_Lg",   "jexuloss_n_Lg",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jexuloss_n_Sm",   "jexuloss_n_Sm",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jaggloss_n_Di",   "jaggloss_n_Di",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jaggloss_n_Lg",   "jaggloss_n_Lg",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jaggloss_n_Sm",   "jaggloss_n_Sm",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_n2_Di",   "juptake_n2_Di",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_fe_Di",   "juptake_fe_Di",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_fe_Lg",   "juptake_fe_Lg",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_fe_Sm",   "juptake_fe_Sm",      "ocean_cobalt_phyto_diags","all",.true.,"none",2
+ "generic_cobalt","juptake_nh4_Di",  "juptake_nh4_Di",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+ "generic_cobalt","juptake_nh4_Lg",  "juptake_nh4_Lg",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+ "generic_cobalt","juptake_nh4_Sm",  "juptake_nh4_Sm",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+ "generic_cobalt","juptake_no3_Di",  "juptake_no3_Di",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+ "generic_cobalt","juptake_no3_Lg",  "juptake_no3_Lg",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+ "generic_cobalt","juptake_no3_Sm",  "juptake_no3_Sm",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_po4_Di",  "juptake_po4_Di",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_po4_Lg",  "juptake_po4_Lg",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_po4_Sm",  "juptake_po4_Sm",     "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_sio4_Lg", "juptake_sio4_Lg",    "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_nsmp",      "jprod_nsmp",         "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_nlgp",      "jprod_nlgp",         "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ndi",       "jprod_ndi",          "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","irr_inst",           "irr_inst",        "ocean_cobalt_phyto_diags","all",.true.,"none",2
+# "generic_cobalt","irr_mix",            "irr_mix",         "ocean_cobalt_phyto_diags","all",.true.,"none",2
+#===================================
+# 2D and 3D bacteria diagnostics, saved yearly by default
+#===================================
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_bact_diags","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_bact_diags","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_bact_diags","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_bact_diags","all",.false.,"none",2
+# "generic_cobalt","jzloss_n_Bact",   "jzloss_n_Bact",         "ocean_cobalt_bact_diags","all",.true.,"none",2
+# "generic_cobalt","jvirloss_n_Bact", "jvirloss_n_Bact",       "ocean_cobalt_bact_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_ldon",    "juptake_ldon",          "ocean_cobalt_bact_diags","all",.true.,"none",2
+# "generic_cobalt","juptake_ldop",    "juptake_ldop",          "ocean_cobalt_bact_diags","all",.true.,"none",2
+"generic_cobalt","jprod_nh4_Bact",  "jprod_nh4_Bact",        "ocean_cobalt_bact_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_po4_Bact",  "jprod_po4_Bact",        "ocean_cobalt_bact_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_nbact",     "jprod_nbact",            "ocean_cobalt_bact_diags","all",.true.,"none",2
+# "generic_cobalt","temp_lim_Bact",   "temp_lim_Bact",         "ocean_cobalt_bact_diags","all",.true.,"none",2
+#
+## zoo_diags: zooplankton diagnostics
+ "ocean_model","geolat_c","geolat_c"                    ,"ocean_cobalt_zoo_diags","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c"                    ,"ocean_cobalt_zoo_diags","all",.false.,"none",2
+ "ocean_model","geolat","geolat"                        ,"ocean_cobalt_zoo_diags","all",.false.,"none",2
+ "ocean_model","geolon","geolon"                        ,"ocean_cobalt_zoo_diags","all",.false.,"none",2
+# "generic_cobalt","jzloss_n_Smz",    "jzloss_n_Smz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jzloss_n_Mdz",    "jzloss_n_Mdz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jzloss_n_Lgz",    "jzloss_n_Lgz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jhploss_n_Smz",   "jhploss_n_Smz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jhploss_n_Mdz",   "jhploss_n_Mdz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jhploss_n_Lgz",   "jhploss_n_Lgz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_n_Smz",   "jingest_n_Smz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_n_Mdz",   "jingest_n_Mdz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_n_Lgz",   "jingest_n_Lgz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_sio2_Smz","jingest_sio2_Smz",      "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_sio2_Mdz","jingest_sio2_Mdz",      "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_sio2_Lgz","jingest_sio2_Lgz",      "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","total_filter_feeding","total_filter_feeding","ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_fe_Smz",  "jingest_fe_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_fe_Mdz",  "jingest_fe_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jingest_fe_Lgz",  "jingest_fe_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ndet_Smz",  "jprod_ndet_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ndet_Mdz",  "jprod_ndet_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ndet_Lgz",  "jprod_ndet_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_pdet_Smz",  "jprod_pdet_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_pdet_Mdz",  "jprod_pdet_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_pdet_Lgz",  "jprod_pdet_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sidet_Smz", "jprod_sidet_Smz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sidet_Mdz", "jprod_sidet_Mdz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sidet_Lgz", "jprod_sidet_Lgz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sio4_Smz", "jprod_sio4_Smz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sio4_Mdz", "jprod_sio4_Mdz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sio4_Lgz", "jprod_sio4_Lgz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_fedet_Smz", "jprod_fedet_Smz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_fedet_Mdz", "jprod_fedet_Mdz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_fedet_Lgz", "jprod_fedet_Lgz",       "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ldon_Smz",  "jprod_ldon_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ldon_Mdz",  "jprod_ldon_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ldon_Lgz",  "jprod_ldon_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ldop_Smz",  "jprod_ldop_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ldop_Mdz",  "jprod_ldop_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_ldop_Lgz",  "jprod_ldop_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_srdon_Smz",  "jprod_srdon_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_srdon_Mdz",  "jprod_srdon_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_srdon_Lgz",  "jprod_srdon_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_srdop_Smz",  "jprod_srdop_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_srdop_Mdz",  "jprod_srdop_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_srdop_Lgz",  "jprod_srdop_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sldon_Smz",  "jprod_sldon_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sldon_Mdz",  "jprod_sldon_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sldon_Lgz",  "jprod_sldon_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sldop_Smz",  "jprod_sldop_Smz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sldop_Mdz",  "jprod_sldop_Mdz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_sldop_Lgz",  "jprod_sldop_Lgz",        "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_fed_Smz",   "jprod_fed_Smz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_fed_Mdz",   "jprod_fed_Mdz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_fed_Lgz",   "jprod_fed_Lgz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_po4_Smz",   "jprod_po4_Smz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_po4_Mdz",   "jprod_po4_Mdz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_po4_Lgz",   "jprod_po4_Lgz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+ "generic_cobalt","jprod_nh4_Smz",   "jprod_nh4_Smz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+ "generic_cobalt","jprod_nh4_Mdz",   "jprod_nh4_Mdz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+ "generic_cobalt","jprod_nh4_Lgz",   "jprod_nh4_Lgz",         "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","jprod_nsmz",       "jprod_nsmz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+## "generic_cobalt","jprod_nmdz",       "jprod_nmdz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+## "generic_cobalt","jprod_nlgz",       "jprod_nlgz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","temp_lim_Smz",    "temp_lim_Smz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","temp_lim_Mdz",    "temp_lim_Mdz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","temp_lim_Lgz",    "temp_lim_Lgz",          "ocean_cobalt_zoo_diags","all",.true.,"none",2
+# "generic_cobalt","hp_temp_lim",     "hp_temp_lim",           "ocean_cobalt_zoo_diags","all",.true.,"none",2
+#
+#===================================================================================================================
+# GENERIC OCEAN COBALT_z DIAGNOSTICS   JGJ 2016/05/05
+#      2016/05/05 jgj add _z diagnostics
+#===================================================================
+## add _z diagnostics to COBALT
+#"ocean_cobalt_1day_z",         24, "hours", 1, "days", "time",
+"ocean_cobalt_tracers_month_z", 1, "months", 1, "days", "time",
+"ocean_cobalt_tracers_year_z", 12, "months", 1, "days", "time",
+"ocean_cobalt_phyto_diags_z",  12, "months", 1, "days", "time",
+"ocean_cobalt_bact_diags_z",   12, "months", 1, "days", "time",
+"ocean_cobalt_zoo_diags_z",    12, "months", 1, "days", "time",
+"ocean_cobalt_misc_z",         12, "months", 1, "days", "time",
+#
+#===========================
+# ocean_cobalt_1day_z
+#===========================
+# "generic_cobalt_z","no3", "no3", "ocean_cobalt_1day_z","all","mean","none",2
+#
+#=============================================
+# ocean_cobalt_tracers_month_z
+#=============================================
+ "generic_cobalt_z","chl",                "chl",                "ocean_cobalt_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","dic",                "dic",                "ocean_cobalt_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","htotal",             "htotal",             "ocean_cobalt_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","no3",                "no3",                "ocean_cobalt_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","o2",                 "o2",                 "ocean_cobalt_tracers_month_z","all","mean","none",2
+#
+#=======================================
+# ocean_cobalt_tracers_year_z
+#=======================================
+ "generic_cobalt_z","alk",                "alk",                "ocean_cobalt_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","cadet_arag",         "cadet_arag",         "ocean_cobalt_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","cadet_calc",         "cadet_calc",         "ocean_cobalt_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","nh4",                "nh4",                "ocean_cobalt_tracers_year_z","all","mean","none",2
+#
+#=======================================
+# Miscellaneous 3D COBALT_z diagnostics, saved yearly by default
+#=======================================
+ "generic_cobalt_z","jdiss_cadet_arag", "jdiss_cadet_arag",   "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jprod_cadet_arag", "jprod_cadet_arag",   "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jprod_cadet_calc", "jprod_cadet_calc",   "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jalk",             "jalk",               "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jdic",             "jdic",               "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jnh4",             "jnh4",               "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jno3denit_wc",     "jno3denit_wc",       "ocean_cobalt_misc_z","all","mean","none",2
+ "generic_cobalt_z","jnitrif",          "jnitrif",            "ocean_cobalt_misc_z","all","mean","none",2
+#
+#========================
+# phytoplankton_z diagnostics, saved yearly by default
+#========================
+ "generic_cobalt_z","juptake_nh4_Di",  "juptake_nh4_Di",     "ocean_cobalt_phyto_diags_z","all","mean","none",2
+ "generic_cobalt_z","juptake_nh4_Lg",  "juptake_nh4_Lg",     "ocean_cobalt_phyto_diags_z","all","mean","none",2
+ "generic_cobalt_z","juptake_nh4_Sm",  "juptake_nh4_Sm",     "ocean_cobalt_phyto_diags_z","all","mean","none",2
+ "generic_cobalt_z","juptake_no3_Di",  "juptake_no3_Di",     "ocean_cobalt_phyto_diags_z","all","mean","none",2
+ "generic_cobalt_z","juptake_no3_Lg",  "juptake_no3_Lg",     "ocean_cobalt_phyto_diags_z","all","mean","none",2
+ "generic_cobalt_z","juptake_no3_Sm",  "juptake_no3_Sm",     "ocean_cobalt_phyto_diags_z","all","mean","none",2
+#
+#===================================
+# bacteria_z diagnostics, saved yearly by default
+#===================================
+ "generic_cobalt_z","jprod_nh4_Bact",  "jprod_nh4_Bact",        "ocean_cobalt_bact_diags_z","all","mean","none",2
+#
+#===================================
+## zoo_diags: zooplankton_z diagnostics
+#===================================
+ "generic_cobalt_z","jprod_nh4_Smz",   "jprod_nh4_Smz",         "ocean_cobalt_zoo_diags_z","all","mean","none",2
+ "generic_cobalt_z","jprod_nh4_Mdz",   "jprod_nh4_Mdz",         "ocean_cobalt_zoo_diags_z","all","mean","none",2
+ "generic_cobalt_z","jprod_nh4_Lgz",   "jprod_nh4_Lgz",         "ocean_cobalt_zoo_diags_z","all","mean","none",2
+#
+#===================================================================================================================
+#
+#=============================================================================================================================
+# CMIP6_OMIP_biogeochemistry DIAGNOSTICS  JGJ 2017/08/11    Data Request v01.00.15
+# To be used with GENERIC OCEAN COBALT
+# Oyr, Omon and day are requested.
+# Additionally, output _z versions of 3-D fields.
+# added variables not in spreadsheet (but in OMIP BGC documentation paper)
+#=============================================================================================================================
+#output files
+"ocean_cobalt_omip_daily",          24, "hours",  1, "days", "time",
+"ocean_cobalt_omip_tracers_month",   1, "months", 1, "days", "time",
+"ocean_cobalt_omip_tracers_year",   12, "months", 1, "days", "time",
+"ocean_cobalt_omip_rates_year",     12, "months", 1, "days", "time",
+"ocean_cobalt_omip_sfc",             1, "months", 1, "days", "time",
+"ocean_cobalt_omip_2d",              1, "months", 1, "days", "time",
+
+#"ocean_cobalt_omip_daily",           24, "hours", 1, "days", "time",
+#"ocean_cobalt_omip_tracers_month",   24, "hours", 1, "days", "time",
+#"ocean_cobalt_omip_tracers_year",    24, "hours", 1, "days", "time",
+#"ocean_cobalt_omip_rates_year",      24, "hours", 1, "days", "time",
+#"ocean_cobalt_omip_sfc",             24, "hours", 1, "days", "time",
+#"ocean_cobalt_omip_2d",              24, "hours", 1, "days", "time",
+#
+#=============================================================================================================================
+# ocean_cobalt_omip_daily
+#=============================================================================================================================
+ "ocean_model","geolat_c","geolat_c",                       "ocean_cobalt_omip_daily","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c",                       "ocean_cobalt_omip_daily","all",.false.,"none",2
+ "ocean_model","geolat","geolat",                           "ocean_cobalt_omip_daily","all",.false.,"none",2
+ "ocean_model","geolon","geolon",                           "ocean_cobalt_omip_daily","all",.false.,"none",2
+ "generic_cobalt","chlos",        "chlos",                  "ocean_cobalt_omip_daily","all",.true.,"none",2
+ "generic_cobalt","phycos",       "phycos",                 "ocean_cobalt_omip_daily","all",.true.,"none",2
+#
+#=============================================================================================================================
+# Omon: 3-D Marine Biogeochemical Tracer Fields:  ocean_cobalt_omip_tracers_month
+#=============================================================================================================================
+ "ocean_model","geolat_c","geolat_c",                       "ocean_cobalt_omip_tracers_month","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c",                       "ocean_cobalt_omip_tracers_month","all",.false.,"none",2
+ "ocean_model","geolat","geolat",                           "ocean_cobalt_omip_tracers_month","all",.false.,"none",2
+ "ocean_model","geolon","geolon",                           "ocean_cobalt_omip_tracers_month","all",.false.,"none",2
+ "generic_cobalt","dissic",       "dissic",                 "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+# pending
+# "generic_cobalt","dissicnat",    "dissicnat",              "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+# "generic_cobalt","dissicabio",   "dissicabio",             "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+# "generic_cobalt","dissi14cabio", "dissi14cabio",           "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","dissoc",       "dissoc",                 "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","phyc",         "phyc",                   "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","zooc",         "zooc",                   "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","bacc",         "bacc",                   "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","detoc",        "detoc",                  "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","calc",         "calc",                   "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","arag",         "arag",                   "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","phydiat",      "phydiat",                "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","phydiaz",      "phydiaz",                "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","phypico",      "phypico",                "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","phymisc",      "phymisc",                "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","zmicro",       "zmicro",                 "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","zmeso",        "zmeso",                  "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","talk",         "talk",                   "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+# pending
+# "generic_cobalt","talknat",      "talknat",                "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","ph",           "ph",                     "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+# pending
+# "generic_cobalt","phnat",        "phnat",                  "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+# "generic_cobalt","phabio",       "phabio",                 "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","o2_cmip",      "o2",                     "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+# pending
+# "generic_cobalt","o2sat",        "o2sat",                  "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","no3_cmip",     "no3",                    "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","nh4_cmip",     "nh4",                    "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","po4_cmip",     "po4",                    "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","dfe",          "dfe",                    "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","si",           "si",                     "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","chl_cmip",     "chl",                    "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","chldiat",      "chldiat",                "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","chldiaz",      "chldiaz",                "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","chlpico",      "chlpico",                "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","chlmisc",      "chlmisc",                "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","poc",          "poc",                    "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","pon",          "pon",                    "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","pop",          "pop",                    "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","bfe",          "bfe",                    "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","bsi",          "bsi",                    "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","phyn",         "phyn",                   "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","phyp",         "phyp",                   "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","phyfe",        "phyfe",                  "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","physi",        "physi",                  "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","co3",          "co3",                    "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+# pending
+# "generic_cobalt","co3nat",       "co3nat",                 "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+# "generic_cobalt","co3abio",      "co3abio",                "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","co3satcalc",   "co3satcalc",             "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","co3satarag",   "co3satarag",             "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+#=============================================================================================================================
+# Additional Omon: 3-D Marine Biogeochemical Fields:  ocean_cobalt_omip_tracers_month
+#=============================================================================================================================
+ "generic_cobalt","pp",           "pp",                     "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","graz",         "graz",                   "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","expc",         "expc",                   "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","limndiat",     "limndiat",               "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","limnpico",     "limnpico",               "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","limnmisc",     "limnmisc",               "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","limirrdiat",   "limirrdiat",             "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","limirrdiaz",   "limirrdiaz",             "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","limirrpico",   "limirrpico",             "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","limirrmisc",   "limirrmisc",             "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","limfediat",    "limfediat",              "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","limfediaz",    "limfediaz",              "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","limfepico",    "limfepico",              "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+ "generic_cobalt","limfemisc",    "limfemisc",              "ocean_cobalt_omip_tracers_month","all",.true.,"none",2
+#
+#=============================================================================================================================
+# Oyr: 3-D Marine Biogeochemical Tracer Fields:  ocean_cobalt_omip_tracers_year
+#=============================================================================================================================
+ "ocean_model","geolat_c","geolat_c",                       "ocean_cobalt_omip_tracers_year","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c",                       "ocean_cobalt_omip_tracers_year","all",.false.,"none",2
+ "ocean_model","geolat","geolat",                           "ocean_cobalt_omip_tracers_year","all",.false.,"none",2
+ "ocean_model","geolon","geolon",                           "ocean_cobalt_omip_tracers_year","all",.false.,"none",2
+ "generic_cobalt","dissic",       "dissic",                 "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+# pending
+# "generic_cobalt","dissicnat",    "dissicnat",              "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+# "generic_cobalt","dissicabio",   "dissicabio",             "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+# "generic_cobalt","dissi14cabio", "dissi14cabio",           "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","dissoc",       "dissoc",                 "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","phyc",         "phyc",                   "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","zooc",         "zooc",                   "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","bacc",         "bacc",                   "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","detoc",        "detoc",                  "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","calc",         "calc",                   "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","arag",         "arag",                   "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","phydiat",      "phydiat",                "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","phydiaz",      "phydiaz",                "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","phypico",      "phypico",                "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","phymisc",      "phymisc",                "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","zmicro",       "zmicro",                 "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","zmeso",        "zmeso",                  "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","talk",         "talk",                   "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+# pending
+# "generic_cobalt","talknat",      "talknat",                "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","ph",           "ph",                     "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+# pending
+# "generic_cobalt","phnat",        "phnat",                  "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+# "generic_cobalt","phabio",       "phabio",                 "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","o2_cmip",      "o2",                     "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+# pending
+# "generic_cobalt","o2sat",        "o2sat",                  "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","no3_cmip",     "no3",                    "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","nh4_cmip",     "nh4",                    "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","po4_cmip",     "po4",                    "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","dfe",          "dfe",                    "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","si",           "si",                     "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","chl_cmip",     "chl",                    "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","chldiat",      "chldiat",                "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","chldiaz",      "chldiaz",                "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","chlpico",      "chlpico",                "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","chlmisc",      "chlmisc",                "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+# only requested in Omon
+# "generic_cobalt","poc",          "poc",                    "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","pon",          "pon",                    "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","pop",          "pop",                    "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","bfe",          "bfe",                    "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","bsi",          "bsi",                    "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","phyn",         "phyn",                   "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","phyp",         "phyp",                   "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","phyfe",        "phyfe",                  "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","physi",        "physi",                  "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","co3",          "co3",                    "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+# pending
+# "generic_cobalt","co3nat",       "co3nat",                 "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+# "generic_cobalt","co3abio",      "co3abio",                "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","co3satcalc",   "co3satcalc",             "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+ "generic_cobalt","co3satarag",   "co3satarag",             "ocean_cobalt_omip_tracers_year","all",.true.,"none",2
+#
+#=============================================================================================================================
+# Oyr: 3-D Marine Biogeochemical Rates of Production and Removal:  ocean_cobalt_omip_rates_year
+#=============================================================================================================================
+ "ocean_model","geolat_c","geolat_c",                       "ocean_cobalt_omip_rates_year","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c",                       "ocean_cobalt_omip_rates_year","all",.false.,"none",2
+ "ocean_model","geolat","geolat",                           "ocean_cobalt_omip_rates_year","all",.false.,"none",2
+ "ocean_model","geolon","geolon",                           "ocean_cobalt_omip_rates_year","all",.false.,"none",2
+ "generic_cobalt","pp",           "pp",                     "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","pnitrate",     "pnitrate",               "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+# not requested
+# "generic_cobalt","pphosphate",   "pphosphate",             "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","pbfe",         "pbfe",                   "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","pbsi",         "pbsi",                   "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","parag",        "parag",                  "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","pcalc",        "pcalc",                  "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","expc",         "expc",                   "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","expn",         "expn",                   "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","expp",         "expp",                   "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","expfe",        "expfe",                  "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","expsi",        "expsi",                  "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","expcalc",      "expcalc",                "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","exparag",      "exparag",                "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","remoc",        "remoc",                  "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","dcalc",        "dcalc",                  "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","darag",        "darag",                  "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","ppdiat",       "ppdiat",                 "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","ppdiaz",       "ppdiaz",                 "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","pppico",       "pppico",                 "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","ppmisc",       "ppmisc",                 "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","bddtdic",      "bddtdic",                "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","bddtdin",      "bddtdin",                "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","bddtdip",      "bddtdip",                "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","bddtdife",     "bddtdife",               "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","bddtdisi",     "bddtdisi",               "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","bddtalk",      "bddtalk",                "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","fescav",       "fescav",                 "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","fediss",       "fediss",                 "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+ "generic_cobalt","graz",         "graz",                   "ocean_cobalt_omip_rates_year","all",.true.,"none",2
+#
+#====================================================================================================================
+# Omon: 2-D Marine Biogeochemical Surface Tracer Fields:  ocean_cobalt_omip_sfc
+#====================================================================================================================
+ "ocean_model","geolat_c","geolat_c",                       "ocean_cobalt_omip_sfc","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c",                       "ocean_cobalt_omip_sfc","all",.false.,"none",2
+ "ocean_model","geolat","geolat",                           "ocean_cobalt_omip_sfc","all",.false.,"none",2
+ "ocean_model","geolon","geolon",                           "ocean_cobalt_omip_sfc","all",.false.,"none",2
+ "generic_cobalt","dissicos",       "dissicos",             "ocean_cobalt_omip_sfc","all",.true.,"none",2
+# pending
+# "generic_cobalt","dissicnatos",    "dissicnatos",          "ocean_cobalt_omip_sfc","all",.true.,"none",2
+# "generic_cobalt","dissicabioos",   "dissicabioos",         "ocean_cobalt_omip_sfc","all",.true.,"none",2
+# "generic_cobalt","dissi14cabioos", "dissi14cabioos",       "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","dissocos",       "dissocos",             "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","phycos",         "phycos",               "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","zoocos",         "zoocos",               "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","baccos",         "baccos",               "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","detocos",        "detocos",              "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","calcos",         "calcos",               "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","aragos",         "aragos",               "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","phydiatos",      "phydiatos",            "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","phydiazos",      "phydiazos",            "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","phypicoos",      "phypicoos",            "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","phymiscos",      "phymiscos",            "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","zmicroos",       "zmicroos",             "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","zmesoos",        "zmesoos",              "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","talkos",         "talkos",               "ocean_cobalt_omip_sfc","all",.true.,"none",2
+# pending
+# "generic_cobalt","talknatos",      "talknatos",            "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","phos",           "phos",                 "ocean_cobalt_omip_sfc","all",.true.,"none",2
+# pending
+# "generic_cobalt","phnatos",        "phnatos",              "ocean_cobalt_omip_sfc","all",.true.,"none",2
+# "generic_cobalt","phabioos",       "phabioos",             "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","o2os",           "o2os",                 "ocean_cobalt_omip_sfc","all",.true.,"none",2
+# pending
+# "generic_cobalt","o2satos",        "o2satos",              "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","no3os",          "no3os",                "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","nh4os",          "nh4os",                "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","po4os",          "po4os",                "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","dfeos",          "dfeos",                "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","sios",           "sios",                 "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","chlos",          "chlos",                "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","chldiatos",      "chldiatos",            "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","chldiazos",      "chldiazos",            "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","chlpicoos",      "chlpicoos",            "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","chlmiscos",      "chlmiscos",            "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","ponos",          "ponos",                "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","popos",          "popos",                "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","bfeos",          "bfeos",                "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","bsios",          "bsios",                "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","phynos",         "phynos",               "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","phypos",         "phypos",               "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","phyfeos",        "phyfeos",              "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","physios",        "physios",              "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","co3os",          "co3os",                "ocean_cobalt_omip_sfc","all",.true.,"none",2
+# pending
+# "generic_cobalt","co3nat",         "co3natos",             "ocean_cobalt_omip_sfc","all",.true.,"none",2
+# "generic_cobalt","co3abio",        "co3abioos",            "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","co3satcalc",     "co3satcalcos",         "ocean_cobalt_omip_sfc","all",.true.,"none",2
+ "generic_cobalt","co3satarag",     "co3sataragos",         "ocean_cobalt_omip_sfc","all",.true.,"none",2
+#
+#=============================================================================================================================
+# Omon: Additional 2-D Marine Biogeochemical Fields (e.g. vertically integrated, 100m, etc)
+#=============================================================================================================================
+ "ocean_model","geolat_c","geolat_c",                       "ocean_cobalt_omip_2d","all",.false.,"none",2
+ "ocean_model","geolon_c","geolon_c",                       "ocean_cobalt_omip_2d","all",.false.,"none",2
+ "ocean_model","geolat","geolat",                           "ocean_cobalt_omip_2d","all",.false.,"none",2
+ "ocean_model","geolon","geolon",                           "ocean_cobalt_omip_2d","all",.false.,"none",2
+ "generic_cobalt","intpp",           "intpp",               "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intppnitrate",    "intppnitrate",        "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intppdiat",       "intppdiat",           "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intppdiaz",       "intppdiaz",           "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intpppico",       "intpppico",           "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intppmisc",       "intppmisc",           "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intpbn",          "intpbn",              "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intpbp",          "intpbp",              "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intpbfe",         "intpbfe",             "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intpbsi",         "intpbsi",             "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intpcalcite",     "intpcalcite",         "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intparag",        "intparag",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","epc100",          "epc100",              "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","epn100",          "epn100",              "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","epp100",          "epp100",              "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","epfe100",         "epfe100",             "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","epsi100",         "epsi100",             "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","epcalc100",       "epcalc100",           "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","eparag100",       "eparag100",           "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intdic",          "intdic",              "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intdoc",          "intdoc",              "ocean_cobalt_omip_2d","all",.true.,"none",2
+# pending
+# "generic_cobalt","intpoc",          "intpoc",              "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","spco2",           "spco2",               "ocean_cobalt_omip_2d","all",.true.,"none",2
+# pending
+# "generic_cobalt","spco2nat",        "spco2nat",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","spco2abio",       "spco2abio",           "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","dpco2",           "dpco2",               "ocean_cobalt_omip_2d","all",.true.,"none",2
+# pending
+# "generic_cobalt","dpco2nat",        "dpco2nat",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","dpco2abio",       "dpco2abio",           "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","dpo2",            "dpo2",                "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","fgco2",           "fgco2",               "ocean_cobalt_omip_2d","all",.true.,"none",2
+# pending
+# "generic_cobalt","fgco2nat",        "fgco2nat",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fgco2abio",       "fgco2abio",           "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fg14cabio",       "fg14cabio",           "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","fgo2",            "fgo2",                "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","icfriver",        "icfriver",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","fric",            "fric",                "ocean_cobalt_omip_2d","all",.true.,"none",2
+# pending
+# "generic_cobalt","ocfriver",        "ocfriver",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","froc",            "froc",                "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","intpn2",          "intpn2",              "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","fsn",             "fsn",                 "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","frn",             "frn",                 "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","fsfe",            "fsfe",                "ocean_cobalt_omip_2d","all",.true.,"none",2
+ "generic_cobalt","frfe",            "frfe",                "ocean_cobalt_omip_2d","all",.true.,"none",2
+# not being provided
+# "generic_cobalt","o2min",           "o2min",               "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","zo2min",          "zo2min",              "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","zsatcalc",        "zsatcalc",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","zsatarag",        "zsatarag",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fddtdic",         "fddtdic",             "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fddtdin",         "fddtdin",             "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fddtdip",         "fddtdip",             "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fddtdife",        "fddtdife",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fddtdisi",        "fddtdisi",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fddtalk",         "fddtalk",             "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fbddtdic",        "fbddtdic",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fbddtdin",        "fbddtdin",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fbddtdip",        "fbddtdip",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fbddtdife",       "fbddtdife",           "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fbddtdisi",       "fbddtdisi",           "ocean_cobalt_omip_2d","all",.true.,"none",2
+# "generic_cobalt","fbddtalk",        "fbddtalk",            "ocean_cobalt_omip_2d","all",.true.,"none",2
+#
+#=============================================================================================================================
+# CMIP6_OMIP_biogeochemistry DIAGNOSTICS  JGJ 2016/08/15
+# To be used with GENERIC OCEAN COBALT
+# output _z versions of 3-D fields.
+#=============================================================================================================================
+# 
+"ocean_cobalt_omip_tracers_month_z",   1, "months", 1, "days", "time",
+"ocean_cobalt_omip_tracers_year_z",   12, "months", 1, "days", "time",
+"ocean_cobalt_omip_rates_year_z",     12, "months", 1, "days", "time",
+#
+#"ocean_cobalt_omip_tracers_month_z",  24, "hours", 1, "days", "time",
+#"ocean_cobalt_omip_tracers_year_z",   24, "hours", 1, "days", "time",
+#"ocean_cobalt_omip_rates_year_z",     24, "hours", 1, "days", "time",
+#
+#=============================================================================================================================
+# Omon: 3-D Marine Biogeochemical Tracer Fields:  ocean_cobalt_omip_tracers_month_z
+#=============================================================================================================================
+ "generic_cobalt_z","dissic",       "dissic",                 "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+# pending
+# "generic_cobalt_z","dissicnat",    "dissicnat",              "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+# "generic_cobalt_z","dissicabio",   "dissicabio",             "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+# "generic_cobalt_z","dissi14cabio", "dissi14cabio",           "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","dissoc",       "dissoc",                 "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","phyc",         "phyc",                   "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","zooc",         "zooc",                   "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","bacc",         "bacc",                   "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","detoc",        "detoc",                  "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","calc",         "calc",                   "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","arag",         "arag",                   "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","phydiat",      "phydiat",                "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","phydiaz",      "phydiaz",                "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","phypico",      "phypico",                "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","phymisc",      "phymisc",                "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","zmicro",       "zmicro",                 "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","zmeso",        "zmeso",                  "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","talk",         "talk",                   "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+# pending
+# "generic_cobalt_z","talknat",      "talknat",                "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","ph",           "ph",                     "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+# pending
+# "generic_cobalt_z","phnat",        "phnat",                  "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+# "generic_cobalt_z","phabio",       "phabio",                 "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","o2_cmip",      "o2",                     "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+# pending
+# "generic_cobalt_z","o2sat",        "o2sat",                  "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","no3_cmip",     "no3",                    "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","nh4_cmip",     "nh4",                    "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","po4_cmip",     "po4",                    "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","dfe",          "dfe",                    "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","si",           "si",                     "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","chl_cmip",     "chl",                    "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","chldiat",      "chldiat",                "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","chldiaz",      "chldiaz",                "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","chlpico",      "chlpico",                "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","chlmisc",      "chlmisc",                "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","poc",          "poc",                    "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","pon",          "pon",                    "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","pop",          "pop",                    "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","bfe",          "bfe",                    "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","bsi",          "bsi",                    "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","phyn",         "phyn",                   "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","phyp",         "phyp",                   "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","phyfe",        "phyfe",                  "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","physi",        "physi",                  "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","co3",          "co3",                    "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+# pending
+# "generic_cobalt_z","co3nat",       "co3nat",                 "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+# "generic_cobalt_z","co3abio",      "co3abio",                "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","co3satcalc",   "co3satcalc",             "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","co3satarag",   "co3satarag",             "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+#=============================================================================================================================
+# Additional Omon: 3-D Marine Biogeochemical Fields:  ocean_cobalt_omip_tracers_month
+#=============================================================================================================================
+ "generic_cobalt_z","pp",           "pp",                     "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","graz",         "graz",                   "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","expc",         "expc",                   "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","limndiat",     "limndiat",               "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","limnpico",     "limnpico",               "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","limnmisc",     "limnmisc",               "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","limirrdiat",   "limirrdiat",             "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","limirrdiaz",   "limirrdiaz",             "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","limirrpico",   "limirrpico",             "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","limirrmisc",   "limirrmisc",             "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","limfediat",    "limfediat",              "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","limfediaz",    "limfediaz",              "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","limfepico",    "limfepico",              "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+ "generic_cobalt_z","limfemisc",    "limfemisc",              "ocean_cobalt_omip_tracers_month_z","all","mean","none",2
+#
+#=============================================================================================================================
+# Oyr: 3-D Marine Biogeochemical Tracer Fields:  ocean_cobalt_omip_tracers_year_z
+#=============================================================================================================================
+ "generic_cobalt_z","dissic",       "dissic",                 "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+# pending
+# "generic_cobalt_z","dissicnat",    "dissicnat",              "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+# "generic_cobalt_z","dissicabio",   "dissicabio",             "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+# "generic_cobalt_z","dissi14cabio", "dissi14cabio",           "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","dissoc",       "dissoc",                 "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","phyc",         "phyc",                   "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","zooc",         "zooc",                   "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","bacc",         "bacc",                   "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","detoc",        "detoc",                  "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","calc",         "calc",                   "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","arag",         "arag",                   "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","phydiat",      "phydiat",                "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","phydiaz",      "phydiaz",                "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","phypico",      "phypico",                "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","phymisc",      "phymisc",                "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","zmicro",       "zmicro",                 "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","zmeso",        "zmeso",                  "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","talk",         "talk",                   "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+# pending
+# "generic_cobalt_z","talknat",      "talknat",                "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","ph",           "ph",                     "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+# pending
+# "generic_cobalt_z","phnat",        "phnat",                  "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+# "generic_cobalt_z","phabio",       "phabio",                 "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","o2_cmip",      "o2",                     "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+# pending
+# "generic_cobalt_z","o2sat",        "o2sat",                  "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","no3_cmip",     "no3",                    "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","nh4_cmip",     "nh4",                    "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","po4_cmip",     "po4",                    "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","dfe",          "dfe",                    "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","si",           "si",                     "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","chl_cmip",    "chl",                    "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","chldiat",      "chldiat",                "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","chldiaz",      "chldiaz",                "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","chlpico",      "chlpico",                "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","chlmisc",      "chlmisc",                "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+# only requested in Omon
+# "generic_cobalt_z","poc",          "poc",                    "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","pon",          "pon",                    "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","pop",          "pop",                    "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","bfe",          "bfe",                    "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","bsi",          "bsi",                    "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","phyn",         "phyn",                   "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","phyp",         "phyp",                   "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","phyfe",        "phyfe",                  "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","physi",        "physi",                  "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","co3",          "co3",                    "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+# pending
+# "generic_cobalt_z","co3nat",       "co3nat",                 "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+# "generic_cobalt_z","co3abio",      "co3abio",                "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","co3satcalc",   "co3satcalc",             "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+ "generic_cobalt_z","co3satarag",   "co3satarag",             "ocean_cobalt_omip_tracers_year_z","all","mean","none",2
+#
+#=============================================================================================================================
+# Oyr: 3-D Marine Biogeochemical Rates of Production and Removal:  ocean_cobalt_omip_rates_year_z
+#=============================================================================================================================
+ "generic_cobalt_z","pp",           "pp",                     "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","pnitrate",     "pnitrate",               "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+# not requested
+# "generic_cobalt_z","pphosphate",   "pphosphate",             "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","pbfe",         "pbfe",                   "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","pbsi",         "pbsi",                   "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","parag",        "parag",                  "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","pcalc",        "pcalc",                  "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","expc",         "expc",                   "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","expn",         "expn",                   "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","expp",         "expp",                   "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","expfe",        "expfe",                  "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","expsi",        "expsi",                  "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","expcalc",      "expcalc",                "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","exparag",      "exparag",                "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","remoc",        "remoc",                  "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","dcalc",        "dcalc",                  "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","darag",        "darag",                  "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","ppdiat",       "ppdiat",                 "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","ppdiaz",       "ppdiaz",                 "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","pppico",       "pppico",                 "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","ppmisc",       "ppmisc",                 "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","bddtdic",      "bddtdic",                "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","bddtdin",      "bddtdin",                "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","bddtdip",      "bddtdip",                "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","bddtdife",     "bddtdife",               "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","bddtdisi",     "bddtdisi",               "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","bddtalk",      "bddtalk",                "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","fescav",       "fescav",                 "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","fediss",       "fediss",                 "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+ "generic_cobalt_z","graz",         "graz",                   "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+#
+# Required cell measures
+ "ocean_model",  "volcello","volcello","ocean_cobalt_1day","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_tracers_month","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_tracers_year","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_sfc","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_btm","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_phytolim_sfc","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_fdet_100","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_biomass_100","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_prod_100","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_miscflux_100","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_phyto_diags","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_bact_diags","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_zoo_diags","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_misc","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model","volcello","volcello","ocean_cobalt_omip_daily","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model","volcello","volcello","ocean_cobalt_omip_tracers_month","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model","volcello","volcello","ocean_cobalt_omip_tracers_year","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model","volcello","volcello","ocean_cobalt_omip_rates_year","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model","volcello","volcello","ocean_cobalt_omip_sfc","all","mean","none",2 # Cell measure for 3d data
+# "ocean_model",  "volcello","volcello","","all","mean","none",2 # Cell measure for 3d data
+#
+# "ocean_model_z","volcello","volcello","","all","mean","none",2 # Cell measure for 3d data
+# "ocean_model_z","volcello","volcello","ocean_cobalt_1day_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_tracers_month_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_tracers_year_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_phyto_diags_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_bact_diags_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_zoo_diags_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_misc_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_omip_tracers_month_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_omip_tracers_year_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_omip_rates_year_z","all","mean","none",2 # Cell measure for 3d data
