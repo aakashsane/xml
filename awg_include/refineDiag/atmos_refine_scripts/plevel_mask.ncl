@@ -172,14 +172,14 @@ begin
     ;    3) coordinates variable is a scalar
     ;    4) coordinates variable has units = "Pa"
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    else if (dimsizes(dimnames) .eq. 3) then
+    else if (dimsizes(dimnames) .eq. 3 .and. .not. any(varnames(iv) .eq. (/"cll","clm","clh"/))) then
       if (any(getfilevaratts(fi,varnames(iv)) .eq. "coordinates")) then
         coord = fi->$varnames(iv)$@coordinates
         if (isfilevar(fi,coord)) then ; multiple names will fail
           plev = fi->$coord$
           if (sum(dimsizes(plev)) .eq. 1) then
             if (isatt(plev,"units")) then
-              if (plev@units .eq. "Pa") then
+              if (plev@units .eq. "Pa" .and. plev .gt. 50000.) then
                 data = fi->$varnames(iv)$
                 data = where(plev .gt. ps, data@_FillValue, data)
                 if (.not.tavginfo .and. isatt(data,"time_avg_info")) then

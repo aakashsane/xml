@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+use warnings FATAL => 'all';
+use strict;
+use autodie;
+use Data::Dumper;
+
+my %sites;
+open my $fh, 'cmip6-cfsites-locations.txt';
+while (<$fh>) {
+    my ($site, $lon, $lat) = split ',';
+    s/ +//g for $site, $lon, $lat;
+    $sites{$site} = [$lon, $lat];
+}
+#print Dumper %sites;
+
+while (<>) {
+    if (/atmos_station_001/ and ! /^\s*#/) {
+        for my $site (1 .. 121) {
+            my ($lon, $lat) = @{$sites{$site}};
+            $site = 0 . $site until length $site == 3;
+            #print "doing site=$site lon=$lon lat=$lat\n";
+            my $line = $_;
+            for ($line) {
+                s/atmos_station_001/atmos_station_$site/;
+                s/"290., 290., -20.0, -20.0, -1, -1"/"$lon, $lon, $lat, $lat, -1, -1"/;
+            }
+            print $line;
+        }
+    }
+    else {
+        print;
+    }
+}
