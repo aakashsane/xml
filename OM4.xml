@@ -14,11 +14,12 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
   <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
-  <property name="MOM6_DATE"      value="2017.10.05"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"      value="2017.10.19"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="dev_master_20171007_mom6_2017.10.05"/> <!-- customize as needed -->
+  <!--property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/--> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_YOURGROUPLETTER"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
    <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
 
@@ -59,16 +60,17 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
    </freInclude>
    <freInclude name="resourceparams_O32">
 	     <resources jobWallclock="00:30:00">
-               <atm ranks="0" threads="2"/>
+               <atm ranks="0" threads="1"/>
 	       <ice                        layout = "8,4"   io_layout = "1,2" mask_table="MOM_mask_table"/>
-	       <ocn ranks="32" threads="2" layout = "8,4"   io_layout = "1,2" mask_table="MOM_mask_table"/>
+	       <ocn ranks="32" threads="1" layout = "8,4"   io_layout = "1,2" mask_table="MOM_mask_table"/>
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_O32x2">
 	     <resources jobWallclock="00:30:00">
+               <atm ranks="0" threads="2"/>
 	       <ice                        layout = "8,4"   io_layout = "1,2" mask_table="MOM_mask_table"/>
-	       <ocn ranks="32" threads="1"   layout = "8,4"   io_layout = "1,2" mask_table="MOM_mask_table"/>
-	     </resources>
+	       <ocn ranks="32" threads="2"   layout = "8,4"   io_layout = "1,2" mask_table="MOM_mask_table"/>
+             </resources>
    </freInclude>
    <freInclude name="resourceparams_O64">
 	     <resources jobWallclock="00:30:00">
@@ -963,6 +965,47 @@ module use -a /usw/eslogin/modulefiles-c3
 
     </platform>
 
+    <platform name="ncrc3.cray8">
+      <freVersion>$(FRE_VERSION)</freVersion>
+      <compiler type="cce" version="8.5.0" />
+      <project>$(GFDL_GROUP)</project>
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Chris.Golaz/archive/mdt"/>
+      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/f1/pdata/gfdl_M"/>
+      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/f1/unswept/Ming.Zhao/archive/mdt"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="CWG_HOME"          value="/lustre/f1/unswept/John.Krasting/cwg"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/f1/unswept/Niki.Zadeh/archive/input"/>
+      <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20160517"/>
+      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
+      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+      <property name="OBGC_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/retrospective"/> 
+      <property name="OBGC_MODEL_UPDATES"   value="/ncrc/home2/Jasmin.John"/>
+      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
+      <property name="CMIP6_ESM4_ARCHIVE_ROOT"    value="$CDATA/gfdl_B/CMIP6/ESM4"/>
+     
+      <csh><![CDATA[
+          setenv KMP_STACKSIZE 512m
+          setenv NC_BLKSZ 1M
+          # MAIN_PROGRAM env is needed by the GNU compiler
+          setenv MAIN_PROGRAM coupler/coupler_main.o
+          module load git
+      ]]></csh>
+
+    </platform>
     <platform name="theia.intel">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="15.1.133" />
@@ -1973,8 +2016,9 @@ touch $work/INPUT/SIS_override
          <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O864x2']/node())"/> </run>
       </regression>
       <regression name="debugomp">
-        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512x2']/node())"/> </run>
+        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O256x2']/node())"/> </run>
+        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
       </regression>
  
       <regression name="ice_layouts">
@@ -2014,7 +2058,7 @@ touch $work/INPUT/SIS_override
 
    </experiment>
 
-  <experiment name="OM4_initCond5_nobergs" inherit="OM4_SIS2_baseline">
+  <experiment name="OM4_initCond_lotsofbergs" inherit="OM4_SIS2_baseline">
     <input>
      <!--There is  MOM6/SIS2 restart provided in initCond.-->
      <namelist name="MOM_input_nml" >
@@ -2046,15 +2090,10 @@ touch $work/INPUT/SIS_override
       <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/answers/warsaw_mom6_2017.06.12_answers/CM4_c96L33_am4p0_2010_30d15_tlt.2017.06.12/ncrc3.intel16-prod-openmp/archive/1x1m0d_216x2a_1756x1o/restart/00010201.tar</dataSource> PASS
       <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4_c96L33_am4p0_1850_30d15_tlt_dyn_veg_SAI_combined_01410101.tar</dataSource> FAIL
       <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4_c96L33_am4p0_2010_30d15_tlt_725_01210101.tar</dataSource> FAIL
-      -->
       <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4_c96L33_am4p0_2010_30d15_tlt_725_01210101.tar</dataSource>
+      -->
+      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_806_from450_combined_06310101.tar</dataSource>
      </dataFile>
-
-     <csh><![CDATA[
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override DO_ICEBERGS = False
-SIS_OVERRIDE_EOF
-     ]]></csh>
 
     </input>
   </experiment>
@@ -3144,6 +3183,11 @@ OVERRIDE_EOF
        ocean_npes = 0,               
        concurrent = .false.          
        use_lag_fluxes=.true.         
+       atmos_nthreads = $atm_threads
+       ocean_nthreads = $ocean_nthreads
+debug_affinity =.true.
+ncores_per_node = 36
+use_hyper_thread = .false.
      </namelist>                     
 
      <namelist name="MOM_input_nml" >
@@ -3216,6 +3260,7 @@ OVERRIDE_EOF
       </regression>
 
       <regression name="debugomp">
+        <run days="2" >   <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O32']/node())"/> </run>
         <run days="2" >   <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O32x2']/node())"/> </run>
       </regression>
 
