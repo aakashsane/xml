@@ -92,17 +92,17 @@ NOTES:
 -->
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="warsaw_201707"/>           <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
-  <property name="MOM6_DATE"      value="2017.07.05"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/master/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
+  <property name="MOM6_DATE"      value="2017.10.19"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>     <!-- git tag for LAND_LAD2 source code -->  
-  <property name="FRE_STEM"       value="mdt/20170921"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)_Bupdates"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
-  <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
+  <property name="OM4_ANALYSIS"   value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
   <property name="PROD_SIMTIME"     value="1000"/>  <!--simulation length in years-->
   <property name="PP_CMIP_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
@@ -124,7 +124,9 @@ NOTES:
   <property name="CVDP_startyear"  value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-  <property name="reference_tag"   value="warsaw_201707_mom6_2017.07.05_answers"/>
+  <property name="reference_tag"   value="warsaw_201710_mom6_2017.10.19_answers"/>
+  <!--property name="reference_tag"   value="warsaw_201707_mom6_2017.07.05_answers"/--><!--This is 817 answers which cannot be reproduced because of merge reuest !25 in ocean_shared-->
+                          
                           
   <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
@@ -261,6 +263,14 @@ NOTES:
 	       <lnd                            layout = "3,24"   io_layout = "1,4" />
                <ice                            layout = "144,3"  io_layout = "1,3" />               
 	       <ocn ranks="951" threads="1"    layout = "32,36"  io_layout = "1,4" mask_table="mask_table.201.32x36"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A288x2_O842p5"><!--1/2 degree ocean grid Only-->
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="288" threads="2"    layout = "4,12"   io_layout = "1,4" />
+	       <lnd                            layout = "4,12"   io_layout = "1,4" />
+	       <ice                            layout = "96,3"   io_layout = "1,3" />
+	       <ocn ranks="842"   threads="1"    layout = "32,32"   io_layout = "1,4" mask_table="mask_table.182.32x32"/>
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A432x2_O842p5"><!--1/2 degree ocean grid Only-->
@@ -424,6 +434,14 @@ NOTES:
                <ocn ranks="1437"   threads="1"    layout = "40,45"   io_layout = "1,5" mask_table="mask_table.363.40x45"/>
  	     </resources>
    </freInclude>
+   <freInclude name="resourceparams_A432x2_O1608p5"><!--1/2 degree ocean grid Only-->
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="432" threads="2"	    layout = "3,24"   io_layout = "1,4" />
+	       <lnd                            layout = "3,24"   io_layout = "1,4" />
+	       <ice                            layout = "144,3"   io_layout = "1,3" />
+	       <ocn ranks="1608"   threads="1"    layout = "45,45"   io_layout = "1,5" mask_table="mask_table.417.45x45"/>
+ 	     </resources> 
+   </freInclude>
    <freInclude name="resourceparams_A864x2_O1608p5"><!--1/2 degree ocean grid Only-->
 	     <resources jobWallclock="01:00:00">
                <atm ranks="864" threads="2"	    layout = "6,24"   io_layout = "1,4" />
@@ -446,6 +464,22 @@ NOTES:
 	       <lnd                            layout = "6,24"   io_layout = "1,4" />
 	       <ice                            layout = "144,6"   io_layout = "1,3" />
                <ocn ranks="951"   threads="1"    layout = "32,36"   io_layout = "1,4" mask_table="mask_table.201.32x36"/>
+ 	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A576x2_O2044p5"><!--1/2 degree ocean grid Only-->
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="576" threads="2"	    layout = "8,12"   io_layout = "1,4" />
+	       <lnd                            layout = "8,12"   io_layout = "1,4" />
+	       <ice                            layout = "144,4"   io_layout = "1,4" />
+	       <ocn ranks="2044"   threads="1"    layout = "36,72"   io_layout = "1,4" mask_table="mask_table.548.36x72"/>
+ 	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A576x2_O2044p5_production"><!--1/2 degree ocean grid Only-->
+             <resources jobWallclock="16:00:00" segRuntime="2:00:00">
+               <atm ranks="576" threads="2"	    layout = "8,12"   io_layout = "1,4" />
+	       <lnd                            layout = "8,12"   io_layout = "1,4" />
+	       <ice                            layout = "144,4"   io_layout = "1,4" />
+	       <ocn ranks="2044"   threads="1"    layout = "36,72"   io_layout = "1,4" mask_table="mask_table.548.36x72"/>
  	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A864x2_O2044p5"><!--1/2 degree ocean grid Only-->
@@ -659,7 +693,7 @@ Experiment to build executable.
     <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared/generic_tracers ocean_shared/mocsy/src">
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
+        <codeBase version="$(MOM6_GIT_TAG)"> ocean_shared.git </codeBase>
         <csh><![CDATA[
           \rm -rf ocean_null
           git clone -b $(MOM6_GIT_TAG) https://github.com/NOAA-GFDL/MOM6-examples.git mom6
@@ -672,33 +706,14 @@ Experiment to build executable.
           git submodule update #This gets the right version of submodules
           popd
 
-          #To use MOM6 diagnostics/remapping in generic tracers package ocean_shared should be compiled as part of the MOM6 library and NOT as a separate stand-alone library
-          git clone -b $(RELEASE) http://gitlab.gfdl.noaa.gov/fms/ocean_shared.git
+##The following block is only needed for latest updates from b-group and should be removed when the next MOM6 tag becomes available
+#################################################
           pushd ocean_shared
-          #git checkout user/nnz/mom6_dev
-          git checkout $(MOM6_GIT_TAG)
-
-          #John Dunne updates for BLING
-          git checkout user/nnz/cmip6diags_gasfluxfixes_from_jpd
-
-          # mocsy updates  2017/09/20
-          git checkout user/jpk/BLING_COBALT_20170911_hotfix2
-
+          git checkout user/nnz/mom6_dev/20171027
           git submodule init mocsy
           git submodule update
-	  #Have to rename *.f90 to *.F90 so that we can pass cpp def  -DUSE_PRECISION=2 to them.
-          #Alternatively, we could build mocsy as a library by itself without renaming the files,
-          #but then we have to add a mocsy lib to link with.
-          cd mocsy/src
-          # 2017/09/21 no longer needed - causes checkout error
-          #foreach f (*.f90)
-          #  mv ${f} "`basename ${f} .f90`.F90"
-          #end
           popd
-
-          # 2017/09/12 COBALT updates to the above
-          /bin/cp -p ocean_shared/generic_tracers/generic_COBALT.F90                                 ocean_shared/generic_tracers/generic_COBALT.F90.ORIG
-          /bin/cp -p $(MODEL_UPDATES)/fre/updates/COBALT/generic_COBALT_091217_jo2_plus_btm_fix.F90  ocean_shared/generic_tracers/generic_COBALT.F90
+#################################################
 
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
@@ -2299,7 +2314,6 @@ Compile on Gaea C4 (intel-16).
       </namelist>
 
       <namelist name="mocsy_nml">
-       salinity_epsln = 1.e-10           ! default is 1.e-10
        sal_floor_based_on_alk = .true.   ! default is true
       </namelist>
 
@@ -2402,8 +2416,10 @@ GEOTHERMAL_VARNAME = "geothermal_hf"
 #override USE_CALVING_HEAT_CONTENT = False
 #override ENERGYSAVEDAYS = 30
 
-MOM_OVERRIDE_EOF
+!preserve 2017.07.05 answers see MOM6 commit 970af50ff
+#override BT_USE_OLD_CORIOLIS_BRACKET_BUG=True
 
+MOM_OVERRIDE_EOF
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
@@ -3545,24 +3561,34 @@ $baseDate
 #
 #output files
 "land_static",     -1,  "months", 1, "days", "time"
+"land_static_sg",  -1,  "months", 1, "days", "time"
 "land_daily",      24,  "hours",  1, "days", "time"
 "land_month",       1,  "months", 1, "days", "time"
 "land_month_inst",  1,  "months", 1, "days", "time"
 #
 #
+"land",    "dummy_lon",   "dummy_lon",   "land_static", "all", .false., "none", 1
+"land",    "dummy_lat",   "dummy_lat",   "land_static", "all", .false., "none", 1
 "land",    "geolon_t",   "geolon_t",   "land_static", "all", .false., "none", 1
 "land",    "geolat_t",   "geolat_t",   "land_static", "all", .false., "none", 1
 "land",    "geolon_t",   "geolon_t",   "land_month", "all", .false., "none", 1
 "land",    "geolat_t",   "geolat_t",   "land_month", "all", .false., "none", 1
+"land",    "dummy_lon",   "dummy_lon",   "land_month", "all", .false., "none", 1
+"land",    "dummy_lat",   "dummy_lat",   "land_month", "all", .false., "none", 1
 "land",    "geolon_t",   "geolon_t",   "land_daily", "all", .false., "none", 1
 "land",    "geolat_t",   "geolat_t",   "land_daily", "all", .false., "none", 1
+"land",    "dummy_lon",   "dummy_lon",   "land_daily", "all", .false., "none", 1
+"land",    "dummy_lat",   "dummy_lat",   "land_daily", "all", .false., "none", 1
 "land",    "geolon_t",   "geolon_t",   "land_month_inst", "all", .false., "none", 1
 "land",    "geolat_t",   "geolat_t",   "land_month_inst", "all", .false., "none", 1
+"land",    "dummy_lon",   "dummy_lon",   "land_month_inst", "all", .false., "none", 1
+"land",    "dummy_lat",   "dummy_lat",   "land_month_inst", "all", .false., "none", 1
 #
 # land static output
 "lake",    "lake_depth", "lake_depth", "land_static", "all", .false., "none", 2
 "lake",    "lake_width", "lake_width", "land_static", "all", .false., "none", 2
 "land",    "cell_area",  "cell_area",  "land_static", "all", .false., "none", 2
+"land_sg", "cell_area",  "cell_area",  "land_static_sg", "all", .false., "none", 2
 "land",    "area_land",  "land_area",  "land_static", "all", .false., "none", 2
 "land",    "area_lake",  "lake_area",  "land_static", "all", .false., "none", 2
 "land",    "area_soil",  "soil_area",  "land_static", "all", .false., "none", 2
@@ -3790,8 +3816,10 @@ $baseDate
 "ocean_month_snap",       1, "months", 1, "days", "time"
 "ocean_month",            1, "months", 1, "days", "time"
 "ocean_month_z",          1, "months", 1, "days", "time"
+"ocean_month_rho2",       1, "months", 1, "days", "time"
 "ocean_annual",          12, "months", 1, "days", "time"
 "ocean_annual_z",        12, "months", 1, "days", "time"
+"ocean_annual_rho2",     12, "months", 1, "days", "time"
 "ocean_scalar_month",     1, "months", 1, "days", "time"
 "ocean_scalar_annual",   12, "months", 1, "days", "time"
 "ocean_static",          -1, "months", 1, "days", "time" # ocean_static is a protected name. Do not change this line.
@@ -3821,6 +3849,7 @@ $baseDate
  "ocean_model", "deptho",      "deptho",      "ocean_static", "all", "none", "none", 2
 #"ocean_model", "basin",       "basin",       "ocean_static", "all", "none", "none", 2  # in /archive/gold/datasets/OM4_025/
  "ocean_model", "hfgeou",      "hfgeou",      "ocean_static", "all", "none", "none", 2  # for static geothermal heat
+ "ocean_model", "sftof",       "sftof",       "ocean_static", "all", "none", "none", 2
 # Extra static geometry data beyond CMIP6/OMIP Table 2.1
  "ocean_model", "Coriolis",    "Coriolis",    "ocean_static", "all", "none", "none", 2
  "ocean_model", "geolon",      "geolon",      "ocean_static", "all", "none", "none", 2
@@ -3841,9 +3870,18 @@ $baseDate
  "ocean_model", "dyCu",        "dyCu",        "ocean_static", "all", "none", "none", 2
  "ocean_model", "dxCv",        "dxCv",        "ocean_static", "all", "none", "none", 2
  "ocean_model", "dyCv",        "dyCv",        "ocean_static", "all", "none", "none", 2
+ "ocean_model", "areacello_cu","areacello_cu","ocean_static", "all", "none", "none", 2
+ "ocean_model", "areacello_cv","areacello_cv","ocean_static", "all", "none", "none", 2
+ "ocean_model", "areacello_bu","areacello_bu","ocean_static", "all", "none", "none", 2
 # -----------------------------------------------------------------------------------------
 # CMIP6/OMIP Table H1: scalar fields such as tracers, cell mass/volume, sea level, MLD
 # Generally save annuals, and sometimes monthly and daily.
+ "ocean_model_z", "volcello",     "volcello",         "ocean_annual_z",      "all", "mean", "none",2 # Cell measure for 3d data
+ "ocean_model_z", "volcello",     "volcello",         "ocean_month_z",       "all", "mean", "none",2 # Cell measure for 3d data
+ "ocean_model_rho2", "volcello",  "volcello",         "ocean_annual_rho2",   "all", "mean", "none",2 # Cell measure for 3d data
+ "ocean_model_rho2", "volcello",  "volcello",         "ocean_month_rho2",    "all", "mean", "none",2 # Cell measure for 3d data
+ "ocean_model",   "volcello",     "volcello",         "ocean_annual",        "all", "mean", "none",2 # Cell measure for 3d data
+#"ocean_model",   "volcello",     "volcello",         "ocean_month",         "all", "mean", "none",2 # Cell measure for 3d data
  "ocean_model",   "pbo",          "pbo",              "ocean_annual",        "all", "mean", "none",2
  "ocean_model",   "pbo",          "pbo",              "ocean_month",         "all", "mean", "none",2
  "ocean_model",   "pso",          "pso",              "ocean_annual",        "all", "mean", "none",2
@@ -3853,6 +3891,8 @@ $baseDate
  "ocean_model",   "masso",        "masso",            "ocean_scalar_month",  "all", "mean", "none",2  # global sum masscello
  "ocean_model",   "masso",        "masso",            "ocean_scalar_annual", "all", "mean", "none",2  # global sum masscello
  "ocean_model",   "thkcello",     "thkcello",         "ocean_annual",        "all", "mean", "none",2  # Only needed in native space a static field needs to be provided for CMIP6
+ "ocean_model_rho2", "thkcello",  "thkcello",         "ocean_annual_rho2",   "all", "mean", "none",2  # Only needed in native space a static field needs to be provided for CMIP6
+ "ocean_model_rho2", "thkcello",  "thkcello",         "ocean_month_rho2",    "all", "mean", "none",2  # Only needed in native space a static field needs to be provided for CMIP6
 #"ocean_model",   "thkcello",     "thkcello",         "ocean_month",         "all", "mean", "none",2
  "ocean_model",   "volo",         "volo",             "ocean_scalar_month",  "all", "mean", "none",2  # global sum thkcello
  "ocean_model",   "volo",         "volo",             "ocean_scalar_annual", "all", "mean", "none",2  # global sum thkcello
@@ -3910,6 +3950,10 @@ $baseDate
  "ocean_model",   "mlotst",       "mlotst",           "ocean_month",         "all", "mean", "none",2
  "ocean_model",   "mlotstsq",     "mlotstsq",         "ocean_annual",        "all", "mean", "none",2
  "ocean_model",   "mlotstsq",     "mlotstsq",         "ocean_month",         "all", "mean", "none",2
+ "ocean_model",   "mlotst",       "mlotstmin",        "ocean_annual",        "all", "min",  "none",2
+ "ocean_model",   "mlotst",       "mlotstmin",        "ocean_month",         "all", "min",  "none",2
+ "ocean_model",   "mlotst",       "mlotstmax",        "ocean_annual",        "all", "max",  "none",2
+ "ocean_model",   "mlotst",       "mlotstmax",        "ocean_month",         "all", "max",  "none",2
 #"ocean_model",   "msftbarot",    "msftbarot",        "ocean_month",         "all", "mean", "none",2  # to be done offline
 # -----------------------------------------------------------------------------------------
 # CMIP6/OMIP Table I1: components of vector fields
@@ -3928,32 +3972,48 @@ $baseDate
 #"ocean_model",  "vo",           "vo",               "ocean_month",        "all", "mean", "none",2
 #"ocean_model",  "umo",          "umo",              "ocean_annual",       "all", "mean", "none",2
  "ocean_model_z","umo",          "umo",              "ocean_annual_z",     "all", "mean", "none",2
+ "ocean_model_z","umo",          "umo",              "ocean_month_z",      "all", "mean", "none",2
 #"ocean_model",  "vmo",          "vmo",              "ocean_annual",       "all", "mean", "none",2
  "ocean_model_z","vmo",          "vmo",              "ocean_annual_z",     "all", "mean", "none",2
+ "ocean_model_z","vmo",          "vmo",              "ocean_month_z",      "all", "mean", "none",2
 #"ocean_model",  "wmo",          "wmo",              "ocean_annual",       "all", "mean", "none",2  # needs to be coded
 #"ocean_model",  "wmo",          "wmo",              "ocean_month",        "all", "mean", "none",2  # needs to be coded
 #"ocean_model",  "uhml",         "uhml",             "ocean_annual",       "all", "mean", "none",2
  "ocean_model_z","uhml",         "uhml",             "ocean_annual_z",     "all", "mean", "none",2
+#"ocean_model_z","uhml",         "uhml",             "ocean_month_z",      "all", "mean", "none",2
 #"ocean_model",  "vhml",         "vhml",             "ocean_annual",       "all", "mean", "none",2
  "ocean_model_z","vhml",         "vhml",             "ocean_annual_z",     "all", "mean", "none",2
+ "ocean_model_z","vhml",         "vhml",             "ocean_month_z",      "all", "mean", "none",2
 #"ocean_model",  "uhGM",         "uhGM",             "ocean_annual",       "all", "mean", "none",2
  "ocean_model_z","uhGM",         "uhGM",             "ocean_annual_z",     "all", "mean", "none",2
+#"ocean_model_z","uhGM",         "uhGM",             "ocean_month_z",      "all", "mean", "none",2
 #"ocean_model",  "vhGM",         "vhGM",             "ocean_annual",       "all", "mean", "none",2
  "ocean_model_z","vhGM",         "vhGM",             "ocean_annual_z",     "all", "mean", "none",2
+ "ocean_model_z","vhGM",         "vhGM",             "ocean_month_z",      "all", "mean", "none",2
  "ocean_model_z","uh",           "uh",               "ocean_annual_z",     "all", "mean", "none",2
  "ocean_model_z","vh",           "vh",               "ocean_annual_z",     "all", "mean", "none",2
  "ocean_model_z","T_adx",        "T_adx",            "ocean_annual_z",     "all", "mean", "none",2
  "ocean_model_z","T_ady",        "T_ady",            "ocean_annual_z",     "all", "mean", "none",2
- "ocean_model",  "T_adx_2d",     "T_adx_2d",         "ocean_annual",       "all", "mean", "none",2
- "ocean_model",  "T_ady_2d",     "T_ady_2d",         "ocean_annual",       "all", "mean", "none",2
+ "ocean_model",  "T_adx_2d",     "T_adx_2d",         "ocean_month",       "all", "mean", "none",2
+ "ocean_model",  "T_ady_2d",     "T_ady_2d",         "ocean_month",       "all", "mean", "none",2
  "ocean_model_z","S_adx",        "S_adx",            "ocean_annual_z",     "all", "mean", "none",2
  "ocean_model_z","S_ady",        "S_ady",            "ocean_annual_z",     "all", "mean", "none",2
- "ocean_model",  "S_adx_2d",     "S_adx_2d",         "ocean_annual",       "all", "mean", "none",2
- "ocean_model",  "S_ady_2d",     "S_ady_2d",         "ocean_annual",       "all", "mean", "none",2
- "ocean_model",  "ndiff_tracer_trans_x_2d_T","ndiff_tracer_trans_x_2d_T",  "ocean_annual",  "all", "mean", "none",2
- "ocean_model",  "ndiff_tracer_trans_y_2d_T","ndiff_tracer_trans_y_2d_T",  "ocean_annual",  "all", "mean", "none",2
- "ocean_model",  "ndiff_tracer_trans_x_2d_S","ndiff_tracer_trans_x_2d_S",  "ocean_annual",  "all", "mean", "none",2
- "ocean_model",  "ndiff_tracer_trans_y_2d_S","ndiff_tracer_trans_y_2d_S",  "ocean_annual",  "all", "mean", "none",2
+ "ocean_model",  "S_adx_2d",     "S_adx_2d",         "ocean_month",       "all", "mean", "none",2
+ "ocean_model",  "S_ady_2d",     "S_ady_2d",         "ocean_month",       "all", "mean", "none",2
+ "ocean_model",  "ndiff_tracer_trans_x_2d_T","ndiff_tracer_trans_x_2d_T",  "ocean_month",  "all", "mean", "none",2
+ "ocean_model",  "ndiff_tracer_trans_y_2d_T","ndiff_tracer_trans_y_2d_T",  "ocean_month",  "all", "mean", "none",2
+ "ocean_model",  "ndiff_tracer_trans_x_2d_S","ndiff_tracer_trans_x_2d_S",  "ocean_month",  "all", "mean", "none",2
+ "ocean_model",  "ndiff_tracer_trans_y_2d_S","ndiff_tracer_trans_y_2d_S",  "ocean_month",  "all", "mean", "none",2
+# Density space diagnostics (not necessarily using CMIP names but needed to generate CMIP output in post-processing)
+ "ocean_model_rho2","umo",       "umo",              "ocean_annual_rho2",  "all", "mean", "none",2
+ "ocean_model_rho2","uhGM",      "uhGM",             "ocean_annual_rho2",  "all", "mean", "none",2
+ "ocean_model_rho2","uhml",      "uhml",             "ocean_annual_rho2",  "all", "mean", "none",2
+ "ocean_model_rho2","vmo",       "vmo",              "ocean_annual_rho2",  "all", "mean", "none",2
+ "ocean_model_rho2","vhGM",      "vhGM",             "ocean_annual_rho2",  "all", "mean", "none",2
+ "ocean_model_rho2","vhml",      "vhml",             "ocean_annual_rho2",  "all", "mean", "none",2
+ "ocean_model_rho2","vmo",       "vmo",              "ocean_month_rho2",   "all", "mean", "none",2
+ "ocean_model_rho2","vhGM",      "vhGM",             "ocean_month_rho2",   "all", "mean", "none",2
+ "ocean_model_rho2","vhml",      "vhml",             "ocean_month_rho2",   "all", "mean", "none",2
 # -----------------------------------------------------------------------------------------
 # CMIP6/OMIP Table J1: in support of mass transport through straits
 # net transport of mass through straits is either done offline using
@@ -3967,96 +4027,115 @@ $baseDate
 # B/ OM4 goes from -300 to 60.  So longitudes must be set within this range.
 # C/ Can use these sections for post-processing diagnostics to fill OMIP Table 2.4.
 # Barents Opening (north-south section)
+"ocean_model_z", "volcello", "volcello", "ocean_Barents_opening",    "all", "mean", "6. 6. 62. 80.2 -1 -1",2
 "ocean_model_z", "thetao", "theta",  "ocean_Barents_opening",    "all", "mean", "6. 6. 62. 80.2 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Barents_opening",    "all", "mean", "6. 6. 62. 80.2 -1 -1",2
 "ocean_model_z", "umo",  "umo",      "ocean_Barents_opening",    "all", "mean", "6. 6. 62. 80.2 -1 -1",2
 "ocean_model_z", "uo",   "uo",       "ocean_Barents_opening",    "all", "mean", "6. 6. 62. 80.2 -1 -1",2
 # Bering Strait (east-west section)
+"ocean_model_z", "volcello", "volcello", "ocean_Bering_Strait",    "all", "mean", "-171.4 -168.7  66.1 66.1 -1 -1",2
 "ocean_model_z", "thetao","thetao",  "ocean_Bering_Strait",    "all", "mean", "-171.4 -168.7  66.1 66.1 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Bering_Strait",    "all", "mean", "-171.4 -168.7  66.1 66.1 -1 -1",2
 "ocean_model_z", "vmo",  "vmo",      "ocean_Bering_Strait",    "all", "mean", "-171.4 -168.7  66.1 66.1 -1 -1",2
 "ocean_model_z", "vo",   "vo",       "ocean_Bering_Strait",    "all", "mean", "-171.4 -168.7  66.1 66.1 -1 -1",2
 # Caribbean (east-west section, Cuba-Haiti) Windward Passage
+"ocean_model_z", "volcello", "volcello", "ocean_Windward_Passage", "all", "mean", "-75.0 -72.5 19.96 19.96 -1 -1",2
 "ocean_model_z", "thetao","thetao",  "ocean_Windward_Passage", "all", "mean", "-75.0 -72.5 19.96 19.96 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Windward_Passage", "all", "mean", "-75.0 -72.5 19.96 19.96 -1 -1",2
 "ocean_model_z", "vmo",  "vmo",      "ocean_Windward_Passage", "all", "mean", "-75.0 -72.5 19.96 19.96 -1 -1",2
 "ocean_model_z", "vo",   "vo",       "ocean_Windward_Passage", "all", "mean", "-75.0 -72.5 19.96 19.96 -1 -1",2
 # Approximate section to capture outflow of Arctic through Davis Strait (east-west section)
+"ocean_model_z", "volcello", "volcello", "ocean_Davis_Strait", "all", "mean", "-65.0 -48.0  66.0 66.0 -1 -1",2
 "ocean_model_z", "thetao","thetao",  "ocean_Davis_Strait", "all", "mean", "-65.0 -48.0  66.0 66.0 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Davis_Strait", "all", "mean", "-65.0 -48.0  66.0 66.0 -1 -1",2
 "ocean_model_z", "vmo",  "vmo",      "ocean_Davis_Strait", "all", "mean", "-65.0 -48.0  66.0 66.0 -1 -1",2
 "ocean_model_z", "vo",   "vo",       "ocean_Davis_Strait", "all", "mean", "-65.0 -48.0  66.0 66.0 -1 -1",2
 # Approximate section to capture flow across Denmark Strait (east-west section)
+"ocean_model_z", "volcello", "volcello", "ocean_Denmark_Strait",   "all", "mean", "-42.5 -20. 65. 65. -1 -1",2
 "ocean_model_z", "thetao","thetao",  "ocean_Denmark_Strait",   "all", "mean", "-42.5 -20. 65. 65. -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Denmark_Strait",   "all", "mean", "-42.5 -20. 65. 65. -1 -1",2
 "ocean_model_z", "vmo",  "vmo",      "ocean_Denmark_Strait",   "all", "mean", "-42.5 -20. 65. 65. -1 -1",2
 "ocean_model_z", "vo",   "vo",       "ocean_Denmark_Strait",   "all", "mean", "-42.5 -20. 65. 65. -1 -1",2
 # Approximate section to capture flow through Drake Passage (north-south section)
+"ocean_model_z", "volcello", "volcello", "ocean_Drake_Passage",    "all", "mean", "-70. -70. -71. -54.5 -1 -1",2
 "ocean_model_z", "thetao","thetao",  "ocean_Drake_Passage",    "all", "mean", "-70. -70. -71. -54.5 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Drake_Passage",    "all", "mean", "-70. -70. -71. -54.5 -1 -1",2
 "ocean_model_z", "umo",  "umo",      "ocean_Drake_Passage",    "all", "mean", "-70. -70. -71. -54.5 -1 -1",2
 "ocean_model_z", "uo",   "uo",       "ocean_Drake_Passage",    "all", "mean", "-70. -70. -71. -54.5 -1 -1",2
 # English channel flow (north-south section)
+"ocean_model_z", "volcello", "volcello", "ocean_English_Channel",  "all", "mean", "2.16 2.16  50.8  51.2 -1 -1",2
 "ocean_model_z", "thetao","thetao",  "ocean_English_Channel",  "all", "mean", "2.16 2.16  50.8  51.2 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_English_Channel",  "all", "mean", "2.16 2.16  50.8  51.2 -1 -1",2
 "ocean_model_z", "umo",  "umo",      "ocean_English_Channel",  "all", "mean", "2.16 2.16  50.8  51.2 -1 -1",2
 "ocean_model_z", "uo",   "uo",       "ocean_English_Channel",  "all", "mean", "2.16 2.16  50.8  51.2 -1 -1",2
 # Faroe-Scotland flow (north-south section)
+"ocean_model_z", "volcello", "volcello", "ocean_Faroe_Scotland",  "all", "mean", "-6.3 -6.3  58. 61.5 -1 -1",2
 "ocean_model_z", "thetao","thetao",  "ocean_Faroe_Scotland",  "all", "mean", "-6.3 -6.3  58. 61.5 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Faroe_Scotland",  "all", "mean", "-6.3 -6.3  58. 61.5 -1 -1",2
 "ocean_model_z", "umo",  "umo",      "ocean_Faroe_Scotland",  "all", "mean", "-6.3 -6.3  58. 61.5 -1 -1",2
 "ocean_model_z", "uo",   "uo",       "ocean_Faroe_Scotland",  "all", "mean", "-6.3 -6.3  58. 61.5 -1 -1",2
 # Florida-Bahamas Strait (east-west section)
+"ocean_model_z", "volcello", "volcello", "ocean_Florida_Bahamas",  "all", "mean", "-80.5 -77.8  25. 25. -1 -1",2
 "ocean_model_z", "thetao","thetao",  "ocean_Florida_Bahamas",  "all", "mean", "-80.5 -77.8  25. 25. -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Florida_Bahamas",  "all", "mean", "-80.5 -77.8  25. 25. -1 -1",2
 "ocean_model_z", "vmo",  "vmo",      "ocean_Florida_Bahamas",  "all", "mean", "-80.5 -77.8  25. 25. -1 -1",2
 "ocean_model_z", "vo",   "vo",       "ocean_Florida_Bahamas",  "all", "mean", "-80.5 -77.8  25. 25. -1 -1",2
 # Fram Strait (east-west section)
+"ocean_model_z", "volcello", "volcello", "ocean_Fram_Strait",  "all", "mean", "-22. 0.0  81.2 81.2 -1 -1",2
 "ocean_model_z", "thetao","thetao",  "ocean_Fram_Strait",  "all", "mean", "-22. 0.0  81.2 81.2 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Fram_Strait",  "all", "mean", "-22. 0.0  81.2 81.2 -1 -1",2
 "ocean_model_z", "vmo",  "vmo",      "ocean_Fram_Strait",  "all", "mean", "-22. 0.0  81.2 81.2 -1 -1",2
 "ocean_model_z", "vo",   "vo",       "ocean_Fram_Strait",  "all", "mean", "-22. 0.0  81.2 81.2 -1 -1",2
 # Gibraltar Strait (north-south section)
+"ocean_model_z", "volcello", "volcello", "ocean_Gibraltar_Strait", "all", "mean", "-5. -5. 35.8 36.2 -1 -1",2
 "ocean_model_z", "thetao","thetao",  "ocean_Gibraltar_Strait", "all", "mean", "-5. -5. 35.8 36.2 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Gibraltar_Strait", "all", "mean", "-5. -5. 35.8 36.2 -1 -1",2
 "ocean_model_z", "umo",  "umo",      "ocean_Gibraltar_Strait", "all", "mean", "-5. -5. 35.8 36.2 -1 -1",2
 "ocean_model_z", "uo",   "uo",       "ocean_Gibraltar_Strait", "all", "mean", "-5. -5. 35.8 36.2 -1 -1",2
 # Iceland-Faroe flow: 1st part of zig-zag for flow moving north/south; specific settings for OM4
+"ocean_model_z", "volcello", "volcello", "ocean_Iceland_Faroe_V", "all", "mean", "-17.89 -6. 62.25 62.25 -1 -1",2
 "ocean_model_z", "thetao", "thetao", "ocean_Iceland_Faroe_V", "all", "mean", "-17.89 -6. 62.25 62.25 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Iceland_Faroe_V", "all", "mean", "-17.89 -6. 62.25 62.25 -1 -1",2
 "ocean_model_z", "vmo",  "vmo",      "ocean_Iceland_Faroe_V", "all", "mean", "-17.89 -6. 62.25 62.25 -1 -1",2
 "ocean_model_z", "vo",   "vo",       "ocean_Iceland_Faroe_V", "all", "mean", "-17.89 -6. 62.25 62.25 -1 -1",2
 # Iceland-Faroe flow: 2nd part of zig-zag for flow moving east/west; specific settings for OM4
+"ocean_model_z", "volcello", "volcello", "ocean_Iceland_Faroe_U", "all", "mean", "-17.74 -17.74  62.31 63.6 -1 -1",2
 "ocean_model_z", "thetao", "thetao", "ocean_Iceland_Faroe_U", "all", "mean", "-17.74 -17.74  62.31 63.6 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Iceland_Faroe_U", "all", "mean", "-17.74 -17.74  62.31 63.6 -1 -1",2
 "ocean_model_z", "umo",  "umo",      "ocean_Iceland_Faroe_U", "all", "mean", "-17.74 -17.74  62.31 63.6 -1 -1",2
 "ocean_model_z", "uo",   "uo",       "ocean_Iceland_Faroe_U", "all", "mean", "-17.74 -17.74  62.31 63.6 -1 -1",2
 # Indonesian Throughflow (east-west section): settings in spirit of OMIP "bulk" transport calculation
+"ocean_model_z", "volcello", "volcello", "ocean_Indonesian_Throughflow",  "all", "mean", "-246.0 -220.0  -8.1 -8.1 -1 -1",2
 "ocean_model_z", "thetao", "thetao", "ocean_Indonesian_Throughflow",  "all", "mean", "-246.0 -220.0  -8.1 -8.1 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Indonesian_Throughflow",  "all", "mean", "-246.0 -220.0  -8.1 -8.1 -1 -1",2
 "ocean_model_z", "vmo",  "vmo",      "ocean_Indonesian_Throughflow",  "all", "mean", "-246.0 -220.0  -8.1 -8.1 -1 -1",2
 "ocean_model_z", "vo",   "vo",       "ocean_Indonesian_Throughflow",  "all", "mean", "-246.0 -220.0  -8.1 -8.1 -1 -1",2
 # Mozambique Channel (east-west section)
+"ocean_model_z", "volcello", "volcello", "ocean_Mozambique_Channel",  "all", "mean", "39. 46. -16. -16. -1 -1",2
 "ocean_model_z", "thetao", "thetao", "ocean_Mozambique_Channel",  "all", "mean", "39. 46. -16. -16. -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Mozambique_Channel",  "all", "mean", "39. 46. -16. -16. -1 -1",2
 "ocean_model_z", "vmo",  "vmo",      "ocean_Mozambique_Channel",  "all", "mean", "39. 46. -16. -16. -1 -1",2
 "ocean_model_z", "vo",   "vo",       "ocean_Mozambique_Channel",  "all", "mean", "39. 46. -16. -16. -1 -1",2
 # Pacific Equatorial Undercurrent (north-south section)
+"ocean_model_z", "volcello", "volcello", "ocean_Pacific_undercurrent",  "all", "mean", "-155. -155. -2. 2. -1 -1",2
 "ocean_model_z", "thetao", "thetao", "ocean_Pacific_undercurrent",  "all", "mean", "-155. -155. -2. 2. -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Pacific_undercurrent",  "all", "mean", "-155. -155. -2. 2. -1 -1",2
 "ocean_model_z", "umo",  "umo",      "ocean_Pacific_undercurrent",  "all", "mean", "-155. -155. -2. 2. -1 -1",2
 "ocean_model_z", "uo",   "uo",       "ocean_Pacific_undercurrent",  "all", "mean", "-155. -155. -2. 2. -1 -1",2
 # Taiwan-Luzon (north-south section)
+"ocean_model_z", "volcello", "volcello", "ocean_Taiwan_Luzon",  "all", "mean", "-239.5 -239.5  17. 23. -1 -1",2
 "ocean_model_z", "thetao", "thetao", "ocean_Taiwan_Luzon",  "all", "mean", "-239.5 -239.5  17. 23. -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Taiwan_Luzon",  "all", "mean", "-239.5 -239.5  17. 23. -1 -1",2
 "ocean_model_z", "umo",  "umo",      "ocean_Taiwan_Luzon",  "all", "mean", "-239.5 -239.5  17. 23. -1 -1",2
 "ocean_model_z", "uo",   "uo",       "ocean_Taiwan_Luzon",  "all", "mean", "-239.5 -239.5  17. 23. -1 -1",2
 # Agulhas section (north-south section; transport is closely tied to Drake Passage transport)
+"ocean_model_z", "volcello", "volcello", "ocean_Agulhas_section",  "all", "mean", "20. 20. -71.0 -34 -1 -1",2
 "ocean_model_z", "thetao", "thetao", "ocean_Agulhas_section",  "all", "mean", "20. 20. -71.0 -34 -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Agulhas_section",  "all", "mean", "20. 20. -71.0 -34 -1 -1",2
 "ocean_model_z", "umo",  "umo",      "ocean_Agulhas_section",  "all", "mean", "20. 20. -71.0 -34 -1 -1",2
 "ocean_model_z", "uo",   "uo",       "ocean_Agulhas_section",  "all", "mean", "20. 20. -71.0 -34 -1 -1",2
 # Iceland-Norway (east-west section)
+"ocean_model_z", "volcello", "volcello", "ocean_Iceland_Norway",   "all", "mean", "-20. 15. 65. 65. -1 -1",2
 "ocean_model_z", "thetao","thetao",  "ocean_Iceland_Norway",   "all", "mean", "-20. 15. 65. 65. -1 -1",2
 "ocean_model_z", "so",   "so",       "ocean_Iceland_Norway",   "all", "mean", "-20. 15. 65. 65. -1 -1",2
 "ocean_model_z", "vmo",  "vmo",      "ocean_Iceland_Norway",   "all", "mean", "-20. 15. 65. 65. -1 -1",2
@@ -4175,8 +4254,8 @@ $baseDate
  "ocean_model_z",  "S_advection_xy",               "S_advection_xy",                 "ocean_annual_z",   "all", "mean", "none",2
  "ocean_model_z",  "Th_tendency_vert_remap",       "Th_tendency_vert_remap",         "ocean_annual_z",   "all", "mean", "none",2
  "ocean_model_z",  "Sh_tendency_vert_remap",       "Sh_tendency_vert_remap",         "ocean_annual_z",   "all", "mean", "none",2
- "ocean_model",  "boundary_forcing_heat_tendency", "boundary_forcing_heat_tendency", "ocean_annual",     "all", "mean", "none",2
- "ocean_model",  "boundary_forcing_salt_tendency", "boundary_forcing_salt_tendency", "ocean_annual",     "all", "mean", "none",2
+ "ocean_model_z","boundary_forcing_heat_tendency", "boundary_forcing_heat_tendency", "ocean_annual_z",   "all", "mean", "none",2
+ "ocean_model_z","boundary_forcing_salt_tendency", "boundary_forcing_salt_tendency", "ocean_annual_z",   "all", "mean", "none",2
 # -----------------------------------------------------------------------------------------
 # CMIP6/OMIP Table M1: vertical tracer diffusivities and potential energy dissipation
  "ocean_model_z",  "difvho",     "difvho",           "ocean_annual_z",      "all", "mean", "none",2
@@ -4198,12 +4277,12 @@ $baseDate
  "ocean_model", "SSV",          "ssv",              "ocean_daily", "all", "mean", "none",2
 #"ocean_model", "tos",          "tos_max",          "ocean_daily", "all", "max",  "none",2
 #"ocean_model", "tos",          "tos_min",          "ocean_daily", "all", "min",  "none",2
+ "ocean_model", "ePBL_h_ML",    "omldamax",         "ocean_daily", "all", "max",  "none",2
 # -----------------------------------------------------------------------------------------
 # various fields
  "ocean_model",   "e",                "e",                  "ocean_annual",   "all", "mean", "none",2
 #"ocean_model",   "e",                "e",                  "ocean_month",    "all", "mean", "none",2
  "ocean_model",   "speed",            "speed",              "ocean_annual",   "all", "mean", "none",2
-#"ocean_model",   "speed",            "speed_pow2",         "ocean_annual",   "all", "pow2", "none",2
  "ocean_model",   "KE",               "KE",                 "ocean_annual",   "all", "mean", "none",2
  "ocean_model",   "mass_wt",          "mass_wt",            "ocean_annual",   "all", "mean", "none",2
  "ocean_model",   "temp_layer_ave",   "temp_layer_ave",     "ocean_annual",   "all", "mean", "none",2
@@ -4235,8 +4314,6 @@ $baseDate
  "ocean_model",   "MEKE_Le",          "MEKE_Le",            "ocean_annual",   "all", "mean", "none",2
  "ocean_model",   "MEKE_KH",          "MEKE_KH",            "ocean_annual",   "all", "mean", "none",2
  "ocean_model",   "subML_N2",         "subML_N2",           "ocean_annual",   "all", "mean", "none",2
- "ocean_model",   "zos",              "zos_pow2",           "ocean_annual",   "all", "pow2", "none",2
- "ocean_model",   "tos",              "tos_pow2",           "ocean_annual",   "all", "pow2", "none",2
  "ocean_model",   "tos",              "tos_max",            "ocean_annual",   "all", "max",  "none",2
  "ocean_model",   "tos",              "tos_min",            "ocean_annual",   "all", "min",  "none",2
 # -----------------------------------------------------------------------------------------
@@ -5635,6 +5712,39 @@ $baseDate
  "generic_cobalt_z","fescav",       "fescav",                 "ocean_cobalt_omip_rates_year_z","all","mean","none",2
  "generic_cobalt_z","fediss",       "fediss",                 "ocean_cobalt_omip_rates_year_z","all","mean","none",2
  "generic_cobalt_z","graz",         "graz",                   "ocean_cobalt_omip_rates_year_z","all","mean","none",2
+# Required cell measures
+ "ocean_model",  "volcello","volcello","ocean_cobalt_1day","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_tracers_month","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_tracers_year","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_sfc","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_btm","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_phytolim_sfc","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_fdet_100","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_biomass_100","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_prod_100","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_miscflux_100","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_phyto_diags","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_bact_diags","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_zoo_diags","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model",  "volcello","volcello","ocean_cobalt_misc","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model","volcello","volcello","ocean_cobalt_omip_daily","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model","volcello","volcello","ocean_cobalt_omip_tracers_month","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model","volcello","volcello","ocean_cobalt_omip_tracers_year","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model","volcello","volcello","ocean_cobalt_omip_rates_year","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model","volcello","volcello","ocean_cobalt_omip_sfc","all","mean","none",2 # Cell measure for 3d data
+# "ocean_model",  "volcello","volcello","","all","mean","none",2 # Cell measure for 3d data
+#
+# "ocean_model_z","volcello","volcello","","all","mean","none",2 # Cell measure for 3d data
+# "ocean_model_z","volcello","volcello","ocean_cobalt_1day_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_tracers_month_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_tracers_year_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_phyto_diags_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_bact_diags_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_zoo_diags_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_misc_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_omip_tracers_month_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_omip_tracers_year_z","all","mean","none",2 # Cell measure for 3d data
+ "ocean_model_z","volcello","volcello","ocean_cobalt_omip_rates_year_z","all","mean","none",2 # Cell measure for 3d data
 #
 #=============================================================================================================================
 # CMIP6 diag tables: 
@@ -6775,17 +6885,14 @@ endif
     <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
-          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1057p5_production']/node())"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O2044p5_production']/node())"/>
       </production>
-      <regression name="2months">
-          <run months="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
-      </regression>
       <regression name="basic">
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O2044p5']/node())"/> </run>
       </regression>
 
       <regression name="rts">
-        <run days="15 16" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
+        <run days="15 16" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O2044p5']/node())"/> </run>
         <run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O648']/node())"/> </run>
   	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
   	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
@@ -6827,8 +6934,8 @@ endif
       	</regression>
 
         <regression name="timings">
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O1057p5']/node())"/> </run>
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1608p5']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O2044p5']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2_O1608p5']/node())"/> </run>
         </regression>
 
 	<regression name="timings_all">
@@ -6854,7 +6961,7 @@ endif
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1608p5']/node())"/> </run>
           <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A864x2_O1441p5']/node())"/> </run>
       	</regression>
-      <reference restart="$(REFERENCE)/archive/1x1m0d_576x2a_842x1o/restart/00010201.tar"/>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_576x2a_2044x1o/restart/00010201.tar"/>
 
     </runtime>
 
