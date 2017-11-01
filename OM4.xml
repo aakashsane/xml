@@ -15,8 +15,8 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="MOM6_DATE"      value="2017.10.19"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)_Bupdates"/> <!-- customize as needed -->
+  <property name="MOM6_GIT_TAG"   value="om4/v1.0"/>   <!-- git tag for MOM6 source code -->
+  <property name="FRE_STEM"       value="$(RELEASE)_om4v1.0"/> <!-- customize as needed -->
   <!--property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/--> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_YOURGROUPLETTER"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -24,7 +24,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
    <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-   <property name="PROD_SIMTIME"   value="10"/>
+   <property name="PROD_SIMTIME"   value="1"/>
    <!--Post-processing  chunk lengths -->
    <property name="CHUNK_LENGTH_A" value="5yr"/>
    <property name="CHUNK_LENGTH_B" value="20yr"/>
@@ -1233,6 +1233,9 @@ limit coredumpsize unlimited
     <platform name="gfdl.ncrc4-intel16">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
+    <platform name="gfdl.ncrc4-intel17">
+      <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
+    </platform>
     <platform name="gfdl.olcf-eos_intel15">
       <xi:include xpointer="xpointer(//setup/platform[@name='gfdl.default']/node())" />
     </platform>
@@ -1291,14 +1294,6 @@ Make the executable for ocean-ice experiments.
           git submodule update #This gets the right version of submodules
           popd
 
-##The following block is only needed for latest updates from b-group and should be removed when the next MOM6 tag becomes available
-#################################################
-          pushd ocean_shared
-          git checkout user/nnz/mom6_dev/20171027
-          git submodule init mocsy
-          git submodule update
-          popd
-#################################################
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
           if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
@@ -3457,6 +3452,28 @@ OVERRIDE_EOF
     </postProcess>
    </experiment>
 
+   <experiment name="MOM6_GOLD_SIS2_initCond" inherit="MOM6_GOLD_SIS2_bergs">
+    <input>
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/MOM6_GOLD_SIS2_bergs_combined_00020101.tar</dataSource>
+     </dataFile>
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override'  
+     </namelist>
+
+     <namelist name="SIS_input_nml" >
+        output_directory = './',
+        input_filename = 'r'
+        restart_input_dir = 'INPUT/',
+        restart_output_dir = 'RESTART/',
+        parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_diurnal','INPUT/SIS_override' 
+     </namelist>
+    </input>
+   </experiment>
    <experiment name="MOM6_GOLD_SIS2_nobergs" inherit="MOM6_GOLD_SIS2_bergs">
     <input>
      <csh><![CDATA[
