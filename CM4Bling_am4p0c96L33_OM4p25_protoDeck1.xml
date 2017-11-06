@@ -71,15 +71,16 @@ NOTES:
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="warsaw_201710"/>        <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="MOM6_DATE"      value="2017.10.19"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="om4/v1.0.1"/>              <!-- git tag for MOM6 source code -->
+  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20171106"/> <!-- git tag for ocean_shared source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>              <!-- git tag for LAND_LAD2 source code -->  
-  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="$(RELEASE)_om4v1.0.1"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
@@ -106,7 +107,7 @@ NOTES:
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
   <property name="reference_tag"   value="warsaw_201710_mom6_2017.10.05_answers"/>
                           
-  <property name="DEBUGLEVEL" value=""/>
+  <property name="DEBUGLEVEL" value="_2"/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
                                           <!--In that case you will need to put an identifier string for the value to distinguish the /nbhome-->
 
@@ -456,6 +457,14 @@ NOTES:
 	       <ocn ranks="1756" threads="1"   layout = "32,72"  io_layout = "1,4" mask_table="mask_table.548.32x72"/>
 	     </resources>
    </freInclude>
+   <freInclude name="resourceparams_A576x2_O2997">
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="576" threads="2"    layout = "6,16"   io_layout = "1,4" />
+	       <lnd                            layout = "6,16"   io_layout = "1,4" />
+	       <ice                            layout = "144,4"   io_layout = "1,4" />
+               <ocn ranks="2997" threads="1"   layout = "90,45"  io_layout = "9,5" mask_table="mask_table.1053.90x45"/>
+	     </resources>
+   </freInclude>
    <freInclude name="resourceparams_A216x2_O1152">
 	     <resources jobWallclock="01:00:00">
                <atm ranks="216" threads="2"	    layout = "3,12"   io_layout = "1,4" />
@@ -771,10 +780,69 @@ NOTES:
 	     </resources>
    </freInclude>
 
+   <freInclude name="resourceparams_A960x2_O5791">
+	     <resources jobWallclock="00:30:00">
+               <atm ranks="960" threads="2"    layout = "10,16"   io_layout = "1,4" />
+	       <lnd                            layout = "10,16"   io_layout = "1,4" />
+	       <ice                            layout = "320,3"   io_layout = "1,3" />
+               <ocn ranks="5791" threads="1"   layout = "90,90"  io_layout = "1,5" mask_table="mask_table.2309.90x90"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A1056x2_O5791">
+	     <resources jobWallclock="00:30:00">
+               <atm ranks="1056" threads="2"   layout = "8,22"   io_layout = "1,2" />
+	       <lnd                            layout = "8,22"   io_layout = "1,2" />
+	       <ice                            layout = "352,3"  io_layout = "1,3" />
+               <ocn ranks="5791" threads="1"   layout = "90,90"  io_layout = "1,5" mask_table="mask_table.2309.90x90"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A1152x2_O5791">
+             <resources jobWallclock="00:30:00">
+               <atm ranks="1152" threads="2"   layout = "8,24"   io_layout = "1,4" />
+               <lnd                            layout = "8,24"   io_layout = "1,4" />
+               <ice                            layout = "384,3"  io_layout = "1,3" />
+               <ocn ranks="5791" threads="1"   layout = "90,90"  io_layout = "1,5" mask_table="mask_table.2309.90x90"/>
+             </resources>
+   </freInclude>
+
   <setup>
     <platform name="ncrc4.intel16">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="16.0.3.210" />
+      <project>$(GFDL_GROUP)</project>
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+	<include>$(rootDir)/include</include>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
+      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
+      <property name="NCORE_PER_NODE"       value="36"/>
+      <property name="NPES_IO_LAND"         value="18"/>
+
+      <csh><![CDATA[
+        module use -a /usw/eslogin/modulefiles-c3
+        module load git
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+      ]]></csh>
+    </platform>
+    <platform name="ncrc4.intel17">
+      <freVersion>$(FRE_VERSION)</freVersion>
+      <compiler type="intel" version="17.0.0.098" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
@@ -842,6 +910,40 @@ NOTES:
       ]]></csh>
     </platform>
 
+    <platform name="ncrc3.intel16_c3">
+      <freVersion>$(FRE_VERSION)</freVersion>
+      <compiler type="intel" version="16.0.3.210" />
+      <project>$(GFDL_GROUP)</project>
+      <directory stem="$(FRE_STEM)">
+        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
+        <root>$CPERM/$USER/$(FRE_STEM)</root>
+        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+	<include>$(rootDir)/include</include>
+        <!--swept locations (including the staged archive location)-->
+        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
+      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
+      <property name="FMS_ESM_ARCHIVE_ROOT" value="$CDATA/fms/esm"/>
+      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
+      <property name="NCORE_PER_NODE"       value="32"/>
+      <property name="NPES_IO_LAND"         value="16"/>
+
+      <csh><![CDATA[
+        module load git
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+        module load nco/4.5.2
+      ]]></csh>
+    </platform>
     <platform name="gfdl.default">
       <freVersion>$(FRE_VERSION)</freVersion>
       <property name="NB_ROOT"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/><!--Do not change this! Other platforms use  the same value. -->
@@ -969,7 +1071,7 @@ Experiment to build executable.
     <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared/generic_tracers ocean_shared/mocsy/src">
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="$(MOM6_GIT_TAG)"> ocean_shared.git </codeBase>
+        <codeBase version="$(OCEAN_SHARED_GIT_TAG)"> ocean_shared.git </codeBase>
         <csh><![CDATA[
           git clone -b $(MOM6_GIT_TAG) https://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
@@ -2028,6 +2130,7 @@ endif
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1809.90x72
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1309.90x54     
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1402.72x72
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.2309.90x90
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.2428.90x95
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.3785.90x144
      </dataFile>
@@ -3331,6 +3434,13 @@ MOM_OVERRIDE_EOF
           <run days="1 1 " ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A504x1_O504']/node())"/> </run>
       </regression>
 
+      <regression name="timing">
+        <run months="1"> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1152x2_O5791']/node())"/> </run>
+        <run months="1"> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O2997']/node())"/> </run>
+        <run months="1"> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O1756']/node())"/> </run>
+      </regression>
+
+
       <production simTime="5" units="years">
           <segment simTime="12" units="months"/>
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O4671_production']/node())"/>
@@ -3422,84 +3532,6 @@ make_calving_reproduce=.true.
       </namelist>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/Run814_Restart701_Run759_RestartIcebergsAndCalving50.tar</dataSource>
-      </dataFile>       
-      <namelist name="frecheck_nml"><!--this nml is needed only for frecheck to work. It is not needed and does not affect the model run in any way-->
-          start_date =  0631,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
-      </namelist>
-    </input>
-  </experiment>
-  <!--the following crashes at restart with Duplicated bergs-->
-  <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_806_from450_cmip6Diag_driftBergs_newRes" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_806_from450_cmip6Diag">
-    <input>
-      <namelist name="icebergs_nml">
-        really_debug=.FALSE.
-        debug=.FALSE.
-        verbose=.FALSE.
-        verbose_hrs=7200
-        use_operator_splitting=.TRUE.
-        bergy_bit_erosion_fraction=0.0
-        sicn_shift=0.1
-        parallel_reprod=.TRUE.
-        traj_sample_hrs=0
-        add_weight_to_ocean=.false.	
-make_calving_reproduce=.true.
-       tidal_drift = 0.005
-       coastal_drift = 0.001
-      </namelist>
-      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">/lustre/f1/unswept/oar.gfdl.cmip6/h1g/INPUT/InitCond/CM4/Run814_Restart701_Run759_RestartIcebergs55_fromAlistair.tar</dataSource>
-      </dataFile>       
-      <namelist name="frecheck_nml"><!--this nml is needed only for frecheck to work. It is not needed and does not affect the model run in any way-->
-          start_date =  0631,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
-      </namelist>
-    </input>
-  </experiment>
-  <!--the following crashes at restart with Duplicated bergs-->
-  <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_806_from450_cmip6Diag_driftBergs_newRes_calving" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_806_from450_cmip6Diag">
-    <input>
-      <namelist name="icebergs_nml">
-        really_debug=.FALSE.
-        debug=.FALSE.
-        verbose=.FALSE.
-        verbose_hrs=7200
-        use_operator_splitting=.TRUE.
-        bergy_bit_erosion_fraction=0.0
-        sicn_shift=0.1
-        parallel_reprod=.TRUE.
-        traj_sample_hrs=0
-        add_weight_to_ocean=.false.	
-make_calving_reproduce=.true.
-       tidal_drift = 0.005
-       coastal_drift = 0.001
-      </namelist>
-      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/Run814_Restart701_Run759_RestartIcebergs55_swapcalvingres_fromAlistair.tar</dataSource>
-      </dataFile>       
-      <namelist name="frecheck_nml"><!--this nml is needed only for frecheck to work. It is not needed and does not affect the model run in any way-->
-          start_date =  0631,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
-      </namelist>
-    </input>
-  </experiment>
-  <!--the following does not run basic since initCond is uncombined-->
-  <experiment name="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_814_from680_cmip6Diag_driftBergs_JDicebergs50" inherit="CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_806_from450_cmip6Diag">
-    <input>
-      <namelist name="icebergs_nml">
-        really_debug=.FALSE.
-        debug=.FALSE.
-        verbose=.FALSE.
-        verbose_hrs=7200
-        use_operator_splitting=.TRUE.
-        bergy_bit_erosion_fraction=0.0
-        sicn_shift=0.1
-        parallel_reprod=.TRUE.
-        traj_sample_hrs=0
-        add_weight_to_ocean=.false.	
-make_calving_reproduce=.true.
-       tidal_drift = 0.005
-       coastal_drift = 0.001
-      </namelist>
-      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">/lustre/f1/unswept/John.Dunne/restart_814from680_icebergs50/restart_814from680_icebergs50.tar</dataSource>
       </dataFile>       
       <namelist name="frecheck_nml"><!--this nml is needed only for frecheck to work. It is not needed and does not affect the model run in any way-->
           start_date =  0631,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
