@@ -2365,6 +2365,10 @@ MOM_OVERRIDE_EOF
           <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_025/mosaic.v20140610.unpacked/ocean_static.nc</dataSource>
      </dataFile>
 
+     <dataFile label="input" target="INPUT/basin_codes.nc" chksum="" size="" timestamp="">
+          <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_025/mosaic.v20140610.unpacked/basin_codes.v20140629.nc</dataSource>
+     </dataFile>
+
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
@@ -2483,6 +2487,8 @@ make_calving_reproduce=.true.
       #This causes problems for ferret and python tools for analysis.
       #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
       cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+      #Basin codes are needed to calculate offline diagnostics for CMIP6 
+      cp $work/INPUT/basin_codes.nc $work/
          ]]></csh>
       <!--REFINE DIAG SCRIPT -->
       <!--refineDiag_data_stager.csh calculates global averages of basic quantities and stores them in a sqlit database file-->
@@ -2602,6 +2608,25 @@ make_calving_reproduce=.true.
       </component>
       <component type="ocean_Iceland_Norway" source="ocean_Iceland_Norway" sourceGrid="ocean-tripolar">
         <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_B)" source="ocean_Iceland_Norway"/>
+      </component>
+
+      <!--OCEAN REFINEDIAG-->
+      <component type="ocean_month_refined"   source="ocean_month_refined" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_month_refined"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)" />
+        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_month_z_refined"   source="ocean_month_z_refined" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_month_z_refined"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)" />
+        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_month_rho2_refined"   source="ocean_month_rho2_refined" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(PP_CPLD_CHUNK_A)" source="ocean_month_rho2_refined"/>
+        <timeAverage source="monthly" interval="$(PP_CPLD_CHUNK_A)" />
+        <timeAverage source="annual"  interval="$(PP_CPLD_CHUNK_A)"/>
       </component>
 
       <!--ICE-->      
