@@ -19,36 +19,33 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20171106"/> <!-- git tag for ocean_shared source code -->
   <property name="FRE_STEM"       value="$(RELEASE)_om4v1.0.1"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
    <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-   <property name="PROD_SIMTIME"   value="1"/>
+   <property name="PROD_SIMTIME"   value="100"/>
    <!--Post-processing  chunk lengths -->
    <property name="CHUNK_LENGTH_A" value="5yr"/>
    <property name="CHUNK_LENGTH_B" value="20yr"/>
-
-   <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
-      and are not needed for the run or post-processing -->
-   <property name="PP_START_YEAR"  value="1900"/>
-   <property name="PP_END_YEAR"    value="1910"/>
-   <!--Use these values for CORE2 dynamic forcing runs -->
-   <!--
-   <property name="PP_START_YEAR"  value="1948"/>
-   <property name="PP_END_YEAR"    value="1958"/>
-   -->
+   <!--Start year of PP -->
+   <property name="PP_START_YEAR"  value="1948"/>      <!--Use these values for CORE2 dynamic forcing runs -->
    <property name="FRE_VERSION"     value="bronx-12"/> <!-- fre version to be used -->
    <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
    <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
    <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
+   <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
+             and are not needed for the run or post-processing -->
+   <property name="EXP_CPLD_START"   value="1948"/> <!--simulation start year-->
+   <property name="EXP_CPLD_END"     value="2047"/> <!--simulation end   year-->
+
 
    <!--Users need not change the following properties -->
    <property name="reference_tag"  value="warsaw_201707_mom6_2017.07.05_answers"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
-   <property name="DEBUGLEVEL"   value="_0"/>
+   <property name="DEBUGLEVEL"   value=""/>
    <property name="STATIC"       value=""/>  
 
 
@@ -1856,7 +1853,7 @@ touch $work/INPUT/SIS_override
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>
         </timeSeries>
       </component>
-      <component type="ocean_monthly_z"   source="ocean_month_z" sourceGrid="ocean-tripolar">
+      <component type="ocean_monthly_z" start="$(PP_START_YEAR)"  source="ocean_month_z" sourceGrid="ocean-tripolar">
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
       </component>
 
@@ -1867,7 +1864,6 @@ touch $work/INPUT/SIS_override
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
-
         <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>	
       </component>
 
@@ -1881,13 +1877,13 @@ touch $work/INPUT/SIS_override
       </component>
 
       <!--Ocean scalars-->
-      <component type="ocean_scalar_monthly"   source="ocean_scalar_month" sourceGrid="ocean-tripolar">
+      <component type="ocean_scalar_monthly" start="$(PP_START_YEAR)" source="ocean_scalar_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_scalar_month"/>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_B)"/>
       </component>
       
-      <component type="ocean_scalar_annual"    source="ocean_scalar_annual" sourceGrid="ocean-tripolar">
+      <component type="ocean_scalar_annual"  start="$(PP_START_YEAR)" source="ocean_scalar_annual" sourceGrid="ocean-tripolar">
         <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_B)" source="ocean_scalar_annual"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
@@ -1960,52 +1956,10 @@ touch $work/INPUT/SIS_override
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)"  source="ice_month">
            <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
         </timeSeries>
-        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)">
-          <!-- MDBI, this will trigger "fredb" to log the experiment to database if MDBIswitch is on -->
-          <analysis switch="$(MDBIswitch)" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
-
-        </timeAverage>
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
 	  
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_B)"/>
       </component>
-      <!--BLING-->
-      <component type="ocean_bling" source="ocean_bling" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-      <component type="ocean_bling_z" source="ocean_bling_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-      <component type="ocean_bling_cmip6_omip_daily" source="ocean_bling_cmip6_omip_daily" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-      <component type="ocean_bling_cmip6_omip_sfc" source="ocean_bling_cmip6_omip_sfc" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-      <component type="ocean_bling_cmip6_omip_2d" source="ocean_bling_cmip6_omip_2d" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-      <component type="ocean_bling_cmip6_omip_tracers_month_z" source="ocean_bling_cmip6_omip_tracers_month_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-      <component type="ocean_bling_cmip6_omip_tracers_year_z" source="ocean_bling_cmip6_omip_tracers_year_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-      <component type="ocean_bling_cmip6_omip_rates_year_z" source="ocean_bling_cmip6_omip_rates_year_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-
      </postProcess>
    </freInclude>
 
@@ -2171,6 +2125,7 @@ touch $work/INPUT/SIS_override
 
     </input>
   </experiment>
+
    <experiment name="OM4_SIS2_baseline.$(MOM6_DATE)" inherit="OM4_SIS2_baseline"/>
    <experiment name="OM4_SIS2_baseline.nodiag.$(MOM6_DATE)" inherit="OM4_SIS2_baseline">
      <input>
@@ -2181,6 +2136,7 @@ $baseDate
     </input>
   </experiment>
 
+   <experiment name="OM4p25_NYF_baseline" inherit="OM4_SIS2_baseline"/>
    <experiment name="OM4p25_baseline" inherit="OM4_SIS2_baseline"/>
    <experiment name="OM4_SIS2_baseline$(STATIC)" inherit="OM4_SIS2_baseline_config">
      <input>
@@ -2273,26 +2229,51 @@ MOM_OVERRIDE_EOF
    </input>
    </experiment>
 
-
-   <experiment name="OM4_SIS2_CORE2_IAF_baseline" inherit="OM4_SIS2_baseline_config">
-    <publicMetadata DBswitch="on">
+   <experiment name="OM4p25_IAF_baseline" inherit="OM4_SIS2_baseline_config">
+    <description>
+global 1/4 degree z ocean_ice experiment 
+regridded runoff and salinity
+CORE2 dynamic inter_annual forcing data
+    </description>  
+    <publicMetadata DBswitch="$(MDBIswitch)">
+      <!-- Realization tag -->
+      <realization r="1" i="1" p="1" f="1"/>
+      <!-- project info -->
       <project>"$(ProjectID)"</project>
-      <model>"OM4_SIS2 $(FRE_STEM)"</model>
-      <modelID>"OM4_SIS2 $(FRE_STEM)"</modelID>
-      <experimentName>"$(name)"</experimentName>
-      <experimentID>"$(name)" </experimentID>
+      <activity_id>OMIP</activity_id>
+      <mip_era>CMIP6</mip_era>
+      <!-- model info -->
+      <source>GFDL OM4p25 (2017)</source>
+      <source_id>GFDL-OM4p25_2</source_id>
+      <source_type>OGCM</source_type>
+      <!--experiment info-->
+      <experiment_name>"$(name)"</experiment_name>
+      <experiment_id>"$(name)"</experiment_id>
+      <sub_experiment>none</sub_experiment>
+      <sub_experiment_id>none</sub_experiment_id>
+      <start_time>$(EXP_CPLD_START)</start_time>
+      <end_time>$(EXP_CPLD_END)</end_time>
+      <!-- branch info -->
+      <branch_method>standard</branch_method>
+      <branch_time_in_child>0.0D0</branch_time_in_child>
+      <branch_time_in_parent></branch_time_in_parent>
+      <!-- variant info-->
+      <variant_info></variant_info>
+      <!--parent info-->
+      <parent_time_units>days since 1948-1-1</parent_time_units>
+      <parent_activity_id>CMIP</parent_activity_id>
+      <parent_experiment_id></parent_experiment_id>
+      <parent_mip_era>CMIP6</parent_mip_era>
+      <parent_source_id>GFDL-OM4</parent_source_id>
+      <parent_variant_label>r1i1p1f1</parent_variant_label>
       <comment>
        Experiment name = $(name)
     For more information please refer to the
-    &lt;a href="http://wiki.gfdl.noaa.gov/index.php/MOM6"&gt; MOM6 Wiki.  &lt;/a&gt;
+    &lt;a href="https://github.com/NOAA-GFDL/MOM6-examples/wiki"&gt; MOM6 Wiki.  &lt;/a&gt;
       </comment>
+
     </publicMetadata>
-    <description>
-global 1/4 degree z test case
-based off of the OM4_SIS2_baseline experiment
-regridded runoff and salinity
-CORE2 dynamic forcing data
-    </description>  
+
      <input>
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_common']/input/node())"/>
       <!--MOM6 Input datasets-->
@@ -6521,5 +6502,39 @@ dissi14cabio_valid_min = 0.0
      </postProcess>
   </freInclude>
 
+  <freInclude name="BLING_postprocess">
+      <postProcess> 
+      <component type="ocean_bling_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_sfc_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_sfc" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_2d_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_2d" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_tracers_month_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_tracers_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_tracers_year_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_tracers_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_rates_year_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_rates_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+     </postProcess>
+  </freInclude>
 
 </experimentSuite>
