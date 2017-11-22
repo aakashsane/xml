@@ -17,14 +17,15 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="MOM6_DATE"      value="2017.10.19"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="om4/v1.0.1"/>                <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20171106"/> <!-- git tag for ocean_shared source code -->
-  <property name="FRE_STEM"       value="$(RELEASE)_om4v1.0.1"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="$(RELEASE)_MOM6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <!--property name="FRE_STEM"       value="$(RELEASE)_om4v1.0.1"/--> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_YOURGROUPLETTER"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
    <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-   <property name="PROD_SIMTIME"   value="100"/>
+   <property name="PROD_SIMTIME"   value="200"/>
    <!--Post-processing  chunk lengths -->
    <property name="CHUNK_LENGTH_A" value="5yr"/>
    <property name="CHUNK_LENGTH_B" value="20yr"/>
@@ -37,7 +38,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
    <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
              and are not needed for the run or post-processing -->
    <property name="EXP_CPLD_START"   value="1948"/> <!--simulation start year-->
-   <property name="EXP_CPLD_END"     value="2047"/> <!--simulation end   year-->
+   <property name="EXP_CPLD_END"     value="2147"/> <!--simulation end   year-->
 
 
    <!--Users need not change the following properties -->
@@ -1841,9 +1842,9 @@ touch $work/INPUT/SIS_override
       <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh  $(NB_ROOT)/mdt_xml/awg_include/refineDiag/refineDiag_data_stager_globalAve.csh"/>
 
       <!--PostProcessing component models-->
-      <component type="ocean_5daily"   start="$(PP_START_YEAR)" source="ocean_5daily" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_5daily"/>
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_5daily"/>
+      <component type="ocean_daily"   start="$(PP_START_YEAR)" source="ocean_daily" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_daily"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_daily"/>
       </component>
       <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
@@ -1891,61 +1892,80 @@ touch $work/INPUT/SIS_override
 
       <!--Ocean regions-->
       <component type="ocean_Barents_opening" source="ocean_Barents_opening" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Barents_opening"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Bering_Strait" source="ocean_Bering_Strait" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Bering_Strait"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Davis_Strait" source="ocean_Davis_Strait" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Davis_Strait"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Windward_Passage" source="ocean_Windward_Passage" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Windward_Passage"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Denmark_Strait" source="ocean_Denmark_Strait" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Denmark_Strait"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Drake_Passage" source="ocean_Drake_Passage" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Drake_Passage"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_English_Channel" source="ocean_English_Channel" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_English_Channel"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Faroe_Scotland" source="ocean_Faroe_Scotland" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Faroe_Scotland"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Florida_Bahamas" source="ocean_Florida_Bahamas" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Florida_Bahamas"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Fram_Strait" source="ocean_Fram_Strait" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Fram_Strait"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Iceland_Faroe_V" source="ocean_Iceland_Faroe_V" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Iceland_Faroe_V"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Iceland_Faroe_U" source="ocean_Iceland_Faroe_U" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Iceland_Faroe_U"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Indonesian_Throughflow" source="ocean_Indonesian_Throughflow" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Indonesian_Throughflow"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Mozambique_Channel" source="ocean_Mozambique_Channel" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Mozambique_Channel"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Pacific_undercurrent" source="ocean_Pacific_undercurrent" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Pacific_undercurrent"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Taiwan_Luzon" source="ocean_Taiwan_Luzon" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Taiwan_Luzon"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Agulhas_section" source="ocean_Agulhas_section" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Agulhas_section"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Gibraltar_Strait" source="ocean_Gibraltar_Strait" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Gibraltar_Strait"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
       <component type="ocean_Iceland_Norway" source="ocean_Iceland_Norway" sourceGrid="ocean-tripolar">
-        <timeSeries freq="120hr" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_Iceland_Norway"/>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
 
       <!--ICE-->      
