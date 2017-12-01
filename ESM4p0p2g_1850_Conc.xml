@@ -804,11 +804,6 @@ Experiment to build executable.
         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
-<!-- jgj 2017/09/27 added to match awg_warsaw_201707.xml -->
-          <csh><![CDATA[
-          ( cd coupler && git checkout $(AWG_GIT_TAG) )
-          ]]>
-          </csh>
         </source>
         <compile>
           <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
@@ -8145,7 +8140,7 @@ endif
       <!--REFINE DIAG SCRIPT -->
       <!--refineDiag_data_stager.csh calculates global averages of basic quantities and stores them in a sqlit database file-->
       <!--By default a refineDiag script causes the annual history files to be unpacked and saved in /ptmp/$USER-->
-      <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh,$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_data_stager_globalAve.csh"/>
+      <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_data_stager_globalAve.csh"/>
 
       <component type="ocean_daily"   source="ocean_daily" sourceGrid="ocean-tripolar">
         <timeSeries freq="daily" chunkLength="$(PP_CMIP_CHUNK_A)" source="ocean_daily"/>
@@ -8796,7 +8791,6 @@ endif
 "ATM", "co2_flux_pcair_atm",           "",  "", "none",  284.262e-06
 #
       </dataTable>  
-<!--
       <diagTable order="append"> 
 #===========================
 # ocean_cobalt_dust
@@ -8822,13 +8816,13 @@ endif
 #"dynamics",  "dust4",  "dust4",  "atmos_dust_sample", "all", .true.,  "none", 2
 #"dynamics",  "dust5",  "dust5",  "atmos_dust_sample", "all", .true.,  "none", 2
 #
+#Note the dust_wet_dep diagnostics is needed for the wetdep dust to work (line 1222 of atmos_param/moist_processes/moist_processes.F90)
 "moist",     "dust_wet_dep", "dust_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
 #"moist",     "ssalt_wet_dep", "ssalt_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
 #"moist",     "totNH4_wet_dep", "totNH4_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
 #"moist",     "so4_wet_dep", "so4_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
 #"moist",     "so2_wet_dep", "so2_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
       </diagTable> 
--->
 
    </input>
   </experiment>
