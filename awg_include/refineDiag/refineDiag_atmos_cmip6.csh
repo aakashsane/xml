@@ -22,7 +22,7 @@ set xmlDir = $rtsxml:h
 set refineDiagScriptDir = $xmlDir/awg_include/refineDiag
 cp -r $refineDiagScriptDir/$CODE_DIRECTORY $CODE_DIRECTORY
 chmod +x $CODE_DIRECTORY/refineDiag_atmos.csh
-chmod +x $CODE_DIRECTORY/refine_field.pl
+chmod +x $CODE_DIRECTORY/refine_fields.pl
 
 # check that output directory is defined
 
