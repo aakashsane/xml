@@ -17,10 +17,10 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="MOM6_DATE"      value="2017.10.19"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="om4/v1.0.1"/>                <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20171106"/> <!-- git tag for ocean_shared source code -->
-  <property name="FRE_STEM"       value="$(RELEASE)_MOM6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!--property name="FRE_STEM"       value="$(RELEASE)_om4v1.0.1"/--> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_YOURGROUPLETTER"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
    <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
 
@@ -1501,7 +1501,7 @@ endif
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/grid_spec.nc</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/grid_spec.nc</dataSource>
         <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/grid_spec.nc</dataSource>
-        <dataSource site="gfdl">/archive/gold/datasets/OM4_025/mosaic.v20140610.unpacked/grid_spec.nc</dataSource> 
+        <dataSource site="gfdl">/archive/gold/datasets/OM4_025/mosaic.v20170622.tar</dataSource> 
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/atmos_mosaic_tile1Xland_mosaic_tile1.nc</dataSource>
@@ -1729,8 +1729,25 @@ endif
         <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
       </dataFile>
+<!-- "heat_content_vprec" are repeated in diag_table.MOM6
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
+        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
+      </dataFile>
+-->
+      <diagTable order="append">
+# MOM6 ocean diagnostics only used in a CORE/OMIP (no interactive atmos). 
+# These terms provide diagnostics for the surface salinity / fresh water restoring. 
+ "ocean_model", "vprec",              "vprec",              "ocean_annual", "all", "mean", "none",2
+ "ocean_model", "salt_flux_restore",  "salt_flux_restore",  "ocean_annual", "all", "mean", "none",2
 
-     <namelist name="MOM_input_nml" >
+ "ocean_model", "vprec",              "vprec",              "ocean_month", "all", "mean", "none",2
+ "ocean_model", "salt_flux_restore",  "salt_flux_restore",  "ocean_month", "all", "mean", "none",2
+      </diagTable>
+
+      <namelist name="MOM_input_nml" >
          output_directory = './',
          input_filename = '$restart_flag'
          restart_input_dir = 'INPUT/',
@@ -1743,6 +1760,9 @@ if ( $currentSeg == 1 ) then
    set restart_flag = 'n'
 else
    set restart_flag = 'r'
+   #Because of a technical issue FRE does not delete old uncombined restarts before copying the new ones for the next segment
+   #The INPUT/ ends up with inconsistent restart files which at best cause the model to crash right away.
+   if(-e $work/INPUT/MOM.res.nc.0000 ) \rm -rf $work/INPUT/MOM.res*.nc
 endif
 
 ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc 
@@ -3439,8 +3459,8 @@ OVERRIDE_EOF
       </regression>
 
       <regression name="debug">
-        <run days="2" >   <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
-        <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
+        <run days="2" >   <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O64']/node())"/> </run>
+        <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O32']/node())"/> </run>
       </regression>
 
       <regression name="debug2">
@@ -4129,9 +4149,6 @@ biomass_p_valid_min = 0.0
 "generic_age","age_stf",    "age_stf",    "generic_tracers","all",.true.,"none",2
 "generic_argon","argon",    "argon",        "generic_tracers","all",.true.,"none",2
 "generic_argon","argon_stf","argon_stf",    "generic_tracers","all",.true.,"none",2
-#
-"ocean_model","temp","temp","generic_tracers","all",.true.,"none",2
-"ocean_model","salt","salt","generic_tracers","all",.true.,"none",2
 
 #
 "generic_tracers_z",          1,  "days", 1, "days", "time",
@@ -4145,9 +4162,6 @@ biomass_p_valid_min = 0.0
 "generic_age_z","age_stf",    "age_stf",    "generic_tracers_z","all",.true.,"none",2
 "generic_argon_z","argon",    "argon",      "generic_tracers_z","all",.true.,"none",2
 "generic_argon_z","argon_stf","argon_stf",  "generic_tracers_z","all",.true.,"none",2
-#
-"ocean_model_z","temp","temp","generic_tracers_z","all",.true.,"none",2
-"ocean_model_z","salt","salt","generic_tracers_z","all",.true.,"none",2
 #
 # Required cell measures
 "ocean_model",  "volcello", "volcello",  "generic_tracers","all","mean","none",2 # Cell measure for 3d data
@@ -4268,6 +4282,23 @@ cd $work/INPUT
         <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
       </dataFile>
+<!-- "heat_content_vprec" are repeated in diag_table.MOM6
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
+        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
+      </dataFile>
+-->
+      <diagTable order="append">
+# MOM6 ocean diagnostics only used in a CORE/OMIP (no interactive atmos). 
+# These terms provide diagnostics for the surface salinity / fresh water restoring. 
+ "ocean_model", "vprec",              "vprec",              "ocean_annual", "all", "mean", "none",2
+ "ocean_model", "salt_flux_restore",  "salt_flux_restore",  "ocean_annual", "all", "mean", "none",2
+
+ "ocean_model", "vprec",              "vprec",              "ocean_month", "all", "mean", "none",2
+ "ocean_model", "salt_flux_restore",  "salt_flux_restore",  "ocean_month", "all", "mean", "none",2
+      </diagTable>
 
      <namelist name="MOM_input_nml" >
          output_directory = './',
@@ -4464,9 +4495,8 @@ SIS_OVERRIDE_EOF
       </regression>
 
       <regression name="debug">
-        <run days="2"   > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
-        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O648']/node())"/> </run>
-        <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
+        <run days="2"   > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
+        <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
       </regression>
 
       <regression name="debugomp">
@@ -4544,7 +4574,23 @@ SIS_OVERRIDE_EOF
         <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
       </dataFile>
+<!-- "heat_content_vprec" are repeated in diag_table.MOM6
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
+        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
+      </dataFile>
+-->
+      <diagTable order="append">
+# MOM6 ocean diagnostics only used in a CORE/OMIP (no interactive atmos). 
+# These terms provide diagnostics for the surface salinity / fresh water restoring. 
+ "ocean_model", "vprec",              "vprec",              "ocean_annual", "all", "mean", "none",2
+ "ocean_model", "salt_flux_restore",  "salt_flux_restore",  "ocean_annual", "all", "mean", "none",2
 
+ "ocean_model", "vprec",              "vprec",              "ocean_month", "all", "mean", "none",2
+ "ocean_model", "salt_flux_restore",  "salt_flux_restore",  "ocean_month", "all", "mean", "none",2
+      </diagTable>
      <namelist name="MOM_input_nml" >
          output_directory = './',
          input_filename = '$restart_flag'
@@ -4688,9 +4734,8 @@ SIS_OVERRIDE_EOF
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O648']/node())"/> </run>
       </regression>
       <regression name="debug">
-        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
-        <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
-        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O648']/node())"/> </run>
+        <run days="2"   > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
+        <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
       </regression>
       <regression name="debug_ens">
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
