@@ -103,7 +103,7 @@ NOTES:
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
-  <property name="PROD_SIMTIME"     value="1000"/>  <!--simulation length in years-->
+  <property name="PROD_SIMTIME"     value="1"/>  <!--simulation length in years-->
   <property name="PP_CMIP_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CMIP_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
   <property name="PP_START_YEAR"    value="0001" />
@@ -123,9 +123,9 @@ NOTES:
   <property name="CVDP_startyear"  value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-  <property name="reference_tag"   value="warsaw_201707_mom6_2017.07.05_answers"/>
+  <property name="reference_tag"   value="warsaw_201710_mom6_2017.10.19_answers"/>
                           
-  <property name="DEBUGLEVEL" value=""/>
+  <property name="DEBUGLEVEL" value="_2"/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
                                           <!--In that case you will need to put an identifier string for the value to distinguish the /nbhome-->
 
@@ -7544,6 +7544,58 @@ $baseDate
 #===============================================================================================
       </diagTable> 
 
+      <diagTable order="append"> 
+#===========================
+# ocean_cobalt_dust
+#===========================
+"ocean_cobalt_dust",       1,  "months", 1, "days", "time",
+# Required cell measures
+"generic_cobalt","dep_dry_lith", "dep_dry_lith", "ocean_cobalt_dust","all",.true.,"none",2
+"generic_cobalt","dep_wet_lith", "dep_wet_lith", "ocean_cobalt_dust","all",.true.,"none",2
+"generic_cobalt","dep_dry_fed", "dep_dry_fed", "ocean_cobalt_dust","all",.true.,"none",2
+"generic_cobalt","dep_wet_fed", "dep_wet_fed", "ocean_cobalt_dust","all",.true.,"none",2
+"generic_cobalt","dep_dry_nh4", "dep_dry_nh4", "ocean_cobalt_dust","all",.true.,"none",2
+"generic_cobalt","dep_wet_nh4", "dep_wet_nh4", "ocean_cobalt_dust","all",.true.,"none",2
+"generic_cobalt","dep_dry_no3", "dep_dry_no3", "ocean_cobalt_dust","all",.true.,"none",2
+"generic_cobalt","dep_wet_no3", "dep_wet_no3", "ocean_cobalt_dust","all",.true.,"none",2
+
+#
+"atmos_dust_sample",       1,  "months", 1, "days", "time",
+"tracers" , "dust_ddep", "dust_ddep", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "dust_emis", "dust_emis", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "dust_conc", "dust_conc", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "drydust", "drydust", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "emidust", "emidust", "atmos_dust_sample","all",.true.,"none",2
+"tracers" , "dust1_setl", "dust1_setl", "atmos_dust_sample","all",.true.,"none",2
+#"tracers" , "dust2_setl", "dust2_setl", "atmos_dust_sample","all",.true.,"none",2
+#"tracers" , "dust3_setl", "dust3_setl", "atmos_dust_sample","all",.true.,"none",2
+#"tracers" , "dust4_setl", "dust4_setl", "atmos_dust_sample","all",.true.,"none",2
+#"tracers" , "dust5_setl", "dust5_setl", "atmos_dust_sample","all",.true.,"none",2
+"dynamics",  "dust1",  "dust1",  "atmos_dust_sample", "all", .true.,  "none", 2
+#"dynamics",  "dust2",  "dust2",  "atmos_dust_sample", "all", .true.,  "none", 2
+#"dynamics",  "dust3",  "dust3",  "atmos_dust_sample", "all", .true.,  "none", 2
+#"dynamics",  "dust4",  "dust4",  "atmos_dust_sample", "all", .true.,  "none", 2
+#"dynamics",  "dust5",  "dust5",  "atmos_dust_sample", "all", .true.,  "none", 2
+#
+#Note the dust_wet_dep diagnostics is needed for the wetdep dust to work (line 1222 of atmos_param/moist_processes/moist_processes.F90)
+"moist",     "dust_wet_dep", "dust_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
+#"moist",     "ssalt_wet_dep", "ssalt_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
+#"moist",     "totNH4_wet_dep", "totNH4_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
+#"moist",     "so4_wet_dep", "so4_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
+#"moist",     "so2_wet_dep", "so2_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
+##. wet deposition rate of dust, kg m-2 s-1 (longitude,latitude,time)
+ "moist",         "wetdust",       "wetdust",       "atmos_dust_sample",      "all",  .true.,  "none", 2
+##. wet deposition rate of nh3, kg m-2 s-1 (longitude,latitude,time)
+ "moist",         "nh3_wetdep_kg_m2_s",   "wetnh3",        "atmos_dust_sample",      "all",  .true.,  "none", 2
+##. wet deposition rate of nh4, kg m-2 s-1 (longitude,latitude,time)
+ "moist",         "nh4_wetdep_kg_m2_s",   "wetnh4",        "atmos_dust_sample",      "all",  .true.,  "none", 2
+##. dry deposition rate of noy, kg m-2 s-1 (longitude,latitude,time)
+ "tracers",       "fam_noy_ddep_kg_m2_s", "drynoy",        "atmos_dust_sample",      "all",  .true.,  "none", 2
+##. Dry Deposition Rate of nh3, kg m-2 s-1 (longitude,latitude,time)
+ "tracers",       "nh3_ddep_kg_m2_s", "drynh3",        "atmos_dust_sample",      "all",  .true.,  "none", 2
+##. dry deposition rate of nh4, kg m-2 s-1 (longitude,latitude,time)
+ "tracers",       "nh4_ddep_kg_m2_s", "drynh4",        "atmos_dust_sample",      "all",  .true.,  "none", 2
+      </diagTable> 
 
 <!--  CSH SECTION 
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
@@ -8154,6 +8206,7 @@ endif
         <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)" >
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>
 	</timeAverage>
+        <timeAverage source="annual" interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
       <!-- changed to CHUNK_A only -->
@@ -8791,39 +8844,122 @@ endif
 "ATM", "co2_flux_pcair_atm",           "",  "", "none",  284.262e-06
 #
       </dataTable>  
-      <diagTable order="append"> 
-#===========================
-# ocean_cobalt_dust
-#===========================
-"ocean_cobalt_dust",       1,  "days", 1, "days", "time",
-# Required cell measures
-"generic_cobalt","dep_dry_lith", "dep_dry_lith", "ocean_cobalt_dust","all",.true.,"none",2
-"generic_cobalt","dep_wet_lith", "dep_wet_lith", "ocean_cobalt_dust","all",.true.,"none",2
-#
-"atmos_dust_sample",       1,  "days", 1, "days", "time",
-"tracers" , "dust_ddep", "dust_ddep", "atmos_dust_sample","all",.true.,"none",2
-"tracers" , "dust_emis", "dust_emis", "atmos_dust_sample","all",.true.,"none",2
-"tracers" , "drydust", "drydust", "atmos_dust_sample","all",.true.,"none",2
-"tracers" , "emidust", "emidust", "atmos_dust_sample","all",.true.,"none",2
-"tracers" , "dust1_setl", "dust1_setl", "atmos_dust_sample","all",.true.,"none",2
-#"tracers" , "dust2_setl", "dust2_setl", "atmos_dust_sample","all",.true.,"none",2
-#"tracers" , "dust3_setl", "dust3_setl", "atmos_dust_sample","all",.true.,"none",2
-#"tracers" , "dust4_setl", "dust4_setl", "atmos_dust_sample","all",.true.,"none",2
-#"tracers" , "dust5_setl", "dust5_setl", "atmos_dust_sample","all",.true.,"none",2
-"dynamics",  "dust1",  "dust1",  "atmos_dust_sample", "all", .true.,  "none", 2
-#"dynamics",  "dust2",  "dust2",  "atmos_dust_sample", "all", .true.,  "none", 2
-#"dynamics",  "dust3",  "dust3",  "atmos_dust_sample", "all", .true.,  "none", 2
-#"dynamics",  "dust4",  "dust4",  "atmos_dust_sample", "all", .true.,  "none", 2
-#"dynamics",  "dust5",  "dust5",  "atmos_dust_sample", "all", .true.,  "none", 2
-#
-#Note the dust_wet_dep diagnostics is needed for the wetdep dust to work (line 1222 of atmos_param/moist_processes/moist_processes.F90)
-"moist",     "dust_wet_dep", "dust_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
-#"moist",     "ssalt_wet_dep", "ssalt_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
-#"moist",     "totNH4_wet_dep", "totNH4_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
-#"moist",     "so4_wet_dep", "so4_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
-#"moist",     "so2_wet_dep", "so2_wet_dep",  "atmos_month",     "all", .true.,  "none", 2
-      </diagTable> 
 
+   </input>
+  </experiment>
+  <experiment name="ESM4p0p2g_1850C_PIpcairco2_dust_iron" inherit="ESM4p0p2g_1850C_PIpcairco2_dust">
+    <input>
+      <!--COBALT 1860 data table, o2 gas exchange data table, CMIP6 Jan 1 1850 co2 data table -->
+<!-- update to match BLING -->
+      <dataTable>
+# jgj 2016/07/08 COBALT 1860 data table with TOPAZ Fe datasets                                                                    
+#                                                                                                                                 
+"OCN", "runoff_no3_flux_ice_ocn",   "NO3_CONC",   "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_ldon_flux_ice_ocn",  "LDON_CONC",  "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_sldon_flux_ice_ocn", "SLDON_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_srdon_flux_ice_ocn", "SRDON_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_ndet_flux_ice_ocn",  "NDET_CONC",  "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_po4_flux_ice_ocn",   "PO4_CONC",   "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_ldop_flux_ice_ocn",  "LDOP_CONC",  "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_sldop_flux_ice_ocn", "SLDOP_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_srdop_flux_ice_ocn", "SRDOP_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_fed_flux_ice_ocn", ""   , ""                             , "none" ,  0.0
+# Updated settings to match BLINGv2
+# Composition of runoff includes 0.1 PgC for CaCO3 burial (0.48 Alk, 0.24DIC)
+# plus 0.3 Pg C for Org burial (0.72 DIC, 0.72/106 PO4, 0.72/106*16 Alk ) 
+"OCN", "runoff_alk_flux_ice_ocn",  "",    "",                             "none",  0.5932e-3
+"OCN", "runoff_dic_flux_ice_ocn",  "",    "",                             "none",  0.96e-3
+"OCN", "runoff_lith_flux_ice_ocn", ""  , ""                             , "none" , 13.0e-3
+###fed has wet and dry dep fluxes from dust. Do not override it in an active dust exchange experiment
+###"OCN", "dry_dep_fed_flux_ice_ocn",  "FLUX",        "./INPUT/Soluble_Fe_Flux_PI.nc", "bilinear", -1.0
+###lith has wet and dry dep fluxes from dust. Do not override it in an active dust exchange experiment
+###"OCN", "dry_dep_lith_flux_ice_ocn", "FLUX_MINERAL","./INPUT/Mineral_Fe_Flux_PI.nc", "bilinear", -1.0
+"OCN", "dry_dep_po4_flux_ice_ocn",  "FLUX",        "./INPUT/Mineral_Fe_Flux_PI.nc", "bilinear", -0.0084
+"OCN", "wet_dep_no3_flux_ice_ocn",  "NO3_WET_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
+"OCN", "dry_dep_no3_flux_ice_ocn",  "NO3_DRY_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
+"OCN", "wet_dep_nh4_flux_ice_ocn",  "NH4_WET_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
+"OCN", "dry_dep_nh4_flux_ice_ocn",  "NH4_DRY_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
+#
+# jgj 2015/12/09 data table for o2 gas exchange
+#
+"ATM", "o2_flux_pcair_atm", ""         , ""                             , "none" , 0.21
+#
+# jgj 2016/11/29 co2 data table (Jan 1 1850 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
+#
+## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
+## radiation co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
+"ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
+"ATM" , "co2_dvmr_rad",     "",     "", "none",  284.262e-06
+#
+# 2017/09/21  for development: override pcairco2 with CMIP6 Jan 1 1850 value
+"ATM", "co2_flux_pcair_atm",           "",  "", "none",  284.262e-06
+#
+      </dataTable>  
+   </input>
+  </experiment>
+  <experiment name="ESM4p0p2g_1850C_PIpcairco2_dust_iron_nitrogen" inherit="ESM4p0p2g_1850C_PIpcairco2_dust">
+    <input>
+      <namelist name="atmos_tracer_driver_nml">
+      step_update_tracer = .true.
+      do_esm_nitrogen_flux = .true. !turn on nh4,no3 exchange with OCN
+      </namelist>
+      <fieldTable order="append">      
+# land field table needed for any coupler flux exchange
+# otherwise the model crashes in flux_exchange 
+  "TRACER", "land_mod",     "nh4"
+           "longname",     "nh4 But Why You Ask"
+           "units",        "NA" /
+  "TRACER", "land_mod",     "hno3"
+           "longname",     "hno3 But Why You Ask"
+           "units",        "NA" /
+      </fieldTable>
+      <!--COBALT 1860 data table, o2 gas exchange data table, CMIP6 Jan 1 1850 co2 data table -->
+<!-- update to match BLING -->
+      <dataTable>
+# jgj 2016/07/08 COBALT 1860 data table with TOPAZ Fe datasets                                                                    
+#                                                                                                                                 
+"OCN", "runoff_no3_flux_ice_ocn",   "NO3_CONC",   "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_ldon_flux_ice_ocn",  "LDON_CONC",  "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_sldon_flux_ice_ocn", "SLDON_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_srdon_flux_ice_ocn", "SRDON_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_ndet_flux_ice_ocn",  "NDET_CONC",  "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_po4_flux_ice_ocn",   "PO4_CONC",   "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_ldop_flux_ice_ocn",  "LDOP_CONC",  "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_sldop_flux_ice_ocn", "SLDOP_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_srdop_flux_ice_ocn", "SRDOP_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
+"OCN", "runoff_fed_flux_ice_ocn", ""   , ""                             , "none" ,  0.0
+# Updated settings to match BLINGv2
+# Composition of runoff includes 0.1 PgC for CaCO3 burial (0.48 Alk, 0.24DIC)
+# plus 0.3 Pg C for Org burial (0.72 DIC, 0.72/106 PO4, 0.72/106*16 Alk ) 
+"OCN", "runoff_alk_flux_ice_ocn",  "",    "",                             "none",  0.5932e-3
+"OCN", "runoff_dic_flux_ice_ocn",  "",    "",                             "none",  0.96e-3
+"OCN", "runoff_lith_flux_ice_ocn", ""  , ""                             , "none" , 13.0e-3
+###fed has wet and dry dep fluxes from dust. Do not override it in an active dust exchange experiment
+###"OCN", "dry_dep_fed_flux_ice_ocn",  "FLUX",        "./INPUT/Soluble_Fe_Flux_PI.nc", "bilinear", -1.0
+###lith has wet and dry dep fluxes from dust. Do not override it in an active dust exchange experiment
+###"OCN", "dry_dep_lith_flux_ice_ocn", "FLUX_MINERAL","./INPUT/Mineral_Fe_Flux_PI.nc", "bilinear", -1.0
+"OCN", "dry_dep_po4_flux_ice_ocn",  "FLUX",        "./INPUT/Mineral_Fe_Flux_PI.nc", "bilinear", -0.0084
+###nh4 and no3  wet and dry dep fluxes from atm. Do not override it in an active nitrogen exchange experiment
+###"OCN", "wet_dep_no3_flux_ice_ocn",  "NO3_WET_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
+###"OCN", "dry_dep_no3_flux_ice_ocn",  "NO3_DRY_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
+###"OCN", "wet_dep_nh4_flux_ice_ocn",  "NH4_WET_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
+###"OCN", "dry_dep_nh4_flux_ice_ocn",  "NH4_DRY_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
+#
+# jgj 2015/12/09 data table for o2 gas exchange
+#
+"ATM", "o2_flux_pcair_atm", ""         , ""                             , "none" , 0.21
+#
+# jgj 2016/11/29 co2 data table (Jan 1 1850 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
+#
+## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
+## radiation co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
+"ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
+"ATM" , "co2_dvmr_rad",     "",     "", "none",  284.262e-06
+#
+# 2017/09/21  for development: override pcairco2 with CMIP6 Jan 1 1850 value
+"ATM", "co2_flux_pcair_atm",           "",  "", "none",  284.262e-06
+#
+      </dataTable>  
    </input>
   </experiment>
 </experimentSuite>
