@@ -228,15 +228,21 @@ for oceanFile in history:
   fdata = gmeantools.ncopen(fYear + '.' + oceanFile + '.nc',action=None)
   if fdata is not None:
     for varName in fdata.variables.keys():
-      if (len(fdata.variables[varName].shape) == 3):
+      ndims = len(fdata.variables[varName].shape)
+      if ndims == 3:
         dims = fdata.variables[varName].dimensions
-        if (dims[1] == 'yh' and dims[2] == 'xh'):
+        if (dims[-2] == 'yh' and dims[-1] == 'xh'):
           var = fdata.variables[varName][:]
-          var = np.ma.average(var,axis=0,weights=fdata.variables['average_DT'][:])
-          for reg in ['global','tropics','nh','sh']:
-            result, areaSum = gmeantools.area_mean(var,cellArea,geoLat,geoLon,region=reg)
-            gmeantools.write_sqlite_data(outdir+'/'+fYear+'.'+reg+'Ave'+label+'.db',varName,fYear[:4],result)
-            gmeantools.write_sqlite_data(outdir+'/'+fYear+'.'+reg+'Ave'+label+'.db','area',fYear[:4],areaSum)
+      elif (ndims == 4) and (varName[0:9] == 'tot_layer'):
+        var = fdata.variables[varName][:]
+        var = np.ma.sum(var,axis=1)
+      else:
+        continue
+      var = np.ma.average(var,axis=0,weights=fdata.variables['average_DT'][:])
+      for reg in ['global','tropics','nh','sh']:
+        result, areaSum = gmeantools.area_mean(var,cellArea,geoLat,geoLon,region=reg)
+        gmeantools.write_sqlite_data(outdir+'/'+fYear+'.'+reg+'Ave'+label+'.db',varName,fYear[:4],result)
+        gmeantools.write_sqlite_data(outdir+'/'+fYear+'.'+reg+'Ave'+label+'.db','area',fYear[:4],areaSum)
   else:
     continue
 
@@ -447,7 +453,7 @@ python global_average_cubesphere.py ${oname} ${refineDiagDir} Atmos atmos_month
 python global_average_cubesphere.py ${oname} ${refineDiagDir} AtmosAer atmos_month_aer
 python global_average_land.py ${oname} ${refineDiagDir} Land land_month
 python global_average_ice.py ${oname} ${refineDiagDir} Ice ice_month
-python global_average_tripolar.py ${oname} ${refineDiagDir} COBALT ocean_cobalt_sfc,garbage,ocean_cobalt_misc
+python global_average_tripolar.py ${oname} ${refineDiagDir} COBALT ocean_cobalt_sfc,ocean_cobalt_misc,ocean_cobalt_tracers_year
 python extract_ocean_scalar.py ${oname} ${refineDiagDir}
 python amoc.py ${oname} ${refineDiagDir} ${gridspec}
 
