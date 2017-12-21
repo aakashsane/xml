@@ -14,11 +14,10 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
   <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
-  <property name="MOM6_DATE"      value="2017.10.19"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="om4/v1.0.1"/>                <!-- git tag for MOM6 source code -->
-  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20171106"/> <!-- git tag for ocean_shared source code -->
+  <property name="MOM6_DATE"      value="20171219"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
+  <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/> <!--value="dev/esm4/20171106"/--> <!-- git tag for ocean_shared source code -->
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
-  <!--property name="FRE_STEM"       value="$(RELEASE)_om4v1.0.1"/--> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
@@ -42,11 +41,11 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 
 
    <!--Users need not change the following properties -->
-   <property name="reference_tag"  value="warsaw_201707_mom6_2017.07.05_answers"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
+   <property name="reference_tag"  value="warsaw_201710_mom6_2017.10.19_answers"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
-   <property name="DEBUGLEVEL"   value=""/>
+   <property name="DEBUGLEVEL"   value="_0"/>
    <property name="STATIC"       value=""/>  
 
 
@@ -76,10 +75,16 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 	       <ocn ranks="64" threads="1"   layout = "8,8"   io_layout = "1,2" mask_table="MOM_mask_table"/>
 	     </resources>
    </freInclude>
-   <freInclude name="resourceparams_O">
+   <freInclude name="resourceparams_O64x2">
 	     <resources jobWallclock="00:30:00">
-	       <ice                        layout = ""   io_layout = "1,4" mask_table="MOM_mask_table"/>
-	       <ocn ranks="" threads="1"   layout = ""   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	       <ice                        layout = "8,8"   io_layout = "1,2" mask_table="MOM_mask_table"/>
+	       <ocn ranks="64" threads="2"   layout = "8,8"   io_layout = "1,2" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_O72">
+	     <resources jobWallclock="00:30:00">
+	       <ice                        layout = "9,8"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	       <ocn ranks="72" threads="1"   layout = "9,8"   io_layout = "1,4" mask_table="MOM_mask_table"/>
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_O128">
@@ -120,13 +125,13 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
    </freInclude>
 
    <freInclude name="resourceparams_O256">
-	     <resources jobWallclock="01:00:00">
+	     <resources jobWallclock="01:30:00">
 	       <ice                           layout = "16,16"   io_layout = "1,4" mask_table="MOM_mask_table"/>
 	       <ocn ranks="256" threads="1"   layout = "16,16"   io_layout = "1,4" mask_table="MOM_mask_table"/>
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_O256x2">
-	     <resources jobWallclock="01:00:00">
+	     <resources jobWallclock="00:30:00">
                <atm  ranks="0" threads="2"/>
 	       <ice                           layout = "16,16"   io_layout = "1,4" mask_table="MOM_mask_table"/>
 	       <ocn ranks="256" threads="2"   layout = "16,16"   io_layout = "1,4" mask_table="MOM_mask_table"/>
@@ -165,13 +170,13 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_O512">
-	     <resources jobWallclock="01:00:00">
+	     <resources jobWallclock="00:20:00">
 	       <ice                           layout = "32,16"   io_layout = "1,4" mask_table="MOM_mask_table"/>
 	       <ocn ranks="512" threads="1"   layout = "32,16"   io_layout = "1,4" mask_table="MOM_mask_table"/>
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_O512x2">
-	     <resources jobWallclock="01:00:00">
+	     <resources jobWallclock="00:20:00">
                <atm  ranks="0" threads="2"/>
 	       <ice                           layout = "32,16"   io_layout = "1,4" mask_table="MOM_mask_table"/>
 	       <ocn ranks="512" threads="2"   layout = "32,16"   io_layout = "1,4" mask_table="MOM_mask_table"/>
@@ -1365,6 +1370,45 @@ Make the executable for ocean-ice experiments.
       </component>
    </experiment>
 
+   <experiment name="MOM6_SIS2_compile_symmetric" inherit="MOM6_SIS2_compile">
+      <component paths="shared" name="fms" includeDir="$root/$(LIBS_ROOT)/src/shared/include">
+         <library path="$(MY_LIBS)/fms/libfms.a" headerDir="$(MY_LIBS)/fms"/>
+      </component>
+      <component name="land_null" paths="land_null" requires="fms">
+         <library path="$(MY_LIBS)/land_null/libland_null.a" headerDir="$(MY_LIBS)/land_null"/>
+      </component>
+      <component name="atmos_null" paths="atmos_null atmos_param" requires="fms">
+          <library path="$(MY_LIBS)/atmos_null/libatmos_null.a" headerDir="$(MY_LIBS)/atmos_null"/>
+      </component>
+      <component paths="icebergs" requires="fms" name="icebergs">
+         <library path="$(MY_LIBS)/icebergs/libicebergs.a" headerDir="$(MY_LIBS)/icebergs"/>
+      </component> 
+      <component paths="sis2" requires="fms icebergs" name="sis2">
+         <library path="$(MY_LIBS)/sis2/libsis2.a" headerDir="$(MY_LIBS)/sis2"/>
+      </component>
+      <component name="mom6_symmetric" requires="fms" paths="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/config_src/dynamic_symmetric $root/$(LIBS_ROOT)/src/mom6/src/MOM6/config_src/coupled_driver $root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/*/ $root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/*/*/ $root/$(LIBS_ROOT)/src/ocean_shared/generic_tracers $root/$(LIBS_ROOT)/src/ocean_shared/mocsy/src">
+       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
+        <csh><![CDATA[
+          \rm -rf ocean_null
+          echo "No need to checkout any new source code for this component!" 
+        ]]></csh>
+         </source>
+         <compile>
+            <cppDefs><![CDATA[ $(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+         </compile>
+      </component>
+
+      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6_symmetric icebergs">
+         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
+         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+            <codeBase version="$(RELEASE)"> coupler.git </codeBase>
+         </source>
+         <compile>
+            <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+         </compile>
+      </component>
+   </experiment>
    <experiment name="MOM6_SIS2_compile_static_90x45" inherit="MOM6_SIS2_compile">
       <component paths="shared" name="fms" includeDir="$root/$(LIBS_ROOT)/src/shared/include">
          <library path="$(MY_LIBS)/fms/libfms.a" headerDir="$(MY_LIBS)/fms"/>
@@ -1423,6 +1467,9 @@ if ( $currentSeg == 1 ) then
    set restart_flag = 'n'
 else
    set restart_flag = 'r'
+   #Because of a technical issue FRE does not delete old uncombined restarts before copying the new ones for the next segment
+   #The INPUT/ ends up with inconsistent restart files which at best cause the model to crash right away.
+   if(-e $work/INPUT/MOM.res.nc.0000 ) \rm -rf $work/INPUT/MOM.res*.nc
 endif
 
 ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc 
@@ -1755,23 +1802,6 @@ endif
          parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_saltrestore','INPUT/MOM_override'
      </namelist>
 
-     <csh type="always"><![CDATA[
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-   #Because of a technical issue FRE does not delete old uncombined restarts before copying the new ones for the next segment
-   #The INPUT/ ends up with inconsistent restart files which at best cause the model to crash right away.
-   if(-e $work/INPUT/MOM.res.nc.0000 ) \rm -rf $work/INPUT/MOM.res*.nc
-endif
-
-ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc 
-
-touch $work/INPUT/MOM_override
-touch $work/INPUT/SIS_override
-
-      ]]></csh>
- 
      </input>
 
    </freInclude>
@@ -1790,11 +1820,6 @@ touch $work/INPUT/SIS_override
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/SIS_input</dataSource>
      </dataFile>
 
-<!-- No init ice yet
-     <dataFile label="input" target="INPUT/ice_model.res.nc" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/.datasets/OM4_025/INPUT/ice_model.res.v20140620.nc</dataSource>
-     </dataFile>
--->
      <namelist name="SIS_input_nml" >
          output_directory = './',
          input_filename = '$restart_flag'
@@ -2163,8 +2188,9 @@ touch $work/INPUT/SIS_override
       <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4_c96L33_am4p0_1850_30d15_tlt_dyn_veg_SAI_combined_01410101.tar</dataSource> FAIL
       <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4_c96L33_am4p0_2010_30d15_tlt_725_01210101.tar</dataSource> FAIL
       <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4_c96L33_am4p0_2010_30d15_tlt_725_01210101.tar</dataSource>
+      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_806_from450_combined_06310101.tar</dataSource> Crash
       -->
-      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_806_from450_combined_06310101.tar</dataSource>
+      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/answers/warsaw_mom6_2017.06.12_answers/CM4_c96L33_am4p0_2010_30d15_tlt.2017.06.12/ncrc3.intel16-prod-openmp/archive/1x1m0d_216x2a_1756x1o/restart/00010201.tar</dataSource>
      </dataFile>
 
     </input>
@@ -3684,6 +3710,10 @@ cd $work/INPUT
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_BLING</dataSource>
      </dataFile>
+     <diagTable order="append">
+         "ocean_model_z", "volcello",     "volcello",         "ocean_day_z",      "all", "mean", "none",2 # Cell measure for 3d data
+         "ocean_model",   "volcello",     "volcello",         "ocean_day",        "all", "mean", "none",2 # Cell measure for 3d data
+     </diagTable>
      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">                   
         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/field_table</dataSource>
      </dataFile>                                                                                     
@@ -4191,6 +4221,10 @@ cd $work/INPUT
 
    </input>
 
+   <runtime>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_128x1o/restart/19700201.tar"/>
+      <reference restart="$(archiveDir)/../../$(platform)-prod/archive/1x1m0d_128x1o/restart/00010201.tar"/>
+   </runtime>
    </experiment>
 
    <!--****************************************************************************************-->
@@ -4716,6 +4750,17 @@ SIS_OVERRIDE_EOF
 
       <regression name="debugomp">
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512x2']/node())"/> </run>
+      </regression>
+
+      <regression name="timing">
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O842p5']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1057p5']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1608p5']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O2783p5']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O3314p5']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O3925p5']/node())"/> </run>
+
       </regression>
 
       <regression name="timings">
@@ -6604,6 +6649,354 @@ dissi14cabio_valid_min = 0.0
       </component>
 
      </postProcess>
+  </freInclude>
+
+<experiment name="SPEAR_o1_CORE2_OM4" inherit="MOM6_SIS2_compile_symmetric">
+  <description>
+ For Core2: change ocean_albedo, monin obukhov 
+ Recompile without land and atmos
+  10/16/2017
+  The baseline 1850 Control run of SPEAR at c96 atmospheric resolution.
+  The "bridge" run to create land usage partitioning for 1850 and 2010 left the biomass associated with those regions in 1850-era conditions.
+  Therefore an extra spinup of 150 years was performed to equilibrate the land with the CO2 forcing of the appropriate model
+  The initial condition for SPEAR is formed from
+     atmos : Year  21/1/1 of the spinup run (LOAR4_c96L33_am4p0_1850climo_H07)
+     ice   : Year  21/1/1 of the spinup run (LOAR4_c96L33_am4p0_1850climo_H07)
+     land  : Year 151/1/1 of the spinup run (LOAR4_c96L33_am4p0_1850climo_H07)
+     ocean : World Ocean Atlas.
+  Postprocessing will take place at intervals of 10, 100 and 1000 years.
+  </description>
+  <input>
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1948,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'NOLEAP',
+       dt_cpld  = 3600,
+       dt_atmos = 3600,
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.false. 
+       check_stocks=0
+     </namelist>
+          <namelist name="sat_vapor_pres_nml">
+      construct_table_wrt_liq = .true.,
+      construct_table_wrt_liq_and_ice = .true.,
+     </namelist>
+
+      <namelist name="xgrid_nml">
+        make_exchange_reproduce = .true.
+        interp_method = 'second_order'
+      </namelist> 
+       <namelist name="ocean_albedo_nml">
+      ocean_albedo_option = 2 
+      </namelist>
+       <namelist name="ice_albedo_nml">
+            t_range = 10.
+      </namelist>
+       <namelist name="ocean_rough_nml">
+            rough_scheme = 'beljaars'
+       </namelist>
+       <namelist name="monin_obukhov_nml">
+            neutral = .true.
+        </namelist>
+      <namelist name="atmos_model_nml">
+        nxblocks = 1
+        nyblocks = $atm_threads
+	layout=0,0
+      </namelist>
+      <namelist name="flux_exchange_nml">
+            debug_stocks = .FALSE.
+            divert_stocks_report = .TRUE.            
+            do_area_weighted_flux = .FALSE. 
+     </namelist>
+      <namelist name="surface_flux_nml">
+            ncar_ocean_flux = .true.
+	    raoult_sat_vap = .true.
+     </namelist>      
+
+      <namelist name="fms_io_nml">
+        threading_read  = 'multi',
+        max_files_r = 200,
+        max_files_w = 200,
+        checksum_required =.false.
+      </namelist>
+      <namelist name="fms_nml">
+            clock_grain='ROUTINE'
+            clock_flags='NONE'
+            domains_stack_size = 8000000
+            stack_size =0
+      </namelist>
+
+     <namelist name="icebergs_nml">
+        make_calving_reproduce=.TRUE.
+        really_debug=.FALSE.
+        debug=.FALSE.
+        verbose=.FALSE.
+        verbose_hrs=7200
+        use_operator_splitting=.TRUE.
+        bergy_bit_erosion_fraction=0.0
+        sicn_shift=0.1
+        parallel_reprod=.TRUE.
+        traj_sample_hrs=0
+        add_weight_to_ocean=.false.
+force_all_pes_traj = .true.
+     </namelist>
+     <namelist name="diag_manager_nml">
+        mix_snapshot_average_fields = .false.,
+        max_input_fields = 800,
+        max_output_fields = 1500
+        max_axes = 100
+        max_num_axis_sets = 50
+        max_files = 40
+        issue_oor_warnings = .false.
+        max_axis_attributes=4
+     </namelist>
+ 
+
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_common']/input/node())"/> 
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='FLOR2_MOM6_data']/input/node())"/> 
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='MOM6_1deg_data']/input/node())"/>
+      <!--SIS Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='SIS2_1deg_data']/input/node())"/>
+      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">                   
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_icebergs/field_table</dataSource>
+      </dataFile>                                                                                     
+
+      <diagTable>
+$name
+$baseDate
+      </diagTable>
+
+      <!--CORE forcing datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='CORE2_data']/input/node())"/>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/unswept/Amy.Langenhorst/CORE/IAF_v2.0/runoff.daitren.iaf.1948-2007.regridded.nc</dataSource>
+      </dataFile>
+
+      <dataTable>
+"ATM" , "p_surf"        , "SLP"         , "./INPUT/slp.1948-2007.nomads.nc"          , "bilinear" ,  1.0
+"ATM" , "p_bot"         , "SLP"         , "./INPUT/slp.1948-2007.nomads.nc"          , "bilinear" ,  1.0
+"ATM" , "t_bot"         , "T_10_MOD"    , "./INPUT/t_10_mod.1948-2007.nomads.nc"     , "bilinear" ,  1.0
+"ATM" , "sphum_bot"     , "Q_10_MOD"    , "./INPUT/q_10_mod.1948-2007.nomads.nc"     , "bilinear" ,  1.0
+"ATM" , "u_bot"         , "U_10_MOD"    , "./INPUT/u_10_mod.1948-2007.nomads.nc"     , "bicubic",   1.0
+"ATM" , "v_bot"         , "V_10_MOD"    , "./INPUT/v_10_mod.1948-2007.nomads.nc"     , "bicubic",   1.0
+"ATM" , "z_bot"         , ""            , ""                                         , "bilinear" , 10.0
+"ATM" , "gust"          , ""            , ""                                         , "bilinear" ,  1.0e-4
+"ICE" , "lw_flux_dn"    , "LWDN_MOD"    , "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  1.0
+"ICE" , "sw_flux_vis_dir_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.285
+"ICE" , "sw_flux_vis_dif_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.285
+"ICE" , "sw_flux_nir_dir_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.215
+"ICE" , "sw_flux_nir_dif_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.215
+"ICE" , "lprec"         , "RAIN"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
+"ICE" , "fprec"         , "SNOW"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933/
+#"ICE" , "runoff"        , "runoff"      , "./INPUT/runoff.daitren.iaf.1948-2007.regridded.nc", "none" ,  1.0
+"ICE" , "runoff"        , ""            , ""                             , "none"  ,  0.0
+"ICE" , "calving"       , ""            , ""                             , "none"  ,  0.0
+"ICE" , "dhdt"          , ""            , ""                             , "none"  , 80.0
+"ICE" , "dedt"          , ""            , ""                             , "none"  ,  2.0e-6
+"ICE" , "drdt"          , ""            , ""                             , "none"  ,  10.0
+"LND" , "t_surf"        , ""            , ""                             , "none"  ,  273.0
+"LND" , "t_ca"          , ""            , ""                             , "none"  ,  273.0
+"LND" , "q_ca"          , ""            , ""                             , "none"  ,  0.0
+"LND" , "rough_mom"     , ""            , ""                             , "none"  ,  0.01
+"LND" , "rough_heat"    , ""            , ""                             , "none"  ,  0.1
+"LND" , "albedo"        , ""            , ""                             , "none"  ,  0.1
+#"LND" , "t_ca"         , ""            , ""                             , "none"  ,  273.0
+#"LND" , "t_surf"       , ""            , ""                             , "none"  ,  273.0
+"LND" , "sphum_surf"    , ""            , ""                             , "none"  ,  0.0
+"LND" , "sphum_ca"      , ""            , ""                             , "none"  ,  0.0
+"LND" , "t_flux"        , ""            , ""                             , "none"  ,  0.0
+"LND" , "sphum_flux"    , ""            , ""                             , "none"  ,  0.0
+"LND" , "lw_flux"       , ""            , ""                             , "none"  ,  0.0
+"LND" , "sw_flux"       , ""            , ""                             , "none"  ,  0.0
+"LND" , "lprec"         , ""            , ""                             , "none"  ,  0.0
+"LND" , "fprec"         , ""            , ""                             , "none"  ,  0.0
+"LND" , "dhdt"          , ""            , ""                             , "none"  ,  5.0
+"LND" , "dedt"          , ""            , ""                             , "none"  ,  2e-6
+"LND" , "dedq"          , ""            , ""                             , "none"  ,  0.0
+"LND" , "drdt"          , ""            , ""                             , "none"  ,  5.0
+"LND" , "drag_q"        , ""            , ""                             , "none"  ,  0.0
+"LND" , "p_surf"        , ""            , ""                             , "none"  ,  1.e5
+      </dataTable>
+      <dataFile label="input" target="INPUT/KH_background_2d.nc">
+         /lustre/f1/unswept/William.Cooke/MOM6_datasets/Kh_BG_2D/Kh_background_1e4_50to90ns.nc
+      </dataFile>
+
+      <dataFile label="input" target="INPUT/">
+         /autofs/mnt/ncrc-svm1_home2/William.Cooke/decadal/topo_edits_033016a.nc
+      </dataFile>
+
+         <csh><![CDATA[
+touch $work/INPUT/MOM_override
+
+cat > $work/INPUT/MOM_override << EOF
+NUM_DIAG_COORDS = 2             ! default = 1
+                                ! The number of diagnostic vertical coordinates to use.
+                                ! For each coordinate, an entry in DIAG_COORDS must be provided.
+DIAG_COORDS = "z Z ZSTAR", "rho2 RHO2 RHO" !
+
+DIAG_COORD_DEF_RHO2 = "RFNC1:35,999.5,1028,1028.5,8.,1038.,0.0078125" ! default = "WOA09"
+                                ! Determines how to specify the coordinate
+                                ! resolution. Valid options are:
+                                !  PARAM       - use the vector-parameter DIAG_COORD_RES_RHO2
+                                !  UNIFORM[:N] - uniformly distributed
+                                !  FILE:string - read from a file. The string specifies
+                                !                the filename and variable name, separated
+                                !                by a comma or space, e.g. FILE:lev.nc,dz
+                                !                or FILE:lev.nc,interfaces=zw
+                                !  WOA09[:N]   - the WOA09 vertical grid (approximately)
+                                !  FNC1:string - FNC1:dz_min,H_total,power,precision
+                                !  HYBRID:string - read from a file. The string specifies
+                                !                the filename and two variable names, separated
+                                !                by a comma or space, for sigma-2 and dz. e.g.
+                                !                HYBRID:vgrid.nc,sigma2,dz
+
+USE_LAND_MASK_FOR_HVISC = True  !   [Boolean] default = False
+                                ! If true, use Use the land mask for the computation of thicknesses
+                                ! at velocity locations. This eliminates the dependence on arbitrary
+                                ! values over land or outside of the domain. Default is False in order to
+                                ! maintain answers with legacy experiments but should be changed to True
+                                ! for new experiments.
+EOF
+
+    ]]></csh>
+  </input>
+   <runtime>   
+     <production simTime="$(PROD_SIMTIME)" units="years">
+        <segment simTime="12" units="months"/>
+        <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O128p']/node())"/>
+      </production>
+      <regression name="basic">
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
+      </regression>
+      <regression name="rts">
+        <run days="15 16" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O64']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O72']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O64x2']/node())"/> </run>
+      </regression>
+      <regression name="debug">
+        <run days="2"   > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O64']/node())"/> </run>
+        <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O64']/node())"/> </run>
+      </regression>
+
+   </runtime>
+</experiment>
+  <freInclude name="FLOR2_MOM6_data">
+    <input>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/land_ice_ocean_LM3_SIS2/OM_360x320_C180/INPUT/layer_coord.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/land_ice_ocean_LM3_SIS2/OM_360x320_C180/INPUT/seawifs_1998-2006_smoothed_2X.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/land_ice_ocean_LM3_SIS2/OM_360x320_C180/INPUT/tidal_amplitude.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/land_ice_ocean_LM3_SIS2/OM_360x320_C180/INPUT/MOM_channels_FLOR</dataSource>
+      </dataFile>
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+          <dataSource site="ncrc">/lustre/f1/unswept/Matthew.Harrison/MOM6_datasets/FLOR2/diag_vgrid.nc</dataSource>
+          <dataSource site="gfdl">/archive/William.Cooke/gold/datasets/FLOR2/diag_vgrid.nc</dataSource>
+      </dataFile>
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/WOA05_pottemp_salt.nc </dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/unswept/Matthew.Harrison/MOM6_datasets/FLOR2/edits_012016.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/unswept/Matthew.Harrison/MOM6_datasets/FLOR2/edits_013016a.nc</dataSource>
+      </dataFile>
+    </input>
+  </freInclude>
+
+  <freInclude name="SIS2_1deg_data">
+    <input>
+     <dataFile label="input" target="INPUT/SIS_input" chksum="" size="" timestamp="">
+         <dataSource site="ncrc">/lustre/f1/unswept/William.Cooke/MOM6_datasets/LOAR4/SIS_input_C39_init</dataSource>
+     </dataFile>
+<!--
+     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/land_ice_ocean_LM3_SIS2/OM_360x320_C180/SIS_input</dataSource>
+     </dataFile>
+-->
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = '$restart_flag'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_diurnal','INPUT/SIS_override'
+     </namelist>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+     </dataFile>
+
+     </input>
+  </freInclude>
+
+  <freInclude name="MOM6_1deg_data">
+    <input>
+
+      <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/mosaic_ocean.360x320.tar</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/MOM_input" chksum="" size="" timestamp="">
+         <dataSource site="ncrc">/lustre/f1/unswept/William.Cooke/MOM6_datasets/LOAR4/MOM_input_C39_init</dataSource>
+      </dataFile>
+<!-- 
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/land_ice_ocean_LM3_SIS2/OM_360x320_C180/MOM_input</dataSource>
+      </dataFile>
+-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = '$restart_flag'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override'
+     </namelist>
+
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
+      </dataFile>
+      <diagTable order="append">
+# MOM6 ocean diagnostics only used in a CORE/OMIP (no interactive atmos). 
+# These terms provide diagnostics for the surface salinity / fresh water restoring. 
+ "ocean_model", "vprec",              "vprec",              "ocean_annual", "all", "mean", "none",2
+ "ocean_model", "salt_flux_restore",  "salt_flux_restore",  "ocean_annual", "all", "mean", "none",2
+
+ "ocean_model", "vprec",              "vprec",              "ocean_month", "all", "mean", "none",2
+ "ocean_model", "salt_flux_restore",  "salt_flux_restore",  "ocean_month", "all", "mean", "none",2
+      </diagTable>
+
+     </input>
   </freInclude>
 
 </experimentSuite>
