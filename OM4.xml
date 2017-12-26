@@ -2157,6 +2157,25 @@ endif
 
   <experiment name="OM4_initCond" inherit="OM4_SIS2_baseline">
     <input>
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'NOLEAP',
+       dt_cpld  = 1800,
+       dt_atmos = 1800,
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.false. 
+     </namelist>
      <!--There is  MOM6/SIS2 restart provided in initCond.-->
      <namelist name="MOM_input_nml" >
          output_directory = './',
@@ -2193,6 +2212,9 @@ endif
       <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/answers/warsaw_mom6_2017.06.12_answers/CM4_c96L33_am4p0_2010_30d15_tlt.2017.06.12/ncrc3.intel16-prod-openmp/archive/1x1m0d_216x2a_1756x1o/restart/00010201.tar</dataSource>
      </dataFile>
 
+      <namelist name="frecheck_nml"><!--this nml is needed only for frecheck to work. It is not needed and does not affect the model run in any way-->
+          start_date =  0001,02,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
+      </namelist>
     </input>
   </experiment>
 
@@ -2496,7 +2518,7 @@ OVERRIDE_EOF
    </input>
     <runtime>
       <reference restart="$(REFERENCE)/archive/1x1m0d_1756x1o/restart/19480201.tar"/>
-      <reference restart="$(archiveDir)/../../$(platform)-prod/archive/1x1m0d_1756x1o/restart/19480201.tar"/>
+      <reference restart="$(archiveDir)/../../$(platform)-prod-openmp/archive/1x1m0d_1756x1o/restart/19480201.tar"/>
     </runtime>
    </experiment>
 
