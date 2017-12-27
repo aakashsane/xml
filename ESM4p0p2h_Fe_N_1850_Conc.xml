@@ -659,7 +659,10 @@ Experiment to build executable.
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)"> atmos_shared.git atmos_param.git </codeBase>
           <csh><![CDATA[
-            ( cd atmos_shared && git checkout  user/lwh/o3s_e90 )
+           # ( cd atmos_shared && git checkout  user/lwh/o3s_e90 )
+           #merged in with Nitrogen deposition flux development
+            ( cd atmos_shared && git fetch && git checkout  08656534 ) 
+            ( cd atmos_param  && git fetch && git checkout  c5e7c5a3 )
            ]]>
           </csh>
       </source>
@@ -724,8 +727,12 @@ Experiment to build executable.
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
           popd
-
-
+########################################################################
+#updates needed to run new experiments.
+#Remove this block when the updates are absorbed and tagged
+(cd ocean_shared  && git fetch && git checkout user/nnz/cas_geotherm_cobalt_updates && git submodule init && git submodule update)
+(cd mom6/src/MOM6 && git remote add nikifork https://github.com/nikizadehgfdl/MOM6.git && git fetch nikifork && git checkout nikifork/user/nikizadehgfdl/esm4_runoff_iron_and_geothermal_flux)
+########################################################################
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
           if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
