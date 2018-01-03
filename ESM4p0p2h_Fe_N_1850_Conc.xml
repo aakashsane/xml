@@ -96,7 +96,7 @@ NOTES:
   <property name="MOM6_GIT_TAG"   value="om4/v1.0.1"/>              <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20171106"/> <!-- git tag for ocean_shared source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG"   value="user/pag/lm4_dust"/>       <!-- git tag for LAND_LAD2 source code -->  
+  <property name="LAND_GIT_TAG"   value="snow_on_glacier_20180103_slm"/>       <!-- git tag for LAND_LAD2 source code -->  
   <property name="FRE_STEM"       value="$(RELEASE)_om4v1.0.1_esm4"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -1055,7 +1055,6 @@ Experiment to build executable.
         </timeSeries>
         <!-- changed to CHUNK_A only -->
         <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)">
-	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh"/>
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAve/*)">
             <xi:fallback/>
           </xi:include>
@@ -8865,6 +8864,48 @@ endif
 ##. dry deposition rate of nh4, kg m-2 s-1 (longitude,latitude,time)
  "tracers",       "nh4_ddep_kg_m2_s", "drynh4",        "atmos_dust_sample",      "all",  .true.,  "none", 2
       </diagTable> 
+   </input>
+  </experiment>
+
+  <experiment name="ESM4p0p2h_1850C_PIpcairco2_dust_iron_nitrogen_snow_on_glacier" inherit="ESM4p0p2h_1850C_PIpcairco2_dust_iron_nitrogen">
+    <input>
+       <namelist name="glac_data_nml">
+       use_lm2_awc = .true.,
+       rsa_exp_global = 10.,
+       f_iso_cold = 0.92, 0.58
+       f_vol_cold = 0.06, 0.08
+       f_geo_cold = 0.00, 0.00
+       f_iso_warm = 0.92, 0.58
+       f_vol_warm = 0.06, 0.08
+       f_geo_warm = 0.00, 0.00
+       dat_emis_dry = 1.,
+       dat_emis_sat = 1.,
+       geothermal_heat_flux_constant = 0.065
+      </namelist>
+
+       <namelist name="snow_data_nml">
+        emis_snow_max = 1.
+        emis_snow_min = 1.
+        z0_momentum = 0.01
+        num_l = 5
+        dz = 0.05, 0.2, 0.5, 0.2, 0.05, 0.0, 0.0, 0.0, 0.0, 0.0
+        f_iso_cold = 0.92, 0.58
+        f_vol_cold = 0.06, 0.08
+        f_geo_cold = 0.00, 0.00
+        f_iso_warm = 0.77, 0.43
+        f_vol_warm = 0.06, 0.08
+        f_geo_warm = 0.00, 0.00
+        depth_crit = 0.0125
+        thermal_cond_ref = 0.09
+        distinct_snow_on_glacier = .TRUE.
+        f_iso_cold_on_glacier = 0.92, 0.68
+        f_vol_cold_on_glacier = 0.06, 0.08
+        f_geo_cold_on_glacier = 0.00, 0.00
+        f_iso_warm_on_glacier = 0.77, 0.43
+        f_vol_warm_on_glacier = 0.06, 0.08
+        f_geo_warm_on_glacier = 0.00, 0.00
+      </namelist>
+
    </input>
   </experiment>
 </experimentSuite>
