@@ -73,14 +73,14 @@ NOTES:
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
-  <property name="MOM6_DATE"      value="2017.10.19"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="om4/v1.0.1"/>              <!-- git tag for MOM6 source code -->
+  <property name="MOM6_DATE"      value="20171222"/>                <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="om4/v1.0.4"/>              <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20171106"/> <!-- git tag for ocean_shared source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>              <!-- git tag for LAND_LAD2 source code -->  
-  <property name="FRE_STEM"       value="$(RELEASE)_om4v1.0.1"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_o"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS"   value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
                                                                     <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
@@ -607,6 +607,14 @@ NOTES:
                <atm ranks="432" threads="2"    layout = "3,24"   io_layout = "1,4" />
                <lnd                            layout = "3,24"   io_layout = "1,4" />
                <ice                            layout = "144,3"  io_layout = "1,3" />
+               <ocn ranks="4671" threads="1"   layout = "90,72"  io_layout = "1,4" mask_table="mask_table.1809.90x72"/>
+             </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A576x2_O4671_production">
+             <resources jobWallclock="16:00:00" segRuntime="2:30:00">
+               <atm ranks="576" threads="2"    layout = "8,12"   io_layout = "1,4" />
+	       <lnd                            layout = "8,12"   io_layout = "1,4" />
+	       <ice                            layout = "144,4"  io_layout = "1,4" />
                <ocn ranks="4671" threads="1"   layout = "90,72"  io_layout = "1,4" mask_table="mask_table.1809.90x72"/>
              </resources>
    </freInclude>
@@ -1992,7 +2000,7 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
 <!--=======================-->
 <!--= CM4 EXPERIMENTS     =-->
 <!--=======================-->
-  <experiment name="CM4_c96L33_am4p0_2010_30d15_tlt_initCond" inherit="CM4_c96L33_am4p0_2010_30d15_tlt">
+  <experiment name="CM4_c96L33_am4p0_2010_base_initCond" inherit="CM4_c96L33_am4p0_2010_base">
     <input>
      <!--There is  MOM6/SIS2 restart provided in initCond.-->
      <namelist name="MOM_input_nml" >
@@ -2024,8 +2032,8 @@ http://cobweb.gfdl.noaa.gov/~cjg/awg
     </input>
   </experiment>
 
-  <experiment name="CM4_c96L33_am4p0_2010_30d15_tlt.$(MOM6_DATE)" inherit="CM4_c96L33_am4p0_2010_30d15_tlt"/>
-  <experiment name="CM4_c96L33_am4p0_2010_30d15_tlt" inherit="cm4_sis2_compile">
+  <experiment name="CM4_c96L33_am4p0_2010_base.$(MOM6_DATE)" inherit="CM4_c96L33_am4p0_2010_base"/>
+  <experiment name="CM4_c96L33_am4p0_2010_base" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"CM4_c96L33_am4p0"</model>
@@ -2095,15 +2103,7 @@ For more information please refer to the
 
       <csh><![CDATA[
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-! Geothermal heating
-#override DO_GEOTHERMAL = False
-#override KD = 2.0E-05
-!preserve 2017.07.05 answers see MOM6 commit 970af50ff
-#override BT_USE_OLD_CORIOLIS_BRACKET_BUG=True
-!old parameters to reproduce 2017.07.05 answers 
-#override FOX_KEMPER_ML_RESTRAT_COEF = 15.0
-#override MLE_FRONT_LENGTH = 0.0
-
+! Intentionally blank since MOM-examples MOM_input has all need changes for CMIP6
 MOM_OVERRIDE_EOF
      ]]></csh>
     </input>
@@ -2111,7 +2111,7 @@ MOM_OVERRIDE_EOF
     <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
-          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O3782_production']/node())"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O4671_production']/node())"/>
       </production>
       <regression name="basic">
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1756']/node())"/> </run>
@@ -2159,27 +2159,51 @@ MOM_OVERRIDE_EOF
 
   </experiment>
 
-  <experiment name="CM4_c96L33_am4p0_2010_30d15_tlt_geo_kd15" inherit="CM4_c96L33_am4p0_2010_base"/>
-  <experiment name="CM4_c96L33_am4p0_2010_base" inherit="CM4_c96L33_am4p0_2010_30d15_tlt">
+  <experiment name="CM4_c96L33_am4p0_2010_dt" inherit="CM4_c96L33_am4p0_2010_base">
     <input>
       <csh><![CDATA[
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-! Geothermal heating
-#override DO_GEOTHERMAL = True
-#override GEOTHERMAL_FILE = "geothermal_davies2013_v1.nc"
-#override GEOTHERMAL_SCALE = 1.0
-#override GEOTHERMAL_VARNAME = "geothermal_hf"
-! Kd = 1.5e-5
-#override KD = 1.5E-5
-!preserve 2017.07.05 answers see MOM6 commit 970af50ff
-#override BT_USE_OLD_CORIOLIS_BRACKET_BUG=True
-
+! Changed for efficiency
+#override DT_THERM = 7200.0
 MOM_OVERRIDE_EOF
      ]]></csh>
     </input>
   </experiment>
 
-  <experiment name="CM4_c96L33_am4p0_1850_30d15_tlt" inherit="CM4_c96L33_am4p0_2010_30d15_tlt">
+  <experiment name="CM4_c96L33_am4p0_2010_glac" inherit="CM4_c96L33_am4p0_2010_dt">
+    <input>
+      <namelist name="glac_data_nml">
+        use_lm2_awc = .true.,
+        rsa_exp_global = 10.,
+        f_iso_cold = 0.92, 0.73
+        f_vol_cold = 0.06, 0.08
+        f_geo_cold = 0.00, 0.00
+        f_iso_warm = 0.92, 0.73
+        f_vol_warm = 0.06, 0.08
+        f_geo_warm = 0.00, 0.00
+        dat_emis_dry = 1.,
+        dat_emis_sat = 1.,
+        geothermal_heat_flux_constant = 0.065
+      </namelist>
+      <namelist name="snow_data_nml">
+        emis_snow_max = 1.
+        emis_snow_min = 1.
+        z0_momentum = 0.01
+        num_l = 5
+        dz = 0.05, 0.2, 0.5, 0.2, 0.05, 0.0, 0.0, 0.0, 0.0, 0.0
+        f_iso_cold = 0.92, 0.68
+        f_vol_cold = 0.06, 0.08
+        f_geo_cold = 0.00, 0.00
+        f_iso_warm = 0.77, 0.43
+        f_vol_warm = 0.06, 0.08
+        f_geo_warm = 0.00, 0.00
+        depth_crit = 0.0125
+        thermal_cond_ref = 0.09
+      </namelist>
+    </input>
+  </experiment>
+
+  <experiment name="CM4_c96L33_am4p0_1850_base" inherit="CM4_c96L33_am4p0_2010_base">
     <input>
       <namelist name="photosynthesis_nml">
        photosynthesis_to_use = 'leuning'
@@ -2216,7 +2240,7 @@ MOM_OVERRIDE_EOF
   </experiment>
 
 
-  <experiment name="CM4_c96L33_am4p0_1850_30d15_tlt_4XCO2" inherit="CM4_c96L33_am4p0_1850_30d15_tlt">
+  <experiment name="CM4_c96L33_am4p0_1850_base_4XCO2" inherit="CM4_c96L33_am4p0_1850_base">
     <input>
       <namelist name="radiative_gases_nml">
       use_co2_10um = .true.
