@@ -91,15 +91,15 @@ NOTES:
 
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
-  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
+  <property name="SHARED_GIT_TAG" value="user/nnz/fabien_Nitrogen_MW"/>              <!-- git tag for shared source code -->
   <property name="MOM6_DATE"      value="2017.10.19"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="om4/v1.0.1"/>              <!-- git tag for MOM6 source code -->
-  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20171106"/> <!-- git tag for ocean_shared source code -->
+  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180109"/> <!-- git tag for ocean_shared source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
   <property name="LAND_GIT_TAG"   value="snow_on_glacier_20180103_slm"/>       <!-- git tag for LAND_LAD2 source code -->  
-  <property name="FRE_STEM"       value="fms/ESM4/$(RELEASE)/20180104"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="fms/ESM4/$(RELEASE)/20180112"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_m"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
@@ -645,7 +645,7 @@ Experiment to build executable.
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
             <codeBase version="$(RELEASE)"> shared.git </codeBase>
       	    <csh><![CDATA[
-              ( cd shared && git checkout $(SHARED_GIT_TAG) )
+              ( cd shared && git checkout user/nnz/fabien_Nitrogen_MW ) #PR 136
               ]]>
             </csh>
       </source>
@@ -659,10 +659,8 @@ Experiment to build executable.
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(RELEASE)"> atmos_shared.git atmos_param.git </codeBase>
           <csh><![CDATA[
-           # ( cd atmos_shared && git checkout  user/lwh/o3s_e90 )
-           #merged in with Nitrogen deposition flux development
-            ( cd atmos_shared && git fetch && git checkout  08656534 ) 
-            ( cd atmos_param  && git fetch && git checkout  c5e7c5a3 )
+            ( cd atmos_shared && git fetch && git checkout  user/f1p/so2_het )  #PR 69
+            ( cd atmos_param  && git fetch && git checkout  user/f1p/n_update ) #PR 75
            ]]>
           </csh>
       </source>
@@ -730,7 +728,6 @@ Experiment to build executable.
 ########################################################################
 #updates needed to run new experiments.
 #Remove this block when the updates are absorbed and tagged
-(cd ocean_shared  && git fetch && git checkout user/nnz/cas_geotherm_cobalt_updates && git submodule init && git submodule update)
 (cd mom6/src/MOM6 && git remote add nikifork https://github.com/nikizadehgfdl/MOM6.git && git fetch nikifork && git checkout nikifork/user/nikizadehgfdl/esm4_runoff_iron_and_geothermal_flux)
 ########################################################################
           pushd mom6
@@ -2591,6 +2588,7 @@ Add interactive dust emissions
         gNO2 = 1e-5
         gNH3 = 0.,
         time_varying_solarflux = .false.
+	gSO2_dynamic = 'zheng2015'
       </namelist>
 
       <namelist name ="uw_closure_nml">
@@ -3154,18 +3152,10 @@ Add interactive dust emissions
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override SMAGORINSKY_KH = True
 #override SMAG_LAP_CONST = 0.15
-#override KH_RES_SCALE_COEF = 1.0
-#override KH_RES_FN_POWER = 100
-#override MEKE_VISCOSITY_COEFF = 1.0
-#override VISC_RES_FN_POWER = 100
-#override VISC_RES_SCALE_COEF = 1.0
-#override MEKE_KHTR_FAC = 0.3
-#override KH = 0.0
-#override KHTR = 0.0
-#override KD = 1.5e-5
+#override KD = 1.45e-5
 #override FOX_KEMPER_ML_RESTRAT_COEF = 1.0
 #override FGNV_FILTER_SCALE = 0.1
-#override MLE_FRONT_LENGTH = 100.
+#override MLE_FRONT_LENGTH = 200.
 #override KH_VEL_SCALE = 0.01
 ! Geothermal heating
 DO_GEOTHERMAL = True
@@ -5014,6 +5004,7 @@ $baseDate
 # atmos_daily
 # ###########
 #
+"radiation", "pm2.5", "pm2.5", "atmos_daily", "all", .true., "none", 2
 #"flux",      "land_mask",                      "land_mask",        "atmos_daily",     "all", .false., "none", 2
 #"dynamics",  "zsurf",                          "zsurf",            "atmos_daily",     "all", .false., "none", 2
 #"dynamics",  "bk",                             "bk",               "atmos_daily",     "all", .false., "none", 2
@@ -5208,9 +5199,6 @@ $baseDate
 "dynamics",  "bcphob", "bcphob", "atmos_tracer", "all", .true.,  "none", 2
 "dynamics",  "radon",  "radon",  "atmos_tracer", "all", .true.,  "none", 2
 
-#
-"atmos_hourly",    1,  "hours",  1, "days", "time",
-
 # ------------
 # atmos_tracer
 # ------------
@@ -5275,9 +5263,11 @@ $baseDate
 "tracers",   "SO4_col",       "SO4_col_tracer", "atmos_tracer", "all", .true., "none", 2
 "tracers",   "pso4_h2o2",     "PROD_SO4_H2O2",  "atmos_tracer", "all", .true., "none", 2
 "tracers",   "pso4_o3",       "PROD_SO4_O3",    "atmos_tracer", "all", .true., "none", 2
+"tracers",   "gamma_so2",     "gamma_so2",      "atmos_tracer", "all", .true., "none", 2
 
+#
+"atmos_hourly",    1,  "hours",  1, "days", "time",
 "dynamics",  "O3", "O3", "atmos_hourly", "all", .true.,  "-1  -1 -1  -1 997. 1000.", 2
-"radiation", "pm2.5", "pm2.5", "atmos_daily", "all", .true., "none", 2
 
 # ############
 # atmos_scalar
@@ -8014,7 +8004,8 @@ $baseDate
 ##. wet deposition rate of nh4, kg m-2 s-1 (longitude,latitude,time)
  "moist",         "nh4_wetdep_kg_m2_s",   "wetnh4",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. wet deposition of noy incl aerosol nitrate, kg m-2 s-1 (longitude,latitude,time)
-#"UNKNOWN",       "wetnoy",        "wetnoy",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+"moist",       "fam_noy_wetdep_kg_m2_s",        "wetnoy",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+"moist",       "fam_nhx_wetdep_kg_m2_s",        "wetnhx",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. wet deposition rate of dry aerosol total organic matter, kg m-2 s-1 (longitude,latitude,time)
 #"UNKNOWN",       "wetoa",         "wetoa",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 # REFINED_DIAG: wetoa = wetpoa + wetsoa
@@ -8606,7 +8597,8 @@ endif
       </dataFile>
 <!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/INPUT/tropchem/sim.AM4_isop_e90.dat</dataSource>
+         <!--dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/INPUT/tropchem/sim.AM4_isop_e90.dat</dataSource-->
+         <dataSource platform="$(platform)">$CPERM/Fabien.Paulot/awg/INPUT/tropchem/sim.AM4_isop_e90.dat</dataSource>
       </dataFile>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
