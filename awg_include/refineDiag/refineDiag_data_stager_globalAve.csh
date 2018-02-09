@@ -453,7 +453,7 @@ python global_average_cubesphere.py ${oname} ${refineDiagDir} Atmos atmos_month
 python global_average_cubesphere.py ${oname} ${refineDiagDir} AtmosAer atmos_month_aer
 python global_average_land.py ${oname} ${refineDiagDir} Land land_month
 python global_average_ice.py ${oname} ${refineDiagDir} Ice ice_month
-python global_average_tripolar.py ${oname} ${refineDiagDir} COBALT ocean_cobalt_sfc,ocean_cobalt_misc,ocean_cobalt_tracers_year
+python global_average_tripolar.py ${oname} ${refineDiagDir} COBALT ocean_cobalt_sfc,ocean_cobalt_misc,ocean_cobalt_tracers_year,ocean_cobalt_tracers_int
 python extract_ocean_scalar.py ${oname} ${refineDiagDir}
 python amoc.py ${oname} ${refineDiagDir} ${gridspec}
 
