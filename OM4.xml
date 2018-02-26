@@ -15,7 +15,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="MOM6_DATE"      value="20171219"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="om4/v1.0.4"/>              <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/> <!--value="dev/esm4/20171106"/--> <!-- git tag for ocean_shared source code -->
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
@@ -45,7 +45,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
-   <property name="DEBUGLEVEL"   value="_0"/>
+   <property name="DEBUGLEVEL"   value="_chksums2_pr59"/>
    <property name="STATIC"       value=""/>  
 
 
@@ -176,7 +176,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_O512x2">
-	     <resources jobWallclock="00:20:00">
+	     <resources jobWallclock="01:20:00">
                <atm  ranks="0" threads="2"/>
 	       <ice                           layout = "32,16"   io_layout = "1,4" mask_table="MOM_mask_table"/>
 	       <ocn ranks="512" threads="2"   layout = "32,16"   io_layout = "1,4" mask_table="MOM_mask_table"/>
@@ -203,12 +203,24 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
    </freInclude>
 
    <freInclude name="resourceparams_O864x2">
-             <resources jobWallclock="01:00:00">
+             <resources jobWallclock="02:00:00">
                <ice                           layout = "24,36"   io_layout = "1,4" mask_table="MOM_mask_table"/>
                <ocn ranks="864" threads="2"   layout = "24,36"   io_layout = "1,4" mask_table="MOM_mask_table"/>
              </resources>
    </freInclude>
 
+   <freInclude name="resourceparams_O1024">
+	     <resources jobWallclock="00:30:00">
+	       <ice                           layout = "32,32"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	       <ocn ranks="1024" threads="1"  layout = "32,32"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_O1024x2">
+	     <resources jobWallclock="00:30:00">
+	       <ice                           layout = "32,32"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	       <ocn ranks="1024" threads="2"  layout = "32,32"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
    <freInclude name="resourceparams_O1152">
 	     <resources jobWallclock="01:30:00">
 	       <ice                           layout = "32,36"   io_layout = "1,4" mask_table="MOM_mask_table"/>
@@ -262,6 +274,18 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 	     </resources>
    </freInclude>
 
+   <freInclude name="resourceparams_O2048">
+	     <resources jobWallclock="00:30:00">
+	       <ice                           layout = "64,32"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	       <ocn ranks="2048" threads="1"  layout = "64,32"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_O2048x2">
+	     <resources jobWallclock="00:30:00">
+	       <ice                           layout = "64,32"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	       <ocn ranks="2048" threads="2"  layout = "64,32"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
    <freInclude name="resourceparams_O2304">
 	     <resources jobWallclock="00:30:00">
 	       <ice                           layout = "32,72"   io_layout = "1,4" mask_table="MOM_mask_table"/>
@@ -285,8 +309,14 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 
    <freInclude name="resourceparams_O3240">
 	     <resources jobWallclock="00:30:00">
-	       <ocn ranks="3240"  threads="1"       layout = "45,72"   io_layout = "1,4"/>
-	       <ice                                 layout = "45,72"   io_layout = "1,4"/>
+	       <ocn ranks="3240"  threads="1"       layout = "45,72"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	       <ice                                 layout = "45,72"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_O3240x2">
+	     <resources jobWallclock="00:30:00">
+	       <ocn ranks="3240"  threads="2"       layout = "45,72"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	       <ice                                 layout = "45,72"   io_layout = "1,4" mask_table="MOM_mask_table"/>
 	     </resources>
    </freInclude>
 	            
@@ -305,6 +335,18 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 	     </resources>
    </freInclude>
 	       
+   <freInclude name="resourceparams_O4096">
+	     <resources jobWallclock="00:30:00">
+	       <ice                           layout = "64,64"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	       <ocn ranks="4096" threads="1"  layout = "64,64"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_O4096x2">
+	     <resources jobWallclock="00:30:00">
+	       <ice                           layout = "64,64"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	       <ocn ranks="4096" threads="2"  layout = "64,64"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
    <freInclude name="resourceparams_O4671">
 	     <resources jobWallclock="00:30:00">
 	       <ocn ranks="4671" layout = "90,72"   io_layout = "1,4" mask_table="mask_table.1809.90x72" threads="1"/>
@@ -312,6 +354,18 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 	     </resources>
    </freInclude>
 	            
+   <freInclude name="resourceparams_O6480">
+	     <resources jobWallclock="00:10:00">
+	       <ocn ranks="6480"  threads="1"       layout = "90,72"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	       <ice                                 layout = "90,72"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_O8100">
+	     <resources jobWallclock="00:10:00">
+	       <ice                           layout = "90,90"   io_layout = "1,5" mask_table="MOM_mask_table"/>
+	       <ocn ranks="8100" threads="1"  layout = "90,90"   io_layout = "1,5" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
 
    <!--1/2 degree ocean grid Only-->
    <freInclude name="resourceparams_O442p5">
@@ -2134,6 +2188,9 @@ endif
         <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O864']/node())"/> </run>
       </regression>
 
+      <regression name="timing">
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O3551']/node())"/> </run>
+      </regression>
       <regression name="timings">
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O480']/node())"/> </run>
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O910']/node())"/> </run>
@@ -2143,6 +2200,34 @@ endif
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O3782']/node())"/> </run>
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O4671']/node())"/> </run>
       </regression>
+      <regression name="timingsOMP">
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O2304']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1152']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1756']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512x2']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O864x2']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1152x2']/node())"/> </run>
+        <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1756x2']/node())"/> </run>
+      </regression>
+      <regression name="timingsNOMASK">
+        <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
+        <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512x2']/node())"/> </run>
+        <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1024']/node())"/> </run>
+        <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1024x2']/node())"/> </run>
+        <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O2048']/node())"/> </run>
+        <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O2048x2']/node())"/> </run>
+        <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O4096']/node())"/> </run>
+        <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O4096x2']/node())"/> </run>
+        <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O3240']/node())"/> </run>
+        <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O3240x2']/node())"/> </run>
+      </regression>
+      <regression name="timingsNOMASK2">
+        <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O6480']/node())"/> </run>
+        <run days="10" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O8100']/node())"/> </run>
+
+      </regression>
+
+
 
       <reference restart="$(REFERENCE)/archive/1x1m0d_1756x1o/restart/19000201.tar"/>
       <reference restart="$(archiveDir)/../../$(platform)-prod/archive/1x1m0d_1756x1o/restart/19000201.tar"/>
@@ -2209,7 +2294,7 @@ endif
       <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4_c96L33_am4p0_2010_30d15_tlt_725_01210101.tar</dataSource>
       <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/CM4B_1850_Control_am4p0c96L33_OM4p25_30d15_tlt_bling8_F_806_from450_combined_06310101.tar</dataSource> Crash
       -->
-      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/answers/warsaw_mom6_2017.06.12_answers/CM4_c96L33_am4p0_2010_30d15_tlt.2017.06.12/ncrc3.intel16-prod-openmp/archive/1x1m0d_216x2a_1756x1o/restart/00010201.tar</dataSource>
+      <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/answers/testing_20180202_om4v1.0.4_plus/CM4_c96L33_am4p0_2010_base/ncrc4.intel16-prod-openmp/archive/1x1m0d_216x2a_1756x1o/restart/00010201.tar</dataSource>
      </dataFile>
 
       <namelist name="frecheck_nml"><!--this nml is needed only for frecheck to work. It is not needed and does not affect the model run in any way-->
@@ -3499,6 +3584,7 @@ OVERRIDE_EOF
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O64']/node())"/> </run>
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O32']/node())"/> </run>
         <run months="1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O32x2']/node())"/> </run>
+        <run days="15 10 6" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
       </regression>
 
       <regression name="debugomp">
@@ -3561,9 +3647,83 @@ SIS_OVERRIDE_EOF
       <namelist name="ensemble_nml">
         ensemble_size=2
      </namelist>
+      <namelist name="coupler_nml">
+       restart_interval = 0,0,5,0,0,0 !make restarts every 5 days
+       months = $months,           
+       days   = $days,             
+       current_date = 1,1,1,0,0,0,
+       hours = 0                     
+       minutes = 0                   
+       seconds = 0                   
+       calendar = 'NOLEAP',          
+       dt_cpld  = 7200,              
+       dt_atmos = 7200,              
+       do_atmos = .false.,           
+       do_land = .false.,            
+       do_ice = .true.,              
+       do_ocean = .true.,            
+       atmos_npes = 0,            
+       ocean_npes = 0,               
+       concurrent = .false.          
+       use_lag_fluxes=.true.         
+       atmos_nthreads = $atm_threads
+       ocean_nthreads = $ocean_nthreads
+debug_affinity =.true.
+ncores_per_node = 36
+use_hyper_thread = .false.
+     </namelist>                     
     </input>
+    <postProcess>
+         <csh><![CDATA[
+	 #Take care of iceberg restarts and trajectories
+         cd $work/RESTART
+         #Treat icebergs restarts and trajectories
+         #Find non-empty iceberg restarts and combine them AND then remove uncombined restarts
+         #This should be handled properly by FRE
+         #ncrcat icebergs.res.nc.* icebergs.res.nc
+      ls icebergs.res.*
+      if( ! $status ) then
+       which ncdump
+       if( $status ) then
+         echo ncdump not available! We need to stop the run or the model restarts incorrectly!
+         exit 1
+       endif
+
+       foreach ext ('.ens_01' '.ens_02')
+         set non_empty_restarts = ""
+         foreach file ( `ls icebergs.res$ext.nc.????` )
+            if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
+         end
+         if( "$non_empty_restarts" != "" ) then
+          ncrcat $non_empty_restarts icebergs.res$ext.nc
+          if( ! -e icebergs.res$ext.nc ) then
+            echo ERROR: ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
+            exit 1
+          endif
+         endif
+       end
+       mkdir hide_from_fre
+       mv *.icebergs.res*.nc.* hide_from_fre/
+       cd $work
+       mkdir hide_from_fre
+       ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
+       mv iceberg_trajectories.nc.* hide_from_fre/
+      endif
+
+         cd $work
+         #Make a directory to trick FRE to pick up and archive in ascii
+         mkdir extra.results
+         mv *velocity_truncations MOM_parameter_doc* SIS_parameter_doc* seaice.stats* ocean.stats* extra.results/
+
+         #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
+         #This causes problems for ferret and python tools for analysis.
+         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
+         cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+
+         ]]></csh>
+    </postProcess>
    </experiment>
-   <experiment name="MOM6_GOLD_SIS2_bergs_ens12" inherit="MOM6_GOLD_SIS2_bergs">
+   <experiment name="MOM6_GOLD_SIS2_bergs_ens12" inherit="MOM6_GOLD_SIS2_bergs_ens2">
     <input>
       <namelist name="ensemble_nml">
         ensemble_size=12
@@ -4551,8 +4711,8 @@ SIS_OVERRIDE_EOF
       </regression>
 
       <regression name="debug">
-        <run days="2"   > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
-        <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
+        <run days="2"   > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O288']/node())"/> </run>
+        <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O288']/node())"/> </run>
       </regression>
 
       <regression name="debugomp">
@@ -4579,6 +4739,9 @@ SIS_OVERRIDE_EOF
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576.tar</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/OMp5_mask_tables.tar</dataSource>
       </dataFile>
     </input>
    </freInclude>
@@ -4810,8 +4973,12 @@ SIS_OVERRIDE_EOF
       <regression name="debug2">
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O442p5']/node())"/> </run>
         <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O442p5']/node())"/> </run>
-        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
-        <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
+        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O432']/node())"/> </run>
+        <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O432']/node())"/> </run>
+      </regression>
+      <regression name="debug3">
+        <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O288']/node())"/> </run>
+        <run days="1 1" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O288']/node())"/> </run>
       </regression>
       <regression name="debugs">
         <run days="2" > <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
@@ -4827,6 +4994,33 @@ SIS_OVERRIDE_EOF
     <postProcess>
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
     </postProcess>
+   </experiment>
+
+   <experiment name="OMp5_newgrid" inherit="OMp5_baseline">
+    <input>
+      <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic.v20180204.tar</dataSource>
+      </dataFile>
+    </input>
+   </experiment>
+   <experiment name="OMp5_MEKE" inherit="OMp5_baseline">
+    <input>
+     <csh>
+        <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override SMAGORINSKY_KH = True
+#override SMAG_LAP_CONST = 0.15
+#override MEKE_VISCOSITY_COEFF = 1.0
+#override MEKE_KHTR_FAC = 0.3
+#override MLE_FRONT_LENGTH = 100.
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+SIS_OVERRIDE_EOF
+     ]]></csh>
+    </input>
    </experiment>
 
    <experiment name="OMp5_BLING" inherit="OMp5_baseline">
@@ -5361,6 +5555,75 @@ SIS_OVERRIDE_EOF
      
    </experiment>
 
+ <experiment name="OM4_SIS2_05_CORE2_COBALT_combined_cfc_sf6_abio2_mocsy_MEKE" inherit="OM4_SIS2_05_CORE2_COBALT_combined_cfc_sf6_abio2_mocsy">
+    <input>
+      <csh><![CDATA[
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override SMAGORINSKY_KH = True
+#override SMAG_LAP_CONST = 0.15
+#override MEKE_VISCOSITY_COEFF = 1.0
+#override MEKE_KHTR_FAC = 0.3
+#override KHTR = 0.0
+#override KH = 0.0
+#override MLE_FRONT_LENGTH = 100.
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+#override DT = 1800
+#override DT_THERM = 7200  
+
+USE_generic_tracer = True
+#override CHL_FROM_FILE = False
+GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+
+#override ENERGYSAVEDAYS = 30
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+#override ADD_DIURNAL_SW = True 
+#override ICE_STATS_INTERVAL = 30
+SIS_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+ </experiment>
+ <experiment name="OM4_SIS2_05_CORE2_COBALT_combined_cfc_sf6_abio2_mocsy_readCHL" inherit="OM4_SIS2_05_CORE2_COBALT_combined_cfc_sf6_abio2_mocsy">
+    <input>
+      <csh><![CDATA[
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+#override DT = 1800
+#override DT_THERM = 7200  
+
+USE_generic_tracer = True
+#override CHL_FROM_FILE = True
+GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+
+#override ENERGYSAVEDAYS = 30
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+#override ADD_DIURNAL_SW = True 
+#override ICE_STATS_INTERVAL = 30
+SIS_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+ </experiment>
  <experiment name="OM4_SIS2_05_CORE2_COBALT_combined_cfc_sf6_abio2_mocsy" inherit="OM4_SIS2_05_CORE2_COBALT_combined_cfc_sf6_abio2">
     <input>
      <namelist name="generic_COBALT_nml">
@@ -6392,6 +6655,174 @@ dissi14cabio_valid_min = 0.0
 </experiment>
 
 
+ <experiment name="OM4_SIS2_05_CORE2" inherit="OMp5_baseline">
+    <input>
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1948,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'NOLEAP',
+       dt_cpld  = 1800,           ! for stability
+       dt_atmos = 1800,           ! to match dt_cpld
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.false.
+       atmos_nthreads = $atm_threads
+       ocean_nthreads = $ocean_nthreads
+     </namelist>
+     <namelist name="xgrid_nml">
+       make_exchange_reproduce = .true.
+       interp_method = 'second_order'
+     </namelist>
+     <namelist name="fms_nml">
+       clock_grain='ROUTINE'
+       clock_flags='NONE'
+       domains_stack_size = 8000000
+       stack_size =0
+     </namelist>
+     <namelist name="fms_io_nml" >
+       fms_netcdf_restart=.true.
+       threading_read='multi'
+       max_files_r = 800
+       max_files_w = 800
+       checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+     </namelist>
+
+     <namelist name="atmos_model_nml" >
+       layout= 0, 0
+     </namelist>
+
+     <namelist name="generic_tracer_nml">
+       do_generic_tracer=.false.
+       do_generic_abiotic=.false.
+       do_generic_CFC=.false.
+       do_generic_COBALT=.false.
+       do_generic_TOPAZ=.false.
+       do_generic_SF6=.false.
+       force_update_fluxes=.false.
+     </namelist>
+     <namelist name="diag_manager_nml">
+       max_files = 400
+       flush_nc_files=.false.
+       max_axes = 400,
+       max_num_axis_sets = 400,
+       max_input_fields = 1200
+       max_output_fields = 1800
+       mix_snapshot_average_fields=.false.
+     </namelist>
+
+
+      <csh><![CDATA[
+#
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+#override DT = 1800
+#override DT_THERM = 7200  
+
+USE_generic_tracer = False
+#override CHL_FROM_FILE = True
+GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+
+#override ENERGYSAVEDAYS = 30
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+#override ADD_DIURNAL_SW = True 
+#override ICE_STATS_INTERVAL = 30
+SIS_OVERRIDE_EOF
+     ]]></csh>
+
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_common']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_05grid_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='OMp5_data']/input/node())"/>
+      <!--SIS2 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
+      <!--CORE2 forcing datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='CORE2_data']/input/node())"/>
+
+      <diagTable>
+$name
+$baseDate
+      </diagTable>
+
+      <dataTable>
+# 2016/07/18 JGJ CORE-II data table
+# keep generic names here so data table does not have to change with experiments
+# instead update dataset tag to point to generic name
+# modified from  /lustre/f1/unswept/Amy.Langenhorst/CORE/IAF_v2.0/data_table_dyn
+# to use runoff.nc as generic filename for runoff dataset
+#
+"ATM" , "p_surf"        , "SLP"         , "./INPUT/slp.1948-2007.nomads.nc"          , "bilinear" ,  1.0
+"ATM" , "p_bot"         , "SLP"         , "./INPUT/slp.1948-2007.nomads.nc"          , "bilinear" ,  1.0
+"ATM" , "t_bot"         , "T_10_MOD"    , "./INPUT/t_10_mod.1948-2007.nomads.nc"     , "bilinear" ,  1.0
+"ATM" , "sphum_bot"     , "Q_10_MOD"    , "./INPUT/q_10_mod.1948-2007.nomads.nc"     , "bilinear" ,  1.0
+"ATM" , "u_bot"         , "U_10_MOD"    , "./INPUT/u_10_mod.1948-2007.nomads.nc"     , "bicubic",   1.0
+"ATM" , "v_bot"         , "V_10_MOD"    , "./INPUT/v_10_mod.1948-2007.nomads.nc"     , "bicubic",   1.0
+"ATM" , "z_bot"         , ""            , ""                                         , "bilinear" , 10.0
+"ATM" , "gust"          , ""            , ""                                         , "bilinear" ,  1.0e-4
+"ICE" , "lw_flux_dn"    , "LWDN_MOD"    , "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  1.0
+"ICE" , "sw_flux_vis_dir_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.285
+"ICE" , "sw_flux_vis_dif_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.285
+"ICE" , "sw_flux_nir_dir_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.215
+"ICE" , "sw_flux_nir_dif_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.215
+"ICE" , "lprec"         , "RAIN"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
+"ICE" , "fprec"         , "SNOW"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
+"ICE" , "runoff"        , "runoff"      , "./INPUT/runoff.daitren.clim.v2011.02.10a.720x576.nc" , "none"  ,  1.0
+"ICE" , "calving"       , ""            , ""                             , "none"  ,  0.0
+"ICE" , "dhdt"          , ""            , ""                             , "none"  , 80.0
+"ICE" , "dedt"          , ""            , ""                             , "none"  ,  2.0e-6
+"ICE" , "drdt"          , ""            , ""                             , "none"  ,  10.0
+"LND" , "t_surf"        , ""            , ""                             , "none"  ,  273.0
+"LND" , "t_ca"          , ""            , ""                             , "none"  ,  273.0
+"LND" , "q_ca"          , ""            , ""                             , "none"  ,  0.0
+"LND" , "rough_mom"     , ""            , ""                             , "none"  ,  0.01
+"LND" , "rough_heat"    , ""            , ""                             , "none"  ,  0.1
+"LND" , "albedo"        , ""            , ""                             , "none"  ,  0.1
+#"LND" , "t_ca"         , ""            , ""                             , "none"  ,  273.0
+#"LND" , "t_surf"       , ""            , ""                             , "none"  ,  273.0
+"LND" , "sphum_surf"    , ""            , ""                             , "none"  ,  0.0
+"LND" , "sphum_ca"      , ""            , ""                             , "none"  ,  0.0
+"LND" , "t_flux"        , ""            , ""                             , "none"  ,  0.0
+"LND" , "sphum_flux"    , ""            , ""                             , "none"  ,  0.0
+"LND" , "lw_flux"       , ""            , ""                             , "none"  ,  0.0
+"LND" , "sw_flux"       , ""            , ""                             , "none"  ,  0.0
+"LND" , "lprec"         , ""            , ""                             , "none"  ,  0.0
+"LND" , "fprec"         , ""            , ""                             , "none"  ,  0.0
+"LND" , "dhdt"          , ""            , ""                             , "none"  ,  5.0
+"LND" , "dedt"          , ""            , ""                             , "none"  ,  2e-6
+"LND" , "dedq"          , ""            , ""                             , "none"  ,  0.0
+"LND" , "drdt"          , ""            , ""                             , "none"  ,  5.0
+"LND" , "drag_q"        , ""            , ""                             , "none"  ,  0.0
+"LND" , "p_surf"        , ""            , ""                             , "none"  ,  1.e5
+#
+      </dataTable>
+
+
+    </input>
+
+    <runtime>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_1057x1o/restart/19480201.tar"/>
+      <reference restart="$(archiveDir)/../../$(platform)-prod/archive/1x1m0d_1057x1o/restart/19480201.tar"/>
+    </runtime>
+
+</experiment>
 <!-- OCEAN BGC post-processing-->
   <freInclude name="COBALT_postprocess">
 
