@@ -482,7 +482,7 @@ endif
 "ICE" , "sw_flux_nir_dif_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.215
 "ICE" , "lprec"         , "RAIN"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
 "ICE" , "fprec"         , "SNOW"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
-"ICE" , "runoff"        , "runoff"      , "./INPUT/runoff.daitren.clim.v2011.02.10a.720x576.nc" , "none"  ,  1.0
+"ICE" , "runoff"        , "runoff"      , "./INPUT/runoff.daitren.clim.v2011.02.10.720x576.nc" , "none"  ,  1.0
 "ICE" , "calving"       , ""            , ""                             , "none"  ,  0.0
 "ICE" , "dhdt"          , ""            , ""                             , "none"  , 80.0
 "ICE" , "dedt"          , ""            , ""                             , "none"  ,  2.0e-6
@@ -2096,7 +2096,7 @@ OVERRIDE_EOF
    <freInclude name="OM4_05grid_data">
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/mosaic_ocean.720x576.tar</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic_ocean.v20180227.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw/OMp5_mask_tables.tar</dataSource>
@@ -2130,9 +2130,11 @@ OVERRIDE_EOF
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/geothermal_davies2013_v1.nc</dataSource>
       </dataFile>
+      <!-- the following fails with hsmget. not sure why
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/ocean_static_no_mask_table.nc</dataSource>
       </dataFile>
+      -->
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/MOM_input</dataSource>
@@ -2193,6 +2195,12 @@ ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc
 
 touch $work/INPUT/MOM_override
 touch $work/INPUT/SIS_override
+
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override USE_KH_BG_2D = False
+MOM_OVERRIDE_EOF
+
       ]]></csh>
      </input>
    </freInclude>
@@ -2357,6 +2365,7 @@ SIS_OVERRIDE_EOF
      <csh>
         <![CDATA[
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override USE_KH_BG_2D = False
 #override MEKE_KHTR_FAC = 0.3
 #override MLE_FRONT_LENGTH = 100.
 MOM_OVERRIDE_EOF
@@ -3825,7 +3834,7 @@ dissi14cabio_valid_min = 0.0
 "ICE" , "sw_flux_nir_dif_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.215
 "ICE" , "lprec"         , "RAIN"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
 "ICE" , "fprec"         , "SNOW"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
-"ICE" , "runoff"        , "runoff"      , "./INPUT/runoff.daitren.clim.v2011.02.10a.720x576.nc" , "none"  ,  1.0
+"ICE" , "runoff"        , "runoff"      , "./INPUT/runoff.daitren.clim.v2011.02.10.720x576.nc" , "none"  ,  1.0
 "ICE" , "calving"       , ""            , ""                             , "none"  ,  0.0
 "ICE" , "dhdt"          , ""            , ""                             , "none"  , 80.0
 "ICE" , "dedt"          , ""            , ""                             , "none"  ,  2.0e-6
@@ -4130,7 +4139,7 @@ $baseDate
 "ICE" , "sw_flux_nir_dif_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.215
 "ICE" , "lprec"         , "RAIN"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
 "ICE" , "fprec"         , "SNOW"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
-"ICE" , "runoff"        , "runoff"      , "./INPUT/runoff.daitren.clim.v2011.02.10a.720x576.nc" , "none"  ,  1.0
+"ICE" , "runoff"        , "runoff"      , "./INPUT/runoff.daitren.clim.v2011.02.10.720x576.nc" , "none"  ,  1.0
 "ICE" , "calving"       , ""            , ""                             , "none"  ,  0.0
 "ICE" , "dhdt"          , ""            , ""                             , "none"  , 80.0
 "ICE" , "dedt"          , ""            , ""                             , "none"  ,  2.0e-6
