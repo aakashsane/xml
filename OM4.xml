@@ -16,10 +16,10 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="MOM6_DATE"      value="20171219"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="om4/v1.0.4"/>              <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/> <!--value="dev/esm4/20171106"/--> <!-- git tag for ocean_shared source code -->
-  <property name="FRE_STEM"       value="dev_master_20180212_mom6_20180212"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="mdt/20180301"/> <!-- customize as needed -->
   <!--property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/--> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_b"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
    <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
 
@@ -45,7 +45,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
-   <property name="DEBUGLEVEL"   value="_chksums2_pr59"/>
+   <property name="DEBUGLEVEL"   value=""/>
    <property name="STATIC"       value=""/>  
 
 
@@ -102,6 +102,13 @@ Make the executable for ocean-ice experiments.
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
+          # delete these cherry-picks once a tag is finalized
+          git remote add jkrasting https://github.com/jkrasting/MOM6-examples.git
+          git fetch jkrasting
+          git cherry-pick 6a9de59bc1d858798d485154584ae9f737052442
+          git cherry-pick b277e8178ac87994615e7da3ef9de3f608393473
+          git cherry-pick c133ce21801484475ef58288526ec75dafa106c3
+          git cherry-pick 5bcd58bbda2b4284f882a47cbfde5d5872c90ae2
           popd
 
           pushd mom6
@@ -2106,16 +2113,19 @@ OVERRIDE_EOF
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/MOM_saltrestore</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/salt_restore.v2015.12.03.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/salt_restore.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/runoff.daitren.clim.v2011.02.10a.720x576.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/runoff.daitren.clim.v2011.02.10.720x576.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/seawifs_1998-2006_smoothed_2X.v2015.12.03.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/runoff.daitren.iaf.v2011.02.10.720x576.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/tidal_amplitude.v2015.12.03.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/seawifs_1998-2006_smoothed_2X.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/tidal_amplitude.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/INPUT/geothermal_davies2013_v1.nc</dataSource>
