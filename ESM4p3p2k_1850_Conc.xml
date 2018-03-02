@@ -1213,6 +1213,25 @@ Experiment to build executable.
     </postProcess>
   </freInclude>
 
+  <!-- By-species land post-processing -->
+  <freInclude name="land_by_species_postprocess">
+    <postProcess>
+      <component type="land_by_species" start="$(PP_START_YEAR)" source="land_month_by_species" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+    </postProcess>
+  </freInclude>
+
+  <freInclude name="fire_postprocess">
+    <postProcess>
+      <component type="fire" start="$(PP_START_YEAR)" source="fire_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+    </postProcess>
+  </freInclude>
+
 
   <!-- Atmos co2 post-processing: note atmos_level, atmos_month and atmos_scalar already in c96_climo_postprocess -->
   <freInclude name="atmos_co2_postprocess">
@@ -8876,6 +8895,8 @@ endif
       <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess_ATMOS']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess_FULLCHEM']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess_LAND']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='land_by_species_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='fire_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='ICE_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='atmos_co2_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='COBALT_postprocess']/postProcess/node())"/>
