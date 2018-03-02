@@ -14,8 +14,8 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod SPEAR_o1_CORE2_OM4 -r basic
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
   <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
-  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20171106"/> <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="20171219"/>                <!-- git tag date for MOM6 source code -->
+  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/> <!-- git tag for ocean_shared source code -->
+  <property name="MOM6_DATE"      value="20171222"/>                <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="om4/v1.0.4"/>              <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
@@ -45,7 +45,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod SPEAR_o1_CORE2_OM4 -r basic
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
-   <property name="DEBUGLEVEL"   value="_chksums2_pr59"/>
+   <property name="DEBUGLEVEL"   value=""/>
    <property name="STATIC"       value=""/>  
 
 
@@ -105,6 +105,12 @@ Make the executable for ocean-ice experiments.
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
           popd
+
+########################################################################
+#updates needed to run new experiments.
+#Remove this block when the updates are tagged
+(cd mom6/src/MOM6 && git fetch && git checkout 85ad09dba99 )
+########################################################################
 
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
