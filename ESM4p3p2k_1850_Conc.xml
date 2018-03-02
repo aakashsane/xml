@@ -105,7 +105,7 @@ NOTES:
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
   <property name="PROD_SIMTIME"     value="1000"/>  <!--simulation length in years-->
   <property name="PP_CMIP_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
-  <property name="PP_CMIP_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
+  <property name="PP_CMIP_CHUNK_B"  value="10yr"/> <!--bigger  chunk length for pp/analysis-->
   <property name="PP_START_YEAR"    value="0001" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
   <property name="PROD_SEGTIME"     value="03:00:00"/><!--Wall clock per segment (usually 1 year)-->
@@ -721,6 +721,15 @@ Experiment to build executable.
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
+          # delete these cherry-picks once a tag is finalized
+          # These commits update the symlinks and paths to the new input datasets
+          git remote add jkrasting https://github.com/jkrasting/MOM6-examples.git
+          git fetch jkrasting
+          git cherry-pick b277e8178ac87994615e7da3ef9de3f608393473
+          git cherry-pick c133ce21801484475ef58288526ec75dafa106c3
+          git cherry-pick 5bcd58bbda2b4284f882a47cbfde5d5872c90ae2
+          git cherry-pick 10408243d9ce069810986c5a1c13cbb9c1fdece9
+          git cherry-pick 2afd337a2ab45ac191683d64379e780537d8528a
           popd
 ########################################################################
 #updates needed to run new experiments.
@@ -1019,6 +1028,7 @@ Experiment to build executable.
         <timeSeries freq="daily" source="atmos_daily_refined" chunkLength="$(PP_CMIP_CHUNK_A)"/>
 -->
         <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_CMIP_CHUNK_B)"/>
 
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTScmip/*)">
@@ -1180,6 +1190,9 @@ Experiment to build executable.
         <timeSeries freq="daily" source="land_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)"/>
 -->
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_B)">
+	      <analysis switch="on" cumulative="no" script="/home/mdteam/DET/analysis/ILAMB/ILAMB-GFDL.py"/>
+        </timeSeries>
         <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
       <component type="land_dust" start="$(PP_START_YEAR)" source="land_dust" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
@@ -8551,7 +8564,7 @@ endif
 
 <!-- c96_LM4_Op5 -->
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/OM4_05_20160517/mosaic_c96.720x576.tar</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic_c96.v20180227.tar</dataSource>
       </dataFile>
 
       <!--AWG Input datasets -->
@@ -8705,10 +8718,10 @@ endif
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/layer_coord.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/seawifs_1998-2006_smoothed_2X.v2015.12.03.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/seawifs_1998-2006_smoothed_2X.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/tidal_amplitude.v2015.12.03.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/tidal_amplitude.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
 	$(CMIP6_ARCHIVE_ROOT)/CM4/OM4_05_20160517/mosaic_ocean.720x576/mask_table.66.32x16
@@ -8739,14 +8752,15 @@ endif
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/WOA05_pottemp_salt.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/CM4/OM4_05_20160517/mosaic_ocean.720x576/ocean_static.nc</dataSource>
+        <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic_c96.v20180227.unpacked/ocean_static.nc</dataSource>
       </dataFile>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/CM4/OM4_05_20160517/geothermal_davies2013_v1.nc</dataSource>
+        <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/INPUT/geothermal_davies2013_v1.nc</dataSource>
       </dataFile>
 
       <!-- Kh3 Background file -->
+      <!-- JPK:  AJA is working on an in-code fix so that this input file will not be needed in the near future. -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/John.Dunne/datasets/Kh3_background_2d.nc</dataSource>
       </dataFile>
