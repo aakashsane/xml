@@ -90,16 +90,16 @@ NOTES:
 -->
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="testing_20180202"/>           <!-- git tag for general component source code-->
-  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
+  <property name="RELEASE"        value="testing_20180202"/>        <!-- git tag for general component source code-->
+  <property name="SHARED_GIT_TAG" value="ppa_20180301_slm"/>        <!-- git tag for shared source code -->
   <property name="MOM6_DATE"      value="2017.10.19"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="om4/v1.0.4"/>              <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/> <!-- git tag for ocean_shared source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>              <!-- git tag for LAND_LAD2 source code -->  
-  <property name="FRE_STEM"       value="$(RELEASE)_om4v1.0.4_plus"/> <!-- customize as needed -->
+  <property name="LAND_GIT_TAG"   value="ppa_20180301Na_slm"/>      <!-- git tag for LAND_LAD2 source code -->  
+  <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180301"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
@@ -645,7 +645,7 @@ Experiment to build executable.
       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
             <codeBase version="$(RELEASE)"> shared.git </codeBase>
       	    <csh><![CDATA[
-              ( cd shared && git checkout $(RELEASE) ) 
+              ( cd shared && git checkout ppa_20180301_slm ) 
               ]]>
             </csh>
       </source>
@@ -1310,6 +1310,7 @@ Experiment to build executable.
         <timeSeries freq="daily" chunkLength="$(PP_CMIP_CHUNK_A)" />
       </component>
 
+<!--
       <component type="ocean_cobalt_omip_tracers_month" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_month" sourceGrid="ocean-tripolar">
          <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
@@ -1321,6 +1322,7 @@ Experiment to build executable.
          <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
+-->
 
       <component type="ocean_cobalt_omip_sfc" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_sfc" sourceGrid="ocean-tripolar">
          <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
@@ -1383,7 +1385,7 @@ Experiment to build executable.
 <!--= ESM4 EXPERIMENTS    =-->
 <!--=======================-->
 
-  <experiment name="ESM4p0p2k_1850C_PIpcairco2" inherit="cm4_sis2_compile">
+  <experiment name="ESM4p3p2k_1850C_PIpcairco2" inherit="cm4_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"ESM4_c96L49_am4p0_OMp5"</model>
@@ -2620,8 +2622,44 @@ Add interactive dust emissions
        turbulence_to_use = "lm3v"
        init_co2 = 286.0e-6
        canopy_air_mass_for_tracers = 10.0
-       allow_small_z0 = .true.
-       sai_turb = .true.             ! jgj to match CM4B #814 (default is false)
+       use_sai_for_heat_exchange = .TRUE.
+
+      </namelist>
+      <namelist name="fire_nml">
+       fire_to_use = 'unpacked'
+       fire_for_past = 'pastfp'
+       do_calc_derivs = .FALSE.
+       f_agb_style = 'gompertz'
+       f_rh_style = 'gompertz'
+       f_theta_style = 'gompertz'
+       min_BA_to_split = 1.0
+       do_fire_fragmentation = .TRUE.
+       frag_incl_nonveg = .TRUE.
+       frag_incl_PAST = .FALSE.
+       zero_TMF = .TRUE.
+       use_FpopD_ba = .FALSE.
+       use_FpopD_nf = .FALSE.
+       use_Fgdp_nf = .FALSE.
+       use_Fgdp_ba = .FALSE.
+       theta_ROSeffect_asFnTheta = .TRUE.
+       C_beta_params_likeRH = .FALSE.
+!       lock_ROSmaxC3_to_ROSmaxC4 = .TRUE.
+       agb_gom2 = 88.7, 56.7
+       agb_gom3 = 0.66, 9.5
+!       Ia_alpha_monthly = 0.0014, 0.006
+       Ia_alpha_monthly = 0.0, 0.0
+       Ia_param1 = 6.7, 5.8
+       Ia_param2 = 0.2, 0.67
+       popD_supp_eps3 = 0.21, 0.033
+       rh_gom2 = 0.11, 0.0076
+       rh_gom3 = -3.5, -9.4
+       theta_gom2 = 0.0083, 0.082
+       theta_gom3 = -5.6, -6.3
+       magic_scalar = 1.0, 1.0
+       do_crownfires = .TRUE.
+       do_multiday_fires = .TRUE.
+       mdf_threshold = 1.0
+       FireMIP_ltng = .FALSE.
       </namelist>
 
       <namelist name ="glac_data_nml">
@@ -2645,31 +2683,7 @@ Add interactive dust emissions
       </namelist>
 
       <namelist name ="harvesting_nml">
-       do_harvesting          =.true.            ! to match CM4B spinup #814
-       grazing_intensity      = 18.25  !(roughly 5% of biomass per day) (to match CM4B spinup #814)
-       grazing_residue        = 0.1
-       grazing_frequency      = 'daily'
-       min_lai_for_grazing    = 1.0
-       frac_wood_wasted_harv  = 0.25
-       frac_wood_wasted_clear = 0.25
-       !frac_wood_fast         = ONETHIRD
-       !frac_wood_med          = ONETHIRD
-       !frac_wood_slow         = ONETHIRD
-       crop_seed_density      = 0.1
-       waste_below_ground_wood = .TRUE.
-      </namelist>
-
-      <namelist name ="hlsp_nml">
-       max_num_topo_hlsps = 1
-       num_vertclusters = 10
-       use_geohydrodata = .true.
-       strm_depth_penetration = 1.5
-       use_hlsp_aspect_in_gwflow = .true.
-       diagnostics_by_cluster = .true.
-       init_wt_strmelev = .false.
-       dammed_strm_bc = .true.
-       limit_intertile_flow = .true. !.false.
-       flow_ratio_limit = 0.25
+       do_harvesting = .FALSE.
       </namelist>
 
       <namelist name ="lake_data_nml">
@@ -2702,37 +2716,45 @@ Add interactive dust emissions
       </namelist>
 
       <namelist name ="land_conservation_nml">
-        do_check_conservation = .FALSE.
+       do_check_conservation = .FALSE.
       </namelist>
 
       <namelist name ="land_debug_nml">
-      watch_point = 0, 0, 0, 1
+       watch_point = 0, 0, 0, 1
       </namelist>
 
       <namelist name="land_dust_nml">
-         input_file_name  = "INPUT/dust_source.nc",
-         input_field_name = "source_nomask",
-         lai_thresh=0.1
-         sai_thresh=0.025
-         sliq_thresh=0.3
-         sice_thresh=0.025
-         snow_thresh=0.01
-         u_min=1.
-         u_min_past=6.
-         frac_bare_past=0.0325
-         u_min_crop=8.
-         frac_bare_crop=0.0325
-         dependency_soil_moisture=.false.
-         ch=1.65e-9
+       input_file_name  = "INPUT/dust_source.nc",
+       input_field_name = "source_nomask",
+       lai_thresh=0.1
+       sai_thresh=0.025
+       sliq_thresh=0.3
+       sice_thresh=0.025
+       snow_thresh=0.01
+       u_min=1.
+       u_min_past=6.
+       frac_bare_past=0.0325
+       u_min_crop=8.
+       frac_bare_crop=0.0325
+       dependency_soil_moisture=.false.
+       ch=1.65e-9
+      </namelist>
+
+      <namelist name="land_io_nml">
+       new_land_io = .FALSE.
       </namelist>
 
       <namelist name ="land_model_nml">
-        layout   = $lnd_layout
-        io_layout = $lnd_io_layout
-        tau_snow_T_adj = 604800.
-        prohibit_negative_canopy_water=.false.
-        min_frac = 1e-8
-        npes_io_group = 8
+       layout   = $lnd_layout
+       io_layout = $lnd_io_layout
+       tau_snow_T_adj = 604800.
+       prohibit_negative_canopy_water = .TRUE.
+       min_frac = 1e-8
+       con_fac_small = 0.0
+       con_fac_large = 1.0e2
+       max_canopy_water_steps = 4
+       improve_solution = .TRUE.
+       npes_io_group = 8
       </namelist>
 
       <namelist name ="landuse_nml">
@@ -2745,12 +2767,10 @@ Add interactive dust emissions
       </namelist>
 
       <namelist name ="photosynthesis_nml">
-       photosynthesis_to_use = 'leuning'	   
-       co2_to_use_for_photosynthesis ='prescribed'    ! slm/jgj 2016/12/16 ok to set to interactive 
-       co2_for_photosynthesis = 284.262e-6            ! jgj  to match CMIP6 Jan 1 1850 co2 value	     
-       respiration_to_use = 'LM3'                     ! jgj to match CM4B #814
-       Kok_effect = .False.                           ! jgj to match CM4B #814
-       lai_eps=1.e-5                                  ! jgj to match CM4B #814 (default = 0.0)
+       photosynthesis_to_use = 'leuning'
+       co2_to_use_for_photosynthesis ='prescribed'
+       co2_for_photosynthesis = 284.262e-6
+       water_stress_to_use = 'plant-hydraulics'
       </namelist>
 
       <namelist name ="river_nml">
@@ -2794,7 +2814,31 @@ Add interactive dust emissions
        min_snow_mass = 1.e-7
        albedo_to_use = 'brdf-params'
        snow_density = 250.
-       prevent_tiny_snow = .true.
+      </namelist>
+
+      <namelist name="soil_carbon_nml">
+       soil_carbon_model_to_use = 'CORPSE'  !Nitrogen turned off
+       vmaxref=18.0,0.20,4.5     !Vmax at reference temperature (yr-1)
+       Ea=6e3,40e3,6e3
+       kC=3*.015
+       minMicrobeC=1e-3
+       Tmic=0.25
+       eup=.6,.05,.6
+       protection_rate=5.5
+       protection_species=0.2,0.0002,1.0
+       tProtected=75.0
+       soilMaxCohorts=2
+       gas_diffusion_exp=0.6
+       substrate_diffusion_exp=1.5
+       et=0.6
+       C_leaching_solubility=0.1 !0.3 
+       DOC_deposition_rate=1.0
+       C_flavor_relative_solubility=1.0,0.2,1.0
+       protected_relative_solubility=0.0
+       litterDensity=22.0
+       min_anaerobic_resp_factor=0.1
+       microbe_driven_protection=.FALSE.
+       use_rhizosphere_cohort=.TRUE.  ! Use just 2 cohorts: rhiz and bulk
       </namelist>
 
       <namelist name ="soil_data_nml">
@@ -2841,8 +2885,6 @@ Add interactive dust emissions
       <namelist name ="soil_nml">
        init_wtdep    = 10.
        albedo_to_use = 'brdf-maps'
-       uptake_to_use = 'darcy2d-linearized'
-       uptake_oneway = .true.
        active_layer_drainage_acceleration = 1.
        gw_flux_max   = 0.001
        lrunf_from_div = .false.
@@ -2854,7 +2896,6 @@ Add interactive dust emissions
        bwood_macinf = 1.
        allow_neg_wl = .true.
        prohibit_negative_water_div = .true.
-       fix_neg_subsurface_wl = .TRUE.
       </namelist>
 
       <namelist name ="static_veg_nml">
@@ -2868,69 +2909,66 @@ Add interactive dust emissions
       </namelist>
 
       <namelist name ="topo_rough_nml">
-      use_topo_rough    = .true.
-      max_topo_rough    = 100.0 
-      topo_rough_factor = 0.01
-      topo_rough_source = 'input',
-      topo_rough_file = 'INPUT/topo_rough_land.nc',                 
+       use_topo_rough    = .true.
+       max_topo_rough    = 100.0 
+       topo_rough_factor = 0.01
+       topo_rough_source = 'input',
+       topo_rough_file = 'INPUT/topo_rough_land.nc',                 
+      </namelist>
+
+      <namelist name="uptake_nml">
+       uptake_to_use = 'darcy2d-linearized'
+       uptake_oneway = .true.
       </namelist>
 
       <namelist name ="vegn_data_nml">
        vegn_to_use = 'uniform'
-       K1=10,
-       K2=0.1,
-       fsc_liv=0.9,
-       fsc_wood=0.45,
-       c1(4) = 0.3
-       c2(4) = 0.3
-       Vmax = 2.0E-5, 2.0E-5, 2.0E-5, 2.0E-5, 1.50E-5,
-       m_cond = 4., 9., 9., 7., 7.,
-       alpha_phot = 0.05, 0.06, 0.06, 0.06, 0.06,
-       gamma_resp = 0.03, 0.02, 0.02, 0.02, 0.02,
-       tc_crit(0:2) = 3*273.16
-       fact_crit_phen(0:4) = 0., 0., 0., 0., 0.
-       fact_crit_fire(0:4) = 0., 0., 0., 0., 0.
-       cnst_crit_phen(0:4) = 0.30, 0.15, 0.15, 0.30, 0.30
-       cnst_crit_fire(0:4) = 0.15,  0.40, 0.15, 0.15, 0.15
-       wet_leaf_dreg(0:4)  = .3, .3, .3, .3, .3
-       ksi =  0, 0, 0, 0, 0,
-       leaf_refl(0:4,1) = 0.11, 0.11, 0.10, 0.10, 0.10
-       leaf_refl(0:4,2) = 0.58, 0.58, 0.45, 0.45, 0.39,
-       dat_root_zeta(0:4) =   0.35212, 0.17039, 0.28909, 0.25813, 0.17039
-       critical_root_density = 0.0,
+       K1=10
+       K2=0.1
+
+       critical_root_density = 0.0
        tau_drip_s     = 259200.0
-       cmc_lai(0:4) = 0.02, 0.02, 0.02, 0.02, 0.02
-       csc_lai(0:4) = 0.30, 0.30, 0.30, 0.30, 0.2                   ! jgj to match CM4B #814 (last entry was 0.6 in #808)
-       dat_snow_crit = 2*1.e7, .1, 1.e7, .1                         ! jgj to match CM4B #814 (was 4*1.e7, .1 in #808)
        t_transp_min = 268.
-       srl(0:1) = 112.0e3, 150.0e3
-       root_perm = 14*5e-7
-       alpha(1,3) = 4
-       leaf_age_tau(2) = 150
-       smoke_fraction = 0.9, 0.9, 0.6, 0.6, 0.6
-       tg_c3_thresh = 1
-       phen_ev1 = 0.2
-       phen_ev2 = 0.7
+
+       phen_ev2 = 0.925
        cmc_eps = 0.01
-       alpha(0:4,6) = 0.0, 0.0, 0.012, 0.012, 0.012
-       treefall_disturbance_rate = 0.175, 0.185, 0.025, 0.0275, 0.027
-       use_light_saber = .true.     ! jgj to match CM4B #814
-       sai_cover = .true.           ! jgj to match CM4B #814
-       sai_rad = .true.             ! jgj to match CM4B #814
-       min_lai = 1.e-5              ! jgj to match CM4B #814 - prevent numerical instability
+       do_ppa = .TRUE.
+       mcv_min = 0.0
+       mcv_lai = 0.0
+
+       understory_lai_factor = 0.25
+       nat_mortality_splits_tiles = .FALSE.
+
+       NSC_merge_rel = 9999.0
+
+       ! Nitrogen parameters follow:
+       N_fixer_C_efficiency  = 0.2  ! Phillips, 1980: Per plant allocation, about 6 gC/gN
+       myc_scav_C_efficiency = 0.5
+       myc_mine_C_efficiency = 0.5
+       N_limits_live_biomass = F
+       mycorrhizal_turnover_time = 1.0
+       N_fixer_turnover_time = 0.1
+       excess_stored_N_leakage_rate = 1.5e-1
+       et_myc = 0.5
+       N_fix_Tdep_Houlton = TRUE
+       
+       sai_rad = .TRUE.
+       sai_cover = .TRUE.
       </namelist>
 
       <namelist name ="vegn_nml">
-      init_Tv = 288.0
-      rad_to_use = 'two-stream'
-      snow_rad_to_use = 'paint-leaves'
-      do_cohort_dynamics   = .TRUE.,
-      do_patch_disturbance = .TRUE.,
-      do_phenology         = .TRUE.,
-      do_biogeography      = .TRUE.,
-      do_seed_transport    = .TRUE.,
-      tau_smooth_ncm = 22.0
-      rav_lit_bwood = 300.
+       init_Tv = 288.0
+       init_n_cohorts = 6
+       init_cohort_species =  'c3grass', 'c4grass', 'acer', 'picea', 'larix', 'prioria'
+       init_cohort_nindivs =   0.1,       0.1,       1.0,    1.0,      1.0,    1.0
+       init_cohort_height  =   2.5e-3,    2.5e-3,    0.1,    0.1,      0.1,    0.1
+       rad_to_use = 'two-stream'
+       snow_rad_to_use = 'paint-leaves'
+       do_cohort_dynamics   = .TRUE.
+       do_patch_disturbance = .TRUE.
+       do_phenology         = .TRUE.
+       do_biogeography      = .FALSE.
+       do_seed_transport    = .TRUE.
       </namelist>
 
 
@@ -4851,6 +4889,371 @@ fedet_btf_valid_min = 0.0
 #
 /
 ###........................................
+# species parameters
+"species", "land_mod", "default"
+    froot_live_c2n = 45.0
+    sapwood_c2n    = 250.0
+    leaf_C_retrans_frac = 0.24
+    root_C_retrans_frac = 0.24
+    root_N_retrans_frac = 0.2
+    root_exudate_N_frac = 0.001
+    dynamic_root_exudation = F
+    N_fixation_rate = 4.2
+    root_NH4_uptake_rate = 0.1
+    root_NO3_uptake_rate = 0.1
+    N_stress_root_factor = 0.0
+    k_nitrate_root_uptake = 5e-3
+    k_ammonium_root_uptake = 5e-3
+    c2n_mycorrhizae = 10.0
+    myc_N_to_plant_rate = 250.0
+    myc_growth_rate = 0.3
+    kM_myc_growth = 1.0e-4
+    tau_nsc_exudate = 0.0
+/
+ "species", "land_mod", "prioria"
+    long_name = prioria
+    alpha_leaf =  0.5
+    alpha_root = 0.8
+    alpha_wood = 0.5e-01
+    beta_root = 1.25
+    beta_vleaf = 0.0
+    beta_sapwood = 0.1e-02
+    srl =    43900.0
+    root_r =   0.12e-03
+    LMA =   0.35e-01
+    m_cond =    7.0
+    Vmax =   0.2e-04
+    gamma_resp =   0.10e-01
+    alpha_phot = 0.04
+    leaf_age_tau =    0.0
+    cnst_crit_phen =   0.3
+    dat_height =    19.5
+    dat_root_density =    4.9
+    dat_root_zeta =   0.25813
+    dat_rs_min =    43.6
+    allometry_type = HML
+    alphaHT = 60.97697
+    thetaHT = 0.8631476
+    gammaHT = 0.6841742
+    alphaCA = 243.7808
+    thetaCA = 1.18162
+    alphaBM = 0.559
+    phiCSA = 0.841
+    maturalage =    5.0
+    seedling_height = 0.1
+    prob_e =   0.1
+    mortrate_d_c =   0.00526
+    mortrate_d_u =   0.00847
+    rho_wood =   431.0
+    LAImax =   6.0
+    phiRL =   1.4
+    root_exudate_frac = 0.075
+    Kxam = 3.0,     dx = -3.0, cx = 1.5
+    Klam = 3.0E-01, dl = -3.0, cl = 1.5
+    psi_tlp = -2.5
+    root_perm  = 5.0e-7
+    branch_wood_frac = 0.1525
+    leaf_refl = 0.1, 0.5
+    ROS_max = 0.22
+    CC_leaf =  0.7,  CC_stem =  0.15, CC_litter =  0.5
+    F_scorch_height = 0.1487
+    LMA_understory_factor = 1.0, Vmax_understory_factor = 1.0, Resp_understory_factor = 1.0
+    Tmin_mort = 278.16
+    use_light_saber = F
+    leaf_N_retrans_frac = 0.6
+ /
+# species parameters
+"species", "land_mod", "picea"
+    long_name = picea
+    alpha_leaf =  0.120000000
+    alpha_root = 0.8
+    alpha_wood = 0.5e-01
+    beta_root = 1.25
+    beta_vleaf = 0.0
+    beta_sapwood = 0.1e-02
+    srl =    43900.0
+    root_r =   0.12e-03
+    LMA =   0.1
+    m_cond =    7.0
+    Vmax =   0.17e-04
+    gamma_resp =   0.41e-01
+    alpha_phot = 0.04
+    growth_resp = 0.333
+    NSC2targetbl = 4.0
+    leaf_age_tau =    0.0
+    cnst_crit_phen =   0.3
+    dat_height =    19.5
+    dat_root_density =    4.9
+    dat_root_zeta =   0.25813
+    dat_rs_min =    43.6
+    allometry_type = HML
+    alphaHT = 29.82898
+    thetaHT = 1.45212
+    gammaHT = 0.10951
+    alphaCA = 111.059
+    thetaCA = 1.57985 
+    alphaBM = 0.20736
+    phiCSA = 0.5364167
+    maturalage =    5.0
+    seedling_height = 0.1
+    prob_e =   0.1
+    mortrate_d_c =   0.2e-01
+    mortrate_d_u =   0.81e-01
+    rho_wood =  370
+#   laimax was changed to its original value    
+    LAImax =  5.0
+    phiRL =   1.4
+    root_exudate_frac = 0.075
+    Kxam = 3.0,     dx = -3.0, cx = 1.5
+    Klam = 3.0E-01, dl = -3.0, cl = 1.5
+    psi_tlp = -2.5
+    root_perm  = 5.0e-7
+    branch_wood_frac =  0.2065217
+    phenology_type = 'evergreen'
+    F_scorch_height = 0.11
+    ROS_max = 0.3
+    CC_leaf =  0.75,  CC_stem =  0.2, CC_litter =  0.55
+    F_scorch_height = 0.1487    
+    LMA_understory_factor = 1.0, Vmax_understory_factor = 1.0, Resp_understory_factor = 1.0
+    use_light_saber = F
+    leaf_N_retrans_frac = 0.5
+/
+ "species", "land_mod", "larix"
+    long_name = larix
+    alpha_leaf =  0.8
+    alpha_root = 0.8
+    alpha_wood = 0.5e-01
+    beta_root = 1.25
+    beta_vleaf = 0.0
+    beta_sapwood = 0.1e-02
+    srl =    43900.0
+    root_r =   0.12e-03
+     LMA =   0.76e-01
+#    LMA =   0.38e-01
+    m_cond =    7.0
+#    Vmax =   0.15e-04
+#    gamma_resp =   0.20e-01
+    Vmax =   0.17e-04
+    gamma_resp =   0.35e-01
+    growth_resp = 0.333
+    NSC2targetbl = 4.0
+    leaf_age_tau =    0.0
+    cnst_crit_phen =   0.3
+    gdd_crit = 180
+    tc_crit = 278.15
+    dat_height =    19.5
+    dat_root_density =    4.9
+    dat_root_zeta =   0.25813
+    dat_rs_min =    43.6
+    allometry_type = HML
+    alphaHT = 34.88173
+    thetaHT = 1.04406
+    gammaHT = 0.22555
+    alphaCA = 161.562
+    thetaCA = 1.5814 
+    alphaBM = 0.1831469
+    phiCSA = 0.5247044
+    maturalage =    5.0
+    seedling_height = 0.1
+    prob_e =   0.1
+    mortrate_d_c =   0.2e-01
+    mortrate_d_u =   0.81e-01
+    rho_wood =  490
+#    LAImax =   5.0
+    LAImax =   3.5
+#    phiRL =   1.4
+    phiRL =   0.8    
+    root_exudate_frac = 0.075
+    Kxam = 3.0,     dx = -3.0, cx = 1.5
+    Klam = 3.0E-01, dl = -3.0, cl = 1.5
+    psi_tlp = -2.5
+    root_perm  = 5.0e-7
+#    branch_wood_frac =  0.25
+     branch_wood_frac = 0.2065217
+    F_scorch_height = 0.11
+    ROS_max = 0.3
+    CC_leaf =  0.75,  CC_stem =  0.2, CC_litter =  0.55
+    F_scorch_height = 0.1487    
+    LMA_understory_factor = 1.0, Vmax_understory_factor = 1.0, Resp_understory_factor = 1.0
+    use_light_saber = F
+    leaf_N_retrans_frac = 0.6
+/
+ "species", "land_mod", "acer"
+    long_name = acer
+    alpha_leaf =  0.8
+    alpha_root = 0.8
+    alpha_wood = 0.5e-01
+    beta_root = 1.25
+    beta_vleaf = 0.0
+    beta_sapwood = 0.1e-02
+    srl =    43900.0
+    root_r =   0.12e-03
+    LMA =   0.38e-01
+    m_cond =    7.0
+    Vmax =   0.2e-04
+    gamma_resp =   0.35e-01
+    alpha_phot = 0.04
+    growth_resp = 0.333
+    NSC2targetbl = 4.0
+    leaf_age_tau = 0.0
+    cnst_crit_phen =   0.3
+    dat_height =    19.5
+    dat_root_density =    4.9
+    dat_root_zeta =   0.25813
+    dat_rs_min =    43.6
+    allometry_type = HML
+    alphaHT = 25.60119
+    thetaHT = 1.56075
+    gammaHT = 0.04394
+    alphaCA = 150.0
+    thetaCA = 1.5
+    alphaBM = 0.6704459
+    phiCSA = 0.4106051
+    maturalage =    5.0
+    seedling_height = 0.1
+    prob_e =   0.1
+    mortrate_d_c =   0.2e-01
+    mortrate_d_u =   0.81e-01
+    rho_wood =   255.0
+    LAImax =   3.5
+    phiRL =   0.8
+    root_exudate_frac = 0.075
+    Kxam = 3.0,     dx = -3.0, cx = 1.5
+    Klam = 3.0E-01, dl = -3.0, cl = 1.5
+    psi_tlp = -2.5
+    root_perm  = 5.0e-7
+    branch_wood_frac = 0.2065217
+    ROS_max = 0.22
+    CC_leaf =  0.7,  CC_stem =  0.1, CC_litter =  0.45
+    F_scorch_height = 0.094
+    LMA_understory_factor = 1.0, Vmax_understory_factor = 1.0, Resp_understory_factor = 1.0
+    use_light_saber = F
+    leaf_N_retrans_frac = 0.6
+/
+  "species", "land_mod", "c4grass"
+    long_name = Idealized C4 grass
+    lifeform = grass
+    physiology_type = C4
+    phenology_type = deciduous
+    alpha_leaf   = 2.0
+    alpha_root   = 0.8
+    alpha_wood   = 2.0
+    beta_sapwood = 0.1e-02
+    beta_root    = 1.25
+    root_r =   0.12e-03
+    srl = 112.0e3
+#    srl = 31950.0
+    LMA = 0.02655
+    m_cond =    4.0
+    Vmax = 0.1e-4
+    gamma_resp = 0.03
+    alpha_phot = 0.03
+    growth_resp = 0.333
+    NSC2targetbl = 4.0
+    leaf_age_tau =    0.0
+    cnst_crit_phen =   0.3
+    dat_height =    19.5
+    dat_root_density =    4.9
+    dat_root_zeta =   0.35212
+    dat_rs_min =    43.6
+    allometry_type = HML
+    alphaHT = 1.411496
+    thetaHT = 2.61129
+    gammaHT = 0.001410067
+    alphaCA = 95.0
+    thetaCA = 1.5
+    alphaBM = 1.0
+    rho_wood = 69.4
+    phiCSA = 0.0
+    maturalage =    0.0
+    seedling_height = 2.5e-03
+    prob_e =   0.6
+    prob_g = 0.1
+    v_seed = 0.2
+    mortrate_d_c =   0.14
+    mortrate_d_u =   0.14
+    LAImax =  2.5
+    phiRL =   0.8
+    root_exudate_frac = 0.075
+    Kxam = 3.0,     dx = -3.0, cx = 1.5
+    Klam = 3.0E-01, dl = -3.0, cl = 1.5
+    psi_tlp = -2.5
+    root_perm  = 5.0e-7
+    branch_wood_frac = 0.0
+    seedling_nsc_frac = 3.0 
+    leaf_refl = 0.11, 0.58
+    internal_gap_frac = 0.3
+    ROS_max = 0.4
+    CC_leaf       = 0.85,  CC_stem       = 0.85,  CC_litter     = 0.85
+    fireMort_leaf = 0.85,  fireMort_stem = 0.0,   fireMort_root = 0.2
+    LMA_understory_factor = 1.0, Vmax_understory_factor = 1.0, Resp_understory_factor = 1.0
+    reproduces_in_understory = T
+    limit_tussock_R = T, tussock_Ra = 0.1, tussock_Rb = 1.0
+    use_light_saber = T
+    leaf_N_retrans_frac = 0.7
+/
+ "species", "land_mod", "c3grass"
+    long_name = Idealized C3 grass
+    lifeform = grass
+    phenology_type = deciduous
+    alpha_leaf   = 2.0
+    alpha_root = 0.8
+    alpha_wood   = 2.0
+    beta_sapwood = 0.1e-02
+    beta_root    = 1.25
+    root_r =   0.12e-03
+    srl =    150.0e3
+    LMA = 0.02655
+    m_cond =    7.0
+    Vmax = 0.2e-4
+#    gamma_resp = 0.02
+    gamma_resp = 0.015
+    alpha_phot = 0.06
+    growth_resp = 0.333
+    NSC2targetbl = 4.0
+    leaf_age_tau =    0.0
+    cnst_crit_phen =   0.15
+    dat_height =    19.5
+    dat_root_density =    4.9
+    dat_root_zeta =   0.17039
+    dat_rs_min =    43.6
+    allometry_type = HML
+    alphaHT = 1.411496
+    thetaHT = 2.61129
+    gammaHT = 0.001410067
+    alphaCA = 95.0
+    thetaCA = 1.5
+    alphaBM = 1.0
+    rho_wood = 69.4
+    phiCSA = 0.0
+    maturalage =    0.0
+    seedling_height = 0.1
+    prob_e =   0.6
+    prob_g = 0.44
+    v_seed = 0.1
+    mortrate_d_c =   0.02475
+    mortrate_d_u =   0.01936
+    LAImax =  2.5
+    phiRL =   0.8
+    root_exudate_frac = 0.075
+    Kxam = 3.0,     dx = -3.0, cx = 1.5
+    Klam = 3.0E-01, dl = -3.0, cl = 1.5
+    psi_tlp = -2.5
+    root_perm  = 5.0e-7
+    branch_wood_frac = 0.0
+    seedling_nsc_frac = 3.0 
+    leaf_refl = 0.11, 0.58
+    ROS_max = 0.4
+    CC_leaf       = 0.85,  CC_stem       = 0.85,  CC_litter     =  0.85
+    fireMort_leaf = 0.85,  fireMort_stem = 0.0,   fireMort_root = 0.2
+    LMA_understory_factor = 1.0, Vmax_understory_factor = 1.0, Resp_understory_factor = 1.0
+    reproduces_in_understory = T
+    limit_tussock_R = T, tussock_Ra = 0.5, tussock_Rb = 1.0
+    use_light_saber = T
+    gdd_crit = 180
+    tc_crit =  278.15
+    leaf_N_retrans_frac = 0.7
+    /
       </fieldTable>  
 
 
@@ -5284,7 +5687,6 @@ $baseDate
 # land one-level month-average output
 "land",    "area",       "area",       "land_month",  "all", .true., "none", 2
 "land",    "area_glac",  "glac_area",  "land_month",  "all", .true., "none", 2
-"land",    "Ctot",       "Ctot",       "land_month",  "all", .true., "none", 2
 "land",    "evap",       "evap_land",  "land_month",  "all", .true., "none", 2
 "land",    "evap_glac",  "evap_glac",  "land_month",  "all", .true., "none", 2
 "land",    "evap_lake",  "evap_lake",  "land_month",  "all", .true., "none", 2
@@ -5333,6 +5735,8 @@ $baseDate
 "land",    "transp",     "transp",     "land_month",  "all", .true., "none", 2
 "land",    "water_lake", "water_lake", "land_month",  "all", .true., "none", 2
 "land",    "water_soil", "water_soil", "land_month",  "all", .true., "none", 2
+"land",    "LWSr",       "LWSr",       "land_month",  "all", .true., "none", 2
+"land",    "FWSr",       "FWSr",       "land_month",  "all", .true., "none", 2
 "soil",    "soil_fgw",   "soil_fgw",   "land_month",  "all", .true., "none", 2
 "soil",    "soil_fsat",  "soil_fsat",  "land_month",  "all", .true., "none", 2
 "soil",    "soil_psi_n", "soil_psi_n", "land_month",  "all", .true., "none", 2
@@ -5342,35 +5746,89 @@ $baseDate
 "soil",    "soil_rsn",   "soil_rsn",   "land_month",  "all", .true., "none", 2
 "soil",    "soil_wtdep", "soil_wtdep", "land_month",  "all", .true., "none", 2
 "soil",    "soil_wt_4",  "soil_wt_4",  "land_month",  "all", .true., "none", 2
-"vegn",    "an_cl",      "an_cl",      "land_month",  "all", .true., "none", 2
-"vegn",    "an_op",      "an_op",      "land_month",  "all", .true., "none", 2
-"vegn",    "asoil",      "asoil",      "land_month",  "all", .true., "none", 2
-"vegn",    "bl",         "bl",         "land_month",  "all", .true., "none", 2
-"vegn",    "blv",        "blv",        "land_month",  "all", .true., "none", 2
-"vegn",    "br",         "br",         "land_month",  "all", .true., "none", 2
-"vegn",    "bsw",        "bsw",        "land_month",  "all", .true., "none", 2
-"vegn",    "bwood",      "bwood",      "land_month",  "all", .true., "none", 2
-"vegn",    "fsc",        "fsc",        "land_month",  "all", .true., "none", 2
-"vegn",    "gpp",        "gpp",        "land_month",  "all", .true., "none", 2
-"vegn",    "height",     "vegn_height","land_month",  "all", .true., "none", 2
-"vegn",    "LAI",        "LAI",        "land_month",  "all", .true., "none", 2
-"vegn",    "nep",        "nep",        "land_month",  "all", .true., "none", 2
-"vegn",    "npp",        "npp",        "land_month",  "all", .true., "none", 2
-"vegn",    "qco2_phot",  "qco2_phot",  "land_month",  "all", .true., "none", 2
-"vegn",    "root_density","vegn_rden", "land_month",  "all", .true., "none", 2
-"vegn",    "resp",       "resp",       "land_month",  "all", .true., "none", 2
-"vegn",    "resg",       "resg",       "land_month",  "all", .true., "none", 2
-"vegn",    "root_zeta",  "vegn_rzeta", "land_month",  "all", .true., "none", 2
-"vegn",    "rsoil",      "rsoil",      "land_month",  "all", .true., "none", 2
-"vegn",    "rsoil_fast", "rsoil_fast", "land_month",  "all", .true., "none", 2
-"vegn",    "snow_crit",  "vegn_sncrit","land_month",  "all", .true., "none", 2
-"vegn",    "species",    "species",    "land_month",  "all", .true., "none", 2
-"vegn",    "ssc",        "ssc",        "land_month",  "all", .true., "none", 2
-"vegn",    "temp",       "vegn_T",     "land_month",  "all", .true., "none", 2
-"vegn",    "theta",      "theta",      "land_month",  "all", .true., "none", 2
-"vegn",    "tsoil_av",   "tsoil_av",   "land_month",  "all", .true., "none", 2
-"land",    "LWSr",       "LWSr",       "land_month",  "all", .true., "none", 2
-"land",    "FWSr",       "FWSr",       "land_month",  "all", .true., "none", 2
+"vegn",    "PAR_dn",                   "PAR_dn",                  "land_month", "all", .true., "none", 2
+"vegn",    "PAR_net",                  "PAR_net",                 "land_month", "all", .true., "none", 2
+"vegn",    "an_cl",                    "an_cl",                   "land_month", "all", .true., "none", 2
+"vegn",    "an_op",                    "an_op",                   "land_month", "all", .true., "none", 2
+"vegn",    "asoil",                    "asoil",                   "land_month", "all", .true., "none", 2
+"vegn",    "bl",                       "bl",                      "land_month", "all", .true., "none", 2
+"vegn",    "blv",                      "blv",                     "land_month", "all", .true., "none", 2
+"vegn",    "br",                       "br",                      "land_month", "all", .true., "none", 2
+"vegn",    "bsw",                      "bsw",                     "land_month", "all", .true., "none", 2
+"vegn",    "bwood",                    "bwood",                   "land_month", "all", .true., "none", 2
+"vegn",    "bseed",                    "bseed",                   "land_month", "all", .true., "none", 2
+"vegn",    "nsc",                      "nsc",                     "land_month", "all", .true., "none", 2
+"vegn",    "btot",                     "btot",                    "land_month", "all", .true., "none", 2
+"vegn",    "Nl",                       "Nl",                      "land_month", "all", .true., "none", 2
+"vegn",    "Nr",                       "Nr",                      "land_month", "all", .true., "none", 2
+"vegn",    "Nseed",                    "Nseed",                   "land_month", "all", .true., "none", 2
+"vegn",    "Nsw",                      "Nsw",                     "land_month", "all", .true., "none", 2
+"vegn",    "Nwood",                    "Nwood",                   "land_month", "all", .true., "none", 2
+"vegn",    "Nstore",                   "Nstore",                  "land_month", "all", .true., "none", 2
+"vegn",    "Nvegtot",                  "Nvegtot",                 "land_month", "all", .true., "none", 2
+"vegn",    "nitrogen_stress",          "nitrogen_stress",         "land_month", "all", .true., "none", 2
+"land",    "Ctot",                     "Ctot",                    "land_month", "all", .true., "none", 2
+"land",    "Ntot",                     "Ntot",                    "land_month", "all", .true., "none", 2
+"vegn",    "height",                   "height",                  "land_month", "all", .true., "none", 2
+#"vegn",   "height1",                  "height1",                 "land_month", "all", .true., "none", 2
+"vegn",    "height_ave",               "height_ave",              "land_month", "all", .true., "none", 2
+"vegn",    "lai",                      "lai",                     "land_month", "all", .true., "none", 2
+"vegn",    "sai",                      "sai",                     "land_month", "all", .true., "none", 2
+"vegn",    "nep",                      "nep",                     "land_month", "all", .true., "none", 2
+"vegn",    "npp",                      "npp",                     "land_month", "all", .true., "none", 2
+"vegn",    "gpp",                      "gpp",                     "land_month", "all", .true., "none", 2
+"vegn",    "lai_kok",                  "lai_kok",                 "land_month", "all", .true., "none", 2
+"vegn",    "root_density",             "vegn_rden",               "land_month", "all", .true., "none", 2
+"vegn",    "soil_water_supply",        "soil_water_supply",       "land_month", "all", .true., "none", 2
+"vegn",    "resp",                     "resp",                    "land_month", "all", .true., "none", 2
+"vegn",    "resg",                     "resg",                    "land_month", "all", .true., "none", 2
+"vegn",    "root_zeta",                "vegn_rzeta",              "land_month", "all", .true., "none", 2
+"vegn",    "rsoil",                    "rsoil",                   "land_month", "all", .true., "none", 2
+"vegn",    "rsoil_fast",               "rsoil_fast",              "land_month", "all", .true., "none", 2
+"vegn",    "snow_crit",                "vegn_sncrit",             "land_month", "all", .true., "none", 2
+"vegn",    "fsc",                      "fsc",                     "land_month", "all", .true., "none", 2
+"vegn",    "ssc",                      "ssc",                     "land_month", "all", .true., "none", 2
+"vegn",    "theta",                    "theta",                   "land_month", "all", .true., "none", 2
+"vegn",    "tsoil_av",                 "tsoil_av",                "land_month", "all", .true., "none", 2
+"vegn",    "stomatal_cond",            "stomatal_cond",           "land_month", "all", .true., "none", 2
+"vegn",    "w_scale",                  "w_scale",                 "land_month", "all", .true., "none", 2
+"vegn",    "ncohorts",                 "ncohorts",                "land_month", "all", .true., "none", 2
+"vegn",    "nindivs",                  "nindivs",                 "land_month", "all", .true., "none", 2
+"vegn",    "nlayers",                  "nlayers",                 "land_month", "all", .true., "none", 2
+"vegn",    "dbh",                      "dbh",                     "land_month", "all", .true., "none", 2
+"vegn",    "crownarea",                "crownarea",               "land_month", "all", .true., "none", 2
+"vegn",    "gdd",                      "gdd",                     "land_month", "all", .true., "none", 2
+"vegn",    "tc_pheno",                 "tc_pheno",                "land_month", "all", .true., "none", 2
+"vegn",    "psiph",                    "psiph",                   "land_month", "all", .true., "none", 2
+"vegn",    "status",                   "status",                  "land_month", "all", .true., "none", 2
+"vegn",    "bl_max",                   "bl_max",                  "land_month", "all", .true., "none", 2
+"vegn",    "br_max",                   "br_max",                  "land_month", "all", .true., "none", 2
+"vegn",    "con_v_v",                  "con_v_v",                 "land_month", "all", .true., "none", 2
+"vegn",    "con_v_h",                  "con_v_h",                 "land_month", "all", .true., "none", 2
+"land",    "con_g_h",                  "con_g_h",                 "land_month", "all", .true., "none", 2
+"vegn",    "wl",                       "wl",                      "land_month", "all", .true., "none", 2
+"vegn",    "ws",                       "ws",                      "land_month", "all", .true., "none", 2
+"vegn",    "age",                      "age",                     "land_month", "all", .true., "none", 2
+"vegn",    "csmoke",                   "csmoke",                  "land_month", "all", .true., "none", 2
+"vegn",    "lambda",                   "lambda",                  "land_month", "all", .true., "none", 2
+"vegn",    "fuel",                     "fuel",                    "land_month", "all", .true., "none", 2
+"vegn",    "Ndep",                     "Ndep",                    "land_month", "all", .true., "none", 2
+"vegn",    "mrz_mine_biomass_C",       "mrz_mine_biomass_C",      "land_month", "all", .true., "none", 2
+"vegn",    "mrz_mine_biomass_N",       "mrz_mine_biomass_N",      "land_month", "all", .true., "none", 2
+"vegn",    "mrz_scav_biomass_C",       "mrz_scav_biomass_C",      "land_month", "all", .true., "none", 2
+"vegn",    "mrz_scav_biomass_N",       "mrz_scav_biomass_N",      "land_month", "all", .true., "none", 2
+"vegn",    "Nfix_biomass_C",           "Nfix_biomass_C",          "land_month", "all", .true., "none", 2
+"vegn",    "Nfix_biomass_N",           "Nfix_biomass_N",          "land_month", "all", .true., "none", 2
+"vegn",    "mrz_mine_res_C",           "mrz_mine_res_C",          "land_month", "all", .true., "none", 2
+"vegn",    "mrz_mine_res_N",           "mrz_mine_res_N",          "land_month", "all", .true., "none", 2
+"vegn",    "mrz_scav_res_C",           "mrz_scav_res_C",          "land_month", "all", .true., "none", 2
+"vegn",    "mrz_scav_res_N",           "mrz_scav_res_N",          "land_month", "all", .true., "none", 2
+"vegn",    "Nfix_res_C",               "Nfix_res_C",              "land_month", "all", .true., "none", 2
+"vegn",    "Nfix_res_N",               "Nfix_res_N",              "land_month", "all", .true., "none", 2
+"vegn",    "exudate",                  "exudate",                 "land_month", "all", .true., "none", 2
+"vegn",    "rhiz_exud_C",              "rhiz_exud_C",             "land_month", "all", .true., "none", 2
+"vegn",    "rhiz_exud_N",              "rhiz_exud_N",             "land_month", "all", .true., "none", 2
+"vegn",    "rhiz_exud_mgain",          "rhiz_exud_mgain",         "land_month", "all", .true., "none", 2
 ## 2016/12/19 add in land fields for conservation checking
 "land",     "water_cons"           ,        "water_cons",      "land_month",      "all", .true.,"none", 2
 "land",     "carbon_cons"          ,        "carbon_cons",     "land_month",      "all", .true.,"none", 2
@@ -5388,8 +5846,6 @@ $baseDate
 "vegn",    "wood_slow_harv_rate", "wood_slow_harv_rate",  "land_month", "all", .true.,  "none", 2
 "vegn",    "cleared_harv_rate",   "cleared_harv_rate",    "land_month", "all", .true.,  "none", 2
 "vegn",    "csmoke_rate","csmoke_rate","land_month",  "all", .true., "none", 2
-## added
-"vegn",    "SAI",        "SAI",        "land_month",  "all", .true., "none", 2
 #
 "flux_land",  "t_ref",    "t_ref",      "land_month",  "all", .true., "none", 2
 #
@@ -5416,6 +5872,126 @@ $baseDate
 "land",    "LWSr",       "LWSr",       "land_month_inst",  "all", .false., "none", 2
 "land",    "FWSr",       "FWSr",       "land_month_inst",  "all", .false., "none", 2
 "land",    "HSr",        "HSr",        "land_month_inst",  "all", .false., "none", 2
+"vegn",    "treeline_T",               "treeline_T",              "land_month_inst", "all", .false., "none", 2
+"vegn",    "treeline_season",          "treeline_season",         "land_month_inst", "all", .false., "none", 2
+
+"fire_month", 1,  "months", 1, "days", "time"
+"fire",    "fire_fn_rh",               "fire_fn_rh_max",          "fire_month", "all", "max", "none", 2
+"fire",    "fire_rh",                  "fire_rh_max",             "fire_month", "all", "max", "none", 2
+"fire",    "fire_fn_rh",               "fire_fn_rh_min",          "fire_month", "all", "min", "none", 2
+"fire",    "fire_rh",                  "fire_rh_min",             "fire_month", "all", "min", "none", 2
+"fire",    "Fcrop_raw",                "Fcrop_raw",               "fire_month", "all", .true., "none", 2
+"fire",    "Fpast_raw",                "Fpast_raw",               "fire_month", "all", .true., "none", 2
+# MONTHLY fire-related output
+"fire",    "fire_fn_theta",            "fire_fn_theta",           "fire_month", "all", .true., "none", 2
+"fire",    "fire_fn_rh",               "fire_fn_rh",              "fire_month", "all", .true., "none", 2
+"fire",    "fire_fn_Tca",              "fire_fn_Tca",             "fire_month", "all", .true., "none", 2
+"fire",    "fire_fn_agb",              "fire_fn_agb",             "fire_month", "all", .true., "none", 2
+"fire",    "fire_fn_popD_NF",          "fire_fn_popD_NF",         "fire_month", "all", .true., "none", 2
+"fire",    "fire_fn_popD_BA",          "fire_fn_popD_BA",         "fire_month", "all", .true., "none", 2
+"fire",    "fire_fn_GDPpc_NF",         "fire_fn_GDPpc_NF",        "fire_month", "all", .true., "none", 2
+"fire",    "fire_fn_GDPpc_BA",         "fire_fn_GDPpc_BA",        "fire_month", "all", .true., "none", 2
+"fire",    "Ia",                       "Ia",                      "fire_month", "all", .true., "none", 2
+"fire",    "In",                       "In",                      "fire_month", "all", .true., "none", 2
+"fire",    "BAperFire_noAnthro",       "BAperFire_noAnthro",      "fire_month", "all", .true., "none", 2
+"fire",    "BAperFire",                "BAperFire",               "fire_month", "all", .true., "none", 2
+"fire",    "BAperFire_0",              "BAperFire_0",             "fire_month", "all", .true., "none", 2
+"fire",    "BAperFire_1",              "BAperFire_1",             "fire_month", "all", .true., "none", 2
+"fire",    "BAperFire_2",              "BAperFire_2",             "fire_month", "all", .true., "none", 2
+"fire",    "BAperFire_3",              "BAperFire_3",             "fire_month", "all", .true., "none", 2
+"fire",    "lightning",                "lightning",               "fire_month", "all", .true., "none", 2
+"fire",    "population",               "population",              "fire_month", "all", .true., "none", 2
+"fire",    "GDP",                      "GDP",                     "fire_month", "all", .true., "none", 2
+"fire",    "GDPpc",                    "GDPpc",                   "fire_month", "all", .true., "none", 2
+"fire",    "Nfire_perKm2",             "Nfire_perKm2",            "fire_month", "all", .true., "none", 2
+"fire",    "BA_rate",                  "BA_rate",                 "fire_month", "all", .true., "none", 2
+"fire",    "BF_rate",                  "BF_rate",                 "fire_month", "all", .true., "none", 2
+"fire",    "Nfire_rate",               "Nfire_rate",              "fire_month", "all", .true., "none", 2
+"fire",    "burn_Cemit",               "burn_Cemit",              "fire_month", "all", .true., "none", 2
+"fire",    "burn_Cemit_noCWL",         "burn_Cemit_noCWL",        "fire_month", "all", .true., "none", 2
+"fire",    "burn_Cemit_leaf",          "burn_Cemit_leaf",         "fire_month", "all", .true., "none", 2
+"fire",    "burn_Cemit_stem",          "burn_Cemit_stem",         "fire_month", "all", .true., "none", 2
+"fire",    "burn_Cemit_litter",        "burn_Cemit_litter",       "fire_month", "all", .true., "none", 2
+"fire",    "burn_Cemit_litter_lf",     "burn_Cemit_litter_lf",    "fire_month", "all", .true., "none", 2
+"fire",    "burn_Cemit_litter_cw",     "burn_Cemit_litter_cw",    "fire_month", "all", .true., "none", 2
+"fire",    "burn_Cemit_CO2",           "burn_Cemit_CO2",          "fire_month", "all", .true., "none", 2
+"fire",    "burn_Cemit_CO",            "burn_Cemit_CO",           "fire_month", "all", .true., "none", 2
+"fire",    "burn_Ckill",               "burn_Ckill",              "fire_month", "all", .true., "none", 2
+"fire",    "burn_Ckill_leaf",          "burn_Ckill_leaf",         "fire_month", "all", .true., "none", 2
+"fire",    "burn_Ckill_stem",          "burn_Ckill_stem",         "fire_month", "all", .true., "none", 2
+"fire",    "burn_Ckill_root",          "burn_Ckill_root",         "fire_month", "all", .true., "none", 2
+"fire",    "fire_rh",                  "fire_rh",                 "fire_month", "all", .true., "none", 2
+"fire",    "fire_theta",               "fire_theta",              "fire_month", "all", .true., "none", 2
+"fire",    "fire_Tca",                 "fire_Tca",                "fire_month", "all", .true., "none", 2
+"fire",    "ROS",                      "ROS",                     "fire_month", "all", .true., "none", 2
+"fire",    "fire_duration_ave",        "fire_duration_ave",       "fire_month", "all", .true., "none", 2
+"fire",    "LB",                       "LB",                      "fire_month", "all", .true., "none", 2
+"fire",    "HB",                       "HB",                      "fire_month", "all", .true., "none", 2
+"fire",    "fire_agb",                 "fire_agb",                "fire_month", "all", .true., "none", 2
+"fire",    "wind_forFire",             "wind_forFire",            "fire_month", "all", .true., "none", 2
+"fire",    "wind_canaTop",             "wind_canaTop",            "fire_month", "all", .true., "none", 2
+"fire",    "fire_depth_ave",           "fire_depth_ave",          "fire_month", "all", .true., "none", 2
+"fire",    "Fcrop",                    "Fcrop",                   "fire_month", "all", .true., "none", 2
+"fire",    "Fpast",                    "Fpast",                   "fire_month", "all", .true., "none", 2
+"fire",    "BAperFire_max",            "BAperFire_max",           "fire_month", "all", .true., "none", 2
+"fire",    "fragmenting_frac",         "fragmenting_frac",        "fire_month", "all", .true., "none", 2
+"fire",    "burnable_frac",            "burnable_frac",           "fire_month", "all", .true., "none", 2
+"fire",    "fireFtheta_ann",           "fireFtheta_ann",          "fire_month", "all", .true., "none", 2
+"fire",    "defoFS",                   "defoFS",                  "fire_month", "all", .true., "none", 2
+"fire",    "days_since_fire",          "days_since_fire",         "fire_month", "all", .true., "none", 2
+"fire",    "fire_intensity",           "fire_intensity",          "fire_month", "all", .true., "none", 2
+"fire",    "crown_scorch_frac",        "crown_scorch_frac",       "fire_month", "all", .true., "none", 2
+"fire",    "multiday_fire_BA",         "multiday_fire_BA",        "fire_month", "all", .true., "none", 2
+"fire",    "multiday_fire_Nfires",     "multiday_fire_Nfires",    "fire_month", "all", .true., "none", 2
+"fire",    "fire_rad_power",           "fire_rad_power",          "fire_month", "all", .true., "none", 2
+
+"land_month_by_species",  1,  "months", 1, "days", "time"
+"vegn",    "bl(species)",              "bl",                      "land_month_by_species", "all", .true., "none", 2
+"vegn",    "blv(species)",             "blv",                     "land_month_by_species", "all", .true., "none", 2
+"vegn",    "br(species)",              "br",                      "land_month_by_species", "all", .true., "none", 2
+"vegn",    "bsw(species)",             "bsw",                     "land_month_by_species", "all", .true., "none", 2
+"vegn",    "bwood(species)",           "bwood",                   "land_month_by_species", "all", .true., "none", 2
+"vegn",    "bseed(species)",           "bseed",                   "land_month_by_species", "all", .true., "none", 2
+"vegn",    "nsc(species)",             "nsc",                     "land_month_by_species", "all", .true., "none", 2
+"vegn",    "btot(species)",            "btot",                    "land_month_by_species", "all", .true., "none", 2
+"vegn",    "height_ave(species)",      "height_ave",              "land_month_by_species", "all", .true., "none", 2
+"vegn",    "lai(species)",             "lai",                     "land_month_by_species", "all", .true., "none", 2
+"vegn",    "laii(species)",            "laii",                    "land_month_by_species", "all", .true., "none", 2
+"vegn",    "laimax(species)",          "laimax",                  "land_month_by_species", "all", .true., "none", 2
+"vegn",    "laiimax(species)",         "laiimax",                 "land_month_by_species", "all", .true., "none", 2
+"vegn",    "leafarea(species)",        "leafarea",                "land_month_by_species", "all", .true., "none", 2
+"vegn",    "lai_kok(species)",         "lai_kok",                 "land_month_by_species", "all", .true., "none", 2
+"vegn",    "sai(species)",             "sai",                     "land_month_by_species", "all", .true., "none", 2
+"vegn",    "npp(species)",             "npp",                     "land_month_by_species", "all", .true., "none", 2
+"vegn",    "gpp(species)",             "gpp",                     "land_month_by_species", "all", .true., "none", 2
+"vegn",    "resp(species)",            "resp",                    "land_month_by_species", "all", .true., "none", 2
+"vegn",    "w_scale(species)",         "w_scale",                 "land_month_by_species", "all", .true., "none", 2
+"vegn",    "an_cl(species)",           "an_cl",                   "land_month_by_species", "all", .true., "none", 2
+"vegn",    "an_op(species)",           "an_op",                   "land_month_by_species", "all", .true., "none", 2
+"vegn",    "ncohorts(species)",        "ncohorts",                "land_month_by_species", "all", .true., "none", 2
+"vegn",    "nindivs(species)",         "nindivs",                 "land_month_by_species", "all", .true., "none", 2
+"vegn",    "dbh(species)",             "dbh",                     "land_month_by_species", "all", .true., "none", 2
+"vegn",    "crownarea(species)",       "crownarea",               "land_month_by_species", "all", .true., "none", 2
+"vegn",    "bl_max(species)",          "bl_max",                  "land_month_by_species", "all", .true., "none", 2
+"vegn",    "br_max(species)",          "br_max",                  "land_month_by_species", "all", .true., "none", 2
+"vegn",    "wl(species)",              "wl",                      "land_month_by_species", "all", .true., "none", 2
+"vegn",    "ws(species)",              "ws",                      "land_month_by_species", "all", .true., "none", 2
+"vegn",    "age(species)",             "age",                     "land_month_by_species", "all", .true., "none", 2
+"vegn",    "PAR_dn(species)",          "PAR_dn",                  "land_month_by_species", "all", .true., "none", 2
+"vegn",    "PAR_net(species)",         "PAR_net",                 "land_month_by_species", "all", .true., "none", 2
+"vegn",    "temp(species)",            "Tvegn",                   "land_month_by_species", "all", .true., "none", 2
+"vegn",    "Nl(species)",              "Nl",                      "land_month_by_species", "all", .true., "none", 2
+"vegn",    "Nr(species)",              "Nr",                      "land_month_by_species", "all", .true., "none", 2
+"vegn",    "Nseed(species)",           "Nseed",                   "land_month_by_species", "all", .true., "none", 2
+"vegn",    "Nsw(species)",             "Nsw",                     "land_month_by_species", "all", .true., "none", 2
+"vegn",    "Nwood(species)",           "Nwood",                   "land_month_by_species", "all", .true., "none", 2
+"vegn",    "Nstore(species)",          "Nstore",                  "land_month_by_species", "all", .true., "none", 2
+"vegn",    "Nvegtot(species)",         "Nvegtot",                 "land_month_by_species", "all", .true., "none", 2
+"vegn",    "nitrogen_stress(species)", "nitrogen_stress",         "land_month_by_species", "all", .true., "none", 2
+"vegn",    "exudate(species)",         "exudate",                 "land_month_by_species", "all", .true., "none", 2
+"vegn",    "rhiz_exud_C(species)",     "rhiz_exud_C",             "land_month_by_species", "all", .true., "none", 2
+"vegn",    "rhiz_exud_N(species)",     "rhiz_exud_N",             "land_month_by_species", "all", .true., "none", 2
+"vegn",    "rhiz_exud_mgain(species)", "rhiz_exud_mgain",         "land_month_by_species", "all", .true., "none", 2
 
 # ############################
 # land_dust
@@ -7950,7 +8526,8 @@ endif
       -->
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <!--dataSource site="ncrc">/lustre/f1/unswept/Larry.Horowitz/awg/IC/ESM4p0p2_L49_pot_veg_ocean0201_20171103.tar</dataSource-->
-        <dataSource site="ncrc">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw//Larry.Horowitz_awg_IC_ESM4p0p2_L49_pot_veg_ocean0201_20171103_combined_minusMOMrestarts.tar</dataSource>
+        <!--dataSource site="ncrc">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw//Larry.Horowitz_awg_IC_ESM4p0p2_L49_pot_veg_ocean0201_20171103_combined_minusMOMrestarts.tar</dataSource-->
+        <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fms/ESM4/IC/Larry.Horowitz_awg_IC_ESM4p0p2_L49_pot_veg_ocean0201_20171103_combined_minusMOMrestarts_LM4p1.v20180301.tar</dataSource>
       </dataFile>
 
 <!-- c96_LM4_Op5 -->
@@ -8018,6 +8595,21 @@ endif
       <dataFile label="input" target="INPUT/AM4_201510" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/common_AM4/am4_optical_table_20151029.dat</dataSource>
       </dataFile>
+<!-- fire-related data sets -->
+      <dataFile label="input" target="INPUT/lightning.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Daniel.Ward/data/FINAL/LISOTD_LRMTS_V2.3.2013.CLIMO.20140208.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/Fk.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Daniel.Ward/data/FINAL/FcFp_20170207_2deg.nc</dataSource>
+      </dataFile>
+<!-- nitrogen-related data sets -->
+      <dataFile label="input" target="INPUT/nbiodata_nat.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Benjamin.Sulman/green_nsource_preind_fixed.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/nbiodata_ant.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Benjamin.Sulman/green_nsource_anthro_fixed.nc</dataSource>
+      </dataFile>
+
 <!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/INPUT/emissions.diag.tracers.cpio</dataSource>
@@ -8292,6 +8884,61 @@ endif
       <xi:include xpointer="xpointer(//freInclude[@name='COBALT_CMIP6_z_postprocess']/postProcess/node())"/>
     </postProcess>
 
+  </experiment>
+
+  <experiment name="ESM4p3p2k_1850C_PIpcairco2_smag" inherit="ESM4p3p2k_1850C_PIpcairco2">
+    <input>
+<!-- MOM and SIS overrides -->
+      <csh><![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override SMAGORINSKY_KH = True
+#override SMAG_LAP_CONST = 0.15
+#override KH_RES_SCALE_COEF = 1.0
+#override KH_RES_FN_POWER = 100
+#override MEKE_VISCOSITY_COEFF = 1.0
+#override VISC_RES_FN_POWER = 100
+#override VISC_RES_SCALE_COEF = 1.0
+#override MEKE_KHTH_FAC = 0.5
+#override MEKE_KHTR_FAC = 0.5
+#override KH = 0.0
+#override KHTR = 50.0
+#override KD = 1.5e-5
+#override FOX_KEMPER_ML_RESTRAT_COEF = 1.0
+#override FGNV_FILTER_SCALE = 0.1
+#override MLE_FRONT_LENGTH = 200.
+#override KH_VEL_SCALE = 0.01
+#override USE_KH_BG_2D = True
+#override KH_BG_2D_FILENAME = "Kh3_background_2d.nc"
+! Geothermal heating
+DO_GEOTHERMAL = True
+GEOTHERMAL_FILE = "geothermal_davies2013_v1.nc"
+GEOTHERMAL_SCALE = 1.0
+GEOTHERMAL_VARNAME = "geothermal_hf"
+!
+! jgj added - note default dt_therm is not overridden in CM4 OMp5 version
+#override DT_THERM = 10800
+#override USE_generic_tracer = True
+#override CHL_FROM_FILE = False
+#override USE_RIVER_HEAT_CONTENT = False
+#override USE_CALVING_HEAT_CONTENT = False
+#override ENERGYSAVEDAYS = 30
+
+!preserve 2017.07.05 answers see MOM6 commit 970af50ff
+#override BT_USE_OLD_CORIOLIS_BRACKET_BUG=True
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override MIN_OCN_INTERTIAL_H = 2.
+
+#override ICE_STATS_INTERVAL = 30
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
+
+    </input>
   </experiment>
 
 </experimentSuite>
