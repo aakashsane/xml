@@ -105,7 +105,7 @@ NOTES:
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
   <property name="PROD_SIMTIME"     value="1000"/>  <!--simulation length in years-->
   <property name="PP_CMIP_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
-  <property name="PP_CMIP_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
+  <property name="PP_CMIP_CHUNK_B"  value="10yr"/> <!--bigger  chunk length for pp/analysis-->
   <property name="PP_START_YEAR"    value="0001" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
   <property name="PROD_SEGTIME"     value="03:00:00"/><!--Wall clock per segment (usually 1 year)-->
@@ -1019,6 +1019,7 @@ Experiment to build executable.
         <timeSeries freq="daily" source="atmos_daily_refined" chunkLength="$(PP_CMIP_CHUNK_A)"/>
 -->
         <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_CMIP_CHUNK_B)"/>
 
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTScmip/*)">
@@ -1180,6 +1181,9 @@ Experiment to build executable.
         <timeSeries freq="daily" source="land_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)"/>
 -->
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_B)">
+	      <analysis switch="on" cumulative="no" script="/home/mdteam/DET/analysis/ILAMB/ILAMB-GFDL.py"/>
+        </timeSeries>
         <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
       <component type="land_dust" start="$(PP_START_YEAR)" source="land_dust" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
