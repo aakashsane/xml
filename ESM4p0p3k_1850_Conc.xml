@@ -94,8 +94,8 @@ NOTES:
   <property name="MOM6_GIT_TAG"   value="om4/v1.0.4"/>              <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/> <!-- git tag for ocean_shared source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG"   value="ppa_20180301Na_slm"/>      <!-- git tag for LAND_LAD2 source code -->  
-  <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180301"/> <!-- customize as needed -->
+  <property name="LAND_GIT_TAG"   value="ppa_20180305N_slm"/>      <!-- git tag for LAND_LAD2 source code -->  
+  <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180305N_slm"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
@@ -325,7 +325,7 @@ NOTES:
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A1152x2_O1057p5"><!--1/2 degree ocean grid Only-->
-	     <resources jobWallclock="00:30:00">
+	     <resources jobWallclock="01:30:00">
                <atm ranks="1152" threads="2"   layout = "8,24"   io_layout = "1,4" />
 	       <lnd                            layout = "8,24"   io_layout = "1,4" />
 	       <ice                            layout = "144,8"  io_layout = "1,4" />
@@ -1050,7 +1050,10 @@ Experiment to build executable.
         <timeSeries freq="daily" source="atmos_daily_refined" chunkLength="$(PP_CMIP_CHUNK_A)"/>
 -->
         <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_CMIP_CHUNK_A)"/>
-        <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_CMIP_CHUNK_B)"/>
+        <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_CMIP_CHUNK_B)">
+	      <analysis switch="on" cumulative="no" script="/home/mdteam/DET/analysis/ILAMB/ILAMB-GFDL.py"/>
+        </timeSeries>
+
 
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTScmip/*)">
@@ -1212,9 +1215,7 @@ Experiment to build executable.
         <timeSeries freq="daily" source="land_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)"/>
 -->
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
-        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_B)">
-	      <analysis switch="on" cumulative="no" script="/home/mdteam/DET/analysis/ILAMB/ILAMB-GFDL.py"/>
-        </timeSeries>
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_B)"/>
         <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
       <component type="land_dust" start="$(PP_START_YEAR)" source="land_dust" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
@@ -1534,6 +1535,12 @@ This is a new xml. Updates for LM4.1
 - Renamed the compile component to esm4.1_compile (to discourage using/sharing in CM4/ESM4p0 runs)
 - Removed cm4_libs_compile component. No need to build the cm4_libs_compile any more. Just  build esm4.1_compile
 - Removed ice_sis from the build.
+
+JPK (3/6/2018)
+Edits suggested by ENS/SLM to address high veg. reflectance in boreal high latitudes
+- New code tag: fixes bug where canopy air tracers were not being sent to the atmosphere
+- Changed leaf reflectances for Prioria,  Picea, Larix, and Acer
+- Changed LAImax for Larix 
 
 </description>
 
@@ -3031,6 +3038,8 @@ This is a new xml. Updates for LM4.1
        
        sai_rad = .TRUE.
        sai_cover = .TRUE.
+       treeline_thresh_T = -9999.0
+       treeline_season_length = -9999.0
       </namelist>
 
       <namelist name ="vegn_nml">
@@ -5030,7 +5039,7 @@ fedet_btf_valid_min = 0.0
     psi_tlp = -2.5
     root_perm  = 5.0e-7
     branch_wood_frac = 0.1525
-    leaf_refl = 0.1, 0.5
+    leaf_refl = 0.1, 0.45
     ROS_max = 0.22
     CC_leaf =  0.7,  CC_stem =  0.15, CC_litter =  0.5
     F_scorch_height = 0.1487
@@ -5087,6 +5096,7 @@ fedet_btf_valid_min = 0.0
     root_perm  = 5.0e-7
     branch_wood_frac =  0.2065217
     phenology_type = 'evergreen'
+    leaf_refl = 0.1, 0.39
     F_scorch_height = 0.11
     ROS_max = 0.3
     CC_leaf =  0.75,  CC_stem =  0.2, CC_litter =  0.55
@@ -5136,8 +5146,8 @@ fedet_btf_valid_min = 0.0
     mortrate_d_c =   0.2e-01
     mortrate_d_u =   0.81e-01
     rho_wood =  490
-#    LAImax =   5.0
-    LAImax =   3.5
+    LAImax =   5.0
+#    LAImax =   3.5
 #    phiRL =   1.4
     phiRL =   0.8    
     root_exudate_frac = 0.075
@@ -5147,6 +5157,7 @@ fedet_btf_valid_min = 0.0
     root_perm  = 5.0e-7
 #    branch_wood_frac =  0.25
      branch_wood_frac = 0.2065217
+    leaf_refl = 0.1, 0.39
     F_scorch_height = 0.11
     ROS_max = 0.3
     CC_leaf =  0.75,  CC_stem =  0.2, CC_litter =  0.55
@@ -5194,6 +5205,7 @@ fedet_btf_valid_min = 0.0
     rho_wood =   255.0
     LAImax =   3.5
     phiRL =   0.8
+    leaf_refl = 0.1, 0.45
     root_exudate_frac = 0.075
     Kxam = 3.0,     dx = -3.0, cx = 1.5
     Klam = 3.0E-01, dl = -3.0, cl = 1.5
