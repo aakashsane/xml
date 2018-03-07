@@ -15,8 +15,8 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/> <!-- git tag for ocean_shared source code -->
   <property name="MOM6_DATE"      value="20171219"/>                <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="om4/v1.0.4"/>              <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"       value="mdt/20180302"/> <!-- customize as needed -->
+  <property name="MOM6_GIT_TAG"   value="dev/gfdl/2018.03.06"/>              <!-- git tag for MOM6 source code -->
+  <property name="FRE_STEM"       value="mdt/20180306"/> <!-- customize as needed -->
   <!--property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/--> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_b"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -102,15 +102,6 @@ Make the executable for ocean-ice experiments.
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
-          # delete these cherry-picks once a tag is finalized
-          git remote add jkrasting https://github.com/jkrasting/MOM6-examples.git
-          git fetch jkrasting
-          git cherry-pick 6a9de59bc1d858798d485154584ae9f737052442
-          git cherry-pick b277e8178ac87994615e7da3ef9de3f608393473
-          git cherry-pick c133ce21801484475ef58288526ec75dafa106c3
-          git cherry-pick 5bcd58bbda2b4284f882a47cbfde5d5872c90ae2
-          git cherry-pick 10408243d9ce069810986c5a1c13cbb9c1fdece9
-          git cherry-pick 2afd337a2ab45ac191683d64379e780537d8528a
           popd
 
           pushd mom6
@@ -2132,6 +2123,12 @@ OVERRIDE_EOF
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/geothermal_davies2013_v1.nc</dataSource>
       </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/woa13_decav_ptemp_monthly_fulldepth_01.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/woa13_decav_s_monthly_fulldepth_01.nc</dataSource>
+      </dataFile>
       <!-- the following fails with hsmget. not sure why
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/ocean_static_no_mask_table.nc</dataSource>
@@ -2200,7 +2197,10 @@ touch $work/INPUT/SIS_override
 
 
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override USE_KH_BG_2D = False
+#override TEMP_Z_INIT_FILE = "woa13_decav_ptemp_monthly_fulldepth_01.nc"
+#override SALT_Z_INIT_FILE = "woa13_decav_s_monthly_fulldepth_01.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp_an"
+#override Z_INIT_FILE_SALT_VAR = "s_an"
 MOM_OVERRIDE_EOF
 
       ]]></csh>
@@ -2509,6 +2509,10 @@ $baseDate
      <csh>
         <![CDATA[
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override TEMP_Z_INIT_FILE = "woa13_decav_ptemp_monthly_fulldepth_01.nc"
+#override SALT_Z_INIT_FILE = "woa13_decav_s_monthly_fulldepth_01.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp_an"
+#override Z_INIT_FILE_SALT_VAR = "s_an"
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
 #override DT = 1800
@@ -2969,6 +2973,10 @@ GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override TEMP_Z_INIT_FILE = "woa13_decav_ptemp_monthly_fulldepth_01.nc"
+#override SALT_Z_INIT_FILE = "woa13_decav_s_monthly_fulldepth_01.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp_an"
+#override Z_INIT_FILE_SALT_VAR = "s_an"
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
 #override U_TRUNC_FILE = "SIS_U_truncations"
@@ -3102,6 +3110,10 @@ Switch to Preind DIC from GLODAP v1
       <csh><![CDATA[
 #
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override TEMP_Z_INIT_FILE = "woa13_decav_ptemp_monthly_fulldepth_01.nc"
+#override SALT_Z_INIT_FILE = "woa13_decav_s_monthly_fulldepth_01.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp_an"
+#override Z_INIT_FILE_SALT_VAR = "s_an"
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
 #override DT = 1800
@@ -4080,6 +4092,10 @@ dissi14cabio_valid_min = 0.0
       <csh><![CDATA[
 #
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override TEMP_Z_INIT_FILE = "woa13_decav_ptemp_monthly_fulldepth_01.nc"
+#override SALT_Z_INIT_FILE = "woa13_decav_s_monthly_fulldepth_01.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "ptemp_an"
+#override Z_INIT_FILE_SALT_VAR = "s_an"
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
 #override DT = 1800
