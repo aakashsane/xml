@@ -424,25 +424,25 @@ endif
    <freInclude name="CORE2_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/ncar_precip.1948-2007.nomads.nc</dataSource>
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/IAF_v2.0/ncar_precip.1948-2007.nomads.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/ncar_rad.1948-2007.nomads.nc</dataSource>
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/IAF_v2.0/ncar_rad.1948-2007.nomads.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/q_10_mod.1948-2007.nomads.nc</dataSource>
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/IAF_v2.0/q_10_mod.1948-2007.nomads.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/slp.1948-2007.nomads.nc</dataSource>
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/IAF_v2.0/slp.1948-2007.nomads.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/t_10_mod.1948-2007.nomads.nc</dataSource>
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/IAF_v2.0/t_10_mod.1948-2007.nomads.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/u_10_mod.1948-2007.nomads.nc</dataSource>
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/IAF_v2.0/u_10_mod.1948-2007.nomads.nc</dataSource>
       </dataFile>      
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_G/CORE/IAF_v2.0/v_10_mod.1948-2007.nomads.nc</dataSource>
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/IAF_v2.0/v_10_mod.1948-2007.nomads.nc</dataSource>
       </dataFile>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -2196,7 +2196,7 @@ touch $work/INPUT/MOM_override
 touch $work/INPUT/SIS_override
 
 
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+cat >> $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override TEMP_Z_INIT_FILE = "woa13_decav_ptemp_monthly_fulldepth_01.nc"
 #override SALT_Z_INIT_FILE = "woa13_decav_s_monthly_fulldepth_01.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp_an"
@@ -2380,6 +2380,156 @@ SIS_OVERRIDE_EOF
     </input>
    </experiment>
 
+
+   <experiment name="OMp5_IAF_baseline" inherit="OMp5_baseline">
+    <description>
+global 1/2 degree z ocean_ice experiment 
+regridded runoff and salinity
+CORE2 dynamic inter_annual forcing data
+    </description>  
+    <publicMetadata DBswitch="$(MDBIswitch)">
+      <!-- Realization tag -->
+      <realization r="1" i="1" p="1" f="1"/>
+      <!-- project info -->
+      <project>"$(ProjectID)"</project>
+      <activity_id>OMIP</activity_id>
+      <mip_era>CMIP6</mip_era>
+      <!-- model info -->
+      <source>GFDL OM4p25 (2017)</source>
+      <source_id>GFDL-OM4p25_2</source_id>
+      <source_type>OGCM</source_type>
+      <!--experiment info-->
+      <experiment_name>"$(name)"</experiment_name>
+      <experiment_id>"$(name)"</experiment_id>
+      <sub_experiment>none</sub_experiment>
+      <sub_experiment_id>none</sub_experiment_id>
+      <start_time>$(EXP_CPLD_START)</start_time>
+      <end_time>$(EXP_CPLD_END)</end_time>
+      <!-- branch info -->
+      <branch_method>standard</branch_method>
+      <branch_time_in_child>0.0D0</branch_time_in_child>
+      <branch_time_in_parent></branch_time_in_parent>
+      <!-- variant info-->
+      <variant_info></variant_info>
+      <!--parent info-->
+      <parent_time_units>days since 1948-1-1</parent_time_units>
+      <parent_activity_id>CMIP</parent_activity_id>
+      <parent_experiment_id></parent_experiment_id>
+      <parent_mip_era>CMIP6</parent_mip_era>
+      <parent_source_id>GFDL-OM4</parent_source_id>
+      <parent_variant_label>r1i1p1f1</parent_variant_label>
+      <comment>
+       Experiment name = $(name)
+    For more information please refer to the
+    &lt;a href="https://github.com/NOAA-GFDL/MOM6-examples/wiki"&gt; MOM6 Wiki.  &lt;/a&gt;
+      </comment>
+
+    </publicMetadata>
+
+     <input>
+
+     <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/input.nml</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/input.nml</dataSource>
+        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/input.nml</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_05/input.nml</dataSource>
+     </dataFile>
+     <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/field_table</dataSource>
+        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/field_table</dataSource>
+        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/field_table</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_05/field_table</dataSource>
+     </dataFile>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/data_table_iaf</dataSource>
+      </dataFile>
+
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_common']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_05grid_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='OMp5_data']/input/node())"/>
+      <!--SIS2 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
+      <!--CORE forcing datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='CORE2_data']/input/node())"/>
+
+<!--This initCond is not compatible with SIS2 and causes a crash with
+FATAL from PE    46: NETCDF ERROR: NetCDF: Index exceeds dimension bound File=INPUT//ice_model.res.nc.0000 Field=flux_u
+
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f1/unswept/Amy.Langenhorst/CORE/IAF_v2.0/20080101.ice_model.res.tar</dataSource>
+        <dataSource site="gfdl">/archive/arl/CORE/IAF_v2.0/20080101.ice_model.res.tar</dataSource>
+     </dataFile>
+-->
+
+      <diagTable>
+$name
+$baseDate
+      </diagTable>
+
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1708,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'NOLEAP',
+       dt_cpld  = 3600,
+       dt_atmos = 3600,
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.false. 
+     </namelist>
+     <namelist name="fms_nml">
+       clock_grain='ROUTINE'
+       clock_flags='NONE'
+       domains_stack_size = 8000000
+       stack_size =0
+     </namelist>
+     <namelist name="fms_io_nml" >
+       fms_netcdf_restart=.true.
+       threading_read='multi'
+       max_files_r = 200
+       max_files_w = 200
+!       checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+     </namelist>
+     <namelist name="diag_manager_nml">
+       max_axes = 150,
+       max_files = 100,
+       max_num_axis_sets = 100,
+       max_input_fields = 1200
+       max_output_fields = 1800
+       mix_snapshot_average_fields=.false.
+     </namelist>
+     <namelist name="xgrid_nml">
+       make_exchange_reproduce = .false.
+       interp_method = 'second_order'
+     </namelist>
+     <!--verona-->
+     <namelist name="sat_vapor_pres_nml">
+      construct_table_wrt_liq = .true.,
+      construct_table_wrt_liq_and_ice = .true.,
+     </namelist>
+
+      <csh><![CDATA[
+#cat > $work/INPUT/MOM_override << OVERRIDE_EOF
+#OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+SIS_OVERRIDE_EOF
+     ]]></csh>
+
+     </input>
+   </experiment>
+
    <experiment name="OMp5_BLING" inherit="OMp5_baseline">
     <input>
       <namelist name="coupler_nml">
@@ -2509,10 +2659,6 @@ $baseDate
      <csh>
         <![CDATA[
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override TEMP_Z_INIT_FILE = "woa13_decav_ptemp_monthly_fulldepth_01.nc"
-#override SALT_Z_INIT_FILE = "woa13_decav_s_monthly_fulldepth_01.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp_an"
-#override Z_INIT_FILE_SALT_VAR = "s_an"
 Z_INIT_REMAP_GENERAL = True                                                          
 Z_INIT_REMAP_FULL_COLUMN = True                                                      
 #override DT = 1800
