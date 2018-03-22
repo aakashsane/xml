@@ -88,14 +88,17 @@ NOTES:
 
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"        value="testing_20180202"/>        <!-- git tag for general component source code-->
-  <property name="SHARED_GIT_TAG" value="ppa_20180301_slm"/>        <!-- git tag for shared source code -->
-  <property name="ATMOS_GIT_TAG"  value="eswg_20180301"/>           <!-- git tag for atmos_shared and atmos_param source code -->
+  <property name="SHARED_GIT_TAG" value="eswg_20180314"/>        <!-- git tag for shared source code -->
+  <property name="ATMOS_GIT_TAG"  value="eswg_20180319"/>           <!-- git tag for atmos_shared and atmos_param source code -->
   <property name="MOM6_DATE"      value="2017.10.19"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="om4/v1.0.4"/>              <!-- git tag for MOM6 source code -->
-  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/> <!-- git tag for ocean_shared source code -->
+<!--
+  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/>
+-->
+  <property name="OCEAN_SHARED_GIT_TAG" value="user/f1p/nh4_ocean_couply_dry_deposition_merge "/> <!-- git tag for ocean_shared source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG"   value="ppa_20180305N_slm"/>      <!-- git tag for LAND_LAD2 source code -->  
-  <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180305"/> <!-- customize as needed -->
+  <property name="LAND_GIT_TAG"   value="ppa_20180313N_slm"/>      <!-- git tag for LAND_LAD2 source code -->  
+  <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180314"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_m"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
@@ -106,7 +109,7 @@ NOTES:
   <property name="PP_CMIP_CHUNK_B"  value="10yr"/> <!--bigger  chunk length for pp/analysis-->
   <property name="PP_START_YEAR"    value="0001" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
-  <property name="PROD_SEGTIME"     value="03:00:00"/><!--Wall clock per segment (usually 1 year)-->
+  <property name="PROD_SEGTIME"     value="04:00:00"/><!--Wall clock per segment (usually 1 year)-->
 
   <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->   
@@ -836,6 +839,10 @@ Experiment to build executable.
         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
+      	    <csh><![CDATA[
+              ( cd coupler && git checkout user/f1p/nh4_ocean_couply_dry_deposition_merge ) 
+              ]]>
+            </csh>
         </source>
         <compile>
           <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
@@ -905,9 +912,11 @@ Experiment to build executable.
       <!--By default a refineDiag script causes the annual history files to be unpacked and saved in /ptmp/$USER-->
       <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh,$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_data_stager_globalAve.csh"/>
 
+<!--
       <component type="ocean_daily"   source="ocean_daily" sourceGrid="ocean-tripolar">
         <timeSeries freq="daily" chunkLength="$(PP_CMIP_CHUNK_A)" source="ocean_daily"/>
       </component>
+-->
 
       <component type="ocean_monthly"   source="ocean_month" sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" source="ocean_month">
@@ -1054,7 +1063,6 @@ Experiment to build executable.
 	      <analysis switch="on" cumulative="no" script="/home/mdteam/DET/analysis/ILAMB/ILAMB-GFDL.py"/>
         </timeSeries>
 
-
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTScmip/*)">
             <xi:fallback/>
@@ -1184,7 +1192,7 @@ Experiment to build executable.
   <freInclude name="c96_climo_cmip6_postprocess_LAND">
     <postProcess>
       <component type="land" start="$(PP_START_YEAR)" source="land_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CMIP_CHUNK_A)"/> -->
+<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK_A)"/> -->
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthTS/*)" >
             <xi:fallback/>
@@ -1204,7 +1212,7 @@ Experiment to build executable.
             <xi:fallback/>
 	  </xi:include>
         </timeSeries>
-<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CMIP_CHUNK_A)"/> -->
+<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK_A)"/> -->
       </component>
       
       <component type="land_instant_cubic" start="$(PP_START_YEAR)" source="land_month_inst" sourceGrid="land-cubedsphere">
@@ -1335,7 +1343,6 @@ Experiment to build executable.
       <component type="ocean_cobalt_1day_z" start="$(PP_START_YEAR)" source="ocean_cobalt_1day_z" sourceGrid="ocean-tripolar">
         <timeSeries freq="daily" chunkLength="$(PP_CMIP_CHUNK_A)" />
       </component>
--->
 
       <component type="ocean_cobalt_tracers_month_z" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_month_z" sourceGrid="ocean-tripolar">
          <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
@@ -1344,7 +1351,6 @@ Experiment to build executable.
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
-<!--
       <component type="ocean_cobalt_tracers_year_z" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_year_z" sourceGrid="ocean-tripolar">
          <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
@@ -1361,6 +1367,7 @@ Experiment to build executable.
       <postProcess> 
 
       <!--PostProcessing component models-->
+<!--
       <component type="ocean_cobalt_omip_daily" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_daily" sourceGrid="ocean-tripolar">
         <timeSeries freq="daily" chunkLength="$(PP_CMIP_CHUNK_A)" />
       </component>
@@ -1376,6 +1383,7 @@ Experiment to build executable.
          <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
+-->
 
       <component type="ocean_cobalt_omip_sfc" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_sfc" sourceGrid="ocean-tripolar">
          <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
@@ -1438,7 +1446,7 @@ Experiment to build executable.
 <!--= ESM4 EXPERIMENTS    =-->
 <!--=======================-->
 
-  <experiment name="ESM4p0p3k_1850C_PIpcairco2_smag" inherit="esm4.1_sis2_compile">
+  <experiment name="ESM4p0p3l_1850C_PIpcairco2_v5" inherit="esm4.1_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"ESM4_c96L49_am4p0_OMp5"</model>
@@ -1456,6 +1464,20 @@ For more information please refer to the
     </publicMetadata>
 
 <description>
+2018/03/14 slm
+Update code to address SAI issues.
+
+2018/03/11 slm
+* change dat_snow_crit to 1e7, to (effectively) turn off snow overlap parameterization.
+
+2018/03/09 slm
+* in land_dust_nml, reduced sai_thresh from 0.025 to 0.01 (see Paul Ginoux's e-mail
+  of 2018-03-09)
+* after conversation with Paul, increased ch from 1.65e-9 to to 2.15e-9 in land_dust_nml,
+  to increase emission to match model's droughty Sahel conditions.
+* set species parameters as in years 0052-0061 of Elena's
+  c96L33_am4p0_lm4p1v0_1850climo_PISST_ICShef_notrl run
+
 2017/09/21 JGJ
 Build coupled model from AM4fullchem 
 LWH: /ncrc/home1/Larry.Horowitz/awg/warsaw_201707/xml_warsaw_201707/awg_warsaw_201707.xml
@@ -1531,7 +1553,7 @@ This is a new xml. Updates for LM4.1
 - Origin: LM4.1 changes by Sergey from his branch user/slm/esm4p3
 - Update: New 1/2 degree ocean grid from John Krasting user/jpk/ESMp3_mods 
 - Merged atmos from Larry H. "k" run in the notes above LWH (2/14/2018)
-- Added the  recommended settings for ocean (Smag) is in experiment ESM4p3p2k_1850C_PIpcairco2_smag
+- Added the  recommended settings for ocean (Smag) is in experiment ESM4p0p3k_1850C_PIpcairco2_smag
 - Renamed the compile component to esm4.1_sis2_compile (to discourage using/sharing in CM4/ESM4p0 runs)
 - Removed ice_sis from the build.
 
@@ -1541,6 +1563,11 @@ Edits suggested by ENS/SLM to address high veg. reflectance in boreal high latit
 - Changed leaf reflectances for Prioria,  Picea, Larix, and Acer
 - Changed LAImax for Larix 
 
+LWH (3/16/2018)
+- Use MEGAN BVOC emissions for biogenic SOA
+- Updates to aerosol drydep/wetdep (f1p)
+- Seabird emissions of NH3
+- Improved exchange of NHx with ocean
 </description>
 
     <input>
@@ -1554,7 +1581,8 @@ Edits suggested by ENS/SLM to address high veg. reflectance in boreal high latit
       high_concen = 1.0
       </namelist>
 
-      <namelist name ="aerosol_cloud_nml">
+      <namelist name="aerosol_cloud_nml">
+        treat_nitrate_as_sulfate=.true. 
         var_limit = 0.7
       </namelist>
 
@@ -1637,35 +1665,35 @@ Edits suggested by ENS/SLM to address high veg. reflectance in boreal high latit
                       50,50,50,50,50,55,55,55,55,55,60,60,60,60,60,65,
                       65,65,65,65,70,70,70,70,70,75,75,75,75,75,80,80,
                       80,80,82,82,84,84,86,86,88,88,90,91,92,93,94,95,
-                      96,97,97,97,97, 
+                      96,97,98,99,99, 
     seasalt2_indices = 30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,
                       30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,
                       30,35,35,35,35,35,40,40,40,40,40,45,45,45,45,45,
                       50,50,50,50,50,55,55,55,55,55,60,60,60,60,60,65,
                       65,65,65,65,70,70,70,70,70,75,75,75,75,75,80,80,
                       80,80,82,82,84,84,86,86,88,88,90,91,92,93,94,95,
-                      96,97,97,97,97, 
+                      96,97,98,99,99, 
     seasalt3_indices = 30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,
                       30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,
                       30,35,35,35,35,35,40,40,40,40,40,45,45,45,45,45,
                       50,50,50,50,50,55,55,55,55,55,60,60,60,60,60,65,
                       65,65,65,65,70,70,70,70,70,75,75,75,75,75,80,80,
                       80,80,82,82,84,84,86,86,88,88,90,91,92,93,94,95,
-                      96,97,97,97,97, 
+                      96,97,98,99,99, 
     seasalt4_indices = 30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,
                       30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,
                       30,35,35,35,35,35,40,40,40,40,40,45,45,45,45,45,
                       50,50,50,50,50,55,55,55,55,55,60,60,60,60,60,65,
                       65,65,65,65,70,70,70,70,70,75,75,75,75,75,80,80,
                       80,80,82,82,84,84,86,86,88,88,90,91,92,93,94,95,
-                      96,97,97,97,97, 
+                      96,97,98,99,99, 
     seasalt5_indices = 30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,
                       30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,
                       30,35,35,35,35,35,40,40,40,40,40,45,45,45,45,45,
                       50,50,50,50,50,55,55,55,55,55,60,60,60,60,60,65,
                       65,65,65,65,70,70,70,70,70,75,75,75,75,75,80,80,
                       80,80,82,82,84,84,86,86,88,88,90,91,92,93,94,95,
-                      96,97,97,97,97, 
+                      96,97,98,99,99, 
     seasalt_aitken_indices = 30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,
                       30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,
                       30,35,35,35,35,35,40,40,40,40,40,45,45,45,45,45,
@@ -1906,7 +1934,6 @@ Edits suggested by ENS/SLM to address high veg. reflectance in boreal high latit
    "nitrate_95%", "nitrate_96%", "nitrate_97%", "nitrate_98%",
    "nitrate_99%"
       </namelist>
-
 
       <namelist name="atmos_co2_nml">
        do_co2_restore = .true.               
@@ -2494,6 +2521,7 @@ Edits suggested by ENS/SLM to address high veg. reflectance in boreal high latit
 	terpene_input_name(1) = 'biogenic'
 	terpene_SOA_yield = 0.10
 	use_interactive_tracers = .true.
+	use_interactive_BVOC_emis = .true.
       </namelist>
 
       <namelist name ="shortwave_driver_nml">
@@ -2510,8 +2538,9 @@ Edits suggested by ENS/SLM to address high veg. reflectance in boreal high latit
       </namelist>
 
       <namelist name ="ssalt_nml">
-     coef_emis_fine=1.33, coef_emis_coarse=1.33,
-     use_sj_sedimentation_solver=.true.
+	do_sst_seasalt=.true.
+	use_sj_sedimentation_solver=.true.
+	critical_sea_fraction = 0.5
       </namelist>
 
       <namelist name ="stable_bl_turb_nml">
@@ -2810,7 +2839,7 @@ Edits suggested by ENS/SLM to address high veg. reflectance in boreal high latit
        input_file_name  = "INPUT/dust_source.nc",
        input_field_name = "source_nomask",
        lai_thresh=0.1
-       sai_thresh=0.025
+       sai_thresh=0.01
        sliq_thresh=0.3
        sice_thresh=0.025
        snow_thresh=0.01
@@ -2820,7 +2849,7 @@ Edits suggested by ENS/SLM to address high veg. reflectance in boreal high latit
        u_min_crop=8.
        frac_bare_crop=0.0325
        dependency_soil_moisture=.false.
-       ch=1.65e-9
+       ch=2.15e-9
       </namelist>
 
       <namelist name="land_io_nml">
@@ -3360,6 +3389,7 @@ SIS_OVERRIDE_EOF
            "longname",     "hno3"
            "units",        "NA" /
 
+
 # atm chem
  "TRACER", "atmos_mod", "SOA"
            "longname", "SOA tracer"
@@ -3367,8 +3397,8 @@ SIS_OVERRIDE_EOF
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.89,frac_pm25=0.96,frac_pm10=1."
            "profile_type","fixed","surface_value=1.e-32"
-           "dry_deposition","wind_driven","surfr=100."
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.3, frac_incloud_snow=0.0, alphar=0.001, alphas=0.001"
+           "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.3, frac_incloud_snow=0.01, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=omphilic, name_in_clim_mod=organic_carbon" /
 #                            
  "TRACER", "atmos_mod", "dust1"
@@ -3378,7 +3408,7 @@ SIS_OVERRIDE_EOF
            "parameters", "all", "ra=0.1e-6, rb=1.0e-6, dustref=0.75e-6, dustden=2500.0"
            "emission", "lm3", "source_fraction=0.05"
            "convection", "all"
-           "dry_deposition","wind_driven","surfr=100."
+           "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.2, frac_incloud_snow=0.05, alphar=0.001, alphas=0.001"
            "chem_param","aerosol","frac_pm1=0.444,frac_pm25=1.,frac_pm10=1."
            "radiative_param", "online", "name_in_rad_mod=dust1, name_in_clim_mod=small_dust"/
@@ -3389,7 +3419,7 @@ SIS_OVERRIDE_EOF
            "parameters", "all", "ra=1.0e-6, rb=2.0e-6, dustref=1.5e-6, dustden=2650.0"
            "emission", "lm3", "source_fraction=0.15"
            "convection", "all"
-           "dry_deposition","wind_driven","surfr=100."
+           "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.2, frac_incloud_snow=0.05, alphar=0.001, alphas=0.001"
            "chem_param","aerosol","frac_pm1=0.,frac_pm25=0.25,frac_pm10=1."
            "radiative_param", "online", "name_in_rad_mod=dust2, name_in_clim_mod=large_dust"/
@@ -3400,7 +3430,7 @@ SIS_OVERRIDE_EOF
            "parameters", "all", "ra=2.0e-6, rb=3.0e-6, dustref=2.5e-6, dustden=2650.0"
            "emission", "lm3", "source_fraction=0.3"
            "convection", "all"
-           "dry_deposition","wind_driven","surfr=100."
+           "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.2, frac_incloud_snow=0.05, alphar=0.001, alphas=0.001"
            "chem_param","aerosol","frac_pm1=0.,frac_pm25=0.,frac_pm10=1."
            "radiative_param", "online", "name_in_rad_mod=dust3, name_in_clim_mod=large_dust"/
@@ -3411,7 +3441,7 @@ SIS_OVERRIDE_EOF
            "parameters", "all", "ra=3.0e-6, rb=6.0e-6, dustref=4.5e-6, dustden=2650.0"
            "emission", "lm3", "source_fraction=0.27"
            "convection", "all"
-           "dry_deposition","wind_driven","surfr=100."
+           "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.2, frac_incloud_snow=0.05, alphar=0.001, alphas=0.001"
            "chem_param","aerosol","frac_pm1=0.,frac_pm25=0.,frac_pm10=0.667"
            "radiative_param", "online", "name_in_rad_mod=dust4, name_in_clim_mod=large_dust"/
@@ -3422,7 +3452,7 @@ SIS_OVERRIDE_EOF
            "parameters", "all", "ra=6.0e-6, rb=10.0e-6, dustref=8e-6, dustden=2650.0"
            "emission", "lm3", "source_fraction=0.23"
            "convection", "all"
-           "dry_deposition","wind_driven","surfr=100."
+           "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.2, frac_incloud_snow=0.05, alphar=0.001, alphas=0.001"
            "chem_param","aerosol","frac_pm1=0.,frac_pm25=0.,frac_pm10=0."
            "radiative_param", "online", "name_in_rad_mod=dust5, name_in_clim_mod=large_dust"/
@@ -3431,8 +3461,8 @@ SIS_OVERRIDE_EOF
 "longname","SO4"
 "units", "VMR"
 "profile_type","fixed","surface_value=1.e-20"
-"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_donner=0.4, frac_incloud_snow=0.0, alphar=0.001, alphas=0.001"
-"dry_deposition","file","name=so4"
+"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snowh=0.01, frac_incloud_snow=0.01, alphar=0.001, alphas=0.001"
+"dry_deposition","williams_wind_driven","surfr=100.,icer=1200."	
 "convection", "all"
 "radiative_param", "online", "name_in_rad_mod=so4, name_in_clim_mod=sulfate, scale_factor=3.31"
 "cmip","cmip6","cmip_name=sulfate,cmip_longname=sulfate,cmip_longname2=SO4"
@@ -3444,10 +3474,9 @@ SIS_OVERRIDE_EOF
            "units", "mmr"
            "profile_type","fixed","surface_value=1.e-32"
            "parameters", "all", "ra=0.1e-6, rb=0.5e-6, ssaltref=0.3e-6, ssaltden=2200.0"
-           "scheme", "Martensson",
            "convection", "all"
            "chem_param","aerosol","frac_pm1=1.0,frac_pm25=1.0,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=0.1"
+           "dry_deposition","williams_wind_driven","surfr=100.,landr=100.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.4, frac_incloud_donner=0.4, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=seasalt1, name_in_clim_mod=sea_salt"/
  "TRACER", "atmos_mod", "ssalt2"
@@ -3455,44 +3484,40 @@ SIS_OVERRIDE_EOF
            "units", "mmr"
            "profile_type","fixed","surface_value=1.e-32"
            "parameters", "all", "ra=0.5e-6, rb=1.0e-6, ssaltref=0.75e-6, ssaltden=2200.0"
-           "scheme", "Martensson",
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.0,frac_pm25=1.0,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=0.1"
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.4, frac_incloud_donner=0.4, alphar=0.001, alphas=0.001"
+           "dry_deposition","williams_wind_driven","surfr=100.,landr=100.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_donner=0.4, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=seasalt2, name_in_clim_mod=sea_salt"/
  "TRACER", "atmos_mod", "ssalt3"
            "longname", "ssalt 3 tracer"
            "units", "mmr"
            "profile_type","fixed","surface_value=1.e-32"
            "parameters", "all", "ra=1.0e-6, rb=2.5e-6, ssaltref=1.75e-6, ssaltden=2200.0"
-           "scheme", "Martensson"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.0,frac_pm25=0.167,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=0.1"
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.4, frac_incloud_donner=0.4, alphar=0.001, alphas=0.001"
+           "dry_deposition","williams_wind_driven","surfr=100.,landr=100.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.8, frac_incloud_uw=0.8, frac_incloud_donner=0.8, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=seasalt3, name_in_clim_mod=sea_salt"/
  "TRACER", "atmos_mod", "ssalt4"
            "longname", "ssalt 4 tracer"
            "units", "mmr"
            "profile_type","fixed","surface_value=1.e-32"
            "parameters", "all", "ra=2.5e-6, rb=5.0e-6, ssaltref=3.75e-6, ssaltden=2200.0"
-           "scheme", "Martensson"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.0,frac_pm25=0.,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=0.1"
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.4, frac_incloud_donner=0.4, alphar=0.001, alphas=0.001"
+           "dry_deposition","williams_wind_driven","surfr=100.,landr=100.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.8, frac_incloud_uw=0.8, frac_incloud_donner=0.8, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=seasalt4, name_in_clim_mod=sea_salt"/
  "TRACER", "atmos_mod", "ssalt5"
            "longname", "ssalt 5 tracer"
            "units", "mmr"
            "profile_type","fixed","surface_value=1.e-32"
            "parameters", "all", "ra=5.0e-6, rb=10.0e-6, ssaltref=7.5e-6, ssaltden=2200.0"
-           "scheme", "Martensson"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.0,frac_pm25=0.,frac_pm10=0."
-           "dry_deposition","wind_driven","surfr=0.1"
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.4, frac_incloud_donner=0.4, alphar=0.001, alphas=0.001"
+           "dry_deposition","williams_wind_driven","surfr=100.,landr=100.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.8, frac_incloud_uw=0.8, frac_incloud_donner=0.8, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=seasalt5, name_in_clim_mod=sea_salt"/
 #
  "TRACER", "atmos_mod", "bcphob"
@@ -3501,7 +3526,7 @@ SIS_OVERRIDE_EOF
            "profile_type","fixed","surface_value=1.e-32"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.981,frac_pm25=0.995,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=100."
+            "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0., alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=bcphobic, name_in_clim_mod=black_carbon"/
  "TRACER", "atmos_mod", "bcphil"
@@ -3510,8 +3535,8 @@ SIS_OVERRIDE_EOF
            "profile_type","fixed","surface_value=1.e-32"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.981,frac_pm25=0.995,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=100."
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.3, frac_incloud_snow=0.0, alphar=0.001, alphas=0.001"
+            "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.3, frac_incloud_snow=0.01, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=bcphilic, name_in_clim_mod=black_carbon"/
  "TRACER", "atmos_mod", "omphob"
            "longname", "omphob tracer"
@@ -3519,7 +3544,7 @@ SIS_OVERRIDE_EOF
            "profile_type","fixed","surface_value=1.e-32"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.89,frac_pm25=0.960,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=100."
+            "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0., alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=omphobic, name_in_clim_mod=organic_carbon"/
  "TRACER", "atmos_mod", "omphil"
@@ -3528,8 +3553,8 @@ SIS_OVERRIDE_EOF
            "profile_type","fixed","surface_value=1.e-32"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.89,frac_pm25=0.960,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=100."
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.3, frac_incloud_snow=0.0, alphar=0.001, alphas=0.001"
+            "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.3, frac_incloud_snow=0.01, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=omphilic, name_in_clim_mod=organic_carbon"/
 
 #
@@ -4030,8 +4055,8 @@ SIS_OVERRIDE_EOF
 "cmip","cmip6","cmip_name=nitrate,cmip_longname=nitrate,cmip_longname2=NO3"
 "chem_param","aerosol","mw=62,nb_N_ox=1,frac_pm1=0.877,frac_pm25=0.954,frac_pm10=1."
 "profile_type","fixed","surface_value=1.e-20"
-"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_donner=0.4, frac_incloud_snow=0.0,alphar=0.001, alphas=0.001"
-"dry_deposition","file","name=nh4"
+"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snowh=0.01, frac_incloud_snow=0.01,alphar=0.001, alphas=0.001"
+"dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
 "convection","all"
 "radiative_param", "online", "name_in_rad_mod=nitrate, name_in_clim_mod=nitrate, scale_factor=2.14"
 /
@@ -4042,8 +4067,8 @@ SIS_OVERRIDE_EOF
 "cmip","cmip6","cmip_name=ammonium,cmip_longname=ammonium,cmip_longname2=NH4"
 "chem_param","aerosol","mw=18,nb_N_red=1,frac_pm1=0.92,frac_pm25=0.973,frac_pm10=1."
 "profile_type","fixed","surface_value=1.e-20"
-"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_donner=0.4, frac_incloud_snow=0.0,alphar=0.001, alphas=0.001"
-"dry_deposition","file","name=nh4"
+"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snowh=0.4, frac_incloud_snow=0.01,alphar=0.001, alphas=0.001"
+"dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
 "convection","all"
 /
 
@@ -4225,7 +4250,7 @@ SIS_OVERRIDE_EOF
 "longname","AGLYX"
 "units","VMR"
 "profile_type","fixed","surface_value=1.e-20"
-"dry_deposition","wind_driven","surfr=100."
+"dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
 "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.3, alphar=0.001, alphas=0.001"
 "radiative_param", "online", "name_in_rad_mod=omphilic, name_in_clim_mod=organic_carbon, scale_factor=2.00"
 "convection","all"
@@ -4235,7 +4260,7 @@ SIS_OVERRIDE_EOF
 "longname","AIEPOX"
 "units","VMR"
 "profile_type","fixed","surface_value=1.e-20"
-"dry_deposition","wind_driven","surfr=100."
+"dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
 "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_donner=0.3, alphar=0.001, alphas=0.001"
 "radiative_param", "online", "name_in_rad_mod=omphilic, name_in_clim_mod=organic_carbon, scale_factor=4.08"
 "convection","all"
@@ -4441,6 +4466,7 @@ SIS_OVERRIDE_EOF
 "profile_type","fixed","surface_value=1.e-20"
 "convection",   "all"
 /
+
 ####.................................................
 ### ESM atmos co2 field table for CMIP6 Jan 1 1850
 ## jgj 2016/11/29
@@ -4999,6 +5025,9 @@ fedet_btf_valid_min = 0.0
 ###........................................
 # species parameters
 "species", "land_mod", "default"
+    csc_lai = 0.3
+    dat_snow_crit = 1e7
+
     froot_live_c2n = 45.0
     sapwood_c2n    = 250.0
     leaf_C_retrans_frac = 0.24
@@ -5030,7 +5059,7 @@ fedet_btf_valid_min = 0.0
     root_r =   0.12e-03
     LMA =   0.35e-01
     m_cond =    7.0
-    Vmax =   0.2e-04
+    Vmax =   0.3e-04
     gamma_resp =   0.10e-01
     alpha_phot = 0.04
     leaf_age_tau =    0.0
@@ -5074,7 +5103,7 @@ fedet_btf_valid_min = 0.0
 "species", "land_mod", "picea"
     long_name = picea
     alpha_leaf =  0.120000000
-    alpha_root = 0.8
+    alpha_root = 0.5
     alpha_wood = 0.5e-01
     beta_root = 1.25
     beta_vleaf = 0.0
@@ -5083,8 +5112,8 @@ fedet_btf_valid_min = 0.0
     root_r =   0.12e-03
     LMA =   0.1
     m_cond =    7.0
-    Vmax =   0.17e-04
-    gamma_resp =   0.41e-01
+    Vmax =   0.3e-04
+    gamma_resp =   0.3e-01
     alpha_phot = 0.04
     growth_resp = 0.333
     NSC2targetbl = 4.0
@@ -5130,7 +5159,7 @@ fedet_btf_valid_min = 0.0
  "species", "land_mod", "larix"
     long_name = larix
     alpha_leaf =  0.8
-    alpha_root = 0.8
+    alpha_root = 0.5
     alpha_wood = 0.5e-01
     beta_root = 1.25
     beta_vleaf = 0.0
@@ -5140,10 +5169,8 @@ fedet_btf_valid_min = 0.0
      LMA =   0.76e-01
 #    LMA =   0.38e-01
     m_cond =    7.0
-#    Vmax =   0.15e-04
-#    gamma_resp =   0.20e-01
-    Vmax =   0.17e-04
-    gamma_resp =   0.35e-01
+    Vmax =   0.3e-04
+    gamma_resp =   0.3e-01
     growth_resp = 0.333
     NSC2targetbl = 4.0
     leaf_age_tau =    0.0
@@ -5200,8 +5227,8 @@ fedet_btf_valid_min = 0.0
     root_r =   0.12e-03
     LMA =   0.38e-01
     m_cond =    7.0
-    Vmax =   0.2e-04
-    gamma_resp =   0.35e-01
+    Vmax =   0.3e-04
+    gamma_resp =   0.3e-01
     alpha_phot = 0.04
     growth_resp = 0.333
     NSC2targetbl = 4.0
@@ -5292,7 +5319,7 @@ fedet_btf_valid_min = 0.0
     root_perm  = 5.0e-7
     branch_wood_frac = 0.0
     seedling_nsc_frac = 3.0 
-    leaf_refl = 0.11, 0.58
+    leaf_refl = 0.11, 0.45
     internal_gap_frac = 0.3
     ROS_max = 0.4
     CC_leaf       = 0.85,  CC_stem       = 0.85,  CC_litter     = 0.85
@@ -5353,7 +5380,7 @@ fedet_btf_valid_min = 0.0
     root_perm  = 5.0e-7
     branch_wood_frac = 0.0
     seedling_nsc_frac = 3.0 
-    leaf_refl = 0.11, 0.58
+    leaf_refl = 0.11, 0.45
     ROS_max = 0.4
     CC_leaf       = 0.85,  CC_stem       = 0.85,  CC_litter     =  0.85
     fireMort_leaf = 0.85,  fireMort_stem = 0.0,   fireMort_root = 0.2
@@ -5365,7 +5392,7 @@ fedet_btf_valid_min = 0.0
     tc_crit =  278.15
     leaf_N_retrans_frac = 0.7
     /
-      </fieldTable>  
+</fieldTable>
 
 
 <!-- DIAG TABLES by component -->
@@ -5797,7 +5824,6 @@ $baseDate
 # land one-level month-average output
 "land",    "area",       "area",       "land_month",  "all", .true., "none", 2
 "land",    "area_glac",  "glac_area",  "land_month",  "all", .true., "none", 2
-"land",    "Ctot",       "Ctot",       "land_month",  "all", .true., "none", 2
 "land",    "evap",       "evap_land",  "land_month",  "all", .true., "none", 2
 "land",    "evap_glac",  "evap_glac",  "land_month",  "all", .true., "none", 2
 "land",    "evap_lake",  "evap_lake",  "land_month",  "all", .true., "none", 2
@@ -5846,6 +5872,8 @@ $baseDate
 "land",    "transp",     "transp",     "land_month",  "all", .true., "none", 2
 "land",    "water_lake", "water_lake", "land_month",  "all", .true., "none", 2
 "land",    "water_soil", "water_soil", "land_month",  "all", .true., "none", 2
+"land",    "LWSr",       "LWSr",       "land_month",  "all", .true., "none", 2
+"land",    "FWSr",       "FWSr",       "land_month",  "all", .true., "none", 2
 "soil",    "soil_fgw",   "soil_fgw",   "land_month",  "all", .true., "none", 2
 "soil",    "soil_fsat",  "soil_fsat",  "land_month",  "all", .true., "none", 2
 "soil",    "soil_psi_n", "soil_psi_n", "land_month",  "all", .true., "none", 2
@@ -5855,35 +5883,89 @@ $baseDate
 "soil",    "soil_rsn",   "soil_rsn",   "land_month",  "all", .true., "none", 2
 "soil",    "soil_wtdep", "soil_wtdep", "land_month",  "all", .true., "none", 2
 "soil",    "soil_wt_4",  "soil_wt_4",  "land_month",  "all", .true., "none", 2
-"vegn",    "an_cl",      "an_cl",      "land_month",  "all", .true., "none", 2
-"vegn",    "an_op",      "an_op",      "land_month",  "all", .true., "none", 2
-"vegn",    "asoil",      "asoil",      "land_month",  "all", .true., "none", 2
-"vegn",    "bl",         "bl",         "land_month",  "all", .true., "none", 2
-"vegn",    "blv",        "blv",        "land_month",  "all", .true., "none", 2
-"vegn",    "br",         "br",         "land_month",  "all", .true., "none", 2
-"vegn",    "bsw",        "bsw",        "land_month",  "all", .true., "none", 2
-"vegn",    "bwood",      "bwood",      "land_month",  "all", .true., "none", 2
-"vegn",    "fsc",        "fsc",        "land_month",  "all", .true., "none", 2
-"vegn",    "gpp",        "gpp",        "land_month",  "all", .true., "none", 2
-"vegn",    "height",     "vegn_height","land_month",  "all", .true., "none", 2
-"vegn",    "LAI",        "LAI",        "land_month",  "all", .true., "none", 2
-"vegn",    "nep",        "nep",        "land_month",  "all", .true., "none", 2
-"vegn",    "npp",        "npp",        "land_month",  "all", .true., "none", 2
-"vegn",    "qco2_phot",  "qco2_phot",  "land_month",  "all", .true., "none", 2
-"vegn",    "root_density","vegn_rden", "land_month",  "all", .true., "none", 2
-"vegn",    "resp",       "resp",       "land_month",  "all", .true., "none", 2
-"vegn",    "resg",       "resg",       "land_month",  "all", .true., "none", 2
-"vegn",    "root_zeta",  "vegn_rzeta", "land_month",  "all", .true., "none", 2
-"vegn",    "rsoil",      "rsoil",      "land_month",  "all", .true., "none", 2
-"vegn",    "rsoil_fast", "rsoil_fast", "land_month",  "all", .true., "none", 2
-"vegn",    "snow_crit",  "vegn_sncrit","land_month",  "all", .true., "none", 2
-"vegn",    "species",    "species",    "land_month",  "all", .true., "none", 2
-"vegn",    "ssc",        "ssc",        "land_month",  "all", .true., "none", 2
-"vegn",    "temp",       "vegn_T",     "land_month",  "all", .true., "none", 2
-"vegn",    "theta",      "theta",      "land_month",  "all", .true., "none", 2
-"vegn",    "tsoil_av",   "tsoil_av",   "land_month",  "all", .true., "none", 2
-"land",    "LWSr",       "LWSr",       "land_month",  "all", .true., "none", 2
-"land",    "FWSr",       "FWSr",       "land_month",  "all", .true., "none", 2
+"vegn",    "PAR_dn",                   "PAR_dn",                  "land_month", "all", .true., "none", 2
+"vegn",    "PAR_net",                  "PAR_net",                 "land_month", "all", .true., "none", 2
+"vegn",    "an_cl",                    "an_cl",                   "land_month", "all", .true., "none", 2
+"vegn",    "an_op",                    "an_op",                   "land_month", "all", .true., "none", 2
+"vegn",    "asoil",                    "asoil",                   "land_month", "all", .true., "none", 2
+"vegn",    "bl",                       "bl",                      "land_month", "all", .true., "none", 2
+"vegn",    "blv",                      "blv",                     "land_month", "all", .true., "none", 2
+"vegn",    "br",                       "br",                      "land_month", "all", .true., "none", 2
+"vegn",    "bsw",                      "bsw",                     "land_month", "all", .true., "none", 2
+"vegn",    "bwood",                    "bwood",                   "land_month", "all", .true., "none", 2
+"vegn",    "bseed",                    "bseed",                   "land_month", "all", .true., "none", 2
+"vegn",    "nsc",                      "nsc",                     "land_month", "all", .true., "none", 2
+"vegn",    "btot",                     "btot",                    "land_month", "all", .true., "none", 2
+"vegn",    "Nl",                       "Nl",                      "land_month", "all", .true., "none", 2
+"vegn",    "Nr",                       "Nr",                      "land_month", "all", .true., "none", 2
+"vegn",    "Nseed",                    "Nseed",                   "land_month", "all", .true., "none", 2
+"vegn",    "Nsw",                      "Nsw",                     "land_month", "all", .true., "none", 2
+"vegn",    "Nwood",                    "Nwood",                   "land_month", "all", .true., "none", 2
+"vegn",    "Nstore",                   "Nstore",                  "land_month", "all", .true., "none", 2
+"vegn",    "Nvegtot",                  "Nvegtot",                 "land_month", "all", .true., "none", 2
+"vegn",    "nitrogen_stress",          "nitrogen_stress",         "land_month", "all", .true., "none", 2
+"land",    "Ctot",                     "Ctot",                    "land_month", "all", .true., "none", 2
+"land",    "Ntot",                     "Ntot",                    "land_month", "all", .true., "none", 2
+"vegn",    "height",                   "height",                  "land_month", "all", .true., "none", 2
+#"vegn",   "height1",                  "height1",                 "land_month", "all", .true., "none", 2
+"vegn",    "height_ave",               "height_ave",              "land_month", "all", .true., "none", 2
+"vegn",    "lai",                      "lai",                     "land_month", "all", .true., "none", 2
+"vegn",    "sai",                      "sai",                     "land_month", "all", .true., "none", 2
+"vegn",    "nep",                      "nep",                     "land_month", "all", .true., "none", 2
+"vegn",    "npp",                      "npp",                     "land_month", "all", .true., "none", 2
+"vegn",    "gpp",                      "gpp",                     "land_month", "all", .true., "none", 2
+"vegn",    "lai_kok",                  "lai_kok",                 "land_month", "all", .true., "none", 2
+"vegn",    "root_density",             "vegn_rden",               "land_month", "all", .true., "none", 2
+"vegn",    "soil_water_supply",        "soil_water_supply",       "land_month", "all", .true., "none", 2
+"vegn",    "resp",                     "resp",                    "land_month", "all", .true., "none", 2
+"vegn",    "resg",                     "resg",                    "land_month", "all", .true., "none", 2
+"vegn",    "root_zeta",                "vegn_rzeta",              "land_month", "all", .true., "none", 2
+"vegn",    "rsoil",                    "rsoil",                   "land_month", "all", .true., "none", 2
+"vegn",    "rsoil_fast",               "rsoil_fast",              "land_month", "all", .true., "none", 2
+"vegn",    "snow_crit",                "vegn_sncrit",             "land_month", "all", .true., "none", 2
+"vegn",    "fsc",                      "fsc",                     "land_month", "all", .true., "none", 2
+"vegn",    "ssc",                      "ssc",                     "land_month", "all", .true., "none", 2
+"vegn",    "theta",                    "theta",                   "land_month", "all", .true., "none", 2
+"vegn",    "tsoil_av",                 "tsoil_av",                "land_month", "all", .true., "none", 2
+"vegn",    "stomatal_cond",            "stomatal_cond",           "land_month", "all", .true., "none", 2
+"vegn",    "w_scale",                  "w_scale",                 "land_month", "all", .true., "none", 2
+"vegn",    "ncohorts",                 "ncohorts",                "land_month", "all", .true., "none", 2
+"vegn",    "nindivs",                  "nindivs",                 "land_month", "all", .true., "none", 2
+"vegn",    "nlayers",                  "nlayers",                 "land_month", "all", .true., "none", 2
+"vegn",    "dbh",                      "dbh",                     "land_month", "all", .true., "none", 2
+"vegn",    "crownarea",                "crownarea",               "land_month", "all", .true., "none", 2
+"vegn",    "gdd",                      "gdd",                     "land_month", "all", .true., "none", 2
+"vegn",    "tc_pheno",                 "tc_pheno",                "land_month", "all", .true., "none", 2
+"vegn",    "psiph",                    "psiph",                   "land_month", "all", .true., "none", 2
+"vegn",    "status",                   "status",                  "land_month", "all", .true., "none", 2
+"vegn",    "bl_max",                   "bl_max",                  "land_month", "all", .true., "none", 2
+"vegn",    "br_max",                   "br_max",                  "land_month", "all", .true., "none", 2
+"vegn",    "con_v_v",                  "con_v_v",                 "land_month", "all", .true., "none", 2
+"vegn",    "con_v_h",                  "con_v_h",                 "land_month", "all", .true., "none", 2
+"land",    "con_g_h",                  "con_g_h",                 "land_month", "all", .true., "none", 2
+"vegn",    "wl",                       "wl",                      "land_month", "all", .true., "none", 2
+"vegn",    "ws",                       "ws",                      "land_month", "all", .true., "none", 2
+"vegn",    "age",                      "age",                     "land_month", "all", .true., "none", 2
+"vegn",    "csmoke",                   "csmoke",                  "land_month", "all", .true., "none", 2
+"vegn",    "lambda",                   "lambda",                  "land_month", "all", .true., "none", 2
+"vegn",    "fuel",                     "fuel",                    "land_month", "all", .true., "none", 2
+"vegn",    "Ndep",                     "Ndep",                    "land_month", "all", .true., "none", 2
+"vegn",    "mrz_mine_biomass_C",       "mrz_mine_biomass_C",      "land_month", "all", .true., "none", 2
+"vegn",    "mrz_mine_biomass_N",       "mrz_mine_biomass_N",      "land_month", "all", .true., "none", 2
+"vegn",    "mrz_scav_biomass_C",       "mrz_scav_biomass_C",      "land_month", "all", .true., "none", 2
+"vegn",    "mrz_scav_biomass_N",       "mrz_scav_biomass_N",      "land_month", "all", .true., "none", 2
+"vegn",    "Nfix_biomass_C",           "Nfix_biomass_C",          "land_month", "all", .true., "none", 2
+"vegn",    "Nfix_biomass_N",           "Nfix_biomass_N",          "land_month", "all", .true., "none", 2
+"vegn",    "mrz_mine_res_C",           "mrz_mine_res_C",          "land_month", "all", .true., "none", 2
+"vegn",    "mrz_mine_res_N",           "mrz_mine_res_N",          "land_month", "all", .true., "none", 2
+"vegn",    "mrz_scav_res_C",           "mrz_scav_res_C",          "land_month", "all", .true., "none", 2
+"vegn",    "mrz_scav_res_N",           "mrz_scav_res_N",          "land_month", "all", .true., "none", 2
+"vegn",    "Nfix_res_C",               "Nfix_res_C",              "land_month", "all", .true., "none", 2
+"vegn",    "Nfix_res_N",               "Nfix_res_N",              "land_month", "all", .true., "none", 2
+"vegn",    "exudate",                  "exudate",                 "land_month", "all", .true., "none", 2
+"vegn",    "rhiz_exud_C",              "rhiz_exud_C",             "land_month", "all", .true., "none", 2
+"vegn",    "rhiz_exud_N",              "rhiz_exud_N",             "land_month", "all", .true., "none", 2
+"vegn",    "rhiz_exud_mgain",          "rhiz_exud_mgain",         "land_month", "all", .true., "none", 2
 ## 2016/12/19 add in land fields for conservation checking
 "land",     "water_cons"           ,        "water_cons",      "land_month",      "all", .true.,"none", 2
 "land",     "carbon_cons"          ,        "carbon_cons",     "land_month",      "all", .true.,"none", 2
@@ -6060,16 +6142,19 @@ $baseDate
 "vegn",      "sai",                "sai",                 "land_dust", "all", .true.,  "none", 2
 "land_dust", "w10m",               "w10m",                "land_dust", "all", .true.,  "none", 2
 "land_dust", "snow_fmass",         "snow_fmass",          "land_dust", "all", .true.,  "none", 2
+
 "land_dust", "soil_wetness",       "soil_wetness",        "land_dust", "all", .true.,  "none", 2
 "land_dust", "soil_wetness_ntrl",  "soil_wetness_ntrl",   "land_dust", "all", .true.,  "none", 2
 "land_dust", "soil_wetness_crop",  "soil_wetness_crop",   "land_dust", "all", .true.,  "none", 2
 "land_dust", "soil_wetness_past",  "soil_wetness_past",   "land_dust", "all", .true.,  "none", 2
 "land_dust", "soil_wetness_scnd",  "soil_wetness_scnd",   "land_dust", "all", .true.,  "none", 2
+
 "land_dust", "soil_iceness",       "soil_iceness",        "land_dust", "all", .true.,  "none", 2
 "land_dust", "soil_iceness_ntrl",  "soil_iceness_ntrl",   "land_dust", "all", .true.,  "none", 2
 "land_dust", "soil_iceness_crop",  "soil_iceness_crop",   "land_dust", "all", .true.,  "none", 2
 "land_dust", "soil_iceness_past",  "soil_iceness_past",   "land_dust", "all", .true.,  "none", 2
 "land_dust", "soil_iceness_scnd",  "soil_iceness_scnd",   "land_dust", "all", .true.,  "none", 2
+
 "land_dust", "dust_emis",          "dust_emis",           "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_emis_ntrl",     "dust_emis_ntrl",      "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_emis_crop",     "dust_emis_crop",      "land_dust", "all", .true.,  "none", 2
@@ -6077,16 +6162,19 @@ $baseDate
 "land_dust", "dust_emis_scnd",     "dust_emis_scnd",      "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_emis_lake",     "dust_emis_lake",      "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_emis_glac",     "dust_emis_glac",      "land_dust", "all", .true.,  "none", 2
+
 "land_dust", "bareness",           "bareness",            "land_dust", "all", .true.,  "none", 2
 "land_dust", "bareness_ntrl",      "bareness_ntrl",       "land_dust", "all", .true.,  "none", 2
 "land_dust", "bareness_crop",      "bareness_crop",       "land_dust", "all", .true.,  "none", 2
 "land_dust", "bareness_past",      "bareness_past",       "land_dust", "all", .true.,  "none", 2
 "land_dust", "bareness_scnd",      "bareness_scnd",       "land_dust", "all", .true.,  "none", 2
+
 "land_dust", "u_ts",               "u_ts",                "land_dust", "all", .true.,  "none", 2
 "land_dust", "u_ts_ntrl",          "u_ts_ntrl",           "land_dust", "all", .true.,  "none", 2
 "land_dust", "u_ts_scnd",          "u_ts_scnd",           "land_dust", "all", .true.,  "none", 2
 "land_dust", "u_ts_crop",          "u_ts_crop",           "land_dust", "all", .true.,  "none", 2
 "land_dust", "u_ts_past",          "u_ts_past",           "land_dust", "all", .true.,  "none", 2
+
 "land_dust", "dust_wdep",          "dust_wdep",           "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_wdep_ntrl",     "dust_wdep_ntrl",      "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_wdep_scnd",     "dust_wdep_scnd",      "land_dust", "all", .true.,  "none", 2
@@ -6094,6 +6182,7 @@ $baseDate
 "land_dust", "dust_wdep_crop",     "dust_wdep_crop",      "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_wdep_lake",     "dust_wdep_lake",      "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_wdep_glac",     "dust_wdep_glac",      "land_dust", "all", .true.,  "none", 2
+
 "land_dust", "dust_ddep",          "dust_ddep",           "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_ddep_ntrl",     "dust_ddep_ntrl",      "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_ddep_scnd",     "dust_ddep_scnd",      "land_dust", "all", .true.,  "none", 2
@@ -6101,6 +6190,7 @@ $baseDate
 "land_dust", "dust_ddep_crop",     "dust_ddep_crop",      "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_ddep_lake",     "dust_ddep_lake",      "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_ddep_glac",     "dust_ddep_glac",      "land_dust", "all", .true.,  "none", 2
+
 "land_dust", "dust_fatm",          "dust_fatm",           "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_fatm_ntrl",     "dust_fatm_ntrl",      "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_fatm_scnd",     "dust_fatm_scnd",      "land_dust", "all", .true.,  "none", 2
@@ -6108,6 +6198,7 @@ $baseDate
 "land_dust", "dust_fatm_crop",     "dust_fatm_crop",      "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_fatm_glac",     "dust_fatm_glac",      "land_dust", "all", .true.,  "none", 2
 "land_dust", "dust_fatm_lake",     "dust_fatm_lake",      "land_dust", "all", .true.,  "none", 2
+
 "land",      "frac_crop",          "frac_crop",           "land_dust", "all", .true.,  "none", 2
 "land",      "frac_past",          "frac_past",           "land_dust", "all", .true.,  "none", 2
 "land",      "frac_ntrl",          "frac_ntrl",           "land_dust", "all", .true.,  "none", 2
@@ -8714,7 +8805,7 @@ endif
 
 <!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CDATA/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/1850_fixc2h4bb/emissions.0.5x0.5.1850.tar</dataSource>
+        <dataSource platform="$(platform)">$CDATA/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/1850_wseabirdnh3/emissions.0.5x0.5.1850.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/anthro_so2.1849_2017.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/emissions_cmip6_v20170518/emissions.simple.so2.0.5x0.5.1849-2017.nc</dataSource>
