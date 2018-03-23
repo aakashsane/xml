@@ -2592,13 +2592,13 @@ MOM_OVERRIDE_EOF
       <namelist name="coupler_nml">
        months = $months,
        days   = $days,
-       current_date = 1900,1,1,0,0,0,
+       current_date = 1948,1,1,0,0,0,
        hours = 0
        minutes = 0
        seconds = 0
        calendar = 'NOLEAP',
-       dt_cpld  = 7200,
-       dt_atmos = 7200,
+       dt_cpld  = 1800,           ! for stability
+       dt_atmos = 1800,           ! to match dt_cpld
        do_atmos = .false.,
        do_land = .false.,
        do_ice = .true.,
@@ -2616,15 +2616,31 @@ use_hyper_thread = .false.
      </namelist>
 
      <namelist name="diag_manager_nml">
-            flush_nc_files=.false.
-            max_axes = 100,
-            max_files = 63,
-            max_num_axis_sets = 100,
-            max_input_fields = 699
-            max_output_fields = 699
-            mix_snapshot_average_fields=.false.
+       max_files = 400
+       flush_nc_files=.false.
+       max_axes = 400,
+       max_num_axis_sets = 400,
+       max_input_fields = 1200
+       max_output_fields = 1800
+       mix_snapshot_average_fields=.false.
      </namelist>
-
+     <namelist name="xgrid_nml">
+       make_exchange_reproduce = .true.
+       interp_method = 'second_order'
+     </namelist>
+     <namelist name="fms_nml">
+       clock_grain='ROUTINE'
+       clock_flags='NONE'
+       domains_stack_size = 8000000
+       stack_size =0
+     </namelist>
+     <namelist name="fms_io_nml" >
+       fms_netcdf_restart=.true.
+       threading_read='multi'
+       max_files_r = 800
+       max_files_w = 800
+       checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+     </namelist>
 
      <diagTable>
 $name
@@ -2658,11 +2674,18 @@ $baseDate
 
   
       <csh><![CDATA[
+cat >> $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+#override DT = 1800
+#override DT_THERM = 7200  
+MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-
+#override MIN_OCN_INTERTIAL_H = 2.
+#override ICE_STATS_INTERVAL = 30
 SIS_OVERRIDE_EOF
      ]]></csh>
 
@@ -2684,6 +2707,10 @@ SIS_OVERRIDE_EOF
         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
       </regression>
 
+      <regression name="debug5">
+        <run days="10" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1057p5']/node())"/> </run>
+        <run days="4 6" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1057p5']/node())"/> </run>
+      </regression>
       <regression name="debugomp">
         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O512x2']/node())"/> </run>
       </regression>
@@ -2732,12 +2759,89 @@ SIS_OVERRIDE_EOF
     </postProcess>
    </experiment>
 
-   <experiment name="OMp5_newgrid" inherit="OMp5_baseline">
+   <experiment name="OMp5_BLING" inherit="OMp5_baseline">
     <input>
-      <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic.v20180204.tar</dataSource>
+     <namelist name="generic_tracer_nml">
+       do_generic_tracer=.true.
+       do_generic_BLING=.true.
+       do_generic_CFC=.false.
+       do_generic_SF6=.false.
+       do_generic_age=.false.
+       do_generic_argon=.false.
+       do_generic_COBALT=.false.
+       force_update_fluxes=.true.
+      </namelist>
+      <namelist name="generic_bling_nml">
+       do_14c=.false.
+       do_carbon=.true.
+       do_carbon_pre=.false.
+       do_po4_pre=.false.
+       bury_caco3=.true.
+       bury_pop=.true.
+       co2_calc='mocsy'
+      </namelist>
+
+     <diagTable>
+$name
+$baseDate
+     </diagTable>
+
+
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/data_table</dataSource>
       </dataFile>
-    </input>
+
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_common']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_05grid_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='OMp5_data']/input/node())"/>
+      <!--SIS2 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
+      <!--CORE forcing datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='CORE_data']/input/node())"/>
+      <!--BLING specific datasets and tables-->
+      <!--COBALT IC datasets used in BLING field_table-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OBGC_data_set']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='BLING_field_table']/input/node())"/>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/TOPAZ/deposition_fan/Soluble_Fe_Flux_PI.nc</dataSource>
+      </dataFile>
+     <!--Append BLING tables to parent baseline tables-->
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_BLING</dataSource>
+     </dataFile>
+
+      <dataTable order="append">
+"ATM", "c14o2_flux_pcair_atm",         "",      "",                                "none",  284.262e-06
+"ATM", "co2_flux_pcair_atm",           "",      "",                                "none",  284.262e-06
+"ATM", "o2_flux_pcair_atm",            "",      "",                                "none",    0.21
+"OCN", "runoff_alk_flux_ice_ocn",      "",      "",                                "none",    0.5932e-3
+"OCN", "runoff_dic_flux_ice_ocn",      "",      "",                                "none",    0.96e-3
+"OCN", "runoff_po4_flux_ice_ocn",      "",      "",                                "none",    0.006792e-3
+"OCN", "dry_dep_fed_flux_ice_ocn",     "FLUX",  "./INPUT/Soluble_Fe_Flux_PI.nc",   "bilinear",   -1.0
+      </dataTable>  
+
+     <csh>
+        <![CDATA[
+cat >> $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+Z_INIT_REMAP_GENERAL = True                                                          
+Z_INIT_REMAP_FULL_COLUMN = True                                                      
+#override DT = 1800
+#override DT_THERM = 7200  
+USE_generic_tracer = True
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override MIN_OCN_INTERTIAL_H = 2.
+#override ICE_STATS_INTERVAL = 30
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
+
+   </input>
+
    </experiment>
    <experiment name="OMp5_MEKE" inherit="OMp5_baseline">
     <input>
@@ -3043,138 +3147,6 @@ SIS_OVERRIDE_EOF
    </experiment>
 
 
-   <experiment name="OMp5_BLING" inherit="OMp5_baseline">
-    <input>
-      <namelist name="coupler_nml">
-       months = $months,
-       days   = $days,
-       current_date = 1948,1,1,0,0,0,
-       hours = 0
-       minutes = 0
-       seconds = 0
-       calendar = 'NOLEAP',
-       dt_cpld  = 1800,           ! for stability
-       dt_atmos = 1800,           ! to match dt_cpld
-       do_atmos = .false.,
-       do_land = .false.,
-       do_ice = .true.,
-       do_ocean = .true.,
-       atmos_npes = 0,
-       ocean_npes = 0,
-       concurrent = .false.
-       use_lag_fluxes=.false.
-       atmos_nthreads = $atm_threads
-       ocean_nthreads = $ocean_nthreads
-     </namelist>
-     <namelist name="generic_tracer_nml">
-       do_generic_tracer=.true.
-       do_generic_BLING=.true.
-       do_generic_CFC=.false.
-       do_generic_SF6=.false.
-       do_generic_age=.false.
-       do_generic_argon=.false.
-       do_generic_COBALT=.false.
-       force_update_fluxes=.true.
-      </namelist>
-      <namelist name="generic_bling_nml">
-       do_14c=.false.
-       do_carbon=.true.
-       do_carbon_pre=.false.
-       do_po4_pre=.false.
-       bury_caco3=.true.
-       bury_pop=.true.
-       co2_calc='mocsy'
-      </namelist>
-     <namelist name="diag_manager_nml">
-       max_files = 400
-       flush_nc_files=.false.
-       max_axes = 400,
-       max_num_axis_sets = 400,
-       max_input_fields = 1200
-       max_output_fields = 1800
-       mix_snapshot_average_fields=.false.
-     </namelist>
-     <namelist name="xgrid_nml">
-       make_exchange_reproduce = .true.
-       interp_method = 'second_order'
-     </namelist>
-     <namelist name="fms_nml">
-       clock_grain='ROUTINE'
-       clock_flags='NONE'
-       domains_stack_size = 8000000
-       stack_size =0
-     </namelist>
-     <namelist name="fms_io_nml" >
-       fms_netcdf_restart=.true.
-       threading_read='multi'
-       max_files_r = 800
-       max_files_w = 800
-       checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
-     </namelist>
-
-     <diagTable>
-$name
-$baseDate
-     </diagTable>
-
-     <!--Append BLING tables to parent baseline tables-->
-     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_BLING</dataSource>
-     </dataFile>
-
-      <dataTable order="append">
-"ATM", "c14o2_flux_pcair_atm",         "",      "",                                "none",  284.262e-06
-"ATM", "co2_flux_pcair_atm",           "",      "",                                "none",  284.262e-06
-"ATM", "o2_flux_pcair_atm",            "",      "",                                "none",    0.21
-"OCN", "runoff_alk_flux_ice_ocn",      "",      "",                                "none",    0.5932e-3
-"OCN", "runoff_dic_flux_ice_ocn",      "",      "",                                "none",    0.96e-3
-"OCN", "runoff_po4_flux_ice_ocn",      "",      "",                                "none",    0.006792e-3
-"OCN", "dry_dep_fed_flux_ice_ocn",     "FLUX",  "./INPUT/Soluble_Fe_Flux_PI.nc",   "bilinear",   -1.0
-      </dataTable>  
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/TOPAZ/deposition_fan/Soluble_Fe_Flux_PI.nc</dataSource>
-      </dataFile>
-
-      <xi:include xpointer="xpointer(//freInclude[@name='OM4_common']/input/node())"/>
-      <!--MOM6 Input datasets-->
-      <xi:include xpointer="xpointer(//freInclude[@name='OM4_05grid_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='OMp5_data']/input/node())"/>
-      <!--SIS2 Input datasets-->
-      <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
-      <!--CORE2 forcing datasets-->
-      <xi:include xpointer="xpointer(//freInclude[@name='CORE2_data']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='CORE2_data_table']/input/node())"/>
-      <!--BLING specific datasets and tables-->
-      <!--COBALT IC datasets used in BLING field_table-->
-      <xi:include xpointer="xpointer(//freInclude[@name='OBGC_data_set']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='BLING_field_table']/input/node())"/>
-
-     <csh>
-        <![CDATA[
-cat >> $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-Z_INIT_REMAP_GENERAL = True                                                          
-Z_INIT_REMAP_FULL_COLUMN = True                                                      
-#override DT = 1800
-#override DT_THERM = 7200  
-USE_generic_tracer = True
-MOM_OVERRIDE_EOF
-
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-#override U_TRUNC_FILE = "SIS_U_truncations"
-#override V_TRUNC_FILE = "SIS_V_truncations"
-#override MIN_OCN_INTERTIAL_H = 2.
-
-#override ADD_DIURNAL_SW = True 
-#override ICE_STATS_INTERVAL = 30
-SIS_OVERRIDE_EOF
-
-     ]]></csh>
-
-   </input>
-
-   </experiment>
 
   <freInclude name="OBGC_data_set">
     <input>
@@ -3583,11 +3555,7 @@ MOM_OVERRIDE_EOF
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override U_TRUNC_FILE = "SIS_U_truncations"
-#override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
-
-#override ADD_DIURNAL_SW = True 
 #override ICE_STATS_INTERVAL = 30
 SIS_OVERRIDE_EOF
      ]]></csh>
@@ -3612,17 +3580,13 @@ GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
 #override TEMP_Z_INIT_FILE = "woa13_decav_ptemp_monthly_fulldepth_01.nc"
 #override SALT_Z_INIT_FILE = "woa13_decav_s_monthly_fulldepth_01.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "ptemp_an"
 #override Z_INIT_FILE_SALT_VAR = "s_an"
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-#override U_TRUNC_FILE = "SIS_U_truncations"
-#override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
-
-#override ADD_DIURNAL_SW = True 
 #override ICE_STATS_INTERVAL = 30
 SIS_OVERRIDE_EOF
      ]]></csh>
@@ -3769,11 +3733,7 @@ MOM_OVERRIDE_EOF
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override U_TRUNC_FILE = "SIS_U_truncations"
-#override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
-
-#override ADD_DIURNAL_SW = True 
 #override ICE_STATS_INTERVAL = 30
 SIS_OVERRIDE_EOF
      ]]></csh>
@@ -4751,11 +4711,7 @@ MOM_OVERRIDE_EOF
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
 #override NJGLOBAL = 576
-#override U_TRUNC_FILE = "SIS_U_truncations"
-#override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
-
-#override ADD_DIURNAL_SW = True 
 #override ICE_STATS_INTERVAL = 30
 SIS_OVERRIDE_EOF
      ]]></csh>
