@@ -183,25 +183,25 @@ import sys
 fYear = sys.argv[1]
 outdir = sys.argv[2]
 label = sys.argv[3]
-history = sys.argv[4]
+history = str(sys.argv[4]).split(',')
 
 gs_tiles = []
 for tx in range(1,7): gs_tiles.append(gmeantools.ncopen(fYear + '.grid_spec.tile'+str(tx)+'.nc'))
-
-data_tiles = []
-for tx in range(1,7): data_tiles.append(gmeantools.ncopen(fYear + '.'+history+'.tile'+str(tx)+'.nc'))
 
 geoLat = gmeantools.cube_sphere_aggregate('grid_latt',gs_tiles)
 geoLon = gmeantools.cube_sphere_aggregate('grid_lont',gs_tiles)
 cellArea = gmeantools.cube_sphere_aggregate('area',gs_tiles)
 
-for varName in data_tiles[0].variables.keys():
-  if (len(data_tiles[0].variables[varName].shape) == 3):
-    var = gmeantools.cube_sphere_aggregate(varName,data_tiles)
-    var = np.ma.average(var,axis=0,weights=data_tiles[0].variables['average_DT'][:])
-    for reg in ['global','tropics','nh','sh']:
-      result, _null = gmeantools.area_mean(var,cellArea,geoLat,geoLon,region=reg)
-      gmeantools.write_sqlite_data(outdir+'/'+fYear+'.'+reg+'Ave'+label+'.db',varName,fYear[:4],result)
+for atmosFile in history:
+    data_tiles = []
+    for tx in range(1,7): data_tiles.append(gmeantools.ncopen(fYear + '.'+atmosFile+'.tile'+str(tx)+'.nc'))
+    for varName in data_tiles[0].variables.keys():
+      if (len(data_tiles[0].variables[varName].shape) == 3):
+        var = gmeantools.cube_sphere_aggregate(varName,data_tiles)
+        var = np.ma.average(var,axis=0,weights=data_tiles[0].variables['average_DT'][:])
+        for reg in ['global','tropics','nh','sh']:
+          result, _null = gmeantools.area_mean(var,cellArea,geoLat,geoLon,region=reg)
+          gmeantools.write_sqlite_data(outdir+'/'+fYear+'.'+reg+'Ave'+label+'.db',varName,fYear[:4],result)
 
 EOF
 
@@ -449,7 +449,7 @@ for varName in data_tiles[0].variables.keys():
 EOF
 
 #-- Run the averager script
-python global_average_cubesphere.py ${oname} ${refineDiagDir} Atmos atmos_month
+python global_average_cubesphere.py ${oname} ${refineDiagDir} Atmos atmos_month,atmos_co2_month
 python global_average_cubesphere.py ${oname} ${refineDiagDir} AtmosAer atmos_month_aer
 python global_average_land.py ${oname} ${refineDiagDir} Land land_month
 python global_average_ice.py ${oname} ${refineDiagDir} Ice ice_month
