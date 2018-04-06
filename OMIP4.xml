@@ -15,10 +15,10 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/> <!-- git tag for ocean_shared source code -->
   <property name="MOM6_DATE"      value="2018.04.06"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl/2018.04.06"/>   <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"       value="CMIP6/OM4p5/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
+  <property name="FRE_STEM"       value="CMIP6/OMIP4/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_b"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_YOURGROUPLETTER"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
    <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
 
@@ -415,21 +415,7 @@ $baseDate
      </dataFile>
 
      <!--MOM_overrides-->
-
-     <csh>
-        <![CDATA[
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-# Use WOA2013 for initial conditions
-#override SALT_RESTORE_FILE = "salt_restore_PHC2.1440x1080.v20180405.nc"
-#override TEMP_SALT_Z_INIT_FILE = ""
-#override TEMP_Z_INIT_FILE = "woa13_decav_ptemp_monthly_fulldepth_01.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp_an" ! default = "ptemp"
-#override SALT_Z_INIT_FILE = "woa13_decav_s_monthly_fulldepth_01.nc"
-#override Z_INIT_FILE_SALT_VAR = "s_an"   ! default = "salt"
- 
-MOM_OVERRIDE_EOF
-
-     ]]></csh>
+     <!--None required for this experiment-->
 
    </input>
 
@@ -630,21 +616,11 @@ $baseDate
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_field_table']/input/node())"/>
 
      <!--MOM_overrides-->
-
      <csh>
         <![CDATA[
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-# Use WOA2013 for initial conditions
-#override SALT_RESTORE_FILE = "salt_restore_PHC2.720x576.v20180405.nc"
-#override TEMP_SALT_Z_INIT_FILE = ""
-#override TEMP_Z_INIT_FILE = "woa13_decav_ptemp_monthly_fulldepth_01.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp_an" ! default = "ptemp"
-#override SALT_Z_INIT_FILE = "woa13_decav_s_monthly_fulldepth_01.nc"
-#override Z_INIT_FILE_SALT_VAR = "s_an"   ! default = "salt"
 # Turn on generic tracers
 USE_generic_tracer = True
-# Increase tracer timestep to compensate running with BLING slow down
-#override DT_THERM = 7200 
 # Do not look for generic tracers IC file
 GENERIC_TRACER_IC_FILE = "_NULL_"
  
@@ -1073,15 +1049,11 @@ $baseDate
       </dataFile>
 
      <!--MOM_overrides-->
-
      <csh>
         <![CDATA[
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 # Turn on generic tracers
 USE_generic_tracer = True
-# Increase tracer timestep to compensate running with BLING slow down
-# override DT = 1800 !This is the default
-#override DT_THERM = 7200  
 GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
 MOM_OVERRIDE_EOF
 
@@ -1227,27 +1199,6 @@ SIS_OVERRIDE_EOF
          parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_saltrestore','INPUT/MOM_override'
      </namelist>
 
-     <csh type="always"><![CDATA[
-if ( $currentSeg == 1 ) then
-   set restart_flag = 'n'
-else
-   set restart_flag = 'r'
-endif
-
-ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc 
-
-touch $work/INPUT/MOM_override
-touch $work/INPUT/SIS_override
-
-
-cat >> $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override TEMP_Z_INIT_FILE = "woa13_decav_ptemp_monthly_fulldepth_01.nc"
-#override SALT_Z_INIT_FILE = "woa13_decav_s_monthly_fulldepth_01.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "ptemp_an"
-#override Z_INIT_FILE_SALT_VAR = "s_an"
-MOM_OVERRIDE_EOF
-
-      ]]></csh>
      </input>
    </freInclude>
 
