@@ -16,9 +16,9 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/> <!-- git tag for ocean_shared source code -->
   <property name="MOM6_DATE"      value="2018.04.06"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"       value="CMIP6/OMIP4/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_YOURGROUPLETTER"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_b"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
    <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
 
@@ -871,7 +871,7 @@ MOM_OVERRIDE_EOF
    <!--***************************** 1/2 degree experiments        ****************************-->
    <!--****************************************************************************************-->
 											      
-   <experiment name="OM4p5_IAF_baseline_BLING_CFC_abio" inherit="MOM6_SIS2_compile">
+   <experiment name="OM4p5_IAF_BLING_CFC_abio" inherit="MOM6_SIS2_compile">
    <publicMetadata DBswitch="$(MDBIswitch)">
       <!-- Realization tag -->
       <realization r="1" i="1" p="1" f="1"/>
@@ -1055,6 +1055,9 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 # Turn on generic tracers
 USE_generic_tracer = True
 GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+# No need to remap to general coordinates since we are z*
+#override Z_INIT_REMAP_GENERAL = False
+#override REMAP_AFTER_INITIALIZATION = True
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
