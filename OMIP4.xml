@@ -65,7 +65,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   </freInclude>
 
    <freInclude name="resourceparams_O1300p5_production">
-             <resources jobWallclock="16:00:00"  segRuntime="4:00:00">
+             <resources jobWallclock="16:00:00"  segRuntime="1:30:00">
                <ocn ranks="1300" layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45" threads="1"/>
                <ice              layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
              </resources>
@@ -278,7 +278,7 @@ endif
    <!--***************************** 1/4 degree experiments        ****************************-->
    <!--****************************************************************************************-->
 											      
-   <experiment name="OM4p25_IAF_woa13" inherit="MOM6_SIS2_compile">
+   <experiment name="OM4p25_IAF_woa13_csf" inherit="MOM6_SIS2_compile">
     <description>
 global 1/4 degree z ocean_ice experiment 
 regridded runoff and salinity
@@ -415,7 +415,13 @@ $baseDate
      </dataFile>
 
      <!--MOM_overrides-->
-     <!--None required for this experiment-->
+     <csh>
+        <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
+MOM_OVERRIDE_EOF
+
+     ]]></csh>
 
    </input>
 
@@ -447,7 +453,7 @@ $baseDate
    </postProcess>
    </experiment>
 
-   <experiment name="OM4p25_IAF_woa13_BLING_CFC" inherit="MOM6_SIS2_compile">
+   <experiment name="OM4p25_IAF_woa13_BLING_CFC_csf" inherit="MOM6_SIS2_compile">
     <description>
 global 1/4 degree z ocean_ice experiment 
 regridded runoff and salinity
@@ -623,7 +629,7 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 USE_generic_tracer = True
 # Do not look for generic tracers IC file
 GENERIC_TRACER_IC_FILE = "_NULL_"
- 
+#override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
 MOM_OVERRIDE_EOF
 
      ]]></csh>
@@ -871,7 +877,7 @@ MOM_OVERRIDE_EOF
    <!--***************************** 1/2 degree experiments        ****************************-->
    <!--****************************************************************************************-->
 											      
-   <experiment name="OM4p5_IAF_BLING_CFC_abio" inherit="MOM6_SIS2_compile">
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf" inherit="MOM6_SIS2_compile">
    <publicMetadata DBswitch="$(MDBIswitch)">
       <!-- Realization tag -->
       <realization r="1" i="1" p="1" f="1"/>
@@ -1058,6 +1064,7 @@ GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
 # No need to remap to general coordinates since we are z*
 #override Z_INIT_REMAP_GENERAL = False
 #override REMAP_AFTER_INITIALIZATION = True
+#override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
