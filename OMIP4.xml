@@ -14,7 +14,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="RELEASE"        value="warsaw_201803"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/> <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="2018.04.06"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"      value="2018.04.11"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
@@ -415,13 +415,7 @@ $baseDate
      </dataFile>
 
      <!--MOM_overrides-->
-     <csh>
-        <![CDATA[
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
-MOM_OVERRIDE_EOF
-
-     ]]></csh>
+     <!--None needed for this experiment-->
 
    </input>
 
@@ -1061,10 +1055,7 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 # Turn on generic tracers
 USE_generic_tracer = True
 GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
-# No need to remap to general coordinates since we are z*
-#override Z_INIT_REMAP_GENERAL = False
-#override REMAP_AFTER_INITIALIZATION = True
-#override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
+#override MLE_FRONT_LENGTH = 500.0
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
