@@ -18,9 +18,9 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_b"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_YOURGROUPLETTER"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
-   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
+  <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
    <property name="PROD_SIMTIME"   value="300"/>
@@ -58,7 +58,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   </setup>
 
   <freInclude name="resourceparams_O4671_production">
-           <resources jobWallclock="16:00:00"  segRuntime="2:00:00">
+           <resources jobWallclock="16:00:00"  segRuntime="3:00:00">
              <ocn ranks="4671" layout = "90,72"   io_layout = "1,4" mask_table="mask_table.1809.90x72" threads="1"/>
              <ice              layout = "90,72"   io_layout = "1,4" mask_table="mask_table.1809.90x72"/>
            </resources>
@@ -439,12 +439,7 @@ $baseDate
 
     <postProcess>
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='BLING_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='inert_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='inert_z_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='inert_postprocess_1x1deg']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='inert_z_postprocess_1x1deg']/postProcess/node())"/>  
-   </postProcess>
+    </postProcess>
    </experiment>
 
    <experiment name="OM4p25_IAF_woa13_BLING_CFC_csf" inherit="MOM6_SIS2_compile">
@@ -1146,6 +1141,9 @@ SIS_OVERRIDE_EOF
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/woa13_decav_s_monthly_fulldepth_01.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic_ocean.v20180227.unpacked/ocean_static.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/layer_coord.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -1157,11 +1155,6 @@ SIS_OVERRIDE_EOF
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/MOM_saltrestore</dataSource>
       </dataFile>
-
-      <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
-       <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic_ocean.v20180227.unpacked/ocean_static.nc</dataSource>
-      </dataFile>
-
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/analysis_vgrid_lev35.v1.nc</dataSource>
       </dataFile>
