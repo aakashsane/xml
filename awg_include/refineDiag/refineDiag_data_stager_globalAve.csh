@@ -200,8 +200,9 @@ for atmosFile in history:
         var = gmeantools.cube_sphere_aggregate(varName,data_tiles)
         var = np.ma.average(var,axis=0,weights=data_tiles[0].variables['average_DT'][:])
         for reg in ['global','tropics','nh','sh']:
-          result, _null = gmeantools.area_mean(var,cellArea,geoLat,geoLon,region=reg)
+          result, areaSum = gmeantools.area_mean(var,cellArea,geoLat,geoLon,region=reg)
           gmeantools.write_sqlite_data(outdir+'/'+fYear+'.'+reg+'Ave'+label+'.db',varName,fYear[:4],result)
+          gmeantools.write_sqlite_data(outdir+'/'+fYear+'.'+reg+'Ave'+label+'.db','area',fYear[:4],areaSum)
 
 EOF
 
