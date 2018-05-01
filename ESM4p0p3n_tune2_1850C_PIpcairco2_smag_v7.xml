@@ -1937,7 +1937,7 @@ LWH (3/16/2018)
        do_co2_restore = .true.               
        restore_tscale = 3.1536e7,
        restore_klimit = 1000                          ! jgj resolution dependent so set to large number for now
-       co2_radiation_override = .true.
+       co2_radiation_override = .false.
        do_co2_emissions = .false.
       </namelist>
 
@@ -2383,6 +2383,7 @@ LWH (3/16/2018)
       use_single_lw_sw_ts = .false.,
       use_co2_tracer_field = .true.                 ! jgj added
       treat_sfc_refl_dir_as_dif = .false.           ! jgj added
+      use_ch4_tracer_field = .true.
       </namelist>
 
       <namelist name ="radiative_gases_nml">
@@ -2402,8 +2403,9 @@ LWH (3/16/2018)
       time_varying_ch4 = .false.,
       ch4_variation_type = 'linear'
       ch4_dataset_entry = 1850,1,1,0,0,
-      ch4_specification_type = 'time_series'
-      ch4_data_source = 'input'
+      ch4_specification_type = 'base_and_trend'
+      ch4_data_source = 'predicted'
+      ch4_base_value = 808.2490E-9    ! value from gbl_annualdata file, will need to be changed according to the value of $baseDate
 
       time_varying_n2o = .false.,
       n2o_variation_type = 'linear'
@@ -2881,7 +2883,7 @@ LWH (3/16/2018)
 
       <namelist name ="photosynthesis_nml">
        photosynthesis_to_use = 'leuning'
-       co2_to_use_for_photosynthesis ='prescribed'
+       co2_to_use_for_photosynthesis ='interactive'
        co2_for_photosynthesis = 284.262e-6
        water_stress_to_use = 'plant-hydraulics'
       </namelist>
@@ -3250,10 +3252,6 @@ LWH (3/16/2018)
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override USE_generic_tracer = True
 #override CHL_FROM_FILE = False
-#override TEMP_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
-#override SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
-#override Z_INIT_FILE_PTEMP_VAR = "PTEMP"
-#override Z_INIT_FILE_SALT_VAR = "SALT"
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
@@ -3311,9 +3309,6 @@ SIS_OVERRIDE_EOF
 ## radiation co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
 "ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
 "ATM" , "co2_dvmr_rad",     "",     "", "none",  284.262e-06
-#
-# 2017/09/21  for development: override pcairco2 with CMIP6 Jan 1 1850 value
-"ATM", "co2_flux_pcair_atm",           "",  "", "none",  284.262e-06
       </dataTable>  
 
 
@@ -4540,11 +4535,11 @@ sio4_src_var_record = 1
 sio4_src_var_gridspec = NONE
 sio4_valid_min = 0.0
 #
-# Alkalinity from GLODAP  (/archive/jgj/datasets/retrospective/glodap/20160927/Alk.nc)
-# min = 2171, max = 2462 from input dataset
+# Alkalinity from GLODAPv2  (/lustre/f1/unswept/John.Krasting/cwg/input/obgc/GLODAPv2.2016b.oi-filled.20180322.nc)
+# min = 1069, max = 2651 from input dataset
 # divide by 1e6 to convert from umol/kg to mol/kg
-alk_src_file = INPUT/Alk.nc
-alk_src_var_name = Alk
+alk_src_file = INPUT/GLODAPv2.2016b.oi-filled.20180322.nc
+alk_src_var_name = TAlk
 alk_src_var_unit = micromoles_per_kg
 alk_dest_var_name =  alk
 alk_dest_var_unit = mol kg-1
@@ -4552,11 +4547,11 @@ alk_src_var_record = 1
 alk_src_var_gridspec = NONE
 alk_valid_min = 0.0
 #
-# Preind DIC from GLODAP  (/archive/jgj/datasets/retrospective/glodap/20160927/Preind_DIC.nc)
-# min = 1837, max = 2406 from input dataset
+# Preind DIC from GLODAPv2  (/lustre/f1/unswept/John.Krasting/cwg/input/obgc/GLODAPv2.2016b.oi-filled.20180322.nc)
+# min = 1041, max = 2403 from input dataset
 # divide by 1e6 to convert from umol/kg to mol/kg
-dic_src_file = INPUT/Preind_DIC.nc
-dic_src_var_name = Preind_DIC
+dic_src_file = INPUT/GLODAPv2.2016b.oi-filled.20180322.nc
+dic_src_var_name = PI_TCO2
 dic_src_var_unit = micromoles_per_kg
 dic_dest_var_name =  dic
 dic_dest_var_unit = mol kg-1
@@ -8879,14 +8874,16 @@ endif
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
       </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <!-- 
-       <dataSource platform="$(platform)">$(OM4_05_ARCHIVE)/WOA05_ptemp_salt_monthly.nc </dataSource>
-        The above file is  reconstructed from a model run. The following product should be used instead. -->
-       <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/obs/WOA05_pottemp_salt.nc</dataSource>
-      </dataFile>
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic_c96.v20180227.unpacked/ocean_static.nc</dataSource>
+      </dataFile>
+
+      <!-- WOA13 potential temperature and salinity initial conditions -->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/woa13_decav_ptemp_monthly_fulldepth_01.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/woa13_decav_s_monthly_fulldepth_01.nc</dataSource>
       </dataFile>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -8912,13 +8909,11 @@ endif
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/woa13/woa13_all_o_annual_01.nc</dataSource>
      </dataFile>
-<!-- GLODAP v1 (filled) -->
+<!-- GLODAP v2 -->
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/glodap/20160927/Alk.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/John.Krasting/cwg/input/obgc/GLODAPv2.2016b.oi-filled.20180322.nc</dataSource>
      </dataFile>
-     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/glodap/20160927/Preind_DIC.nc</dataSource>
-     </dataFile>
+
      <dataFile label="input" target="INPUT/init_ocean_cobalt.res.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/IC/mom4p1_restart_to_latlon_360x180/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds_mumem_htotalbounds_fedet_btf.ocean_cobalt.res.nc</dataSource>
      </dataFile>
