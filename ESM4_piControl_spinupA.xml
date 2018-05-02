@@ -747,11 +747,7 @@ Experiment to build executable.
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
           popd
-########################################################################
-#updates needed to run new experiments.
-#Remove this block when the updates are tagged
-(cd mom6/src/MOM6 && git fetch && git checkout 85ad09dba99 )
-########################################################################
+
           pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
           if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
@@ -2186,7 +2182,7 @@ LWH (3/16/2018)
       uthresh = 3.5
       coef_emis = 2.0e-10
       use_sj_sedimentation_solver=.true.
-      do_esm_dust_flux = .false.  !.false. till land dust source is evaluated/fixed, .true. to exchange dust with COBALT
+      do_esm_dust_flux = .true.
       </namelist>
 
       <namelist name="edt_nml">
@@ -3283,16 +3279,16 @@ SIS_OVERRIDE_EOF
 # Updated settings to match BLINGv2
 # Composition of runoff includes 0.1 PgC for CaCO3 burial (0.48 Alk, 0.24DIC)
 # plus 0.3 Pg C for Org burial (0.72 DIC, 0.72/106 PO4, 0.72/106*16 Alk ) 
-"OCN", "runoff_alk_flux_ice_ocn",  "",    "",                             "none",  0.5932e-3
-"OCN", "runoff_dic_flux_ice_ocn",  "",    "",                             "none",  0.96e-3
+"OCN", "runoff_alk_flux_ice_ocn",  "",    "",                             "none",  0.49e-3
+"OCN", "runoff_dic_flux_ice_ocn",  "",    "",                             "none",  0.34e-3
 "OCN", "runoff_lith_flux_ice_ocn", ""  , ""                             , "none" , 13.0e-3
 ###fed has wet and dry dep fluxes from dust. Do not override it in an active dust exchange experiment
 #override till the land dust source is evaluated/fixed
-"OCN", "dry_dep_fed_flux_ice_ocn",  "FLUX",        "./INPUT/Soluble_Fe_Flux_AM4.nc", "bilinear", -1.0
+#"OCN", "dry_dep_fed_flux_ice_ocn",  "FLUX",        "./INPUT/Soluble_Fe_Flux_AM4.nc", "bilinear", -1.0
 ###lith has wet and dry dep fluxes from dust. Do not override it in an active dust exchange experiment
 #override till the land dust source is evaluated/fixed
-"OCN", "dry_dep_lith_flux_ice_ocn", "FLUX_MINERAL","./INPUT/Mineral_Flux_AM4.nc", "bilinear", -1.0
-"OCN", "dry_dep_po4_flux_ice_ocn",  "FLUX_MINERAL","./INPUT/Mineral_Flux_AM4.nc", "bilinear", 0.0
+#"OCN", "dry_dep_lith_flux_ice_ocn", "FLUX_MINERAL","./INPUT/Mineral_Flux_AM4.nc", "bilinear", -1.0
+#"OCN", "dry_dep_po4_flux_ice_ocn",  "FLUX_MINERAL","./INPUT/Mineral_Flux_AM4.nc", "bilinear", 0.0
 ###nh4 and no3  wet and dry dep fluxes from atm. Do not override it in an active nitrogen exchange experiment
 ###"OCN", "wet_dep_no3_flux_ice_ocn",  "NO3_WET_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
 ###"OCN", "dry_dep_no3_flux_ice_ocn",  "NO3_DRY_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
@@ -3301,7 +3297,7 @@ SIS_OVERRIDE_EOF
 #
 # jgj 2015/12/09 data table for o2 gas exchange
 #
-"ATM", "o2_flux_pcair_atm", ""         , ""                             , "none" , 0.21
+"ATM", "o2_flux_pcair_atm", ""         , ""                             , "none" , 0.214
 #
 # jgj 2016/11/29 co2 data table (Jan 1 1850 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
 #
@@ -7113,6 +7109,13 @@ $baseDate
  "generic_cobalt","fndet_burial",     "fndet_burial",    "ocean_cobalt_btm","all",.true.,"none",2
  "generic_cobalt","fpdet_burial",     "fpdet_burial",    "ocean_cobalt_btm","all",.true.,"none",2
  "generic_cobalt","cased_2d",         "cased",           "ocean_cobalt_btm","all","mean","none",2
+ "generic_cobalt","btm_co3_sol_arag", "btm_co3_sol_arag","ocean_cobalt_btm","all","mean","none",2
+ "generic_cobalt","btm_co3_sol_calc", "btm_co3_sol_calc","ocean_cobalt_btm","all","mean","none",2
+ "generic_cobalt","btm_co3_ion",      "btm_co3_ion",     "ocean_cobalt_btm","all","mean","none",2
+ "generic_cobalt","btm_htotal",       "btm_htotal",      "ocean_cobalt_btm","all","mean","none",2
+ "generic_cobalt","fcased_redis_surfresp","fcased_redis_surfresp","ocean_cobalt_btm","all","mean","none",2
+ "generic_cobalt","cased_redis_coef", "cased_redis_coef","ocean_cobalt_btm","all","mean","none",2
+ "generic_cobalt","cased_redis_delz", "cased_redis_delz","ocean_cobalt_btm","all","mean","none",2
 #======================
 # Generic COBALT downward fluxes at 100 meters
 #======================
