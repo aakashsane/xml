@@ -97,7 +97,7 @@ NOTES:
 -->
   <property name="OCEAN_SHARED_GIT_TAG" value="user/f1p/nh4_ocean_couply_dry_deposition_merge "/> <!-- git tag for ocean_shared source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG"   value="ppa_20180422_slm"/>        <!-- git tag for LAND source code -->
+  <property name="LAND_GIT_TAG"   value="ppa_20180503_slm"/>        <!-- git tag for LAND source code -->
   <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180426"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -2750,7 +2750,6 @@ LWH (3/16/2018)
        frag_incl_PAST = .FALSE.
        zero_TMF = .TRUE.
        use_FpopD_ba = .FALSE.
-       use_FpopD_nf = .FALSE.
        use_Fgdp_nf = .FALSE.
        use_Fgdp_ba = .FALSE.
        theta_ROSeffect_asFnTheta = .TRUE.
@@ -2758,8 +2757,7 @@ LWH (3/16/2018)
 !       lock_ROSmaxC3_to_ROSmaxC4 = .TRUE.
        agb_gom2 = 88.7, 56.7
        agb_gom3 = 0.66, 9.5
-!       Ia_alpha_monthly = 0.0014, 0.006
-       Ia_alpha_monthly = 0.0, 0.0
+       Ia_alpha_monthly = 0.0014, 0.006
        Ia_param1 = 6.7, 5.8
        Ia_param2 = 0.2, 0.67
        popD_supp_eps3 = 0.21, 0.033
@@ -2794,8 +2792,19 @@ LWH (3/16/2018)
       albedo_to_use = 'brdf-params'
       </namelist>
 
-      <namelist name ="harvesting_nml">
-       do_harvesting = .FALSE.
+      <namelist name="harvesting_nml">
+       do_harvesting          = TRUE
+       grazing_intensity_past = 18.25 ! roughly 5% of biomass per day
+       grazing_residue        = 0.1
+       grazing_frequency      = 'daily'
+       min_lai_for_grazing_past = 1.0
+       frac_wood_wasted_harv  = 0.25
+       frac_wood_wasted_clear = 0.25
+       crop_schedule          = 'prescribed'
+       crop_schedule_file     = '/lustre/f1/unswept/Sergey.Malyshev/DATA/agriculture/NewGrid_2by25_All_26crops_f1p_3d_doy_v20171107.nc'
+       c3_crop_species        = 'c3grass'
+       c4_crop_species        = 'c4grass'
+       crop_seed_density      = 0.1
       </namelist>
 
       <namelist name ="lake_data_nml">
@@ -2870,12 +2879,13 @@ LWH (3/16/2018)
       </namelist>
 
       <namelist name ="landuse_nml">
-       do_landuse_change = .false.
+       do_landuse_change = FALSE
        data_type   = 'luh2'
        input_file  = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/extras/zero-transitions.v20170711.nc'
        state_file  = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/extras/state-1850-nosecd.v20170711.nc'
        static_file = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/landfrac.nc'
        distribute_transitions = 'min-n-tiles'
+       rangeland_is_pasture = TRUE
       </namelist>
 
       <namelist name ="photosynthesis_nml">
@@ -5751,18 +5761,10 @@ $baseDate
 "land_dust",        1,  "months", 1, "days", "time",
 #
 #
+# land static output
 "land",    "geolon_t",   "geolon_t",   "land_static", "all", .false., "none", 1
 "land",    "geolat_t",   "geolat_t",   "land_static", "all", .false., "none", 1
-"land",    "geolon_t",   "geolon_t",   "land_month", "all", .false., "none", 1
-"land",    "geolat_t",   "geolat_t",   "land_month", "all", .false., "none", 1
-#"land",    "geolon_t",   "geolon_t",   "land_daily", "all", .false., "none", 1
-#"land",    "geolat_t",   "geolat_t",   "land_daily", "all", .false., "none", 1
-"land",    "geolon_t",   "geolon_t",   "land_month_inst", "all", .false., "none", 1
-"land",    "geolat_t",   "geolat_t",   "land_month_inst", "all", .false., "none", 1
-"land",    "geolon_t",   "geolon_t",   "land_dust", "all", .false., "none", 1
-"land",    "geolat_t",   "geolat_t",   "land_dust", "all", .false., "none", 1
 #
-# land static output
 "lake",    "lake_depth", "lake_depth", "land_static", "all", .false., "none", 2
 "lake",    "lake_width", "lake_width", "land_static", "all", .false., "none", 2
 #"land",    "cell_area",  "cell_area",  "land_static", "all", .false., "none", 2
@@ -5778,8 +5780,13 @@ $baseDate
 "soil",    "soil_sat",   "soil_sat",   "land_static", "all", .false., "none", 2
 "soil",    "soil_type",  "soil_type",  "land_static", "all", .false., "none", 2
 "soil",    "soil_wilt",  "soil_wilt",  "land_static", "all", .false., "none", 2
+"vegn",    "crop_planting_day",   "crop_planting_day",   "land_static", "all", .false., "none", 2
+"vegn",    "crop_harvesting_day", "crop_harvesting_day", "land_static", "all", .false., "none", 2
 #
 # land monthly output
+#
+"land",    "geolon_t",   "geolon_t",   "land_month", "all", .false., "none", 1
+"land",    "geolat_t",   "geolat_t",   "land_month", "all", .false., "none", 1
 # area fractions for different tile types
 "land",    "frac_glac",  "frac_glac",  "land_month",  "all", .true., "none", 2
 "land",    "frac_lake",  "frac_lake",  "land_month",  "all", .true., "none", 2
@@ -5879,16 +5886,16 @@ $baseDate
 "vegn",    "bseed",                    "bseed",                   "land_month", "all", .true., "none", 2
 "vegn",    "nsc",                      "nsc",                     "land_month", "all", .true., "none", 2
 "vegn",    "btot",                     "btot",                    "land_month", "all", .true., "none", 2
-"vegn",    "Nl",                       "Nl",                      "land_month", "all", .true., "none", 2
-"vegn",    "Nr",                       "Nr",                      "land_month", "all", .true., "none", 2
-"vegn",    "Nseed",                    "Nseed",                   "land_month", "all", .true., "none", 2
-"vegn",    "Nsw",                      "Nsw",                     "land_month", "all", .true., "none", 2
-"vegn",    "Nwood",                    "Nwood",                   "land_month", "all", .true., "none", 2
-"vegn",    "Nstore",                   "Nstore",                  "land_month", "all", .true., "none", 2
-"vegn",    "Nvegtot",                  "Nvegtot",                 "land_month", "all", .true., "none", 2
-"vegn",    "nitrogen_stress",          "nitrogen_stress",         "land_month", "all", .true., "none", 2
+# "vegn",    "Nl",                       "Nl",                      "land_month", "all", .true., "none", 2
+# "vegn",    "Nr",                       "Nr",                      "land_month", "all", .true., "none", 2
+# "vegn",    "Nseed",                    "Nseed",                   "land_month", "all", .true., "none", 2
+# "vegn",    "Nsw",                      "Nsw",                     "land_month", "all", .true., "none", 2
+# "vegn",    "Nwood",                    "Nwood",                   "land_month", "all", .true., "none", 2
+# "vegn",    "Nstore",                   "Nstore",                  "land_month", "all", .true., "none", 2
+# "vegn",    "Nvegtot",                  "Nvegtot",                 "land_month", "all", .true., "none", 2
+# "vegn",    "nitrogen_stress",          "nitrogen_stress",         "land_month", "all", .true., "none", 2
 "land",    "Ctot",                     "Ctot",                    "land_month", "all", .true., "none", 2
-"land",    "Ntot",                     "Ntot",                    "land_month", "all", .true., "none", 2
+# "land",    "Ntot",                     "Ntot",                    "land_month", "all", .true., "none", 2
 "vegn",    "height",                   "height",                  "land_month", "all", .true., "none", 2
 #"vegn",   "height1",                  "height1",                 "land_month", "all", .true., "none", 2
 "vegn",    "height_ave",               "height_ave",              "land_month", "all", .true., "none", 2
@@ -5919,8 +5926,9 @@ $baseDate
 "vegn",    "crownarea",                "crownarea",               "land_month", "all", .true., "none", 2
 "vegn",    "gdd",                      "gdd",                     "land_month", "all", .true., "none", 2
 "vegn",    "tc_pheno",                 "tc_pheno",                "land_month", "all", .true., "none", 2
-"vegn",    "psiph",                    "psiph",                   "land_month", "all", .true., "none", 2
-"vegn",    "status",                   "status",                  "land_month", "all", .true., "none", 2
+"vegn",    "psi_stress_phen",          "psi_stress_phen",         "land_month", "all", .true., "none", 2
+"vegn",    "theta_phen",               "theta_phen",              "land_month", "all", .true., "none", 2
+# "vegn",    "status",                   "status",                  "land_month", "all", .true., "none", 2
 "vegn",    "bl_max",                   "bl_max",                  "land_month", "all", .true., "none", 2
 "vegn",    "br_max",                   "br_max",                  "land_month", "all", .true., "none", 2
 "vegn",    "con_v_v",                  "con_v_v",                 "land_month", "all", .true., "none", 2
@@ -5929,26 +5937,26 @@ $baseDate
 "vegn",    "wl",                       "wl",                      "land_month", "all", .true., "none", 2
 "vegn",    "ws",                       "ws",                      "land_month", "all", .true., "none", 2
 "vegn",    "age",                      "age",                     "land_month", "all", .true., "none", 2
-"vegn",    "csmoke",                   "csmoke",                  "land_month", "all", .true., "none", 2
+# "vegn",    "csmoke",                   "csmoke",                  "land_month", "all", .true., "none", 2
 "vegn",    "csmoke_rate",              "csmoke_rate",             "land_month", "all", .true., "none", 2
 "vegn",    "lambda",                   "lambda",                  "land_month", "all", .true., "none", 2
 "vegn",    "fuel",                     "fuel",                    "land_month", "all", .true., "none", 2
-"vegn",    "Ndep",                     "Ndep",                    "land_month", "all", .true., "none", 2
+# "vegn",    "Ndep",                     "Ndep",                    "land_month", "all", .true., "none", 2
 "vegn",    "mrz_mine_biomass_C",       "mrz_mine_biomass_C",      "land_month", "all", .true., "none", 2
-"vegn",    "mrz_mine_biomass_N",       "mrz_mine_biomass_N",      "land_month", "all", .true., "none", 2
+# "vegn",    "mrz_mine_biomass_N",       "mrz_mine_biomass_N",      "land_month", "all", .true., "none", 2
 "vegn",    "mrz_scav_biomass_C",       "mrz_scav_biomass_C",      "land_month", "all", .true., "none", 2
-"vegn",    "mrz_scav_biomass_N",       "mrz_scav_biomass_N",      "land_month", "all", .true., "none", 2
+# "vegn",    "mrz_scav_biomass_N",       "mrz_scav_biomass_N",      "land_month", "all", .true., "none", 2
 "vegn",    "Nfix_biomass_C",           "Nfix_biomass_C",          "land_month", "all", .true., "none", 2
-"vegn",    "Nfix_biomass_N",           "Nfix_biomass_N",          "land_month", "all", .true., "none", 2
+# "vegn",    "Nfix_biomass_N",           "Nfix_biomass_N",          "land_month", "all", .true., "none", 2
 "vegn",    "mrz_mine_res_C",           "mrz_mine_res_C",          "land_month", "all", .true., "none", 2
-"vegn",    "mrz_mine_res_N",           "mrz_mine_res_N",          "land_month", "all", .true., "none", 2
+# "vegn",    "mrz_mine_res_N",           "mrz_mine_res_N",          "land_month", "all", .true., "none", 2
 "vegn",    "mrz_scav_res_C",           "mrz_scav_res_C",          "land_month", "all", .true., "none", 2
-"vegn",    "mrz_scav_res_N",           "mrz_scav_res_N",          "land_month", "all", .true., "none", 2
+# "vegn",    "mrz_scav_res_N",           "mrz_scav_res_N",          "land_month", "all", .true., "none", 2
 "vegn",    "Nfix_res_C",               "Nfix_res_C",              "land_month", "all", .true., "none", 2
-"vegn",    "Nfix_res_N",               "Nfix_res_N",              "land_month", "all", .true., "none", 2
+# "vegn",    "Nfix_res_N",               "Nfix_res_N",              "land_month", "all", .true., "none", 2
 "vegn",    "exudate",                  "exudate",                 "land_month", "all", .true., "none", 2
 "vegn",    "rhiz_exud_C",              "rhiz_exud_C",             "land_month", "all", .true., "none", 2
-"vegn",    "rhiz_exud_N",              "rhiz_exud_N",             "land_month", "all", .true., "none", 2
+# "vegn",    "rhiz_exud_N",              "rhiz_exud_N",             "land_month", "all", .true., "none", 2
 "vegn",    "rhiz_exud_mgain",          "rhiz_exud_mgain",         "land_month", "all", .true., "none", 2
 ## 2016/12/19 add in land fields for conservation checking
 "land",     "water_cons",              "water_cons",              "land_month", "all", .true., "none", 2
@@ -5970,6 +5978,9 @@ $baseDate
 "flux_land",  "t_ref",    "t_ref",      "land_month",  "all", .true., "none", 2
 #
 # land daily output
+#"land",    "geolon_t",   "geolon_t",   "land_daily", "all", .false., "none", 1
+#"land",    "geolat_t",   "geolat_t",   "land_daily", "all", .false., "none", 1
+#
 #"land",  "precip",     "precip",       "land_daily",  "all", .true., "none", 2
 #"land",  "runf_soil",  "runf_soil",    "land_daily",  "all", .true., "none", 2
 #"land",  "snow_lake",  "snow_lake",    "land_daily",  "all", .true., "none", 2
@@ -5986,25 +5997,27 @@ $baseDate
 #"flux_land",  "t_ref",    "t_ref_min",  "land_daily",  "all",  min,   "none", 2
 #
 # land monthly instant output
+"land",    "geolon_t",   "geolon_t",   "land_month_inst", "all", .false., "none", 1
+"land",    "geolat_t",   "geolat_t",   "land_month_inst", "all", .false., "none", 1
+#
 "land",    "LWS",        "LWS",        "land_month_inst",  "all", .false., "none", 2
 "land",    "FWS",        "FWS",        "land_month_inst",  "all", .false., "none", 2
 "land",    "HS",         "HS",         "land_month_inst",  "all", .false., "none", 2
 "land",    "LWSr",       "LWSr",       "land_month_inst",  "all", .false., "none", 2
 "land",    "FWSr",       "FWSr",       "land_month_inst",  "all", .false., "none", 2
 "land",    "HSr",        "HSr",        "land_month_inst",  "all", .false., "none", 2
-"vegn",    "treeline_T",               "treeline_T",              "land_month_inst", "all", .false., "none", 2
-"vegn",    "treeline_season",          "treeline_season",         "land_month_inst", "all", .false., "none", 2
+# "vegn",    "treeline_T",               "treeline_T",              "land_month_inst", "all", .false., "none", 2
+# "vegn",    "treeline_season",          "treeline_season",         "land_month_inst", "all", .false., "none", 2
 
 "fire_month", 1,  "months", 1, "days", "time"
-"fire",    "fire_fn_rh",               "fire_fn_rh_max",          "fire_month", "all", "max", "none", 2
-"fire",    "fire_rh",                  "fire_rh_max",             "fire_month", "all", "max", "none", 2
-"fire",    "fire_fn_rh",               "fire_fn_rh_min",          "fire_month", "all", "min", "none", 2
-"fire",    "fire_rh",                  "fire_rh_min",             "fire_month", "all", "min", "none", 2
-"fire",    "Fcrop_raw",                "Fcrop_raw",               "fire_month", "all", .true., "none", 2
-"fire",    "Fpast_raw",                "Fpast_raw",               "fire_month", "all", .true., "none", 2
+"land",    "geolon_t",                 "geolon_t",                "fire_month", "all", .false., "none", 1
+"land",    "geolat_t",                 "geolat_t",                "fire_month", "all", .false., "none", 1
+#
 # MONTHLY fire-related output
 "fire",    "fire_fn_theta",            "fire_fn_theta",           "fire_month", "all", .true., "none", 2
 "fire",    "fire_fn_rh",               "fire_fn_rh",              "fire_month", "all", .true., "none", 2
+"fire",    "fire_fn_rh",               "fire_fn_rh_max",          "fire_month", "all", "max",  "none", 2
+"fire",    "fire_fn_rh",               "fire_fn_rh_min",          "fire_month", "all", "min",  "none", 2
 "fire",    "fire_fn_Tca",              "fire_fn_Tca",             "fire_month", "all", .true., "none", 2
 "fire",    "fire_fn_agb",              "fire_fn_agb",             "fire_month", "all", .true., "none", 2
 "fire",    "fire_fn_popD_NF",          "fire_fn_popD_NF",         "fire_month", "all", .true., "none", 2
@@ -6041,6 +6054,8 @@ $baseDate
 "fire",    "burn_Ckill_stem",          "burn_Ckill_stem",         "fire_month", "all", .true., "none", 2
 "fire",    "burn_Ckill_root",          "burn_Ckill_root",         "fire_month", "all", .true., "none", 2
 "fire",    "fire_rh",                  "fire_rh",                 "fire_month", "all", .true., "none", 2
+"fire",    "fire_rh",                  "fire_rh_max",             "fire_month", "all", "max",  "none", 2
+"fire",    "fire_rh",                  "fire_rh_min",             "fire_month", "all", "min",  "none", 2
 "fire",    "fire_theta",               "fire_theta",              "fire_month", "all", .true., "none", 2
 "fire",    "fire_Tca",                 "fire_Tca",                "fire_month", "all", .true., "none", 2
 "fire",    "ROS",                      "ROS",                     "fire_month", "all", .true., "none", 2
@@ -6064,10 +6079,12 @@ $baseDate
 "fire",    "multiday_fire_BA",         "multiday_fire_BA",        "fire_month", "all", .true., "none", 2
 "fire",    "multiday_fire_Nfires",     "multiday_fire_Nfires",    "fire_month", "all", .true., "none", 2
 "fire",    "fire_rad_power",           "fire_rad_power",          "fire_month", "all", .true., "none", 2
-
+#
+# by-species land output
 "land_month_by_species",  1,  "months", 1, "days", "time"
 "land",    "geolon_t",                 "geolon_t",                "land_month_by_species", "all", .false., "none", 1
 "land",    "geolat_t",                 "geolat_t",                "land_month_by_species", "all", .false., "none", 1
+#
 "vegn",    "bl(species)",              "bl",                      "land_month_by_species", "all", .true., "none", 2
 "vegn",    "blv(species)",             "blv",                     "land_month_by_species", "all", .true., "none", 2
 "vegn",    "br(species)",              "br",                      "land_month_by_species", "all", .true., "none", 2
@@ -6078,11 +6095,11 @@ $baseDate
 "vegn",    "btot(species)",            "btot",                    "land_month_by_species", "all", .true., "none", 2
 "vegn",    "height_ave(species)",      "height_ave",              "land_month_by_species", "all", .true., "none", 2
 "vegn",    "lai(species)",             "lai",                     "land_month_by_species", "all", .true., "none", 2
-"vegn",    "laii(species)",            "laii",                    "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "laii(species)",            "laii",                    "land_month_by_species", "all", .true., "none", 2
 "vegn",    "laimax(species)",          "laimax",                  "land_month_by_species", "all", .true., "none", 2
-"vegn",    "laiimax(species)",         "laiimax",                 "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "laiimax(species)",         "laiimax",                 "land_month_by_species", "all", .true., "none", 2
 "vegn",    "leafarea(species)",        "leafarea",                "land_month_by_species", "all", .true., "none", 2
-"vegn",    "lai_kok(species)",         "lai_kok",                 "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "lai_kok(species)",         "lai_kok",                 "land_month_by_species", "all", .true., "none", 2
 "vegn",    "sai(species)",             "sai",                     "land_month_by_species", "all", .true., "none", 2
 "vegn",    "npp(species)",             "npp",                     "land_month_by_species", "all", .true., "none", 2
 "vegn",    "gpp(species)",             "gpp",                     "land_month_by_species", "all", .true., "none", 2
@@ -6096,28 +6113,295 @@ $baseDate
 "vegn",    "crownarea(species)",       "crownarea",               "land_month_by_species", "all", .true., "none", 2
 "vegn",    "bl_max(species)",          "bl_max",                  "land_month_by_species", "all", .true., "none", 2
 "vegn",    "br_max(species)",          "br_max",                  "land_month_by_species", "all", .true., "none", 2
-"vegn",    "wl(species)",              "wl",                      "land_month_by_species", "all", .true., "none", 2
-"vegn",    "ws(species)",              "ws",                      "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "wl(species)",              "wl",                      "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "ws(species)",              "ws",                      "land_month_by_species", "all", .true., "none", 2
 "vegn",    "age(species)",             "age",                     "land_month_by_species", "all", .true., "none", 2
 "vegn",    "PAR_dn(species)",          "PAR_dn",                  "land_month_by_species", "all", .true., "none", 2
 "vegn",    "PAR_net(species)",         "PAR_net",                 "land_month_by_species", "all", .true., "none", 2
 "vegn",    "temp(species)",            "Tvegn",                   "land_month_by_species", "all", .true., "none", 2
-"vegn",    "Nl(species)",              "Nl",                      "land_month_by_species", "all", .true., "none", 2
-"vegn",    "Nr(species)",              "Nr",                      "land_month_by_species", "all", .true., "none", 2
-"vegn",    "Nseed(species)",           "Nseed",                   "land_month_by_species", "all", .true., "none", 2
-"vegn",    "Nsw(species)",             "Nsw",                     "land_month_by_species", "all", .true., "none", 2
-"vegn",    "Nwood(species)",           "Nwood",                   "land_month_by_species", "all", .true., "none", 2
-"vegn",    "Nstore(species)",          "Nstore",                  "land_month_by_species", "all", .true., "none", 2
-"vegn",    "Nvegtot(species)",         "Nvegtot",                 "land_month_by_species", "all", .true., "none", 2
-"vegn",    "nitrogen_stress(species)", "nitrogen_stress",         "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "Nl(species)",              "Nl",                      "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "Nr(species)",              "Nr",                      "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "Nseed(species)",           "Nseed",                   "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "Nsw(species)",             "Nsw",                     "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "Nwood(species)",           "Nwood",                   "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "Nstore(species)",          "Nstore",                  "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "Nvegtot(species)",         "Nvegtot",                 "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "nitrogen_stress(species)", "nitrogen_stress",         "land_month_by_species", "all", .true., "none", 2
 "vegn",    "exudate(species)",         "exudate",                 "land_month_by_species", "all", .true., "none", 2
 "vegn",    "rhiz_exud_C(species)",     "rhiz_exud_C",             "land_month_by_species", "all", .true., "none", 2
-"vegn",    "rhiz_exud_N(species)",     "rhiz_exud_N",             "land_month_by_species", "all", .true., "none", 2
-"vegn",    "rhiz_exud_mgain(species)", "rhiz_exud_mgain",         "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "rhiz_exud_N(species)",     "rhiz_exud_N",             "land_month_by_species", "all", .true., "none", 2
+# "vegn",    "rhiz_exud_mgain(species)", "rhiz_exud_mgain",         "land_month_by_species", "all", .true., "none", 2
 
+# ======================================================================================================
+# by-tile land diagnostics
+# ------------------------------------------------------------------------------------------------------
+# montly land output
+"land_month_past",       1,  "months", 1, "days", "time"
+#
+"land",                 "geolon_t",             "geolon_t", "land_month_past", "all", .false., "none", 1
+"land",                 "geolat_t",             "geolat_t", "land_month_past", "all", .false., "none", 1
+#
+"land",                "area_past",                 "area", "land_month_past", "all", .true., "none", 2
+#
+"land",                "evap_past",                 "evap", "land_month_past", "all", .true., "none", 2
+"land",              "fevapv_past",               "fevapv", "land_month_past", "all", .true., "none", 2
+"land",                 "flw_past",                  "flw", "land_month_past", "all", .true., "none", 2
+"land",                 "fsw_past",                  "fsw", "land_month_past", "all", .true., "none", 2
+"land",                "FWSv_past",                 "FWSv", "land_month_past", "all", .true., "none", 2
+"land",           "grnd_flux_past",            "grnd_flux", "land_month_past", "all", .true., "none", 2
+"land",              "levapv_past",               "levapv", "land_month_past", "all", .true., "none", 2
+"land",                "LWSv_past",                 "LWSv", "land_month_past", "all", .true., "none", 2
+"land",                "runf_past",                 "runf", "land_month_past", "all", .true., "none", 2
+"land",                "sens_past",                 "sens", "land_month_past", "all", .true., "none", 2
+"land",                "snow_past",                 "snow", "land_month_past", "all", .true., "none", 2
+"land",                 "Tca_past",                  "Tca", "land_month_past", "all", .true., "none", 2
+"land",               "Tgrnd_past",                "Tgrnd", "land_month_past", "all", .true., "none", 2
+"vegn",                "temp_past",                "Tvegn", "land_month_past", "all", .true., "none", 2
+"land",              "transp_past",               "transp", "land_month_past", "all", .true., "none", 2
+"land",               "water_past",                "water", "land_month_past", "all", .true., "none", 2
+"soil",               "asoil_past",                "asoil", "land_month_past", "all", .true., "none", 2
+"vegn",                  "bl_past",                   "bl", "land_month_past", "all", .true., "none", 2
+"vegn",                  "br_past",                   "br", "land_month_past", "all", .true., "none", 2
+"vegn",                 "bsw_past",                  "bsw", "land_month_past", "all", .true., "none", 2
+"vegn",               "bwood_past",                "bwood", "land_month_past", "all", .true., "none", 2
+"vegn",               "bseed_past",                "bseed", "land_month_past", "all", .true., "none", 2
+"vegn",                 "nsc_past",                  "nsc", "land_month_past", "all", .true., "none", 2
+"vegn",                "btot_past",                 "btot", "land_month_past", "all", .true., "none", 2
+"land",                "Ctot_past",                 "Ctot", "land_month_past", "all", .true., "none", 2
+"soil",                 "fsc_past",                  "fsc", "land_month_past", "all", .true., "none", 2
+"soil",                 "ssc_past",                  "ssc", "land_month_past", "all", .true., "none", 2
+"vegn",         "csmoke_rate_past",          "csmoke_rate", "land_month_past", "all", .true., "none", 2
+"vegn",                 "lai_past",                  "lai", "land_month_past", "all", .true., "none", 2
+"vegn",                 "sai_past",                  "sai", "land_month_past", "all", .true., "none", 2
+"vegn",                 "gpp_past",                  "gpp", "land_month_past", "all", .true., "none", 2
+"vegn",                 "npp_past",                  "npp", "land_month_past", "all", .true., "none", 2
+"vegn",               "an_op_past",                "an_op", "land_month_past", "all", .true., "none", 2
+"vegn",               "an_cl_past",                "an_cl", "land_month_past", "all", .true., "none", 2
+"vegn",                "resp_past",                 "resp", "land_month_past", "all", .true., "none", 2
+"soil",               "rsoil_past",                "rsoil", "land_month_past", "all", .true., "none", 2
+"soil",          "rsoil_fast_past",           "rsoil_fast", "land_month_past", "all", .true., "none", 2
+"vegn",               "theta_past",                "theta", "land_month_past", "all", .true., "none", 2
+"vegn",            "tsoil_av_past",             "tsoil_av", "land_month_past", "all", .true., "none", 2
+"vegn",      "past_harv_rate_past",       "past_harv_rate", "land_month_past", "all", .true., "none", 2
+"vegn",      "crop_harv_rate_past",       "crop_harv_rate", "land_month_past", "all", .true., "none", 2
+"vegn", "wood_fast_harv_rate_past",  "wood_fast_harv_rate", "land_month_past", "all", .true., "none", 2
+"vegn",  "wood_med_harv_rate_past",   "wood_med_harv_rate", "land_month_past", "all", .true., "none", 2
+"vegn", "wood_slow_harv_rate_past",  "wood_slow_harv_rate", "land_month_past", "all", .true., "none", 2
+"vegn",   "cleared_harv_rate_past",    "cleared_harv_rate", "land_month_past", "all", .true., "none", 2
+"vegn",             "nindivs_past",              "nindivs", "land_month_past", "all", .true., "none", 2
+"vegn",            "ncohorts_past",             "ncohorts", "land_month_past", "all", .true., "none", 2
+"vegn",             "nlayers_past",              "nlayers", "land_month_past", "all", .true., "none", 2
+# ====================
+# INSTANTANEOUS OUTPUT
+# ====================
+"land_month_inst_past", 1, "months", 1, "days", "time"
+#
+"land",                 "geolon_t",             "geolon_t", "land_month_inst_past", "all", .false., "none", 1
+"land",                 "geolat_t",             "geolat_t", "land_month_inst_past", "all", .false., "none", 1
+#
+"land",                "area_past",                 "area", "land_month_inst_past", "all", .false., "none", 2
+#
+"land",                "frac_past",                 "frac", "land_month_inst_past", "all", .false., "none", 2
+"vegn",                  "bl_past",                   "bl", "land_month_inst_past", "all", .false., "none", 2
+"vegn",                  "br_past",                   "br", "land_month_inst_past", "all", .false., "none", 2
+"vegn",                 "bsw_past",                  "bsw", "land_month_inst_past", "all", .false., "none", 2
+"vegn",               "bwood_past",                "bwood", "land_month_inst_past", "all", .false., "none", 2
+"vegn",               "bseed_past",                "bseed", "land_month_inst_past", "all", .false., "none", 2
+"vegn",                 "nsc_past",                  "nsc", "land_month_inst_past", "all", .false., "none", 2
+"vegn",                "btot_past",                 "btot", "land_month_inst_past", "all", .false., "none", 2
+"land",                "Ctot_past",                 "Ctot", "land_month_inst_past", "all", .false., "none", 2
+"soil",                 "fsc_past",                  "fsc", "land_month_inst_past", "all", .false., "none", 2
+"soil",                 "ssc_past",                  "ssc", "land_month_inst_past", "all", .false., "none", 2
+"vegn",              "csmoke_past",               "csmoke", "land_month_inst_past", "all", .false., "none", 2
+"vegn",               "afire_past",                "afire", "land_month_inst_past", "all", .false., "none", 2
+"vegn",      "past_harv_pool_past",       "past_harv_pool", "land_month_inst_past", "all", .false., "none", 2
+"vegn",      "crop_harv_pool_past",       "crop_harv_pool", "land_month_inst_past", "all", .false., "none", 2
+"vegn",   "cleared_harv_pool_past",    "cleared_harv_pool", "land_month_inst_past", "all", .false., "none", 2
+"vegn", "wood_fast_harv_pool_past",  "wood_fast_harv_pool", "land_month_inst_past", "all", .false., "none", 2
+"vegn",  "wood_med_harv_pool_past",   "wood_med_harv_pool", "land_month_inst_past", "all", .false., "none", 2
+"vegn", "wood_slow_harv_pool_past",  "wood_slow_harv_pool", "land_month_inst_past", "all", .false., "none", 2
+"vegn",                 "ncm_past",                  "ncm", "land_month_inst_past", "all", .false., "none", 2
+#
+# montly land output
+"land_month_crop",       1,  "months", 1, "days", "time"
+#
+"land",                 "geolon_t",             "geolon_t", "land_month_crop", "all", .false., "none", 1
+"land",                 "geolat_t",             "geolat_t", "land_month_crop", "all", .false., "none", 1
+#
+"land",                "area_crop",                 "area", "land_month_crop", "all", .true., "none", 2
+#
+"land",                "evap_crop",                 "evap", "land_month_crop", "all", .true., "none", 2
+"land",              "fevapv_crop",               "fevapv", "land_month_crop", "all", .true., "none", 2
+"land",                 "flw_crop",                  "flw", "land_month_crop", "all", .true., "none", 2
+"land",                 "fsw_crop",                  "fsw", "land_month_crop", "all", .true., "none", 2
+"land",                "FWSv_crop",                 "FWSv", "land_month_crop", "all", .true., "none", 2
+"land",           "grnd_flux_crop",            "grnd_flux", "land_month_crop", "all", .true., "none", 2
+"land",              "levapv_crop",               "levapv", "land_month_crop", "all", .true., "none", 2
+"land",                "LWSv_crop",                 "LWSv", "land_month_crop", "all", .true., "none", 2
+"land",                "runf_crop",                 "runf", "land_month_crop", "all", .true., "none", 2
+"land",                "sens_crop",                 "sens", "land_month_crop", "all", .true., "none", 2
+"land",                "snow_crop",                 "snow", "land_month_crop", "all", .true., "none", 2
+"land",                 "Tca_crop",                  "Tca", "land_month_crop", "all", .true., "none", 2
+"land",               "Tgrnd_crop",                "Tgrnd", "land_month_crop", "all", .true., "none", 2
+"vegn",                "temp_crop",                "Tvegn", "land_month_crop", "all", .true., "none", 2
+"land",              "transp_crop",               "transp", "land_month_crop", "all", .true., "none", 2
+"land",               "water_crop",                "water", "land_month_crop", "all", .true., "none", 2
+"soil",               "asoil_crop",                "asoil", "land_month_crop", "all", .true., "none", 2
+"vegn",                  "bl_crop",                   "bl", "land_month_crop", "all", .true., "none", 2
+"vegn",                  "br_crop",                   "br", "land_month_crop", "all", .true., "none", 2
+"vegn",                 "bsw_crop",                  "bsw", "land_month_crop", "all", .true., "none", 2
+"vegn",               "bwood_crop",                "bwood", "land_month_crop", "all", .true., "none", 2
+"vegn",               "bseed_crop",                "bseed", "land_month_crop", "all", .true., "none", 2
+"vegn",                 "nsc_crop",                  "nsc", "land_month_crop", "all", .true., "none", 2
+"vegn",                "btot_crop",                 "btot", "land_month_crop", "all", .true., "none", 2
+"land",                "Ctot_crop",                 "Ctot", "land_month_crop", "all", .true., "none", 2
+"soil",                 "fsc_crop",                  "fsc", "land_month_crop", "all", .true., "none", 2
+"soil",                 "ssc_crop",                  "ssc", "land_month_crop", "all", .true., "none", 2
+"vegn",         "csmoke_rate_crop",          "csmoke_rate", "land_month_crop", "all", .true., "none", 2
+"vegn",                 "lai_crop",                  "lai", "land_month_crop", "all", .true., "none", 2
+"vegn",                 "sai_crop",                  "sai", "land_month_crop", "all", .true., "none", 2
+"vegn",                 "gpp_crop",                  "gpp", "land_month_crop", "all", .true., "none", 2
+"vegn",                 "npp_crop",                  "npp", "land_month_crop", "all", .true., "none", 2
+"vegn",               "an_op_crop",                "an_op", "land_month_crop", "all", .true., "none", 2
+"vegn",               "an_cl_crop",                "an_cl", "land_month_crop", "all", .true., "none", 2
+"vegn",                "resp_crop",                 "resp", "land_month_crop", "all", .true., "none", 2
+"soil",               "rsoil_crop",                "rsoil", "land_month_crop", "all", .true., "none", 2
+"soil",          "rsoil_fast_crop",           "rsoil_fast", "land_month_crop", "all", .true., "none", 2
+"vegn",               "theta_crop",                "theta", "land_month_crop", "all", .true., "none", 2
+"vegn",            "tsoil_av_crop",             "tsoil_av", "land_month_crop", "all", .true., "none", 2
+"vegn",      "past_harv_rate_crop",       "past_harv_rate", "land_month_crop", "all", .true., "none", 2
+"vegn",      "crop_harv_rate_crop",       "crop_harv_rate", "land_month_crop", "all", .true., "none", 2
+"vegn", "wood_fast_harv_rate_crop",  "wood_fast_harv_rate", "land_month_crop", "all", .true., "none", 2
+"vegn",  "wood_med_harv_rate_crop",   "wood_med_harv_rate", "land_month_crop", "all", .true., "none", 2
+"vegn", "wood_slow_harv_rate_crop",  "wood_slow_harv_rate", "land_month_crop", "all", .true., "none", 2
+"vegn",   "cleared_harv_rate_crop",    "cleared_harv_rate", "land_month_crop", "all", .true., "none", 2
+"vegn",             "nindivs_crop",              "nindivs", "land_month_crop", "all", .true., "none", 2
+"vegn",            "ncohorts_crop",             "ncohorts", "land_month_crop", "all", .true., "none", 2
+"vegn",             "nlayers_crop",              "nlayers", "land_month_crop", "all", .true., "none", 2
+# ====================
+# INSTANTANEOUS OUTPUT
+# ====================
+"land_month_inst_past", 1, "months", 1, "days", "time"
+#
+"land",                 "geolon_t",             "geolon_t", "land_month_inst_crop", "all", .false., "none", 1
+"land",                 "geolat_t",             "geolat_t", "land_month_inst_crop", "all", .false., "none", 1
+#
+"land",                "area_crop",                 "area", "land_month_inst_crop", "all", .false., "none", 2
+#
+"land",                "frac_crop",                 "frac", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",                  "bl_crop",                   "bl", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",                  "br_crop",                   "br", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",                 "bsw_crop",                  "bsw", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",               "bwood_crop",                "bwood", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",               "bseed_crop",                "bseed", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",                 "nsc_crop",                  "nsc", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",                "btot_crop",                 "btot", "land_month_inst_crop", "all", .false., "none", 2
+"land",                "Ctot_crop",                 "Ctot", "land_month_inst_crop", "all", .false., "none", 2
+"soil",                 "fsc_crop",                  "fsc", "land_month_inst_crop", "all", .false., "none", 2
+"soil",                 "ssc_crop",                  "ssc", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",              "csmoke_crop",               "csmoke", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",               "afire_crop",                "afire", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",      "past_harv_pool_crop",       "past_harv_pool", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",      "crop_harv_pool_crop",       "crop_harv_pool", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",   "cleared_harv_pool_crop",    "cleared_harv_pool", "land_month_inst_crop", "all", .false., "none", 2
+"vegn", "wood_fast_harv_pool_crop",  "wood_fast_harv_pool", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",  "wood_med_harv_pool_crop",   "wood_med_harv_pool", "land_month_inst_crop", "all", .false., "none", 2
+"vegn", "wood_slow_harv_pool_crop",  "wood_slow_harv_pool", "land_month_inst_crop", "all", .false., "none", 2
+"vegn",                 "ncm_crop",                  "ncm", "land_month_inst_crop", "all", .false., "none", 2
+#
+# montly land output
+"land_month_ntrl",       1,  "months", 1, "days", "time"
+#
+"land",                 "geolon_t",             "geolon_t", "land_month_ntrl", "all", .false., "none", 1
+"land",                 "geolat_t",             "geolat_t", "land_month_ntrl", "all", .false., "none", 1
+#
+"land",                "area_ntrl",                 "area", "land_month_ntrl", "all", .true., "none", 2
+#
+"land",                "evap_ntrl",                 "evap", "land_month_ntrl", "all", .true., "none", 2
+"land",              "fevapv_ntrl",               "fevapv", "land_month_ntrl", "all", .true., "none", 2
+"land",                 "flw_ntrl",                  "flw", "land_month_ntrl", "all", .true., "none", 2
+"land",                 "fsw_ntrl",                  "fsw", "land_month_ntrl", "all", .true., "none", 2
+"land",                "FWSv_ntrl",                 "FWSv", "land_month_ntrl", "all", .true., "none", 2
+"land",           "grnd_flux_ntrl",            "grnd_flux", "land_month_ntrl", "all", .true., "none", 2
+"land",              "levapv_ntrl",               "levapv", "land_month_ntrl", "all", .true., "none", 2
+"land",                "LWSv_ntrl",                 "LWSv", "land_month_ntrl", "all", .true., "none", 2
+"land",                "runf_ntrl",                 "runf", "land_month_ntrl", "all", .true., "none", 2
+"land",                "sens_ntrl",                 "sens", "land_month_ntrl", "all", .true., "none", 2
+"land",                "snow_ntrl",                 "snow", "land_month_ntrl", "all", .true., "none", 2
+"land",                 "Tca_ntrl",                  "Tca", "land_month_ntrl", "all", .true., "none", 2
+"land",               "Tgrnd_ntrl",                "Tgrnd", "land_month_ntrl", "all", .true., "none", 2
+"vegn",                "temp_ntrl",                "Tvegn", "land_month_ntrl", "all", .true., "none", 2
+"land",              "transp_ntrl",               "transp", "land_month_ntrl", "all", .true., "none", 2
+"land",               "water_ntrl",                "water", "land_month_ntrl", "all", .true., "none", 2
+"soil",               "asoil_ntrl",                "asoil", "land_month_ntrl", "all", .true., "none", 2
+"vegn",                  "bl_ntrl",                   "bl", "land_month_ntrl", "all", .true., "none", 2
+"vegn",                  "br_ntrl",                   "br", "land_month_ntrl", "all", .true., "none", 2
+"vegn",                 "bsw_ntrl",                  "bsw", "land_month_ntrl", "all", .true., "none", 2
+"vegn",               "bwood_ntrl",                "bwood", "land_month_ntrl", "all", .true., "none", 2
+"vegn",               "bseed_ntrl",                "bseed", "land_month_ntrl", "all", .true., "none", 2
+"vegn",                 "nsc_ntrl",                  "nsc", "land_month_ntrl", "all", .true., "none", 2
+"vegn",                "btot_ntrl",                 "btot", "land_month_ntrl", "all", .true., "none", 2
+"land",                "Ctot_ntrl",                 "Ctot", "land_month_ntrl", "all", .true., "none", 2
+"soil",                 "fsc_ntrl",                  "fsc", "land_month_ntrl", "all", .true., "none", 2
+"soil",                 "ssc_ntrl",                  "ssc", "land_month_ntrl", "all", .true., "none", 2
+"vegn",         "csmoke_rate_ntrl",          "csmoke_rate", "land_month_ntrl", "all", .true., "none", 2
+"vegn",                 "lai_ntrl",                  "lai", "land_month_ntrl", "all", .true., "none", 2
+"vegn",                 "sai_ntrl",                  "sai", "land_month_ntrl", "all", .true., "none", 2
+"vegn",                 "gpp_ntrl",                  "gpp", "land_month_ntrl", "all", .true., "none", 2
+"vegn",                 "npp_ntrl",                  "npp", "land_month_ntrl", "all", .true., "none", 2
+"vegn",               "an_op_ntrl",                "an_op", "land_month_ntrl", "all", .true., "none", 2
+"vegn",               "an_cl_ntrl",                "an_cl", "land_month_ntrl", "all", .true., "none", 2
+"vegn",                "resp_ntrl",                 "resp", "land_month_ntrl", "all", .true., "none", 2
+"soil",               "rsoil_ntrl",                "rsoil", "land_month_ntrl", "all", .true., "none", 2
+"soil",          "rsoil_fast_ntrl",           "rsoil_fast", "land_month_ntrl", "all", .true., "none", 2
+"vegn",               "theta_ntrl",                "theta", "land_month_ntrl", "all", .true., "none", 2
+"vegn",            "tsoil_av_ntrl",             "tsoil_av", "land_month_ntrl", "all", .true., "none", 2
+"vegn",      "past_harv_rate_ntrl",       "past_harv_rate", "land_month_ntrl", "all", .true., "none", 2
+"vegn",      "crop_harv_rate_ntrl",       "crop_harv_rate", "land_month_ntrl", "all", .true., "none", 2
+"vegn", "wood_fast_harv_rate_ntrl",  "wood_fast_harv_rate", "land_month_ntrl", "all", .true., "none", 2
+"vegn",  "wood_med_harv_rate_ntrl",   "wood_med_harv_rate", "land_month_ntrl", "all", .true., "none", 2
+"vegn", "wood_slow_harv_rate_ntrl",  "wood_slow_harv_rate", "land_month_ntrl", "all", .true., "none", 2
+"vegn",   "cleared_harv_rate_ntrl",    "cleared_harv_rate", "land_month_ntrl", "all", .true., "none", 2
+"vegn",             "nindivs_ntrl",              "nindivs", "land_month_ntrl", "all", .true., "none", 2
+"vegn",            "ncohorts_ntrl",             "ncohorts", "land_month_ntrl", "all", .true., "none", 2
+"vegn",             "nlayers_ntrl",              "nlayers", "land_month_ntrl", "all", .true., "none", 2
+# ====================
+# INSTANTANEOUS OUTPUT
+# ====================
+"land_month_inst_past", 1, "months", 1, "days", "time"
+#
+"land",                 "geolon_t",             "geolon_t", "land_month_inst_ntrl", "all", .false., "none", 1
+"land",                 "geolat_t",             "geolat_t", "land_month_inst_ntrl", "all", .false., "none", 1
+#
+"land",                "area_ntrl",                 "area", "land_month_inst_ntrl", "all", .false., "none", 2
+#
+"land",                "frac_ntrl",                 "frac", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",                  "bl_ntrl",                   "bl", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",                  "br_ntrl",                   "br", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",                 "bsw_ntrl",                  "bsw", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",               "bwood_ntrl",                "bwood", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",               "bseed_ntrl",                "bseed", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",                 "nsc_ntrl",                  "nsc", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",                "btot_ntrl",                 "btot", "land_month_inst_ntrl", "all", .false., "none", 2
+"land",                "Ctot_ntrl",                 "Ctot", "land_month_inst_ntrl", "all", .false., "none", 2
+"soil",                 "fsc_ntrl",                  "fsc", "land_month_inst_ntrl", "all", .false., "none", 2
+"soil",                 "ssc_ntrl",                  "ssc", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",              "csmoke_ntrl",               "csmoke", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",               "afire_ntrl",                "afire", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",      "past_harv_pool_ntrl",       "past_harv_pool", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",      "crop_harv_pool_ntrl",       "crop_harv_pool", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",   "cleared_harv_pool_ntrl",    "cleared_harv_pool", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn", "wood_fast_harv_pool_ntrl",  "wood_fast_harv_pool", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",  "wood_med_harv_pool_ntrl",   "wood_med_harv_pool", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn", "wood_slow_harv_pool_ntrl",  "wood_slow_harv_pool", "land_month_inst_ntrl", "all", .false., "none", 2
+"vegn",                 "ncm_ntrl",                  "ncm", "land_month_inst_ntrl", "all", .false., "none", 2
+#
 # ############################
 # land_dust
 # ############################
+"land",     "geolon_t",            "geolon_t",            "land_dust", "all", .false., "none", 1
+"land",     "geolat_t",            "geolat_t",            "land_dust", "all", .false., "none", 1
+#
 "land",      "area",               "area",                "land_dust", "all", .true.,  "none", 2
 "vegn",      "height",             "height",              "land_dust", "all", .true.,  "none", 2
 "land",      "z0m",                "z0m",                 "land_dust", "all", .true.,  "none", 2
@@ -8681,7 +8965,7 @@ endif
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <!--dataSource site="ncrc">/lustre/f1/unswept/Larry.Horowitz/awg/IC/ESM4p0p2_L49_pot_veg_ocean0201_20171103.tar</dataSource-->
         <!--dataSource site="ncrc">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw//Larry.Horowitz_awg_IC_ESM4p0p2_L49_pot_veg_ocean0201_20171103_combined_minusMOMrestarts.tar</dataSource-->
-        <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fms/ESM4/IC/ESM4p0p3k_1850C_PIpcairco2_smag_v6.v20180415.tar</dataSource>
+        <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fms/ESM4/IC/ESM4p0p3k_1850C_PIpcairco2_smag_v7_1850LU.v20180503.tar</dataSource>
       </dataFile>
 
 <!-- c96_LM4_Op5 -->
@@ -8753,6 +9037,12 @@ endif
 <!-- fire-related data sets -->
       <dataFile label="input" target="INPUT/lightning.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/Daniel.Ward/data/FINAL/LISOTD_LRMTS_V2.3.2013.CLIMO.20140208.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/GDP.nc">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/GDP_1851_1x1_v20180502.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/population.nc">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/pop_density_1851_1x1_v20180502.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/Fk.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f1/unswept/Daniel.Ward/data/FINAL/FcFp_20170207_2deg.nc</dataSource>
