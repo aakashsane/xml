@@ -89,7 +89,7 @@ NOTES:
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"        value="testing_20180202"/>        <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="eswg_20180325"/>        <!-- git tag for shared source code -->
-  <property name="ATMOS_GIT_TAG"  value="eswg_20180425"/>           <!-- git tag for atmos_shared and atmos_param source code -->
+  <property name="ATMOS_GIT_TAG"  value="eswg_20180427_megan"/>  <!-- git tag for atmos_shared and atmos_param source code -->
   <property name="MOM6_DATE"      value="2018.04.06"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>              <!-- git tag for MOM6 source code -->
 <!--
@@ -2727,6 +2727,38 @@ LWH (3/16/2018)
         kbs_val = 0.5
       </namelist>
 
+      <namelist name ="xactive_bvoc_nml">
+   xactive_algorithm = "MEGAN2",
+   file_LAI   = "INPUT/mksrf_lai.060929.nc",
+   file_PFT   = "INPUT/mksrf_pft.060929.nc",
+   file_PPFD  = "INPUT/dswrf_monthly_clim_1980-2000.nc"
+   file_TEMP  = "INPUT/tas_monthly_clim_1980-2000.nc"
+   file_O3    = "surface_ozone.nc",
+   file_SOILM = "soil_moisture.nc",
+   file_WS    = "wind_speed.nc",
+   file_CO2   = "co2_conc.nc",
+   do_AM3_ISOP = .true.,
+   do_SESQTERP = .false.,
+   do_PARSED_TERP = .true.,
+   do_GAMMA_BDLAI = .false.,
+   do_GAMMA_CO2   = .false.,
+   do_GAMMA_AQ    = .false.,
+   do_GAMMA_SM    = .false.,
+   do_GAMMA_HT    = .false.,
+   do_GAMMA_LT    = .false.,
+   do_GAMMA_HW    = .false.,
+   do_ONLINE_LAI  = .false.,
+   do_ONLINE_PFT  = .false.,
+   do_ONLINE_TEMP = .true.,
+   do_ONLINE_PPFD = .true.,
+   do_ONLINE_O3   = .false.,
+   do_ONLINE_WIND = .false.,
+   do_ONLINE_SM   = .false.,
+   do_ONLINE_CO2  = .false.,
+   T_s            = 297.,
+   RHO_CANOPY     = 1.,
+   min_land_frac  = 0.01
+      </namelist>
 
 <!-- LAND namelists -->
       <namelist name ="cana_nml">
@@ -4374,8 +4406,10 @@ SIS_OVERRIDE_EOF
 "longname","RO2fromR4N2"
 "chem_param","gas","nb_N_ox=1"
 "units","VMR"
-"tracer_type","diagnostic"
 "profile_type","fixed","surface_value=1.e-20"
+"wet_deposition","henry_below_noice","henry=2.1e0,dependence=8700."
+"dry_deposition","file","name=hno3"
+"convection","all"
 /
 
 "tracer","atmos_mod","R4N2"
@@ -8678,9 +8712,8 @@ endif
           The IC and static vegetation correspond to 1981 state of land use
       -->
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <!--dataSource site="ncrc">/lustre/f1/unswept/Larry.Horowitz/awg/IC/ESM4p0p2_L49_pot_veg_ocean0201_20171103.tar</dataSource-->
-        <!--dataSource site="ncrc">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw//Larry.Horowitz_awg_IC_ESM4p0p2_L49_pot_veg_ocean0201_20171103_combined_minusMOMrestarts.tar</dataSource-->
-        <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fms/ESM4/IC/ESM4p0p3k_1850C_PIpcairco2_smag_v6.v20180415.tar</dataSource>
+<!--    <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fms/ESM4/IC/ESM4p0p3k_1850C_PIpcairco2_smag_v6.v20180415.tar</dataSource> -->
+        <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/IC/AM4p0p3k_L49_pot_veg_LM4p1_20180501.tar</dataSource>
       </dataFile>
 
 <!-- c96_LM4_Op5 -->
@@ -8750,31 +8783,37 @@ endif
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/common_AM4/am4_optical_table_20151029.dat</dataSource>
       </dataFile>
 <!-- fire-related data sets -->
+<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/lightning.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Daniel.Ward/data/FINAL/LISOTD_LRMTS_V2.3.2013.CLIMO.20140208.nc</dataSource>
+        <dataSource platform="$(platform)">$CPERM/Daniel.Ward/data/FINAL/LISOTD_LRMTS_V2.3.2013.CLIMO.20140208.nc</dataSource>
       </dataFile>
+<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/Fk.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Daniel.Ward/data/FINAL/FcFp_20170207_2deg.nc</dataSource>
+        <dataSource platform="$(platform)">$CPERM/Daniel.Ward/data/FINAL/FcFp_20170207_2deg.nc</dataSource>
       </dataFile>
+<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/Koppen_zones_2deg_1950-2000.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Daniel.Ward/data/FINAL/Koppen_zones_2deg_1950-2000.nc</dataSource>
+        <dataSource platform="$(platform)">$CPERM/Daniel.Ward/data/FINAL/Koppen_zones_2deg_1950-2000.nc</dataSource>
       </dataFile>
 
 <!-- nitrogen-related data sets -->
+<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/nbiodata_nat.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Benjamin.Sulman/green_nsource_preind_fixed.nc</dataSource>
+        <dataSource platform="$(platform)">$CPERM/Benjamin.Sulman/green_nsource_preind_fixed.nc</dataSource>
       </dataFile>
+<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/nbiodata_ant.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Benjamin.Sulman/green_nsource_anthro_fixed.nc</dataSource>
+        <dataSource platform="$(platform)">$CPERM/Benjamin.Sulman/green_nsource_anthro_fixed.nc</dataSource>
       </dataFile>
 
 <!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/INPUT/emissions.diag.tracers.cpio</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
+<!-- Move input file to CMIP6_ARCHIVE_ROOT (merge into tropchem cpio) -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/INPUT/tropchem/megan.TERP.nc</dataSource>
+        <dataSource platform="$(platform)">$CPERM/Jordan.Schnell/input/xactive_emissions/xactive_overhaul/megan.xactive.bvoc.tar
+</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/common_AM4/FastJX-v7.1.tar</dataSource>
@@ -8790,17 +8829,8 @@ endif
       <dataFile label="input" target="INPUT/chemlbf" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/common_cmip6/chemlbf_CMIP6_merge_RCP45</dataSource>
       </dataFile>
-
-      <dataFile label="input" target="INPUT/o3.climatology.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/common_cmip6/mmro3_CMIP6_184901-201512.nc</dataSource>
-      </dataFile>
+<!-- Merge into forcings tar file? -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/common_cmip6/emissions.isoprene.1x1.2000.nc</dataSource>
-      </dataFile>
-       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/common_cmip6/emissions.terpenes.1x1.2000.nc</dataSource>
-      </dataFile>
-       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/common_cmip6/h2_gblannualdata</dataSource>
       </dataFile>
 
@@ -8838,8 +8868,6 @@ endif
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$CPERM/Fabien.Paulot/archive/emissions/dms/DMS_lana_gfdl.nc</dataSource>
       </dataFile>
-
-
 
       <!--MOM6 Input datasets: 0.5 degree -->
 
@@ -8913,12 +8941,14 @@ endif
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/woa13/woa13_all_o_annual_01.nc</dataSource>
      </dataFile>
 <!-- GLODAP v2 -->
+<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/John.Krasting/cwg/input/obgc/GLODAPv2.2016b.oi-filled.20180322.nc</dataSource>
+        <dataSource platform="$(platform)">$CPERM/John.Krasting/cwg/input/obgc/GLODAPv2.2016b.oi-filled.20180322.nc</dataSource>
      </dataFile>
 
+<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
      <dataFile label="input" target="INPUT/init_ocean_cobalt.res.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/John.Krasting/cwg/input/obgc/COBALT/20180503/cobalt_tracer_source.nc</dataSource>
+        <dataSource platform="$(platform)">$CPERM/John.Krasting/cwg/input/obgc/COBALT/20180503/cobalt_tracer_source.nc</dataSource>
      </dataFile>
 <!--
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -8928,9 +8958,11 @@ endif
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/TOPAZ/deposition_fan/Mineral_Fe_Flux_PI.nc</dataSource>
      </dataFile>
 -->
+<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/ncrc/home1/Charles.Stock/iron_sources/Soluble_Fe_Flux_AM4.nc</dataSource>
      </dataFile>
+<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/ncrc/home1/Charles.Stock/iron_sources/Mineral_Flux_AM4.nc</dataSource>
      </dataFile>
@@ -8941,15 +8973,18 @@ endif
       <dataFile label="input" target="INPUT/news_nutrients.nc" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/news_nutrients_halfdeg_20151207.nc</dataSource>
       </dataFile>
+<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/river_iron.nc" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">/ncrc/home1/Charles.Stock/iron_sources/river_iron_halfdeg.nc</dataSource>
       </dataFile>
 <!-- f1p: note added restart files -->
+<!-- Merge input file into IC -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Fabien.Paulot/archive/IC/MOM.res_4.nc</dataSource>
+        <dataSource platform="$(platform)">$CPERM/Fabien.Paulot/archive/IC/MOM.res_4.nc</dataSource>
       </dataFile>
+<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">/lustre/f1/unswept/Fabien.Paulot/archive/IC/init_ocean_cobalt_nh3.res.nc</dataSource>
+         <dataSource platform="$(platform)">$CPERM/Fabien.Paulot/archive/IC/init_ocean_cobalt_nh3.res.nc</dataSource>
       </dataFile>
 
     </input>
