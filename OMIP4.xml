@@ -14,11 +14,11 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="RELEASE"        value="warsaw_201803"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/> <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="2018.04.06"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"      value="2018.04.11"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_YOURGROUPLETTER"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_b"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
 
@@ -415,13 +415,7 @@ $baseDate
      </dataFile>
 
      <!--MOM_overrides-->
-     <csh>
-        <![CDATA[
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
-MOM_OVERRIDE_EOF
-
-     ]]></csh>
+     <!--None needed for this experiment-->
 
    </input>
 
@@ -717,11 +711,38 @@ MOM_OVERRIDE_EOF
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/IAF_v2.0/v_10_mod.1948-2007.nomads.nc</dataSource>
       </dataFile>
-
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/cfc.bc.nc</dataSource>
       </dataFile>
+    </input>
+   </freInclude>
 
+   <freInclude name="CORE2_NYF_data">
+    <input>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/NYF_v2.0/ncar_precip.clim.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/NYF_v2.0/ncar_rad.clim.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/NYF_v2.0/q_10_mod.clim.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/NYF_v2.0/slp.clim.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/NYF_v2.0/t_10_mod.clim.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/NYF_v2.0/u_10_mod.clim.nc</dataSource>
+      </dataFile>      
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_O/datasets/CORE/NYF_v2.0/v_10_mod.clim.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/cfc.bc.nc</dataSource>
+      </dataFile>
     </input>
    </freInclude>
 
@@ -872,7 +893,7 @@ MOM_OVERRIDE_EOF
    <!--***************************** 1/2 degree experiments        ****************************-->
    <!--****************************************************************************************-->
 											      
-   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf" inherit="MOM6_SIS2_compile">
+   <experiment name="OM4p5_NYF_BLING_CFC_abio_csf_mle200" inherit="MOM6_SIS2_compile">
    <publicMetadata DBswitch="$(MDBIswitch)">
       <!-- Realization tag -->
       <realization r="1" i="1" p="1" f="1"/>
@@ -886,8 +907,8 @@ MOM_OVERRIDE_EOF
       <source_id>GFDL-OM4_p5deg</source_id>
       <source_type>OGCM</source_type>
       <!--experiment info-->
-      <experiment_name>OMIP experiment forced by CORE Inter-Annual Forcing (CIAF) version 2.0 and initialized with observed physical and biogeochemical ocean data</experiment_name>
-      <experiment_id>omip2</experiment_id>
+      <experiment_name>OMIP experiment forced by Large and Yeager (CORE-2, NCEP) atmospheric data set and initialized with observed physical and biogeochemical ocean data</experiment_name>
+      <experiment_id>omip1</experiment_id>
       <sub_experiment>none</sub_experiment>
       <sub_experiment_id>none</sub_experiment_id>
       <start_time>$(EXP_CPLD_START)</start_time>
@@ -1021,9 +1042,9 @@ $baseDate
      <!--data_tables and data files-->
 
       <!--CORE2 forcing-->
-      <xi:include xpointer="xpointer(//freInclude[@name='CORE2_IAF_data']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='CORE2_NYF_data']/input/node())"/>
       <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/data_table_iaf</dataSource>
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/data_table_nyf</dataSource>
       </dataFile>
 
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_data_table']/input/node())"/>
@@ -1056,10 +1077,6 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 # Turn on generic tracers
 USE_generic_tracer = True
 GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
-# No need to remap to general coordinates since we are z*
-#override Z_INIT_REMAP_GENERAL = False
-#override REMAP_AFTER_INITIALIZATION = True
-#override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
@@ -1111,6 +1128,160 @@ SIS_OVERRIDE_EOF
     </postProcess>
    </experiment>
 
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf" inherit="OM4p5_NYF_BLING_CFC_abio_csf_mle200">
+   <publicMetadata DBswitch="$(MDBIswitch)">
+      <!-- Realization tag -->
+      <realization r="1" i="1" p="1" f="1"/>
+      <!-- project info -->
+      <project>"$(ProjectID)"</project>
+      <activity_id>OMIP</activity_id>
+      <mip_era>CMIP6</mip_era>
+      <!-- model info --> 
+      <!-- the model names are subject to change after arriving at a new name and registering it in CV-->	
+      <source>GFDL-OM4_p5deg (2017)</source>
+      <source_id>GFDL-OM4_p5deg</source_id>
+      <source_type>OGCM</source_type>
+      <!--experiment info-->
+      <experiment_name>OMIP experiment forced by CORE Inter-Annual Forcing (CIAF) version 2.0 and initialized with observed physical and biogeochemical ocean data</experiment_name>
+      <experiment_id>omip2</experiment_id>
+      <sub_experiment>none</sub_experiment>
+      <sub_experiment_id>none</sub_experiment_id>
+      <start_time>$(EXP_CPLD_START)</start_time>
+      <end_time>$(EXP_CPLD_END)</end_time>
+      <!-- branch info -->
+      <branch_method>standard</branch_method>
+      <branch_time_in_child>0.0D0</branch_time_in_child>
+      <branch_time_in_parent>0.0D0</branch_time_in_parent>
+      <!-- variant info-->
+      <variant_info></variant_info>
+      <!--parent info-->
+      <parent_time_units>days since 1708-1-1</parent_time_units>
+      <parent_activity_id>no parent</parent_activity_id>
+      <parent_experiment_id></parent_experiment_id>
+      <parent_mip_era>CMIP6</parent_mip_era>
+      <parent_source_id>no parent</parent_source_id>
+      <parent_variant_label>no parent</parent_variant_label>
+      <comment>
+       Experiment name = $(name)
+    For more information please refer to the
+    &lt;a href="https://github.com/NOAA-GFDL/MOM6-examples/wiki"&gt; MOM6 Wiki.  &lt;/a&gt;
+      </comment>
+
+    </publicMetadata>
+
+    <input>
+
+      <!--common setup-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_common']/input/node())"/>
+      <!--OM4 gridSpec mosaic datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4p5grid_data']/input/node())"/>
+      <!--MOM6 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4p5_data']/input/node())"/>
+      <!--SIS2 Input datasets-->
+      <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
+
+     <!--diag_tables-->
+
+     <diagTable>
+$name
+$baseDate
+     </diagTable>
+     <xi:include xpointer="xpointer(//freInclude[@name='diag_table_GENERICS']/input/node())"/>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_BLING</dataSource>
+     </dataFile>
+
+     <!--data_tables and data files-->
+
+      <!--CORE2 forcing-->
+      <xi:include xpointer="xpointer(//freInclude[@name='CORE2_IAF_data']/input/node())"/>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/data_table_iaf</dataSource>
+      </dataFile>
+
+      <xi:include xpointer="xpointer(//freInclude[@name='BLING_data_table']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='CFC_data_table']/input/node())"/>
+
+      <xi:include xpointer="xpointer(//freInclude[@name='ABIO_data_table']/input/node())"/>
+
+     <!--field_tables-->
+
+     <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/field_table</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_05/field_table</dataSource>
+     </dataFile>
+
+      <!--BLING specific datasets and tables-->
+      <!--COBALT IC datasets used in BLING field_table-->
+      <xi:include xpointer="xpointer(//freInclude[@name='OBGC_data_set']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='BLING_field_table']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='ABIO_field_table']/input/node())"/>
+
+      <dataFile label="input" target="INPUT/MOM_GENERICS.res.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/John.Krasting/cwg/input/cfc/MOM_GENERICS_OM4p5.20170829.res.nc</dataSource>
+      </dataFile>
+
+     <!--MOM_overrides-->
+     <csh>
+        <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = True
+GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+#override ADD_DIURNAL_SW = True 
+#override ICE_STATS_INTERVAL = 30
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
+
+    </input> 
+
+   <runtime>
+      <production simTime="$(PROD_SIMTIME)" units="years">
+          <segment simTime="12" units="months"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5_production']/node())"/>
+      </production>
+
+      <regression name="basic">
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1057p5']/node())"/> </run>
+      </regression>
+      <regression name="rts">
+        <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1057p5']/node())"/> </run>
+        <!--the following should reproduce eachother but not the basic because basic uses mask_table-->
+        <run days="29" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1296']/node())"/> </run>
+        <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O648']/node())"/> </run>
+        <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
+      </regression>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_1057x1o/restart/17080201.tar"/>
+   </runtime>
+
+
+    <postProcess>
+      <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='BLING_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='abiotic_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='abiotic_z_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='inert_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='inert_z_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='abiotic_postprocess_1x1deg']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='abiotic_z_postprocess_1x1deg']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='inert_postprocess_1x1deg']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='inert_z_postprocess_1x1deg']/postProcess/node())"/>
+    </postProcess>
+   </experiment>
+
+
+
+
    <freInclude name="OM4p5grid_data">
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
@@ -1150,9 +1321,6 @@ SIS_OVERRIDE_EOF
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/woa13_decav_s_monthly_fulldepth_01.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic_ocean.v20180227.unpacked/ocean_static.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/layer_coord.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -1169,6 +1337,10 @@ SIS_OVERRIDE_EOF
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
+      </dataFile>
+
+      <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
+       <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic_ocean.v20180227.unpacked/ocean_static.nc</dataSource>
       </dataFile>
 
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
