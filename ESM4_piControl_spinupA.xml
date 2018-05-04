@@ -87,20 +87,18 @@ NOTES:
 -->
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="testing_20180202"/>        <!-- git tag for general component source code-->
-  <property name="SHARED_GIT_TAG" value="eswg_20180325"/>        <!-- git tag for shared source code -->
+  <property name="RELEASE"        value="testing_20180503"/>        <!-- git tag for general component source code-->
+  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for shared source code -->
   <property name="ATMOS_GIT_TAG"  value="eswg_20180427_megan"/>  <!-- git tag for atmos_shared and atmos_param source code -->
-  <property name="MOM6_DATE"      value="2018.04.06"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"      value="2018.04.11"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>              <!-- git tag for MOM6 source code -->
-<!--
-  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/>
--->
-  <property name="OCEAN_SHARED_GIT_TAG" value="user/f1p/nh4_ocean_couply_dry_deposition_merge "/> <!-- git tag for ocean_shared source code -->
+  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180503"/>
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
+  <property name="COUPLER_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
   <property name="LAND_GIT_TAG"   value="ppa_20180503_slm"/>        <!-- git tag for LAND source code -->
-  <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180426"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="testing_20180503_mom6_2018.04.11"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
@@ -827,7 +825,7 @@ Experiment to build executable.
         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
       	    <csh><![CDATA[
-              ( cd coupler && git checkout user/f1p/nh4_ocean_couply_dry_deposition_merge ) 
+              ( cd coupler && git checkout $(COUPLER_GIT_TAG) ) 
               ]]>
             </csh>
         </source>
@@ -5960,8 +5958,8 @@ $baseDate
 "vegn",    "crownarea",                "crownarea",               "land_month", "all", .true., "none", 2
 "vegn",    "gdd",                      "gdd",                     "land_month", "all", .true., "none", 2
 "vegn",    "tc_pheno",                 "tc_pheno",                "land_month", "all", .true., "none", 2
-"vegn",    "psi_stress_phen",          "psi_stress_phen",         "land_month", "all", .true., "none", 2
-"vegn",    "theta_phen",               "theta_phen",              "land_month", "all", .true., "none", 2
+#"vegn",    "psi_stress_phen",          "psi_stress_phen",         "land_month", "all", .true., "none", 2
+#"vegn",    "theta_phen",               "theta_phen",              "land_month", "all", .true., "none", 2
 # "vegn",    "status",                   "status",                  "land_month", "all", .true., "none", 2
 "vegn",    "bl_max",                   "bl_max",                  "land_month", "all", .true., "none", 2
 "vegn",    "br_max",                   "br_max",                  "land_month", "all", .true., "none", 2
@@ -6315,7 +6313,7 @@ $baseDate
 # ====================
 # INSTANTANEOUS OUTPUT
 # ====================
-"land_month_inst_past", 1, "months", 1, "days", "time"
+"land_month_inst_crop", 1, "months", 1, "days", "time"
 #
 "land",                 "geolon_t",             "geolon_t", "land_month_inst_crop", "all", .false., "none", 1
 "land",                 "geolat_t",             "geolat_t", "land_month_inst_crop", "all", .false., "none", 1
@@ -6402,7 +6400,7 @@ $baseDate
 # ====================
 # INSTANTANEOUS OUTPUT
 # ====================
-"land_month_inst_past", 1, "months", 1, "days", "time"
+"land_month_inst_ntrl", 1, "months", 1, "days", "time"
 #
 "land",                 "geolon_t",             "geolon_t", "land_month_inst_ntrl", "all", .false., "none", 1
 "land",                 "geolat_t",             "geolat_t", "land_month_inst_ntrl", "all", .false., "none", 1
@@ -9289,11 +9287,11 @@ endif
           <run months="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
       </regression>
       <regression name="basic">
-          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1152x2_O1057p5']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
       </regression>
 
       <regression name="rts">
-        <run days="15 16" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1152x2_O1057p5']/node())"/> </run>
+        <run days="15 16" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
         <run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O648']/node())"/> </run>
   	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
   	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O864']/node())"/> </run>
