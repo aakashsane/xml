@@ -2377,7 +2377,7 @@ LWH (3/16/2018)
       use_single_lw_sw_ts = .false.,
       use_co2_tracer_field = .true.                 ! jgj added
       treat_sfc_refl_dir_as_dif = .false.           ! jgj added
-      use_ch4_tracer_field = .true.
+      use_ch4_tracer_field = .false.
       </namelist>
 
       <namelist name ="radiative_gases_nml">
@@ -2831,7 +2831,7 @@ LWH (3/16/2018)
        frac_wood_wasted_harv  = 0.25
        frac_wood_wasted_clear = 0.25
        crop_schedule          = 'prescribed'
-       crop_schedule_file     = '/lustre/f1/unswept/Sergey.Malyshev/DATA/agriculture/NewGrid_2by25_All_26crops_f1p_3d_doy_v20171107.nc'
+       crop_schedule_file     = '$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/agriculture/NewGrid_2by25_All_26crops_f1p_3d_doy_v20171107.nc'
        c3_crop_species        = 'c3grass'
        c4_crop_species        = 'c4grass'
        crop_seed_density      = 0.1
@@ -2911,9 +2911,9 @@ LWH (3/16/2018)
       <namelist name ="landuse_nml">
        do_landuse_change = FALSE
        data_type   = 'luh2'
-       input_file  = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/extras/zero-transitions.v20170711.nc'
-       state_file  = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/extras/state-1850-nosecd.v20170711.nc'
-       static_file = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/landfrac.nc'
+       input_file  = '$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/landuse/LUH2/v2.0h/extras/zero-transitions.v20170711.nc'
+       state_file  = '$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/landuse/LUH2/v2.0h/extras/state-1850-nosecd.v20170711.nc'
+       static_file = '$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/landuse/LUH2/v2.0h/landfrac.nc'
        distribute_transitions = 'min-n-tiles'
        rangeland_is_pasture = TRUE
       </namelist>
@@ -3316,27 +3316,12 @@ SIS_OVERRIDE_EOF
 "OCN", "runoff_ldop_flux_ice_ocn",  "LDOP_CONC",  "./INPUT/news_nutrients.nc","none",1.0e-3
 "OCN", "runoff_sldop_flux_ice_ocn", "SLDOP_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
 "OCN", "runoff_srdop_flux_ice_ocn", "SRDOP_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
-"OCN", "runoff_fed_flux_ice_ocn"  ,  "FED_CONC",  "./INPUT/river_iron.nc",    "none",1.0e-3
-# Updated settings to match BLINGv2
-# Composition of runoff includes 0.1 PgC for CaCO3 burial (0.48 Alk, 0.24DIC)
-# plus 0.3 Pg C for Org burial (0.72 DIC, 0.72/106 PO4, 0.72/106*16 Alk ) 
+"OCN", "runoff_fed_flux_ice_ocn",   "FED_CONC",   "./INPUT/river_iron.nc",    "none",1.0e-3
 "OCN", "runoff_alk_flux_ice_ocn",  "",    "",                             "none",  0.49e-3
 "OCN", "runoff_dic_flux_ice_ocn",  "",    "",                             "none",  0.34e-3
 "OCN", "runoff_lith_flux_ice_ocn", ""  , ""                             , "none" , 13.0e-3
-###fed has wet and dry dep fluxes from dust. Do not override it in an active dust exchange experiment
-#override till the land dust source is evaluated/fixed
-#"OCN", "dry_dep_fed_flux_ice_ocn",  "FLUX",        "./INPUT/Soluble_Fe_Flux_AM4.nc", "bilinear", -1.0
-###lith has wet and dry dep fluxes from dust. Do not override it in an active dust exchange experiment
-#override till the land dust source is evaluated/fixed
-#"OCN", "dry_dep_lith_flux_ice_ocn", "FLUX_MINERAL","./INPUT/Mineral_Flux_AM4.nc", "bilinear", -1.0
-#"OCN", "dry_dep_po4_flux_ice_ocn",  "FLUX_MINERAL","./INPUT/Mineral_Flux_AM4.nc", "bilinear", 0.0
-###nh4 and no3  wet and dry dep fluxes from atm. Do not override it in an active nitrogen exchange experiment
-###"OCN", "wet_dep_no3_flux_ice_ocn",  "NO3_WET_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
-###"OCN", "dry_dep_no3_flux_ice_ocn",  "NO3_DRY_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
-###"OCN", "wet_dep_nh4_flux_ice_ocn",  "NH4_WET_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
-###"OCN", "dry_dep_nh4_flux_ice_ocn",  "NH4_DRY_DEP", "./INPUT/depflux_total.mean.1860.nc", "bilinear" , -1.0
 #
-# jgj 2015/12/09 data table for o2 gas exchange
+# jgj data table for o2 gas exchange
 #
 "ATM", "o2_flux_pcair_atm", ""         , ""                             , "none" , 0.214
 #
@@ -3352,7 +3337,7 @@ SIS_OVERRIDE_EOF
 <!-- FIELD TABLES by component -->
 <!-- atmos, land, atmos_chem 
      ESM4 CMIP6 Jan 1 1850 co2 field table 
-     COBALT field table (currently GLODAPv1 Preind DIC)
+     COBALT field table (2018/05/09 GLODAPv2 Preind DIC)
  -->
       <fieldTable>
 # specific humidity for moist runs
@@ -4490,6 +4475,7 @@ SIS_OVERRIDE_EOF
 ###.................................................
 ### COBALT field table for initializing tracers
 ## jgj 2013/01/23 updated for COBALT
+## jgj 2018/05/09 updated for GLODAP v2 and regridded COBALT history file
 
 "namelists","ocean_mod","generic_cobalt/*global*"
 /
@@ -4574,8 +4560,7 @@ sio4_src_var_record = 1
 sio4_src_var_gridspec = NONE
 sio4_valid_min = 0.0
 #
-# Alkalinity from GLODAPv2  (/lustre/f1/unswept/John.Krasting/cwg/input/obgc/GLODAPv2.2016b.oi-filled.20180322.nc)
-# min = 1069, max = 2651 from input dataset
+# Alkalinity from GLODAPv2  (/lustre/f1/pdata/cmip6/datasets/ESM4/OBGC/GLODAPv2/GLODAPv2.2016b.oi-filled.20180322.nc)
 # divide by 1e6 to convert from umol/kg to mol/kg
 alk_src_file = INPUT/GLODAPv2.2016b.oi-filled.20180322.nc
 alk_src_var_name = TAlk
@@ -4586,8 +4571,7 @@ alk_src_var_record = 1
 alk_src_var_gridspec = NONE
 alk_valid_min = 0.0
 #
-# Preind DIC from GLODAPv2  (/lustre/f1/unswept/John.Krasting/cwg/input/obgc/GLODAPv2.2016b.oi-filled.20180322.nc)
-# min = 1041, max = 2403 from input dataset
+# Preind DIC from GLODAPv2  (/lustre/f1/pdata/cmip6/datasets/ESM4/OBGC/GLODAPv2/GLODAPv2.2016b.oi-filled.20180322.nc)
 # divide by 1e6 to convert from umol/kg to mol/kg
 dic_src_file = INPUT/GLODAPv2.2016b.oi-filled.20180322.nc
 dic_src_var_name = PI_TCO2
@@ -4598,8 +4582,7 @@ dic_src_var_record = 1
 dic_src_var_gridspec = NONE
 dic_valid_min = 0.0
 #
-# additional tracers from ESM2M-COBALT Preindustrial Control restart (/archive/jgj/datasets/retrospective/mom4p1_restart_to_latlon_360x180/ESM2M_pi-control_C2_cobalt_latlon_360x180_15010101_nobounds_mumem_htotalbounds.ocean_cobalt.res.nc)
-# min =  -2.203E-14, max =  1.347E-08 from input dataset
+# additional tracers from ESM4p-COBALT Preindustrial Control restart 
 # no unit conversion necessary
 cadet_arag_src_file = INPUT/init_ocean_cobalt.res.nc
 cadet_arag_src_var_name = cadet_arag
@@ -4610,7 +4593,6 @@ cadet_arag_src_var_record = 1
 cadet_arag_src_var_gridspec = NONE
 cadet_arag_valid_min = 0.0
 #
-# min = -1.774E-15, max =  1.711E-08 from input dataset
 cadet_calc_src_file = INPUT/init_ocean_cobalt.res.nc
 cadet_calc_src_var_name = cadet_calc
 cadet_calc_src_var_unit = none
@@ -4621,7 +4603,6 @@ cadet_calc_src_var_gridspec = NONE
 cadet_calc_valid_min = 0.0
 #
 # NOTE: CASED = 0 at all K except K=1 from input dataset
-# min = 0,  max = 5273. from input dataset
 cased_src_file = INPUT/init_ocean_cobalt.res.nc
 cased_src_var_name = cased
 cased_src_var_unit = none
@@ -4631,7 +4612,6 @@ cased_src_var_record = 1
 cased_src_var_gridspec = NONE
 cased_valid_min = 0.0
 #
-# min = 0,  max = 4.446 from input dataset
 chl_src_file = INPUT/init_ocean_cobalt.res.nc
 chl_src_var_name = chl
 chl_src_var_unit = none
@@ -4641,7 +4621,6 @@ chl_src_var_record = 1
 chl_src_var_gridspec = NONE
 chl_valid_min = 0.0
 #
-# min = 0,  max = 3.576E-04 from input dataset
 co3_ion_src_file = INPUT/init_ocean_cobalt.res.nc
 co3_ion_src_var_name = co3_ion
 co3_ion_src_var_unit = none
@@ -4651,7 +4630,6 @@ co3_ion_src_var_record = 1
 co3_ion_src_var_gridspec = NONE
 co3_ion_valid_min = 0.0
 #
-# min = -1.758E-11,  max = 1.758E-08 from input dataset
 fed_src_file = INPUT/init_ocean_cobalt.res.nc
 fed_src_var_name = fed
 fed_src_var_unit = none
@@ -4661,7 +4639,6 @@ fed_src_var_record = 1
 fed_src_var_gridspec = NONE
 fed_valid_min = 0.0
 #
-# min = 0,  max = 1.715E-11 from input dataset
 fedi_src_file = INPUT/init_ocean_cobalt.res.nc
 fedi_src_var_name = fedi
 fedi_src_var_unit = none
@@ -4671,7 +4648,6 @@ fedi_src_var_record = 1
 fedi_src_var_gridspec = NONE
 fedi_valid_min = 0.0
 #
-# min = 0,  max = 4.724E-11 from input dataset
 felg_src_file = INPUT/init_ocean_cobalt.res.nc
 felg_src_var_name = felg
 felg_src_var_unit = none
@@ -4681,7 +4657,6 @@ felg_src_var_record = 1
 felg_src_var_gridspec = NONE
 felg_valid_min = 0.0
 #
-# min = 0,  max = 7.912E-11 from input dataset
 fesm_src_file = INPUT/init_ocean_cobalt.res.nc
 fesm_src_var_name = fesm
 fesm_src_var_unit = none
@@ -4691,7 +4666,6 @@ fesm_src_var_record = 1
 fesm_src_var_gridspec = NONE
 fesm_valid_min = 0.0
 #
-# min = 10^-8.4=3.981E-09,  max = 10^-7.9 = 1.259E-08 from input dataset
 htotal_src_file = INPUT/init_ocean_cobalt.res.nc
 htotal_src_var_name = htotal
 htotal_src_var_unit = none
@@ -4702,7 +4676,6 @@ htotal_src_var_gridspec = NONE
 htotal_valid_min = 3.981E-09
 htotal_valid_max = 1.259E-08
 #
-# min = 0,  max = 137.7 from input dataset
 irr_mem_src_file = INPUT/init_ocean_cobalt.res.nc
 irr_mem_src_var_name = irr_mem
 irr_mem_src_var_unit = none
@@ -4712,7 +4685,6 @@ irr_mem_src_var_record = 1
 irr_mem_src_var_gridspec = NONE
 irr_mem_valid_min = 0.0
 #
-# min = 0,  max = 5.812E-07 from input dataset
 ldon_src_file = INPUT/init_ocean_cobalt.res.nc
 ldon_src_var_name = ldon
 ldon_src_var_unit = none
@@ -4722,7 +4694,6 @@ ldon_src_var_record = 1
 ldon_src_var_gridspec = NONE
 ldon_valid_min = 0.0
 #
-# min = 0,  max = 3.576E-08 from input dataset
 ldop_src_file = INPUT/init_ocean_cobalt.res.nc
 ldop_src_var_name = ldop
 ldop_src_var_unit = none
@@ -4732,7 +4703,6 @@ ldop_src_var_record = 1
 ldop_src_var_gridspec = NONE
 ldop_valid_min = 0.0
 #
-# min = 0,  max = 0.006529 from input dataset
 lith_src_file = INPUT/init_ocean_cobalt.res.nc
 lith_src_var_name = lith
 lith_src_var_unit = none
@@ -4742,7 +4712,6 @@ lith_src_var_record = 1
 lith_src_var_gridspec = NONE
 lith_valid_min = 0.0
 #
-# min = -1.385E-11,  max = 8.246E-06 from input dataset
 nh4_src_file = INPUT/init_ocean_cobalt.res.nc
 nh4_src_var_name = nh4
 nh4_src_var_unit = none
@@ -4752,7 +4721,6 @@ nh4_src_var_record = 1
 nh4_src_var_gridspec = NONE
 nh4_valid_min = 0.0
 #
-# min = -2.922E-11,  max = 9.184E-07 from input dataset
 nbact_src_file = INPUT/init_ocean_cobalt.res.nc
 nbact_src_var_name = nbact
 nbact_src_var_unit = none
@@ -4762,7 +4730,6 @@ nbact_src_var_record = 1
 nbact_src_var_gridspec = NONE
 nbact_valid_min = 0.0
 #
-# min = -6.356E-11,  max = 1.154E-07 from input dataset
 ndi_src_file = INPUT/init_ocean_cobalt.res.nc
 ndi_src_var_name = ndi
 ndi_src_var_unit = none
@@ -4772,7 +4739,6 @@ ndi_src_var_record = 1
 ndi_src_var_gridspec = NONE
 ndi_valid_min = 0.0
 #
-# min = -3.206E-10,  max = 9.267E-07 from input dataset
 nlg_src_file = INPUT/init_ocean_cobalt.res.nc
 nlg_src_var_name = nlg
 nlg_src_var_unit = none
@@ -4782,7 +4748,6 @@ nlg_src_var_record = 1
 nlg_src_var_gridspec = NONE
 nlg_valid_min = 0.0
 #
-# min = -3.142E-10,  max = 2.285E-06 from input dataset
 nsm_src_file = INPUT/init_ocean_cobalt.res.nc
 nsm_src_var_name = nsm
 nsm_src_var_unit = none
@@ -4792,7 +4757,6 @@ nsm_src_var_record = 1
 nsm_src_var_gridspec = NONE
 nsm_valid_min = 0.0
 #
-# min = -1.241E-10,  max = 5.693E-07 from input dataset
 nlgz_src_file = INPUT/init_ocean_cobalt.res.nc
 nlgz_src_var_name = nlgz
 nlgz_src_var_unit = none
@@ -4802,7 +4766,6 @@ nlgz_src_var_record = 1
 nlgz_src_var_gridspec = NONE
 nlgz_valid_min = 0.0
 #
-# min = -1.766E-10,  max = 7.131E-07 from input dataset
 nmdz_src_file = INPUT/init_ocean_cobalt.res.nc
 nmdz_src_var_name = nmdz
 nmdz_src_var_unit = none
@@ -4812,7 +4775,6 @@ nmdz_src_var_record = 1
 nmdz_src_var_gridspec = NONE
 nmdz_valid_min = 0.0
 #
-# min = -1.385E-11,  max = 8.246E-06 from input dataset
 nsmz_src_file = INPUT/init_ocean_cobalt.res.nc
 nsmz_src_var_name = nsmz
 nsmz_src_var_unit = none
@@ -4822,7 +4784,6 @@ nsmz_src_var_record = 1
 nsmz_src_var_gridspec = NONE
 nsmz_valid_min = 0.0
 #
-# min = 0,  max = 4.083E-10 from input dataset
 fedet_src_file = INPUT/init_ocean_cobalt.res.nc
 fedet_src_var_name = fedet
 fedet_src_var_unit = none
@@ -4832,7 +4793,6 @@ fedet_src_var_record = 1
 fedet_src_var_gridspec = NONE
 fedet_valid_min = 0.0
 #
-# min = 0,  max = 1.137E-06 from input dataset
 lithdet_src_file = INPUT/init_ocean_cobalt.res.nc
 lithdet_src_var_name = lithdet
 lithdet_src_var_unit = none
@@ -4842,7 +4802,6 @@ lithdet_src_var_record = 1
 lithdet_src_var_gridspec = NONE
 lithdet_valid_min = 0.0
 #
-# min = 0,  max = 8.271E-08 from input dataset
 ndet_src_file = INPUT/init_ocean_cobalt.res.nc
 ndet_src_var_name = ndet
 ndet_src_var_unit = none
@@ -4852,7 +4811,6 @@ ndet_src_var_record = 1
 ndet_src_var_gridspec = NONE
 ndet_valid_min = 0.0
 #
-# min = 0,  max = 5.169E-09 from input dataset
 pdet_src_file = INPUT/init_ocean_cobalt.res.nc
 pdet_src_var_name = pdet
 pdet_src_var_unit = none
@@ -4862,7 +4820,6 @@ pdet_src_var_record = 1
 pdet_src_var_gridspec = NONE
 pdet_valid_min = 0.0
 #
-# min = 0,  max = 4.827E-07 from input dataset
 sidet_src_file = INPUT/init_ocean_cobalt.res.nc
 sidet_src_var_name = sidet
 sidet_src_var_unit = none
@@ -4872,17 +4829,15 @@ sidet_src_var_record = 1
 sidet_src_var_gridspec = NONE
 sidet_valid_min = 0.0
 #
-# min = 0,  max = 4.897E-06 from input dataset
 silg_src_file = INPUT/init_ocean_cobalt.res.nc
 silg_src_var_name = silg
 silg_src_var_unit = none
 silg_dest_var_name =  silg
-silg_dest_var_unit = mol kg-1
+silg_dest_var_unit = mol kg-1 
 silg_src_var_record = 1
 silg_src_var_gridspec = NONE
 silg_valid_min = 0.0
 #
-# min = -6.824E-10,  max = 2.989E-06 from input dataset
 sldon_src_file = INPUT/init_ocean_cobalt.res.nc
 sldon_src_var_name = sldon
 sldon_src_var_unit = none
@@ -4892,7 +4847,6 @@ sldon_src_var_record = 1
 sldon_src_var_gridspec = NONE
 sldon_valid_min = 0.0
 #
-# min = -4.722E-11,  max = 1.819E-07 from input dataset
 sldop_src_file = INPUT/init_ocean_cobalt.res.nc
 sldop_src_var_name = sldop
 sldop_src_var_unit = none
@@ -4902,7 +4856,6 @@ sldop_src_var_record = 1
 sldop_src_var_gridspec = NONE
 sldop_valid_min = 0.0
 #
-# min = -3.007E-12,  max = 6.038E-06 from input dataset
 srdon_src_file = INPUT/init_ocean_cobalt.res.nc
 srdon_src_var_name = srdon
 srdon_src_var_unit = none
@@ -4912,7 +4865,6 @@ srdon_src_var_record = 1
 srdon_src_var_gridspec = NONE
 srdon_valid_min = 0.0
 #
-# min = -1.257E-11,  max = 3.831E-07 from input dataset
 srdop_src_file = INPUT/init_ocean_cobalt.res.nc
 srdop_src_var_name = srdop
 srdop_src_var_unit = none
@@ -4922,7 +4874,6 @@ srdop_src_var_record = 1
 srdop_src_var_gridspec = NONE
 srdop_valid_min = 0.0
 #
-# min = 0,  max = 1.465E-08 from input dataset
 cadet_arag_btf_src_file = INPUT/init_ocean_cobalt.res.nc
 cadet_arag_btf_src_var_name = cadet_arag_btf
 cadet_arag_btf_src_var_unit = none
@@ -4932,7 +4883,6 @@ cadet_arag_btf_src_var_record = 1
 cadet_arag_btf_src_var_gridspec = NONE
 cadet_arag_btf_valid_min = 0.0
 #
-# min = 0,  max = 2.011E-08 from input dataset
 cadet_calc_btf_src_file = INPUT/init_ocean_cobalt.res.nc
 cadet_calc_btf_src_var_name = cadet_calc_btf
 cadet_calc_btf_src_var_unit = none
@@ -4942,7 +4892,6 @@ cadet_calc_btf_src_var_record = 1
 cadet_calc_btf_src_var_gridspec = NONE
 cadet_calc_btf_valid_min = 0.0
 #
-# min = 0,  max = 1.364E-06 from input dataset
 lithdet_btf_src_file = INPUT/init_ocean_cobalt.res.nc
 lithdet_btf_src_var_name = lithdet_btf
 lithdet_btf_src_var_unit = none
@@ -4952,7 +4901,6 @@ lithdet_btf_src_var_record = 1
 lithdet_btf_src_var_gridspec = NONE
 lithdet_btf_valid_min = 0.0
 #
-# min = 0,  max = 8.360E-08 from input dataset
 ndet_btf_src_file = INPUT/init_ocean_cobalt.res.nc
 ndet_btf_src_var_name = ndet_btf
 ndet_btf_src_var_unit = none
@@ -4962,7 +4910,6 @@ ndet_btf_src_var_record = 1
 ndet_btf_src_var_gridspec = NONE
 ndet_btf_valid_min = 0.0
 #
-# min = 0,  max = 5.225E-09 from input dataset
 pdet_btf_src_file = INPUT/init_ocean_cobalt.res.nc
 pdet_btf_src_var_name = pdet_btf
 pdet_btf_src_var_unit = none
@@ -4972,7 +4919,6 @@ pdet_btf_src_var_record = 1
 pdet_btf_src_var_gridspec = NONE
 pdet_btf_valid_min = 0.0
 #
-# min = 0,  max = 5.767E-07 from input dataset
 sidet_btf_src_file = INPUT/init_ocean_cobalt.res.nc
 sidet_btf_src_var_name = sidet_btf
 sidet_btf_src_var_unit = none
@@ -4982,7 +4928,6 @@ sidet_btf_src_var_record = 1
 sidet_btf_src_var_gridspec = NONE
 sidet_btf_valid_min = 0.0
 #
-# min = 0,  max = 0 from input dataset
 mu_mem_ndi_src_file = INPUT/init_ocean_cobalt.res.nc
 mu_mem_ndi_src_var_name = mu_mem_ndi
 mu_mem_ndi_src_var_unit = none
@@ -4992,7 +4937,6 @@ mu_mem_ndi_src_var_record = 1
 mu_mem_ndi_src_var_gridspec = NONE
 mu_mem_ndi_valid_min = 0.0
 #
-# min = 0,  max = 0 from input dataset
 mu_mem_nlg_src_file = INPUT/init_ocean_cobalt.res.nc
 mu_mem_nlg_src_var_name = mu_mem_nlg
 mu_mem_nlg_src_var_unit = none
@@ -5002,7 +4946,6 @@ mu_mem_nlg_src_var_record = 1
 mu_mem_nlg_src_var_gridspec = NONE
 mu_mem_nlg_valid_min = 0.0
 #
-# min = 0,  max = 0 from input dataset
 mu_mem_nsm_src_file = INPUT/init_ocean_cobalt.res.nc
 mu_mem_nsm_src_var_name = mu_mem_nsm
 mu_mem_nsm_src_var_unit = none
@@ -5012,7 +4955,6 @@ mu_mem_nsm_src_var_record = 1
 mu_mem_nsm_src_var_gridspec = NONE
 mu_mem_nsm_valid_min = 0.0
 #
-# min = 0,  max = 0 from input dataset
 fedet_btf_src_file = INPUT/init_ocean_cobalt.res.nc
 fedet_btf_src_var_name = fedet_btf
 fedet_btf_src_var_unit = none
@@ -8988,11 +8930,12 @@ endif
 
 <!-- INPUT DATASETS -->
       <!--
-          atm IC from: /lustre/f1/Larry.Horowitz/fms/ESM4/warsaw_201710/20171019/ESM4p0p2d_1850C_PIpcairco2/ncrc4.intel16-prod-openmp/archive/restart/02510101.tar
-          including fv tracers
-          land from: CM4 #808 1/2 deg IC: $CPERM/Niki.Zadeh/archive/input/warsaw/c96L33_Op5_initCond.tar
-          DO NOT USE IC below for production - the IC is just to test this initial ESM4p0p2 setup
-          The IC and static vegetation correspond to 1981 state of land use
+          IC needs to be updated
+          atm IC from: 
+          land IC from:
+          obgc IC from:
+          ice and icebergs from:
+          cold start ocean
       -->
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
 <!--    <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fms/ESM4/IC/ESM4p0p3k_1850C_PIpcairco2_smag_v7_1850LU.v20180503.tar</dataSource> -->
@@ -9001,13 +8944,13 @@ endif
 
 <!-- c96_LM4_Op5 -->
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic_c96.v20180227.tar</dataSource>
+        <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/OM4_05/mosaic_c96.v20180227.tar</dataSource>
         <dataSource site="gfdl">/archive/gold/datasets/OM4_05/mosaic_c96.v20180227.tar</dataSource>
       </dataFile>
 
       <!--AWG Input datasets -->
       <dataFile label="input" target="INPUT/soil_type.nc" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$CPERM/Sergey.Malyshev/DATA/soil/soil_type_gsde_5minute.nc</dataSource>
+         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/soil/soil_type_gsde_5minute.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/common_LM4/biodata.nc</dataSource>
@@ -9037,7 +8980,7 @@ endif
      The IC and static vegetation correspond to 1981 state of land use
 -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$CPERM/Sergey.Malyshev/fre/tikal/LM3/LM3p2_C96_CM2G_historical_HC1_quick/ncrc2.default-prod/static_veg/19810101.static_veg.lm3p2.remapped_to_c96_OM4_05_720x576.v20151120.tar</dataSource>
+        <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/tikal/LM3/LM3p2_C96_CM2G_historical_HC1_quick/ncrc2.default-prod/static_veg/19810101.static_veg.lm3p2.remapped_to_c96_OM4_05_720x576.v20151120.tar</dataSource>
       </dataFile>
 <!--Krista Dunne gage data-->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -9066,38 +9009,32 @@ endif
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/common_AM4/am4_optical_table_20151029.dat</dataSource>
       </dataFile>
 <!-- fire-related data sets -->
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/lightning.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Daniel.Ward/data/FINAL/LISOTD_LRMTS_V2.3.2013.CLIMO.20140208.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/FINAL/LISOTD_LRMTS_V2.3.2013.CLIMO.20140208.nc</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/GDP.nc">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/GDP_1851_1x1_v20180502.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/GDP_1851_1x1_v20180502.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/population.nc">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/pop_density_1851_1x1_v20180502.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/pop_density_1851_1x1_v20180502.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/Fk.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Daniel.Ward/data/FINAL/FcFp_20170207_2deg.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/FINAL/FcFp_20170207_2deg.nc</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/Koppen_zones_2deg_1950-2000.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Daniel.Ward/data/FINAL/Koppen_zones_2deg_1950-2000.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/FINAL/Koppen_zones_2deg_1950-2000.nc</dataSource>
       </dataFile>
 
 <!-- nitrogen-related data sets -->
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/nbiodata_nat.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Benjamin.Sulman/green_nsource_preind_fixed.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/nitrogen/green_nsource_preind_fixed.nc</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/nbiodata_ant.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Benjamin.Sulman/green_nsource_anthro_fixed.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/nitrogen/green_nsource_anthro_fixed.nc</dataSource>
       </dataFile>
 
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/INPUT/emissions.diag.tracers.cpio</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/emissions.diag.tracers.cpio</dataSource>
       </dataFile>
 <!-- Move input file to CMIP6_ARCHIVE_ROOT (merge into tropchem cpio) -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -9107,9 +9044,8 @@ endif
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/common_AM4/FastJX-v7.1.tar</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/INPUT/tropchem/sim.AM4_isop_e90_so2h.dat</dataSource>
+         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/tropchem/sim.AM4_isop_e90_so2h.dat</dataSource>
       </dataFile>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -9145,24 +9081,23 @@ endif
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_1850_cmip6_v2/lean_solar_spectral_data.dat</dataSource>
       </dataFile>
 
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CDATA/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/1850_wseabirdnh3/emissions.0.5x0.5.1850.tar</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/emissions/v2017-05-18/1850_wseabirdnh3/emissions.0.5x0.5.1850.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/anthro_so2.1849_2017.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/emissions_cmip6_v20170518/emissions.simple.so2.0.5x0.5.1849-2017.nc</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/dust_source.nc" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$CPERM/Paul.Ginoux/fms/input/dust_source/dust_source_0.25x0.25_utc.nc</dataSource>
+       <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/dust_source/dust_source_0.25x0.25_utc.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/gas_conc_3D_am3p9.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/L48_gas_conc/gas_conc_3D48L_am3p9.nc</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Fabien.Paulot/archive/emissions/dms/DMS_lana_gfdl.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/emissions/dms/DMS_lana_gfdl.nc</dataSource>
       </dataFile>
+
+
 
       <!--MOM6 Input datasets: 0.5 degree -->
 
@@ -9201,7 +9136,7 @@ endif
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic_c96.v20180227.unpacked/ocean_static.nc</dataSource>
+        <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/ESM4/OM4_05/mosaic_c96.v20180227.unpacked/ocean_static.nc</dataSource>
       </dataFile>
 
       <!-- WOA13 potential temperature and salinity initial conditions -->
@@ -9236,15 +9171,16 @@ endif
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/woa13/woa13_all_o_annual_01.nc</dataSource>
      </dataFile>
 <!-- GLODAP v2 -->
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/John.Krasting/cwg/input/obgc/GLODAPv2.2016b.oi-filled.20180322.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/GLODAPv2/GLODAPv2.2016b.oi-filled.20180322.nc</dataSource>
      </dataFile>
 
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
      <dataFile label="input" target="INPUT/init_ocean_cobalt.res.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/John.Krasting/cwg/input/obgc/COBALT/20180503/cobalt_tracer_source.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/IC/COBALT/20180504/cobalt_tracer_source.nc</dataSource>
      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/IC/init_ocean_cobalt_nh3.res.nc</dataSource>
+      </dataFile>
 <!--
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/TOPAZ/deposition_fan/Soluble_Fe_Flux_PI.nc</dataSource>
@@ -9253,13 +9189,11 @@ endif
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/TOPAZ/deposition_fan/Mineral_Fe_Flux_PI.nc</dataSource>
      </dataFile>
 -->
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/ncrc/home1/Charles.Stock/iron_sources/Soluble_Fe_Flux_AM4.nc</dataSource>
+        <dataSource platform="$(platform)">/$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/iron_sources/Soluble_Fe_Flux_AM4.nc</dataSource>
      </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/ncrc/home1/Charles.Stock/iron_sources/Mineral_Flux_AM4.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/iron_sources/Mineral_Flux_AM4.nc</dataSource>
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/TOPAZ/deposition_horowitz/depflux_total.mean.1860.nc</dataSource>
@@ -9268,18 +9202,8 @@ endif
       <dataFile label="input" target="INPUT/news_nutrients.nc" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/news_nutrients_halfdeg_20151207.nc</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/river_iron.nc" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">/ncrc/home1/Charles.Stock/iron_sources/river_iron_halfdeg.nc</dataSource>
-      </dataFile>
-<!-- f1p: note added restart files -->
-<!-- Merge input file into IC -->
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Fabien.Paulot/archive/IC/MOM.res_4.nc</dataSource>
-      </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$CPERM/Fabien.Paulot/archive/IC/init_ocean_cobalt_nh3.res.nc</dataSource>
+         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/iron_sources/river_iron_halfdeg.nc</dataSource>
       </dataFile>
 
     </input>
