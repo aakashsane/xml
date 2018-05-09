@@ -161,7 +161,7 @@ be controlled by changing properties below.
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
   <property name="FRE_VERSION"     value="bronx-12"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
-  <property name="ANALYSIS_SWITCH" value="off"/>      <!-- on/off switch for ATM/LND analysis -->
+  <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
@@ -760,74 +760,74 @@ Experiment to build executable.
 <!--================================-->
 
       <!--ATMOS-->      
-  <freInclude name="c96_climo_cmip6_postprocess_ATMOS">
+  <freInclude name="c96_amip_cmip6_postprocess_ATMOS">
     <postProcess>
       <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_data_stager_globalAve.csh"/>
       <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_atmos_cmip6.csh"/>
 
 
-      <component type="atmos_cmip"  start="$(ANA_CLIMO_START)" source="atmos_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="yes">
+      <component type="atmos_cmip"  start="$(ANA_AMIP_START)" source="atmos_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="yes">
 <!-- comment out during development
-        <timeSeries freq="3hr" source="atmos_8xdaily_cmip" chunkLength="$(PP_CLIMO_CHUNK)">
+        <timeSeries freq="3hr" source="atmos_8xdaily_cmip" chunkLength="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos8xDailyTScmip/*)">
             <xi:fallback/>
           </xi:include>
         </timeSeries>
 
-        <timeSeries freq="3hr" source="atmos_8xdaily_inst" chunkLength="$(PP_CLIMO_CHUNK)"/>
+        <timeSeries freq="3hr" source="atmos_8xdaily_inst" chunkLength="$(PP_AMIP_CHUNK)"/>
 
-        <timeSeries freq="6hr" source="atmos_4xdaily_cmip" chunkLength="$(PP_CLIMO_CHUNK)"/>
+        <timeSeries freq="6hr" source="atmos_4xdaily_cmip" chunkLength="$(PP_AMIP_CHUNK)"/>
 
-        <timeSeries freq="daily" source="atmos_daily_cmip" chunkLength="$(PP_CLIMO_CHUNK)">
+        <timeSeries freq="daily" source="atmos_daily_cmip" chunkLength="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosDailyTScmip/*)">
             <xi:fallback/>
           </xi:include>
         </timeSeries>
 
-        <timeSeries freq="daily" source="atmos_daily_refined" chunkLength="$(PP_CLIMO_CHUNK)"/>
+        <timeSeries freq="daily" source="atmos_daily_refined" chunkLength="$(PP_AMIP_CHUNK)"/>
 -->
-        <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_CLIMO_CHUNK)"/>
+        <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_AMIP_CHUNK)"/>
 
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTScmip/*)">
             <xi:fallback/>
           </xi:include>
         </timeSeries>
 
         <!-- changed to CHUNK_A -->
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)">
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAvecmip/*)">
             <xi:fallback/>
           </xi:include>
         </timeAverage>
 
-        <timeAverage source="annual" interval="$(PP_CLIMO_CHUNK)"/>
+        <timeAverage source="annual" interval="$(PP_AMIP_CHUNK)"/>
       </component>
 
-      <component type="atmos"  start="$(ANA_CLIMO_START)" zInterp="era40" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+      <component type="atmos"  start="$(ANA_AMIP_START)" zInterp="era40" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
 <!-- comment out during development
-        <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_CLIMO_CHUNK)">
+        <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos4xDailyTS/*)">
             <xi:fallback/>
           </xi:include>
           <analysis switch="$(MDBIswitch)" cumulative="no" script="$FRE_CURATOR_HOME/share/bin/database_ingestor.csh"/>
         </timeSeries>
 -->
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTS/*)">
             <xi:fallback/>
           </xi:include>
 	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/a1r/analysis/agu/Krasting/pywavelet_jpk_a1r.py -varname t_surf -comp atmos"/>
         </timeSeries>
         <!-- changed to CHUNK_A only -->
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)">
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
 	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh"/>
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAve/*)">
             <xi:fallback/>
           </xi:include>
         </timeAverage>
         <!-- changed to CHUNK_A only -->
-        <timeAverage source="annual" interval="$(PP_CLIMO_CHUNK)">
+        <timeAverage source="annual" interval="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosAnnualAve/*)">
             <xi:fallback/>
           </xi:include>
@@ -835,23 +835,23 @@ Experiment to build executable.
       </component>
 
 <!-- comment out for now
-      <component type="atmos_level_cmip" start="$(ANA_CLIMO_START)" source="atmos_level_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="yes">
-        <timeSeries freq="6hr" source="atmos_4xdaily_inst" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="daily" source="atmos_daily_level" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
+      <component type="atmos_level_cmip" start="$(ANA_AMIP_START)" source="atmos_level_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="yes">
+        <timeSeries freq="6hr" source="atmos_4xdaily_inst" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeSeries freq="daily" source="atmos_daily_level" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
       </component>
 -->
 
-      <component type="atmos_level"  start="$(ANA_CLIMO_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="annual"  chunkLength="$(PP_CLIMO_CHUNK)">
+      <component type="atmos_level"  start="$(ANA_AMIP_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeSeries freq="annual"  chunkLength="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosLevelAnnualTS/*)">
             <xi:fallback/>
           </xi:include>
         </timeSeries>
         <!-- changed to CHUNK_A only -->
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)">
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosLevelMonthAve/*)">
             <xi:fallback/>
           </xi:include>
@@ -859,124 +859,128 @@ Experiment to build executable.
       </component>
 
         <!-- changed to CHUNK_A only -->
-      <component type="atmos_month_aer" start="$(ANA_CLIMO_START)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)">
+      <component type="atmos_month_aer" start="$(ANA_AMIP_START)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAerAve/*)">
             <xi:fallback/>
           </xi:include>
         </timeAverage>
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
       </component>
 
         <!-- changed to CHUNK_A only -->
-      <component type="atmos_diurnal" start="$(ANA_CLIMO_START)"  source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
+      <component type="atmos_diurnal" start="$(ANA_AMIP_START)"  source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
       </component>
 
-      <component type="atmos_scalar" start="$(ANA_CLIMO_START)" source="atmos_scalar" cmip="yes">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="monthly" source="atmos_global_cmip" chunkLength="$(PP_CLIMO_CHUNK)"/>
+      <component type="atmos_scalar" start="$(ANA_AMIP_START)" source="atmos_scalar" cmip="yes">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeSeries freq="monthly" source="atmos_global_cmip" chunkLength="$(PP_AMIP_CHUNK)"/>
       </component>
 
     </postProcess>
   </freInclude> 
 
 <!-- FULL CHEMISTRY -->
-  <freInclude name="c96_climo_cmip6_postprocess_FULLCHEM">
+  <freInclude name="c96_amip_cmip6_postprocess_FULLCHEM">
     <postProcess>
       <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_atmos_cmip6.csh"/>
-      <component type="tracer_level" start="$(ANA_CLIMO_START)" source="atmos_tracer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="annual" chunkLength="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/tracerAnnualTS/*)">
+      <component type="tracer_level" start="$(ANA_AMIP_START)" source="atmos_tracer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)">
+          <xi:include href="./awg_include/analysis/analysis_amip_cmip.xml" xpointer="xpointer(*/tracerMonthTS/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeSeries>
+        <timeSeries freq="annual" chunkLength="$(PP_AMIP_CHUNK)">
+          <xi:include href="./awg_include/analysis/analysis_amip_cmip.xml" xpointer="xpointer(*/tracerAnnualTS/*)">
             <xi:fallback/>
           </xi:include>
         </timeSeries>
         <!-- changed to CHUNK_A only -->
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)">
-          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/tracerMonthAve/*)">
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
+          <xi:include href="./awg_include/analysis/analysis_amip_cmip.xml" xpointer="xpointer(*/tracerMonthAV/*)">
             <xi:fallback/>
           </xi:include>
         </timeAverage>
       </component>
-      <component type="aerosol_cmip" start="$(ANA_CLIMO_START)" source="aerosol_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
+      <component type="aerosol_cmip" start="$(ANA_AMIP_START)" source="aerosol_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
 <!-- comment out for now
-        <timeSeries freq="daily" source="aerosol_daily_cmip" chunkLength="$(PP_CLIMO_CHUNK)"/>
+        <timeSeries freq="daily" source="aerosol_daily_cmip" chunkLength="$(PP_AMIP_CHUNK)"/>
 -->
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-<!--    <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)" source="aerosol_month_refined"/> -->
-        <timeSeries freq="annual" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
+<!--    <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)" source="aerosol_month_refined"/> -->
+        <timeSeries freq="annual" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
       </component>
        
     </postProcess>
   </freInclude> 
 
 <!-- LAND -->
-  <freInclude name="c96_climo_cmip6_postprocess_LAND">
+  <freInclude name="c96_amip_cmip6_postprocess_LAND">
     <postProcess>
       <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_atmos_cmip6.csh"/>
-      <component type="land" start="$(ANA_CLIMO_START)" source="land_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CLIMO_CHUNK)"/> -->
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)">
+      <component type="land" start="$(ANA_AMIP_START)" source="land_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK)"/> -->
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthTS/*)" >
             <xi:fallback/>
 	  </xi:include>
         </timeSeries>
         <!-- changed to CHUNK_A only -->
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)">
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthAve/*)" >
             <xi:fallback/>
 	  </xi:include>
         </timeAverage>
       </component>
 
-      <component type="land_cubic" start="$(ANA_CLIMO_START)" source="land_month" sourceGrid="land-cubedsphere">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)" >
+      <component type="land_cubic" start="$(ANA_AMIP_START)" source="land_month" sourceGrid="land-cubedsphere">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)" >
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthTSNative/*)" >
             <xi:fallback/>
 	  </xi:include>
         </timeSeries>
-<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CLIMO_CHUNK)"/> -->
+<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK)"/> -->
       </component>
       
-      <component type="land_instant_cubic" start="$(ANA_CLIMO_START)" source="land_month_inst" sourceGrid="land-cubedsphere">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)" />
+      <component type="land_instant_cubic" start="$(ANA_AMIP_START)" source="land_month_inst" sourceGrid="land-cubedsphere">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)" />
       </component>
-      <component type="land_cmip" start="$(ANA_CLIMO_START)" source="land_month_cmip" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
+      <component type="land_cmip" start="$(ANA_AMIP_START)" source="land_month_cmip" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
 <!-- comment out for now
-        <timeSeries freq="daily" source="land_daily_cmip" chunkLength="$(PP_CLIMO_CHUNK)"/>
+        <timeSeries freq="daily" source="land_daily_cmip" chunkLength="$(PP_AMIP_CHUNK)"/>
 -->
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
       </component>
-      <component type="land_dust" start="$(ANA_CLIMO_START)" source="land_dust" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="annual" interval="$(PP_CLIMO_CHUNK)"/>
+      <component type="land_dust" start="$(ANA_AMIP_START)" source="land_dust" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeAverage source="annual" interval="$(PP_AMIP_CHUNK)"/>
       </component>
 <!-- RIVER -->
-      <component type="river" start="$(ANA_CLIMO_START)" source="river_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeSeries freq="daily" source="river_daily" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
+      <component type="river" start="$(ANA_AMIP_START)" source="river_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="daily" source="river_daily" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
       </component>
  
-      <component type="river_cubic" start="$(ANA_CLIMO_START)" source="river_month" sourceGrid="land-cubedsphere">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)" >
+      <component type="river_cubic" start="$(ANA_AMIP_START)" source="river_month" sourceGrid="land-cubedsphere">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)" >
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/riverMonthTSNative/*)">
             <xi:fallback/>
 	  </xi:include>
         </timeSeries>
-        <timeSeries freq="daily" source="river_daily" chunkLength="$(PP_CLIMO_CHUNK)">
+        <timeSeries freq="daily" source="river_daily" chunkLength="$(PP_AMIP_CHUNK)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/riverDailyTSNative/*)">
             <xi:fallback/>
 	  </xi:include>
         </timeSeries>
       </component>
 
-      <component type="river_instant_cubic" start="$(ANA_CLIMO_START)" source="river_month_inst" sourceGrid="land-cubedsphere">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)" />
+      <component type="river_instant_cubic" start="$(ANA_AMIP_START)" source="river_month_inst" sourceGrid="land-cubedsphere">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)" />
       </component>
 
     </postProcess>
@@ -985,33 +989,33 @@ Experiment to build executable.
   <!-- By-species land post-processing -->
   <freInclude name="land_by_species_postprocess">
     <postProcess>
-      <component type="land_by_species" start="$(ANA_CLIMO_START)" source="land_month_by_species" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
+      <component type="land_by_species" start="$(ANA_AMIP_START)" source="land_month_by_species" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
       </component>
     </postProcess>
   </freInclude>
 
   <freInclude name="fire_postprocess">
     <postProcess>
-      <component type="fire" start="$(ANA_CLIMO_START)" source="fire_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
+      <component type="fire" start="$(ANA_AMIP_START)" source="fire_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
       </component>
     </postProcess>
   </freInclude>
 
 
-  <!-- Atmos co2 post-processing: note atmos_level, atmos_month and atmos_scalar already in c96_climo_postprocess -->
+  <!-- Atmos co2 post-processing: note atmos_level, atmos_month and atmos_scalar already in c96_amip_postprocess -->
   <freInclude name="atmos_co2_postprocess">
       <postProcess> 
       <refineDiag script=""/>
-      <component type="atmos_co2_level" start="$(ANA_CLIMO_START)" source="atmos_co2_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
-        <timeSeries freq="monthly" chunkLength="$(PP_CLIMO_CHUNK)"/>
-        <timeSeries freq="annual"  chunkLength="$(PP_CLIMO_CHUNK)">
+      <component type="atmos_co2_level" start="$(ANA_AMIP_START)" source="atmos_co2_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeSeries freq="annual"  chunkLength="$(PP_AMIP_CHUNK)">
         </timeSeries>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)"/>
-        <timeAverage source="monthly" interval="$(PP_CLIMO_CHUNK)">
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)"/>
+        <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
         </timeAverage>
       </component>
      </postProcess>
@@ -1021,7 +1025,7 @@ Experiment to build executable.
 <!--= ESM4 EXPERIMENTS    =-->
 <!--=======================-->
 
-  <experiment name="AM4p0p3k_bvoc_2010C_PIpcairco2_v7_1980LU" inherit="am4.1_compile">
+  <experiment name="AM4p0p3k_bvoc_AMIP_v7_1980LU" inherit="am4.1_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"AM4_c96L49_am4p0"</model>
@@ -1194,7 +1198,7 @@ LWH (3/16/2018)
       <namelist name ="aerosolrad_package_nml">
     force_to_repro_quebec = .true.
     using_im_bcsul = .true.
-    volcanic_dataset_entry = 1,1,1,0,0,
+    volcanic_dataset_entry = $baseDate
     using_volcanic_lw_files = .true.,
     lw_ext_filename = "extlw_data.nc"
     lw_ext_root = "extlw"
@@ -1550,42 +1554,42 @@ LWH (3/16/2018)
       do_dynamic_om = .true.,
       bcff_source = 'gocart_2007',
         bcff_input_name(1)='anthro',
-        bcff_filename='emissions.bc.0.5x0.5.2010.nc',
-        bcff_time_dependency_type='fixed_year',bcff_dataset_entry=2010,1,1,0,0,
+        bcff_filename='emissions.bc.0.5x0.5.1970-2017.nc',
+        bcff_time_dependency_type='time_varying',bcff_dataset_entry=$baseDate
       omff_source = 'gocart_2007',
         omff_input_name(1)='anthro',
-        omff_filename='emissions.om.0.5x0.5.2010.nc',
-        omff_time_dependency_type='fixed_year',omff_dataset_entry=2010,1,1,0,0,
+        omff_filename='emissions.om.0.5x0.5.1970-2017.nc',
+        omff_time_dependency_type='time_varying',omff_dataset_entry=$baseDate
       omsh_source = 'gocart_2007',
         omsh_input_name(1)='ship',
-        omsh_filename='emissions.om.0.5x0.5.2010.nc',
-        omsh_time_dependency_type='fixed_year',omsh_dataset_entry=2010,1,1,0,0,
+        omsh_filename='emissions.om.0.5x0.5.1970-2017.nc',
+        omsh_time_dependency_type='time_varying',omsh_dataset_entry=$baseDate
       bcsh_source = 'gocart_2007',
         bcsh_input_name(1)='ship',
-        bcsh_filename='emissions.bc.0.5x0.5.2010.nc',
-        bcsh_time_dependency_type='fixed_year',bcsh_dataset_entry=2010,1,1,0,0,
+        bcsh_filename='emissions.bc.0.5x0.5.1970-2017.nc',
+        bcsh_time_dependency_type='time_varying',bcsh_dataset_entry=$baseDate
       bcav_source = 'do_aircraft'
         bcav_input_name(1)='fuel',
-        bcav_filename='emissions.aircraft.aero.0.5x0.5.2010.nc',
-        bcav_time_dependency_type='fixed_year',bcav_dataset_entry=2010,1,1,0,0,
+        bcav_filename='emissions.aircraft.aero.0.5x0.5.1970-2017.nc',
+        bcav_time_dependency_type='time_varying',bcav_dataset_entry=$baseDate
       bcbb_source = 'AEROCOM',
-        bcbb_filename='emissions.bc.0.5x0.5.2010.nc',
+        bcbb_filename='emissions.bc.0.5x0.5.1970-2017.nc',
         bcbb_input_name(1)='bb_l1'
         bcbb_input_name(2)='bb_l2'
         bcbb_input_name(3)='bb_l3'
         bcbb_input_name(4)='bb_l4'
         bcbb_input_name(5)='bb_l5'
         bcbb_input_name(6)='bb_l6'
-        bcbb_time_dependency_type='fixed_year',bcbb_dataset_entry=2010,1,1,0,0,
+        bcbb_time_dependency_type='time_varying',bcbb_dataset_entry=$baseDate
       ombb_source = 'AEROCOM',
-        ombb_filename='emissions.om.0.5x0.5.2010.nc',
+        ombb_filename='emissions.om.0.5x0.5.1970-2017.nc',
         ombb_input_name(1)='bb_l1'
         ombb_input_name(2)='bb_l2'
         ombb_input_name(3)='bb_l3'
         ombb_input_name(4)='bb_l4'
         ombb_input_name(5)='bb_l5'
         ombb_input_name(6)='bb_l6'
-        ombb_time_dependency_type='fixed_year',ombb_dataset_entry=2010,1,1,0,0,
+        ombb_time_dependency_type='time_varying',ombb_dataset_entry=$baseDate
       omna_source = '',
       omss_source = 'ODowd'
         omss_coef = 0.05
@@ -1975,47 +1979,47 @@ LWH (3/16/2018)
       verbose = 3
       gas_printout_freq = 240
 
-      time_varying_co2 = .false.,
+      time_varying_co2 = .false.,                  ! keep false for historical co2 to avoid fatal error message: rad co2 will be overidden
       co2_variation_type = 'linear',
-      co2_dataset_entry = 2010,1,1,0,0,
+      co2_dataset_entry = $baseDate
       co2_specification_type = 'base_and_trend',
       co2_floor = 100.0E-06,
       co2_ceiling = 1600.0E-06,
       co2_data_source = 'predicted'
 
-      time_varying_ch4 = .false.,
+      time_varying_ch4 = .true.,
       ch4_variation_type = 'linear'
-      ch4_dataset_entry = 2010,1,1,0,0,
+      ch4_dataset_entry = $baseDate
       ch4_specification_type = 'time_series'
       ch4_data_source = 'input'
 
-      time_varying_n2o = .false.,
+      time_varying_n2o = .true.,
       n2o_variation_type = 'linear'
-      n2o_dataset_entry = 2010,1,1,0,0,
+      n2o_dataset_entry = $baseDate
       n2o_specification_type = 'time_series'
       n2o_data_source = 'input'
 
-      time_varying_f11 = .false.,
+      time_varying_f11 = .true.,
       f11_variation_type = 'linear'
-      f11_dataset_entry = 2010,1,1,0,0,
+      f11_dataset_entry = $baseDate
       f11_specification_type = 'time_series'
       f11_data_source = 'input'
 
-      time_varying_f12 = .false.,
+      time_varying_f12 = .true.,
       f12_variation_type = 'linear'
-      f12_dataset_entry = 2010,1,1,0,0,
+      f12_dataset_entry = $baseDate
       f12_specification_type = 'time_series'
       f12_data_source = 'input'
 
-      time_varying_f113 = .false.,
+      time_varying_f113 = .true.,
       f113_variation_type = 'linear'
-      f113_dataset_entry = 2010,1,1,0,0,
+      f113_dataset_entry = $baseDate
       f113_specification_type = 'time_series'
       f113_data_source = 'input'
 
-      time_varying_f22 = .false.,
+      time_varying_f22 = .true.,
       f22_variation_type = 'linear'
-      f22_dataset_entry = 2010,1,1,0,0,
+      f22_dataset_entry = $baseDate
       f22_specification_type = 'time_series'
       f22_data_source = 'input'
 
@@ -2110,8 +2114,8 @@ LWH (3/16/2018)
       <namelist name ="shortwave_driver_nml">
       do_cmip_diagnostics = .true.,
       swform = 'esfsw99'
-      solar_dataset_entry = 2010,1,1,0,0,
-      time_varying_solar_constant = .false.,
+      solar_dataset_entry = $baseDate
+      time_varying_solar_constant = .true.,
       </namelist>
 
       <namelist name ="simple_sulfate_nml">
@@ -2173,13 +2177,13 @@ LWH (3/16/2018)
         file_sulfate = 'sulfate.nc',
         file_conc = 'tracerIC.19800101.v2.nc',
         file_emis_1 = 'emissions.',
-        file_emis_2 = '.0.5x0.5.2010.nc',
+        file_emis_2 = '.0.5x0.5.1970-2017.nc',
         file_emis3d_1 = 'emissions3D.',
-        file_emis3d_2 = '.0.5x0.5.2010.nc',
+        file_emis3d_2 = '.0.5x0.5.1970-2017.nc',
         file_ub = 'ub_vals.mozart.nc',
         file_dry = 'depvel_gc_am3_tran.nc',
         inv_list = '',
-        file_aircraft = 'emissions.aircraft.0.5x0.5.2010.nc',
+        file_aircraft = 'emissions.aircraft.0.5x0.5.1970-2017.nc',
         lght_no_prd_factor = 1.2,
         normalize_lght_no_prd_area = .true.,
         min_land_frac_lght = 0.1,
@@ -2195,8 +2199,6 @@ LWH (3/16/2018)
         set_min_h2o_strat = .true.,
         ch4_filename = 'ch4_gblannualdata',
         ch4_scale_factor = 1.e-9,
-        time_varying_cfc_lbc = .false.,
-        cfc_lbc_dataset_entry = 2010,1,1,0,0,0,
         do_fastjx_photo = .true.
         frac_aerosol_incloud   = 0.7,
         frac_dust_incloud = 0.0,
@@ -2213,7 +2215,7 @@ LWH (3/16/2018)
         gNO3 = 0.02
         gNO2 = 1e-5
         gNH3 = 0.,
-        time_varying_solarflux = .false.
+        time_varying_solarflux = .true.
 	gSO2_dynamic = 'zheng2015'
       </namelist>
 
@@ -2505,7 +2507,7 @@ LWH (3/16/2018)
       <namelist name ="photosynthesis_nml">
        photosynthesis_to_use = 'leuning'
        co2_to_use_for_photosynthesis ='interactive'
-       co2_for_photosynthesis = 387.498e-6
+       co2_for_photosynthesis = 335.80e-6             ! jgj  to match CMIP6 Jan 1 1979 co2 value	     
        water_stress_to_use = 'plant-hydraulics'
       </namelist>
 
@@ -2779,8 +2781,8 @@ LWH (3/16/2018)
       <namelist name="coupler_nml">
         months = $months,
         days   = $days,
-        current_date = 1,1,1,0,0,0,
-        calendar = 'NOLEAP'
+        current_date = 1979,1,1,0,0,0,
+        calendar = 'julian'
         dt_atmos = 1800,
         dt_cpld  = 3600,
         use_lag_fluxes = .true.
@@ -2856,11 +2858,9 @@ SIS_OVERRIDE_EOF
 "ICE", "sit_obs", "",    "INPUT/hadisst_ice.data.nc", "none",     2.0
 "ICE", "sst_obs", "sst", "INPUT/hadisst_sst.data.nc", "bilinear", 1.0
 #
-# jgj 2016/11/29 co2 data table (Jan 1 2010 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
 #
-## restoring co2 data override set to CMIP6 Jan 1 2010 value 387.498e-6
-"ATM" , "co2_dvmr_restore", "",     "", "none",  387.498e-06
-#
+# data override for restoring co2 via historical co2 dataset (dvmr)
+"ATM" , "co2_dvmr_restore", "CO2", "INPUT/co2_gblannualdata_1x1.nc", "none",  1.0e-06
       </dataTable>  
 
 
@@ -3165,7 +3165,7 @@ SIS_OVERRIDE_EOF
 "cmip","cmip6","cmip_name=nitrous_oxide"
 "init_conc","file"
 "convection","all"
-"lower_bound","file","file=n2o_gblannualdata,factor=1.e-9,fixed_year=2010."
+"lower_bound","file","file=n2o_gblannualdata,factor=1.e-9"
 /
 
 "tracer","atmos_mod","n"
@@ -3243,7 +3243,7 @@ SIS_OVERRIDE_EOF
 "dry_deposition","file"
 "init_conc","file"
 "convection","all"
-"lower_bound","file","file=ch4_gblannualdata,factor=1.e-9,fixed_year=2010."
+"lower_bound","file","file=ch4_gblannualdata,factor=1.e-9"
 /
 
 "tracer","atmos_mod","ch3o2"
@@ -6569,6 +6569,10 @@ set nyblock = $atm_threads
       <dataFile label="input" target="INPUT/chemlbf" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/common_cmip6/chemlbf_CMIP6_merge_RCP45</dataSource>
       </dataFile>
+<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/INPUT/co2_gblannualdata_1x1.nc</dataSource>
+      </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/common_cmip6/emissions.isoprene.1x1.2000.nc</dataSource>
       </dataFile>
@@ -6580,25 +6584,25 @@ set nyblock = $atm_threads
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/common_cmip6/h2_gblannualdata</dataSource>
       </dataFile>
 
-     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_2010_cmip6_v2/extsw_data.nc</dataSource>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_TimeSeries_cmip6_v2/extsw_data.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_2010_cmip6_v2/omgsw_data.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_TimeSeries_cmip6_v2/omgsw_data.nc</dataSource>
       </dataFile>
         <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_2010_cmip6_v2/asmsw_data.nc</dataSource>
+      <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_TimeSeries_cmip6_v2/asmsw_data.nc</dataSource>
       </dataFile>
         <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_2010_cmip6_v2/extlw_data.nc</dataSource>
+      <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_TimeSeries_cmip6_v2/extlw_data.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_2010_cmip6_v2/lean_solar_spectral_data.dat</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_TimeSeries_cmip6_v2/lean_solar_spectral_data.dat</dataSource>
       </dataFile>
 
 <!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/2010_wseabirdnh3/emissions.0.5x0.5.2010.tar</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/1970-2017_wseabirdnh3/emissions.0.5x0.5.1970-2017.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/anthro_so2.1849_2017.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/emissions_cmip6_v20170518/emissions.simple.so2.0.5x0.5.1849-2017.nc</dataSource>
@@ -6619,17 +6623,15 @@ set nyblock = $atm_threads
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/SIS_input</dataSource>
      </dataFile>
 
-      <dataFile label="input" target="INPUT/hadisst_sst.data.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CDATA/gfdl_M/Huan.Guo/PCMDI_sst/sst.climo.1981-2014.data.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/hadisst_ice.data.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CDATA/gfdl_M/Huan.Guo/PCMDI_sst/ice.climo.1981-2014.data.nc</dataSource>
+<!-- Does this differ from $CDATA/cmip6/datasets/CM4/forcings/AMIP_SST_cmip6_v6p1/CMIP6_PCMDI.186901-201712.v6p1.tar -->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$CDATA/gfdl_M/Huan.Guo/PCMDI_sst/CMIP6_PCMDI.186901-201612.tar</dataSource>
       </dataFile>
 
     </input>
 
     <runtime>
-      <production simTime="$(EXP_CLIMO_LEN)" units="years" >
+      <production simTime="$(EXP_AMIP_LEN)" units="years" >
           <segment simTime="12" units="months" />
           <xi:include xpointer="xpointer(//freInclude[@name='c96_1728_production']/node())"/>
       </production>
@@ -6673,9 +6675,9 @@ set nyblock = $atm_threads
     </runtime>
 
     <postProcess>
-      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess_ATMOS']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess_FULLCHEM']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess_LAND']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_cmip6_postprocess_ATMOS']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_cmip6_postprocess_FULLCHEM']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='c96_amip_cmip6_postprocess_LAND']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='land_by_species_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='fire_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='atmos_co2_postprocess']/postProcess/node())"/>
