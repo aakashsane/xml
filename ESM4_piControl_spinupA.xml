@@ -2726,6 +2726,38 @@ LWH (3/16/2018)
         kbs_val = 0.5
       </namelist>
 
+      <namelist name ="xactive_bvoc_nml">
+   xactive_algorithm = "MEGAN2",
+   file_LAI   = "INPUT/mksrf_lai.060929.nc",
+   file_PFT   = "INPUT/mksrf_pft.060929.nc",
+   file_PPFD  = "INPUT/dswrf_monthly_clim_1980-2000.nc"
+   file_TEMP  = "INPUT/tas_monthly_clim_1980-2000.nc"
+   file_O3    = "surface_ozone.nc",
+   file_SOILM = "soil_moisture.nc",
+   file_WS    = "wind_speed.nc",
+   file_CO2   = "co2_conc.nc",
+   do_AM3_ISOP = .true.,
+   do_SESQTERP = .false.,
+   do_PARSED_TERP = .true.,
+   do_GAMMA_BDLAI = .false.,
+   do_GAMMA_CO2   = .false.,
+   do_GAMMA_AQ    = .false.,
+   do_GAMMA_SM    = .false.,
+   do_GAMMA_HT    = .false.,
+   do_GAMMA_LT    = .false.,
+   do_GAMMA_HW    = .false.,
+   do_ONLINE_LAI  = .false.,
+   do_ONLINE_PFT  = .false.,
+   do_ONLINE_TEMP = .true.,
+   do_ONLINE_PPFD = .true.,
+   do_ONLINE_O3   = .false.,
+   do_ONLINE_WIND = .false.,
+   do_ONLINE_SM   = .false.,
+   do_ONLINE_CO2  = .false.,
+   T_s            = 297.,
+   RHO_CANOPY     = 1.,
+   min_land_frac  = 0.01
+      </namelist>
 
 <!-- LAND namelists -->
       <namelist name ="cana_nml">
@@ -4368,8 +4400,10 @@ SIS_OVERRIDE_EOF
 "longname","RO2fromR4N2"
 "chem_param","gas","nb_N_ox=1"
 "units","VMR"
-"tracer_type","diagnostic"
 "profile_type","fixed","surface_value=1.e-20"
+"wet_deposition","henry_below_noice","henry=2.1e0,dependence=8700."
+"dry_deposition","file","name=hno3"
+"convection","all"
 /
 
 "tracer","atmos_mod","R4N2"
@@ -8904,9 +8938,8 @@ endif
           cold start ocean
       -->
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-        <!--dataSource site="ncrc">/lustre/f1/unswept/Larry.Horowitz/awg/IC/ESM4p0p2_L49_pot_veg_ocean0201_20171103.tar</dataSource-->
-        <!--dataSource site="ncrc">/lustre/f1/unswept/Niki.Zadeh/archive/input/warsaw//Larry.Horowitz_awg_IC_ESM4p0p2_L49_pot_veg_ocean0201_20171103_combined_minusMOMrestarts.tar</dataSource-->
-        <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fms/ESM4/IC/ESM4p0p3k_1850C_PIpcairco2_smag_v7_1850LU.v20180503.tar</dataSource>
+<!--    <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fms/ESM4/IC/ESM4p0p3k_1850C_PIpcairco2_smag_v7_1850LU.v20180503.tar</dataSource> -->
+        <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/IC/ESM4p0p3k_1850C_PIpcairco2_v7_1850LU.v20180504.tar</dataSource>
       </dataFile>
 
 <!-- c96_LM4_Op5 -->
@@ -9004,7 +9037,8 @@ endif
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/emissions.diag.tracers.cpio</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/tropchem/megan.TERP.nc</dataSource>
+        <dataSource platform="$(platform)">$CPERM/Jordan.Schnell/input/xactive_emissions/xactive_overhaul/megan.xactive.bvoc.tar
+</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/common_AM4/FastJX-v7.1.tar</dataSource>
