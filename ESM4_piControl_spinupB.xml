@@ -1431,11 +1431,11 @@ Experiment to build executable.
 <!--= ESM4 EXPERIMENTS    =-->
 <!--=======================-->
 
-  <experiment name="ESM4_piControl_spinupA" inherit="esm4.1_sis2_compile">
+  <experiment name="ESM4_piControl_spinupB" inherit="esm4.1_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
-      <model>"ESM4_c96L49_am4p0_OMp5"</model>
-      <modelID>"ESM4_c96L49_am4p0_OMp5"</modelID>
+      <model>"ESM4_c96L49_am4p1_OMp5"</model>
+      <modelID>"ESM4_c96L49_am4p1_OMp5"</modelID>
       <experimentName>"$(name)"</experimentName>
       <experimentID>"$(name)" </experimentID>
       <comment>
@@ -2007,10 +2007,10 @@ LWH (3/16/2018)
       <namelist name ="cg_drag_nml">
         cg_drag_freq = 1800,
         cg_drag_offset = 0,
-        Bt_0 =  0.004,                  ! from c96L49_am4p0_AM4chem_SOA
+        Bt_0 =  0.004,
         Bt_aug= 0.000,
-        Bt_nh=  0.0010,                 ! from c96L49_am4p0_AM4chem_SOA
-        Bt_sh= -0.0005,                 ! from c96L49_am4p0_AM4chem_SOA
+        Bt_nh=  0.0010,
+        Bt_sh= -0.0005,
         Bt_eq=  0.000,
         Bt_eq_width= 4.0,
         phi0n =  30.,
@@ -2532,8 +2532,11 @@ LWH (3/16/2018)
       </namelist>
 
       <namelist name ="ssalt_nml">
-     coef_emis_fine=1.33, coef_emis_coarse=1.33,
-     use_sj_sedimentation_solver=.true.
+        coef_emis_coarse=1.15,
+	do_sst_seasalt=.true.   !jaegle sst dependence
+	use_sj_sedimentation_solver=.true.
+	critical_sea_fraction = 0.
+	t_crit = -999.
       </namelist>
 
       <namelist name ="stable_bl_turb_nml">
@@ -2719,6 +2722,7 @@ LWH (3/16/2018)
       <namelist name ="wetdep_nml">
         scale_aerosol_wetdep = 1.
         drydep_exp = .true.
+        kbs_val = 0.5
       </namelist>
 
       <namelist name ="xactive_bvoc_nml">
@@ -3387,8 +3391,8 @@ SIS_OVERRIDE_EOF
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.89,frac_pm25=0.96,frac_pm10=1."
            "profile_type","fixed","surface_value=1.e-32"
-           "dry_deposition","wind_driven","surfr=100."
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_snow=0.0, alphar=0.001, alphas=0.001"
+           "dry_deposition","williams_wind_driven","surfr=200.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snow=0., alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=omphilic, name_in_clim_mod=organic_carbon" /
 #
  "TRACER", "atmos_mod", "dust1"
@@ -3398,7 +3402,7 @@ SIS_OVERRIDE_EOF
            "parameters", "all", "ra=0.1e-6, rb=1.0e-6, dustref=0.75e-6, dustden=2500.0"
            "emission", "lm3", "source_fraction=0.05"
            "convection", "all"
-           "dry_deposition","wind_driven","surfr=100."
+           "dry_deposition","williams_wind_driven","surfr=200.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_snow=0.05, alphar=0.001, alphas=0.001"
            "chem_param","aerosol","frac_pm1=0.444,frac_pm25=1.,frac_pm10=1."
            "radiative_param", "online", "name_in_rad_mod=dust1, name_in_clim_mod=small_dust"/
@@ -3409,7 +3413,7 @@ SIS_OVERRIDE_EOF
            "parameters", "all", "ra=1.0e-6, rb=2.0e-6, dustref=1.5e-6, dustden=2650.0"
            "emission", "lm3", "source_fraction=0.15"
            "convection", "all"
-           "dry_deposition","wind_driven","surfr=100."
+           "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_snow=0.05, alphar=0.001, alphas=0.001"
            "chem_param","aerosol","frac_pm1=0.,frac_pm25=0.25,frac_pm10=1."
            "radiative_param", "online", "name_in_rad_mod=dust2, name_in_clim_mod=large_dust"/
@@ -3420,7 +3424,7 @@ SIS_OVERRIDE_EOF
            "parameters", "all", "ra=2.0e-6, rb=3.0e-6, dustref=2.5e-6, dustden=2650.0"
            "emission", "lm3", "source_fraction=0.3"
            "convection", "all"
-           "dry_deposition","wind_driven","surfr=100."
+           "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_snow=0.05, alphar=0.001, alphas=0.001"
            "chem_param","aerosol","frac_pm1=0.,frac_pm25=0.,frac_pm10=1."
            "radiative_param", "online", "name_in_rad_mod=dust3, name_in_clim_mod=large_dust"/
@@ -3431,7 +3435,7 @@ SIS_OVERRIDE_EOF
            "parameters", "all", "ra=3.0e-6, rb=6.0e-6, dustref=4.5e-6, dustden=2650.0"
            "emission", "lm3", "source_fraction=0.27"
            "convection", "all"
-           "dry_deposition","wind_driven","surfr=100."
+           "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_snow=0.05, alphar=0.001, alphas=0.001"
            "chem_param","aerosol","frac_pm1=0.,frac_pm25=0.,frac_pm10=0.667"
            "radiative_param", "online", "name_in_rad_mod=dust4, name_in_clim_mod=large_dust"/
@@ -3442,7 +3446,7 @@ SIS_OVERRIDE_EOF
            "parameters", "all", "ra=6.0e-6, rb=10.0e-6, dustref=8e-6, dustden=2650.0"
            "emission", "lm3", "source_fraction=0.23"
            "convection", "all"
-           "dry_deposition","wind_driven","surfr=100."
+           "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_snow=0.05, alphar=0.001, alphas=0.001"
            "chem_param","aerosol","frac_pm1=0.,frac_pm25=0.,frac_pm10=0."
            "radiative_param", "online", "name_in_rad_mod=dust5, name_in_clim_mod=large_dust"/
@@ -3451,8 +3455,8 @@ SIS_OVERRIDE_EOF
 "longname","SO4"
 "units", "VMR"
 "profile_type","fixed","surface_value=1.e-20"
-"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snow=0.0, alphar=0.001, alphas=0.001"
-"dry_deposition","file","name=so4"
+"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snowh=0.01, frac_incloud_snow=0., alphar=0.001, alphas=0.001"
+"dry_deposition","williams_wind_driven","surfr=200.,icer=1200."	
 "convection", "all"
 "radiative_param", "online", "name_in_rad_mod=so4, name_in_clim_mod=sulfate, scale_factor=3.31"
 "cmip","cmip6","cmip_name=sulfate,cmip_longname=sulfate,cmip_longname2=SO4"
@@ -3464,10 +3468,9 @@ SIS_OVERRIDE_EOF
            "units", "mmr"
            "profile_type","fixed","surface_value=1.e-32"
            "parameters", "all", "ra=0.1e-6, rb=0.5e-6, ssaltref=0.3e-6, ssaltden=2200.0"
-           "scheme", "Martensson",
            "convection", "all"
            "chem_param","aerosol","frac_pm1=1.0,frac_pm25=1.0,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=0.1"
+           "dry_deposition","williams_wind_driven","surfr=200.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.4, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=seasalt1, name_in_clim_mod=sea_salt"/
  "TRACER", "atmos_mod", "ssalt2"
@@ -3475,44 +3478,40 @@ SIS_OVERRIDE_EOF
            "units", "mmr"
            "profile_type","fixed","surface_value=1.e-32"
            "parameters", "all", "ra=0.5e-6, rb=1.0e-6, ssaltref=0.75e-6, ssaltden=2200.0"
-           "scheme", "Martensson",
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.0,frac_pm25=1.0,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=0.1"
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.4, alphar=0.001, alphas=0.001"
+           "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=seasalt2, name_in_clim_mod=sea_salt"/
  "TRACER", "atmos_mod", "ssalt3"
            "longname", "ssalt 3 tracer"
            "units", "mmr"
            "profile_type","fixed","surface_value=1.e-32"
            "parameters", "all", "ra=1.0e-6, rb=2.5e-6, ssaltref=1.75e-6, ssaltden=2200.0"
-           "scheme", "Martensson"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.0,frac_pm25=0.167,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=0.1"
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.4, alphar=0.001, alphas=0.001"
+           "dry_deposition","williams_wind_driven","surfr=50.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.5, frac_incloud_uw=0.8, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=seasalt3, name_in_clim_mod=sea_salt"/
  "TRACER", "atmos_mod", "ssalt4"
            "longname", "ssalt 4 tracer"
            "units", "mmr"
            "profile_type","fixed","surface_value=1.e-32"
            "parameters", "all", "ra=2.5e-6, rb=5.0e-6, ssaltref=3.75e-6, ssaltden=2200.0"
-           "scheme", "Martensson"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.0,frac_pm25=0.,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=0.1"
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.4, alphar=0.001, alphas=0.001"
+           "dry_deposition","williams_wind_driven","surfr=50.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.5, frac_incloud_uw=0.8, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=seasalt4, name_in_clim_mod=sea_salt"/
  "TRACER", "atmos_mod", "ssalt5"
            "longname", "ssalt 5 tracer"
            "units", "mmr"
            "profile_type","fixed","surface_value=1.e-32"
            "parameters", "all", "ra=5.0e-6, rb=10.0e-6, ssaltref=7.5e-6, ssaltden=2200.0"
-           "scheme", "Martensson"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.0,frac_pm25=0.,frac_pm10=0."
-           "dry_deposition","wind_driven","surfr=0.1"
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.4, alphar=0.001, alphas=0.001"
+           "dry_deposition","williams_wind_driven","surfr=50.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.5, frac_incloud_uw=0.8, alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=seasalt5, name_in_clim_mod=sea_salt"/
 #
  "TRACER", "atmos_mod", "bcphob"
@@ -3521,7 +3520,7 @@ SIS_OVERRIDE_EOF
            "profile_type","fixed","surface_value=1.e-32"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.981,frac_pm25=0.995,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=100."
+           "dry_deposition","williams_wind_driven","surfr=200.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0., alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=bcphobic, name_in_clim_mod=black_carbon"/
  "TRACER", "atmos_mod", "bcphil"
@@ -3530,8 +3529,8 @@ SIS_OVERRIDE_EOF
            "profile_type","fixed","surface_value=1.e-32"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.981,frac_pm25=0.995,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=100."
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_snow=0.0, alphar=0.001, alphas=0.001"
+           "dry_deposition","williams_wind_driven","surfr=200.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_snow=0., alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=bcphilic, name_in_clim_mod=black_carbon"/
  "TRACER", "atmos_mod", "omphob"
            "longname", "omphob tracer"
@@ -3539,7 +3538,7 @@ SIS_OVERRIDE_EOF
            "profile_type","fixed","surface_value=1.e-32"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.89,frac_pm25=0.960,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=100."
+           "dry_deposition","williams_wind_driven","surfr=200.,icer=1200."
            "wet_deposition","aerosol_below","frac_incloud=0., alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=omphobic, name_in_clim_mod=organic_carbon"/
  "TRACER", "atmos_mod", "omphil"
@@ -3548,8 +3547,8 @@ SIS_OVERRIDE_EOF
            "profile_type","fixed","surface_value=1.e-32"
            "convection", "all"
            "chem_param","aerosol","frac_pm1=0.89,frac_pm25=0.960,frac_pm10=1."
-           "dry_deposition","wind_driven","surfr=100."
-           "wet_deposition","aerosol_below","frac_incloud=0.2, frac_incloud_uw=0.3, frac_incloud_snow=0.0, alphar=0.001, alphas=0.001"
+            "dry_deposition","williams_wind_driven","surfr=200.,icer=1200."
+           "wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snow=0., alphar=0.001, alphas=0.001"
            "radiative_param", "online", "name_in_rad_mod=omphilic, name_in_clim_mod=organic_carbon"/
 
 #
@@ -4052,8 +4051,8 @@ SIS_OVERRIDE_EOF
 "cmip","cmip6","cmip_name=nitrate,cmip_longname=nitrate,cmip_longname2=NO3"
 "chem_param","aerosol","mw=62,nb_N_ox=1,frac_pm1=0.877,frac_pm25=0.954,frac_pm10=1."
 "profile_type","fixed","surface_value=1.e-20"
-"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snow=0.0,alphar=0.001, alphas=0.001"
-"dry_deposition","file","name=nh4"
+"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snowh=0.01, frac_incloud_snow=0.,alphar=0.001, alphas=0.001"
+"dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
 "convection","all"
 "radiative_param", "online", "name_in_rad_mod=nitrate, name_in_clim_mod=nitrate, scale_factor=2.14"
 /
@@ -4064,8 +4063,8 @@ SIS_OVERRIDE_EOF
 "cmip","cmip6","cmip_name=ammonium,cmip_longname=ammonium,cmip_longname2=NH4"
 "chem_param","aerosol","mw=18,nb_N_red=1,frac_pm1=0.92,frac_pm25=0.973,frac_pm10=1."
 "profile_type","fixed","surface_value=1.e-20"
-"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snow=0.0,alphar=0.001, alphas=0.001"
-"dry_deposition","file","name=nh4"
+"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snowh=0.01, frac_incloud_snow=0.,alphar=0.001, alphas=0.001"
+"dry_deposition","williams_wind_driven","surfr=200.,icer=1200."
 "convection","all"
 /
 
