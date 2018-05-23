@@ -87,16 +87,16 @@ NOTES:
 -->
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="testing_20180503"/>        <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="user/jpk/esm4-20180522"/>  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for shared source code -->
   <property name="ATMOS_GIT_TAG"  value="eswg_20180522"/>  <!-- git tag for atmos_shared and atmos_param source code -->
-  <property name="MOM6_DATE"      value="2018.04.11"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>              <!-- git tag for MOM6 source code -->
-  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180503"/>
-  <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
-  <property name="COUPLER_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG"   value="ppa_20180503_slm"/>        <!-- git tag for LAND source code -->
-  <property name="FRE_STEM"       value="CMIP6/ESM4/testing_20180503_mom6_2018.04.11/spinup"/> <!-- customize as needed -->
+  <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>        <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
+  <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>        <!-- git tag for LAND source code -->
+  <property name="COUPLER_GIT_TAG"    value="$(RELEASE)"/>    <!-- git tag for AWG source code -->
+  <property name="MOM6_DATE"      value="2018.04.11"/>        <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
+  <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>  <!-- git tag for ocean_shared component -->
+  <property name="FRE_STEM"       value="CMIP6/ESM4/$(RELEASE)/spinup"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
@@ -423,6 +423,14 @@ NOTES:
    </freInclude>
    <freInclude name="resourceparams_A1728x2_O1437p5"><!--1/2 degree ocean grid Only-->
 	     <resources jobWallclock="01:00:00">
+               <atm ranks="1728" threads="2"   layout = "12,24"   io_layout = "1,4" />
+	       <lnd                            layout = "12,24"   io_layout = "1,4" />
+	       <ice                            layout = "432,4"   io_layout = "1,4" />
+               <ocn ranks="1437" threads="1"   layout = "40,45"   io_layout = "1,5" mask_table="mask_table.363.40x45"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A1728x2_O1437p5_production"><!--1/2 degree ocean grid Only-->
+	     <resources jobWallclock="16:00:00" segRuntime="2:30:00">
                <atm ranks="1728" threads="2"   layout = "12,24"   io_layout = "1,4" />
 	       <lnd                            layout = "12,24"   io_layout = "1,4" />
 	       <ice                            layout = "432,4"   io_layout = "1,4" />
@@ -2377,7 +2385,7 @@ LWH (3/16/2018)
       use_single_lw_sw_ts = .false.,
       use_co2_tracer_field = .true.                 ! jgj added
       treat_sfc_refl_dir_as_dif = .false.           ! jgj added
-      use_ch4_tracer_field = .false.
+      use_ch4_tracer_field = .true.
       </namelist>
 
       <namelist name ="radiative_gases_nml">
@@ -2397,8 +2405,8 @@ LWH (3/16/2018)
       time_varying_ch4 = .false.,
       ch4_variation_type = 'linear'
       ch4_dataset_entry = 1850,1,1,0,0,
-      ch4_specification_type = 'time_series'
-      ch4_data_source = 'input'
+      ch4_specification_type = 'base_and_trend'
+      ch4_data_source = 'predicted'
 
       time_varying_n2o = .false.,
       n2o_variation_type = 'linear'
@@ -2436,7 +2444,7 @@ LWH (3/16/2018)
 
       calc_ch4_tfs_on_first_step = .false.,
       calc_ch4_tfs_monthly = .true.,
-      ch4_tf_time_displacement = 360.0,
+      ch4_tf_time_displacement = 0.0,
 
       calc_n2o_tfs_on_first_step = .false.,
       calc_n2o_tfs_monthly = .true.,
@@ -3178,17 +3186,6 @@ LWH (3/16/2018)
        do_nh3_atm_ocean_exchange = .true.  !turn on exchange of NH3
        scheme_no3_nh4_lim        = 2       !update nh4/no3 uptake scheme
        scheme_nitrif             = 3       !new nitrification scheme
-       k_nh4_small       = 1.e-8
-       k_nh4_large       = 5e-8
-       k_nh4_diazo       = 5e-8
-       k_no3_small       = 5.e-7  !max = 1e-6
-       k_no3_large       = 2.5e-6 !max = 5e-6
-       k_no3_diazo       = 2.5e-6 !max = 5e-6
-       k_nh3_nitrif      = 3.1e-9
-       gamma_nitrif      = 3.5e6
-       k_o2_nit          = 3.9e-6
-       o2_min_nit        = 0.01e-6
-       irr_inhibit       = 10.
       </namelist>
 
       <namelist name="generic_tracer_nml">
@@ -3312,9 +3309,7 @@ SIS_OVERRIDE_EOF
 # jgj 2016/11/29 co2 data table (Jan 1 1850 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
 #
 ## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
-## radiation co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
 "ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
-"ATM" , "co2_dvmr_rad",     "",     "", "none",  284.262e-06
       </dataTable>  
 
 
@@ -5644,24 +5639,26 @@ $baseDate
 "tracers",   "o3_ddep",     "O3_ddep",     "atmos_tracer", "all", .true.,  "none", 2
 # "tracers",   "jval_001",    "jval_001",    "atmos_tracer", "all", .true.,  "none", 2
 "tracers",   "hook_no",     "hook_no",     "atmos_tracer", "all", .true.,  "none", 2
-# "tracers",   "flash_freq",  "flash_freq",  "atmos_tracer", "all", .true.,  "none", 2
+"tracers",   "flash_freq",    "flash_freq",     "atmos_tracer", "all", .true.,  "none", 2
+"tracers",   "CH4_loss",      "CH4_loss",       "atmos_tracer", "all", .true.,  "none", 2
+"tracers",   "SO2_prodm",     "SO2_prodm",      "atmos_tracer", "all", .true., "none", 2
+"tracers",   "SO4_prodm",     "SO4_prodm",      "atmos_tracer", "all", .true., "none", 2
+"moist",     "so4_wet_depo",  "SO4_wdep_all",   "atmos_tracer", "all", .true., "none", 2
+"tracers",   "so2_reevap_ls", "SO2_evap_ls",    "atmos_tracer", "all", .true., "none", 2
+"tracers",   "so4_ddep",      "SO4_ddep",       "atmos_tracer", "all", .true., "none", 2
+"tracers",   "SO4_col",       "SO4_col_tracer", "atmos_tracer", "all", .true., "none", 2
+"tracers",   "pso4_h2o2",     "PROD_SO4_H2O2",  "atmos_tracer", "all", .true., "none", 2
+"tracers",   "pso4_o3",       "PROD_SO4_O3",    "atmos_tracer", "all", .true., "none", 2
+"tracers",   "gamma_so2",     "gamma_so2",      "atmos_tracer", "all", .true., "none", 2
+"tracers",   "nh4no3_dvel",   "nh4no3_dvel",    "atmos_tracer", "all", .true., "none", 2
+"tracers",   "ssalt3_dvel",   "ssalt_dvel",     "atmos_tracer", "all", .true., "none", 2
 # "tracers",   "prod_no_col", "prod_no_col", "atmos_tracer", "all", .true.,  "none", 2
 # "tracers",   "H2O_prod",    "H2O_prod",    "atmos_tracer", "all", .true.,  "none", 2
 # "tracers",   "H2O_chem_dt", "H2O_chem_dt", "atmos_tracer", "all", .true.,  "none", 2
-# "tracers",   "CH4_loss",    "CH4_loss",    "atmos_tracer", "all", .true.,  "none", 2
 # "tracers",   "so2_emis",      "SO2_emis",       "atmos_tracer", "all", .true., "none", 2
 # "tracers",   "so2_emis3d",    "SO2_emis3d",     "atmos_tracer", "all", .true., "none", 2
-"tracers",   "SO2_prodm",     "SO2_prodm",      "atmos_tracer", "all", .true., "none", 2
-"tracers",   "SO4_prodm",     "SO4_prodm",      "atmos_tracer", "all", .true., "none", 2
-# "moist",     "so4_wet_depo",  "SO4_wdep_all",   "atmos_tracer", "all", .true., "none", 2
-# "tracers",   "so2_reevap_ls", "SO2_evap_ls",    "atmos_tracer", "all", .true., "none", 2
-# "tracers",   "so4_ddep",      "SO4_ddep",       "atmos_tracer", "all", .true., "none", 2
 # "tracers",   "so4_wdep_ls",   "SO4_wdep_ls",    "atmos_tracer", "all", .true., "none", 2
 # "dynamics",  "so4_col",       "so4_col",        "atmos_tracer", "all", .true., "none", 2
-# "tracers",   "SO4_col",       "SO4_col_tracer", "atmos_tracer", "all", .true., "none", 2
-# "tracers",   "pso4_h2o2",     "PROD_SO4_H2O2",  "atmos_tracer", "all", .true., "none", 2
-# "tracers",   "pso4_o3",       "PROD_SO4_O3",    "atmos_tracer", "all", .true., "none", 2
-# "tracers",   "gamma_so2",     "gamma_so2",      "atmos_tracer", "all", .true., "none", 2
 "tracers",   "NH3_lossm",     "NH3_lossm",      "atmos_tracer", "all", .true., "none", 2
 "tracers","nh3_dvel","nh3_dvel",     "atmos_tracer", "all", .true., "none", 2
 "tracers","nh4_dvel","nh4_dvel",     "atmos_tracer", "all", .true., "none", 2
@@ -6469,6 +6466,24 @@ $baseDate
 "river", "rv_d_h2o",   "rv_d_h2o",     "river_daily",  "all", .true., "none", 2
 "river", "rv_o_h2o",   "rv_o_h2o",     "river_daily",  "all", .true., "none", 2
 #
+#==========================================
+# forcing fields for stand-alone land model
+#==========================================
+#
+"land_forcing",   3,  "hours",  1, "days", "time"
+#
+"moist",     "precip",                 "precip",       "land_forcing", "all", .true.,"none", 2
+"flux",      "t_atm",                  "t_atm",        "land_forcing", "all", .true.,"none", 2
+"flux",      "sphum_atm",              "q_atm",        "land_forcing", "all", .true.,"none", 2
+"flux",      "u_atm",                  "u_atm",        "land_forcing", "all", .true.,"none", 2
+"flux",      "v_atm",                  "v_atm",        "land_forcing", "all", .true.,"none", 2
+"flux",      "wind",                   "wind",         "land_forcing", "all", .true.,"none", 2
+"dynamics",  "ps",                     "ps",           "land_forcing", "all", .true.,"none", 2
+"radiation", "lwdn_sfc",               "lwdn_sfc",     "land_forcing", "all", .true.,"none", 2
+"radiation", "flux_sw_down_vis_dir",   "swdn_vis_dir", "land_forcing", "all", .true.,"none", 2
+"radiation", "flux_sw_down_vis_dif",   "swdn_vis_dif", "land_forcing", "all", .true.,"none", 2
+"radiation", "flux_sw_down_total_dir", "swdn_tot_dir", "land_forcing", "all", .true.,"none", 2
+"radiation", "flux_sw_down_total_dif", "swdn_tot_dif", "land_forcing", "all", .true.,"none", 2
 #====================================================================================================
 # MOM6 
 #====================================================================================================
@@ -8898,22 +8913,13 @@ endif
 
 
 <!-- INPUT DATASETS -->
-      <!--
-          IC needs to be updated
-          atm IC from: 
-          land IC from:
-          obgc IC from:
-          ice and icebergs from:
-          cold start ocean
-      -->
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-<!--    <dataSource site="ncrc">/lustre/f1/unswept/Sergey.Malyshev/fms/ESM4/IC/ESM4p0p3k_1850C_PIpcairco2_smag_v7_1850LU.v20180503.tar</dataSource> -->
-        <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/IC/ESM4p0p3k_1850C_PIpcairco2_v7_1850LU.v20180504.tar</dataSource>
+        <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/ESM4/IC/ESM4_piControl_spinup.initCond.20180516.tar</dataSource>
       </dataFile>
 
 <!-- c96_LM4_Op5 -->
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/OM4_05/mosaic_c96.v20180227.tar</dataSource>
+        <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/ESM4/OM4_05/mosaic_c96.v20180227.tar</dataSource>
         <dataSource site="gfdl">/archive/gold/datasets/OM4_05/mosaic_c96.v20180227.tar</dataSource>
       </dataFile>
 
@@ -9136,7 +9142,7 @@ endif
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/IC/COBALT/20180510/cobalt_tracer_source.nc</dataSource>
      </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/IC/init_ocean_cobalt_nh3.res.nc</dataSource>
+         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/IC/COBALT/init_ocean_cobalt_nh3.res.nc</dataSource>
       </dataFile>
 <!--
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -9147,7 +9153,7 @@ endif
      </dataFile>
 -->
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/iron_sources/Soluble_Fe_Flux_AM4.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/iron_sources/Soluble_Fe_Flux_AM4.nc</dataSource>
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/iron_sources/Mineral_Flux_AM4.nc</dataSource>
@@ -9168,7 +9174,7 @@ endif
     <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
-          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1152x2_O1057p5_production']/node())"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1728x2_O1437p5_production']/node())"/>
       </production>
       <regression name="2months">
           <run months="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
