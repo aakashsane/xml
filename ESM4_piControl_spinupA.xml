@@ -87,7 +87,7 @@ NOTES:
 -->
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="pre_xanadu_esm4_20180515"/>  <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="pre_xanadu_esm4_20180524"/>  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for shared source code -->
   <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>        <!-- git tag for atmos_shared and atmos_param source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>        <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
@@ -938,6 +938,81 @@ Experiment to build executable.
         <timeSeries freq="annual"   chunkLength="$(PP_CMIP_CHUNK_A)" source="ocean_annual_z"/>	
       </component>
 
+      <!-- ocean 1x1 degree output -->
+      <component type="ocean_monthly_1x1deg" source="ocean_month" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <variables>   
+              evs                   ficeberg               friver                 heat_content_cond
+              heat_content_fprec    heat_content_massin    heat_content_massout   heat_content_surfwater
+              heat_content_vprec    Heat_PmE               hfds                   hfevapds
+              hfibthermds           hflso                  hfrainds               hfrunoffds
+              hfsifrazil            hfsnthermds            hfsso
+              LwLatSens             MLD_003                MLD_restrat            mlotstmax
+              mlotstmin             mlotst                 mlotstsq               MSTAR
+              net_heat_coupler      net_massin             net_massout            nonpenSW
+              pbo                   prlq                   prsn                   pso
+              rlntds                rsntds                 sfdsi                  sob
+              sos                   sossq                  tob                    tos
+              tossq                 ustar                  wfo                    zos
+              zossq  
+          </variables>   
+        </timeSeries>
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="annual" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_month_rho2_1x1deg" source="ocean_month_rho2" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
+        </timeSeries>
+        <timeAverage source="annual" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_monthly_z_1x1deg" source="ocean_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="annual" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_annual_1x1deg" source="ocean_annual" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <variables>
+             boundary_forcing_heat_tendency_2d  boundary_forcing_salt_tendency_2d  dispkexyfo evs  ficeberg  frazil_heat_tendency_2d
+             friver                             heat_content_cond                           heat_content_fprec        heat_content_massin
+             heat_content_massout               heat_content_surfwater                      heat_content_vprec        Heat_PmE
+             hfds                               hfevapds                                    hfibthermds               hflso
+             hfrainds                           hfrunoffds                                  hfsifrazil                hfsnthermds
+             hfsso                              LwLatSens                                   mass_wt
+             MEKE_KH                            MEKE_Le                                     MEKE_Ue                   MLD_003_max
+             MLD_003_min                        MLD_003                                     mlotstmax                 mlotstmin
+             mlotst                             mlotstsq                                    MSTAR                     net_heat_coupler
+             net_massin                         net_massout                                 nonpenSW                  opottempmint
+             opottemptend_2d                    osalttend_2d                                pbo                       prlq
+             prsn                               pso                                         rlntds                    rsntds
+             S_advection_xy_2d                  sfdsi                                       Sh_tendency_vert_remap_2d sob
+             somint                             sos                                         sossq                     speed
+             subML_N2                           T_advection_xy_2d                           Th_tendency_vert_remap_2d TKE_itidal
+             TKE_tidal                          tob                                         tos_max
+             tos_min                            tos                                         tossq                     ustar
+             wfo                                zos                                         zossq
+          </variables> 
+        </timeSeries>
+
+        <timeAverage source="annual" interval="10yr"/>
+        <timeAverage source="annual" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_annual_rho2_1x1deg" source="ocean_annual_rho2" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)">
+        </timeSeries>
+        <timeAverage source="annual" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_annual_z_1x1deg" source="ocean_annual_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="annual" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+
       <!--Ocean scalars-->
       <!-- changed to CHUNK_A only -->
       <component type="ocean_scalar_monthly"   source="ocean_scalar_month" sourceGrid="ocean-tripolar">
@@ -1022,6 +1097,10 @@ Experiment to build executable.
 	</timeSeries>   
         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>     
+      <component type="ice_1x1deg"  source="ice_month" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
     </postProcess>
   </freInclude> 
 
@@ -1397,6 +1476,26 @@ Experiment to build executable.
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
+<!-- add 1x1 postprocessing for publicly served output -->
+      <component type="ocean_cobalt_omip_sfc_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_sfc" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_omip_rates_year_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_rates_year" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_omip_2d_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_2d" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
     </postProcess>
   </freInclude>
 
@@ -1424,6 +1523,24 @@ Experiment to build executable.
       </component>
 
       <component type="ocean_cobalt_omip_rates_year_z" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_rates_year_z" sourceGrid="ocean-tripolar">
+         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+<!-- add 1x1 postprocessing for publicly served output -->
+      <component type="ocean_cobalt_omip_tracers_month_z_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
+         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
+         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_omip_tracers_year_z_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
+         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_omip_rates_year_z_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_rates_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
          <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
@@ -2751,8 +2868,8 @@ LWH (3/16/2018)
    do_GAMMA_HW    = .false.,
    do_ONLINE_LAI  = .false.,
    do_ONLINE_PFT  = .false.,
-   do_ONLINE_TEMP = .false.,
-   do_ONLINE_PPFD = .false.,
+   do_ONLINE_TEMP = .true.,
+   do_ONLINE_PPFD = .true.,
    do_ONLINE_O3   = .false.,
    do_ONLINE_WIND = .false.,
    do_ONLINE_SM   = .false.,
@@ -5640,24 +5757,26 @@ $baseDate
 "tracers",   "o3_ddep",     "O3_ddep",     "atmos_tracer", "all", .true.,  "none", 2
 # "tracers",   "jval_001",    "jval_001",    "atmos_tracer", "all", .true.,  "none", 2
 "tracers",   "hook_no",     "hook_no",     "atmos_tracer", "all", .true.,  "none", 2
-# "tracers",   "flash_freq",  "flash_freq",  "atmos_tracer", "all", .true.,  "none", 2
+"tracers",   "flash_freq",    "flash_freq",     "atmos_tracer", "all", .true.,  "none", 2
+"tracers",   "CH4_loss",      "CH4_loss",       "atmos_tracer", "all", .true.,  "none", 2
+"tracers",   "SO2_prodm",     "SO2_prodm",      "atmos_tracer", "all", .true., "none", 2
+"tracers",   "SO4_prodm",     "SO4_prodm",      "atmos_tracer", "all", .true., "none", 2
+"moist",     "so4_wet_depo",  "SO4_wdep_all",   "atmos_tracer", "all", .true., "none", 2
+"tracers",   "so2_reevap_ls", "SO2_evap_ls",    "atmos_tracer", "all", .true., "none", 2
+"tracers",   "so4_ddep",      "SO4_ddep",       "atmos_tracer", "all", .true., "none", 2
+"tracers",   "SO4_col",       "SO4_col_tracer", "atmos_tracer", "all", .true., "none", 2
+"tracers",   "pso4_h2o2",     "PROD_SO4_H2O2",  "atmos_tracer", "all", .true., "none", 2
+"tracers",   "pso4_o3",       "PROD_SO4_O3",    "atmos_tracer", "all", .true., "none", 2
+"tracers",   "gamma_so2",     "gamma_so2",      "atmos_tracer", "all", .true., "none", 2
+"tracers",   "nh4no3_dvel",   "nh4no3_dvel",    "atmos_tracer", "all", .true., "none", 2
+"tracers",   "ssalt3_dvel",   "ssalt_dvel",     "atmos_tracer", "all", .true., "none", 2
 # "tracers",   "prod_no_col", "prod_no_col", "atmos_tracer", "all", .true.,  "none", 2
 # "tracers",   "H2O_prod",    "H2O_prod",    "atmos_tracer", "all", .true.,  "none", 2
 # "tracers",   "H2O_chem_dt", "H2O_chem_dt", "atmos_tracer", "all", .true.,  "none", 2
-# "tracers",   "CH4_loss",    "CH4_loss",    "atmos_tracer", "all", .true.,  "none", 2
 # "tracers",   "so2_emis",      "SO2_emis",       "atmos_tracer", "all", .true., "none", 2
 # "tracers",   "so2_emis3d",    "SO2_emis3d",     "atmos_tracer", "all", .true., "none", 2
-"tracers",   "SO2_prodm",     "SO2_prodm",      "atmos_tracer", "all", .true., "none", 2
-"tracers",   "SO4_prodm",     "SO4_prodm",      "atmos_tracer", "all", .true., "none", 2
-# "moist",     "so4_wet_depo",  "SO4_wdep_all",   "atmos_tracer", "all", .true., "none", 2
-# "tracers",   "so2_reevap_ls", "SO2_evap_ls",    "atmos_tracer", "all", .true., "none", 2
-# "tracers",   "so4_ddep",      "SO4_ddep",       "atmos_tracer", "all", .true., "none", 2
 # "tracers",   "so4_wdep_ls",   "SO4_wdep_ls",    "atmos_tracer", "all", .true., "none", 2
 # "dynamics",  "so4_col",       "so4_col",        "atmos_tracer", "all", .true., "none", 2
-# "tracers",   "SO4_col",       "SO4_col_tracer", "atmos_tracer", "all", .true., "none", 2
-# "tracers",   "pso4_h2o2",     "PROD_SO4_H2O2",  "atmos_tracer", "all", .true., "none", 2
-# "tracers",   "pso4_o3",       "PROD_SO4_O3",    "atmos_tracer", "all", .true., "none", 2
-# "tracers",   "gamma_so2",     "gamma_so2",      "atmos_tracer", "all", .true., "none", 2
 "tracers",   "NH3_lossm",     "NH3_lossm",      "atmos_tracer", "all", .true., "none", 2
 "tracers","nh3_dvel","nh3_dvel",     "atmos_tracer", "all", .true., "none", 2
 "tracers","nh4_dvel","nh4_dvel",     "atmos_tracer", "all", .true., "none", 2
@@ -5766,8 +5885,8 @@ $baseDate
 "land",    "swup_dif",   "swup_dif",   "land_month",  "all", .true., "none", 2
 "land",    "swup_dir",   "swup_dir",   "land_month",  "all", .true., "none", 2
 # land one-level month-average output
-"land",    "area_land",  "area",       "land_month",  "all", .true., "none", 2
-"land",    "area_glac",  "glac_area",  "land_month",  "all", .true., "none", 2
+# "land",    "area_land",  "area",       "land_month",  "all", .true., "none", 2
+# "land",    "area_glac",  "glac_area",  "land_month",  "all", .true., "none", 2
 "land",    "evap",       "evap_land",  "land_month",  "all", .true., "none", 2
 "land",    "evap_glac",  "evap_glac",  "land_month",  "all", .true., "none", 2
 "land",    "evap_lake",  "evap_lake",  "land_month",  "all", .true., "none", 2
@@ -6341,7 +6460,7 @@ $baseDate
 "land",     "geolon_t",            "geolon_t",            "land_dust", "all", .false., "none", 1
 "land",     "geolat_t",            "geolat_t",            "land_dust", "all", .false., "none", 1
 #
-"land",      "area_land",          "area",                "land_dust", "all", .true.,  "none", 2
+# "land",      "area_land",          "area",                "land_dust", "all", .true.,  "none", 2
 "vegn",      "height",             "height",              "land_dust", "all", .true.,  "none", 2
 "land",      "z0m",                "z0m",                 "land_dust", "all", .true.,  "none", 2
 "vegn",      "lai",                "lai",                 "land_dust", "all", .true.,  "none", 2
@@ -6465,6 +6584,24 @@ $baseDate
 "river", "rv_d_h2o",   "rv_d_h2o",     "river_daily",  "all", .true., "none", 2
 "river", "rv_o_h2o",   "rv_o_h2o",     "river_daily",  "all", .true., "none", 2
 #
+#==========================================
+# forcing fields for stand-alone land model
+#==========================================
+#
+"land_forcing",   3,  "hours",  1, "days", "time"
+#
+"moist",     "precip",                 "precip",       "land_forcing", "all", .true.,"none", 2
+"flux",      "t_atm",                  "t_atm",        "land_forcing", "all", .true.,"none", 2
+"flux",      "sphum_atm",              "q_atm",        "land_forcing", "all", .true.,"none", 2
+"flux",      "u_atm",                  "u_atm",        "land_forcing", "all", .true.,"none", 2
+"flux",      "v_atm",                  "v_atm",        "land_forcing", "all", .true.,"none", 2
+"flux",      "wind",                   "wind",         "land_forcing", "all", .true.,"none", 2
+"dynamics",  "ps",                     "ps",           "land_forcing", "all", .true.,"none", 2
+"radiation", "lwdn_sfc",               "lwdn_sfc",     "land_forcing", "all", .true.,"none", 2
+"radiation", "flux_sw_down_vis_dir",   "swdn_vis_dir", "land_forcing", "all", .true.,"none", 2
+"radiation", "flux_sw_down_vis_dif",   "swdn_vis_dif", "land_forcing", "all", .true.,"none", 2
+"radiation", "flux_sw_down_total_dir", "swdn_tot_dir", "land_forcing", "all", .true.,"none", 2
+"radiation", "flux_sw_down_total_dif", "swdn_tot_dif", "land_forcing", "all", .true.,"none", 2
 #====================================================================================================
 # MOM6 
 #====================================================================================================
@@ -9259,5 +9396,3 @@ endif
   </experiment>
 
 </experimentSuite>
-
-
