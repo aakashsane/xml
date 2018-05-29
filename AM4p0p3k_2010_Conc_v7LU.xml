@@ -90,9 +90,9 @@ NOTES:
 -->
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="testing_20180503"/>        <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="testing_20180202"/>        <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="eswg_20180325"/>        <!-- git tag for shared source code -->
-  <property name="ATMOS_GIT_TAG"  value="eswg_20180523a"/>  <!-- git tag for atmos_shared and atmos_param source code -->
+  <property name="ATMOS_GIT_TAG"  value="eswg_20180509"/>  <!-- git tag for atmos_shared and atmos_param source code -->
   <property name="MOM6_DATE"      value="2018.04.06"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>              <!-- git tag for MOM6 source code -->
 <!--
@@ -100,7 +100,7 @@ NOTES:
 -->
   <property name="OCEAN_SHARED_GIT_TAG" value="user/f1p/nh4_ocean_couply_dry_deposition_merge "/> <!-- git tag for ocean_shared source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG"   value="pre_xanadu_esm4_20180523"/>        <!-- git tag for LAND source code -->
+  <property name="LAND_GIT_TAG"   value="ppa_20180503_slm"/>        <!-- git tag for LAND source code -->
   <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180502"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -6680,6 +6680,19 @@ set nyblock = $atm_threads
       <xi:include xpointer="xpointer(//freInclude[@name='fire_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='atmos_co2_postprocess']/postProcess/node())"/>
     </postProcess>
+  </experiment>
+
+  <experiment name="AM4p0p3k_bvoc_2010C_p2K_PIpcairco2_v7_1980LU_dustfix" inherit="AM4p0p3k_bvoc_2010C_PIpcairco2_v7_1980LU_dustfix">
+    <input>
+      <namelist name="ice_spec_nml">
+      mcm_ice = .false.
+      do_leads = .false.
+      minimum_ice_concentration = 0.5
+      minimum_ice_thickness = 0.1
+      sst_degk = .true.
+      sst_pert = 2.0
+      </namelist>
+    </input>
   </experiment>
 
 </experimentSuite>
