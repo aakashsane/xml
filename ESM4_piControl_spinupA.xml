@@ -93,12 +93,13 @@ NOTES:
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>        <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>        <!-- git tag for LAND source code -->
   <property name="COUPLER_GIT_TAG"    value="$(RELEASE)"/>    <!-- git tag for AWG source code -->
+  <property name="BUILD_DATE"     value="20180530"/>
   <property name="MOM6_DATE"      value="2018.04.11"/>        <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>  <!-- git tag for ocean_shared component -->
-  <property name="FRE_STEM"       value="CMIP6/ESM4/$(RELEASE)/spinup"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="CMIP6/ESM4/spinup"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_YOURGROUPLETTER"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
@@ -117,7 +118,7 @@ NOTES:
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
   <property name="FRE_VERSION"     value="bronx-12"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
-  <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
+  <property name="ANALYSIS_SWITCH" value="off"/>      <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
   <property name="CVDP_startyear"  value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
@@ -554,12 +555,14 @@ NOTES:
         <root>$CPERM/$USER/$(FRE_STEM)</root>
         <scripts>$CPERM/$USER/$(FRE_STEM)/$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
         <state>$CPERM/$USER/$(FRE_STEM)/$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>$CPERM/$USER/$(FRE_STEM)/$(BUILD_DATE)/$(name)/src</src>
+        <exec>$CPERM/$USER/$(FRE_STEM)/$(BUILD_DATE)/$(name)/$(platform)-$(target)/exec</exec>
         <!--swept locations (including the staged archive location)-->
         <archive>$CTMP/$USER/$(stem)/$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)/$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <stdout>$CPERM/$USER/$(stem)/$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
         <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)/$(BUILD_DATE)"/>
       <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
@@ -591,12 +594,14 @@ module use -a /usw/eslogin/modulefiles-c3
         <root>$CPERM/$USER/$(FRE_STEM)</root>
         <scripts>$CPERM/$USER/$(FRE_STEM)/$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
         <state>$CPERM/$USER/$(FRE_STEM)/$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>$CPERM/$USER/$(FRE_STEM)/$(BUILD_DATE)/$(name)/src</src>
+        <exec>$CPERM/$USER/$(FRE_STEM)/$(BUILD_DATE)/$(name)/$(platform)-$(target)/exec</exec>
         <!--swept locations (including the staged archive location)-->
         <archive>$CTMP/$USER/$(stem)/$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)/$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <stdout>$CPERM/$USER/$(stem)/$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
         <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
+      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)/$(BUILD_DATE)"/>
       <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
@@ -662,7 +667,7 @@ module use -a /usw/eslogin/modulefiles-c3
   <!--The property MOM6_EXAMPLES should point to the mom6 directory that is checked out. It is needed by MOM6 to access its input data files-->
   <property name="LIBS_ROOT"      value="esm4.1_libs_compile"/> <!--name of libs compile experiment-->
   
-  <property name="MOM6_EXAMPLES"  value="$root/$(LIBS_ROOT)/src/mom6"/>
+  <property name="MOM6_EXAMPLES"  value="$root/$(BUILD_DATE)/$(LIBS_ROOT)/src/mom6"/>
   <property name="FMS_LIB_DIR"    value="./$(LIBS_ROOT)/$(platform)-$(target)/exec"/>
   <property name="MY_LIBS"        value="$(EXEC_ROOT)/$(FMS_LIB_DIR)"/>
 
@@ -779,7 +784,7 @@ Experiment to build executable.
       </compile>
     </component>
 
-    <component name="sis2" paths="mom6/src/SIS2 ice_param" requires="fms mom6 icebergs" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
+    <component name="sis2" paths="mom6/src/SIS2 ice_param" requires="fms mom6 icebergs" includeDir="$root/$(BUILD_DATE)/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
            <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
            <csh>\rm -rf ocean_null</csh>
@@ -803,7 +808,7 @@ Experiment to build executable.
   </experiment>
 
   <experiment name="esm4.1_sis2_compile" inherit="esm4.1_libs_compile">
-      <component paths="shared" name="fms" includeDir="$root/$(LIBS_ROOT)/src/shared/include">
+      <component paths="shared" name="fms" includeDir="$root/$(BUILD_DATE)/$(LIBS_ROOT)/src/shared/include">
          <library path="$(MY_LIBS)/fms/libfms.a" headerDir="$(MY_LIBS)/fms"/>
       </component>
       <component name="lm4P" paths="lm4P" requires="fms">
