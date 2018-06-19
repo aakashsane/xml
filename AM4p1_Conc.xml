@@ -90,18 +90,15 @@ NOTES:
 -->
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="testing_20180202"/>        <!-- git tag for general component source code-->
-  <property name="SHARED_GIT_TAG" value="eswg_20180325"/>        <!-- git tag for shared source code -->
-  <property name="ATMOS_GIT_TAG"  value="eswg_20180509"/>  <!-- git tag for atmos_shared and atmos_param source code -->
-  <property name="MOM6_DATE"      value="2018.04.06"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>              <!-- git tag for MOM6 source code -->
-<!--
-  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/>
--->
-  <property name="OCEAN_SHARED_GIT_TAG" value="user/f1p/nh4_ocean_couply_dry_deposition_merge "/> <!-- git tag for ocean_shared source code -->
-  <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG"   value="ppa_20180503_slm"/>        <!-- git tag for LAND source code -->
-  <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180502"/> <!-- customize as needed -->
+  <property name="RELEASE"        value="pre_xanadu_esm4_20180524"/> <!-- git tag for general component source code-->
+  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>               <!-- git tag for shared source code -->
+  <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>               <!-- git tag for atmos_shared and atmos_param source code -->
+  <property name="MOM6_DATE"      value="2018.04.11"/>               <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>    <!-- git tag for MOM6 source code -->
+  <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>         <!-- git tag for ocean_shared source code -->
+  <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>               <!-- git tag for AWG source code -->
+  <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>               <!-- git tag for LAND source code -->
+  <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180530"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
@@ -789,6 +786,8 @@ Experiment to build executable.
         <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_AMIP_CHUNK)"/>
 
         <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)">
+        </timeSeries>
+        <timeSeries freq="monthly" chunkLength="35yr">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTScmip/*)">
             <xi:fallback/>
           </xi:include>
@@ -796,6 +795,8 @@ Experiment to build executable.
 
         <!-- changed to CHUNK_A -->
         <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
+        </timeAverage>
+        <timeAverage source="monthly" interval="35yr">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAvecmip/*)">
             <xi:fallback/>
           </xi:include>
@@ -814,6 +815,8 @@ Experiment to build executable.
         </timeSeries>
 -->
         <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)">
+        </timeSeries>
+        <timeSeries freq="monthly" chunkLength="35yr">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTS/*)">
             <xi:fallback/>
           </xi:include>
@@ -821,6 +824,8 @@ Experiment to build executable.
         </timeSeries>
         <!-- changed to CHUNK_A only -->
         <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
+        </timeAverage>
+        <timeAverage source="monthly" interval="35yr">
 	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/fms/local/opt/fre-analysis/test/eem/code/pcmdi_metrics/frepp.pcmdi_metrics.atmos.csh"/>
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAve/*)">
             <xi:fallback/>
@@ -828,6 +833,8 @@ Experiment to build executable.
         </timeAverage>
         <!-- changed to CHUNK_A only -->
         <timeAverage source="annual" interval="$(PP_AMIP_CHUNK)">
+        </timeAverage>
+        <timeAverage source="annual" interval="35yr">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosAnnualAve/*)">
             <xi:fallback/>
           </xi:include>
@@ -846,12 +853,16 @@ Experiment to build executable.
       <component type="atmos_level"  start="$(ANA_AMIP_START)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
         <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
         <timeSeries freq="annual"  chunkLength="$(PP_AMIP_CHUNK)">
+        </timeSeries>
+        <timeSeries freq="annual"  chunkLength="35yr">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosLevelAnnualTS/*)">
             <xi:fallback/>
           </xi:include>
         </timeSeries>
         <!-- changed to CHUNK_A only -->
         <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
+        </timeAverage>
+        <timeAverage source="monthly" interval="35yr">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosLevelMonthAve/*)">
             <xi:fallback/>
           </xi:include>
@@ -861,6 +872,8 @@ Experiment to build executable.
         <!-- changed to CHUNK_A only -->
       <component type="atmos_month_aer" start="$(ANA_AMIP_START)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
         <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
+        </timeAverage>
+        <timeAverage source="monthly" interval="35yr">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAerAve/*)">
             <xi:fallback/>
           </xi:include>
@@ -924,12 +937,16 @@ Experiment to build executable.
       <component type="land" start="$(ANA_AMIP_START)" source="land_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
 <!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK)"/> -->
         <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)">
+        </timeSeries>
+        <timeSeries freq="monthly" chunkLength="35yr">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthTS/*)" >
             <xi:fallback/>
 	  </xi:include>
         </timeSeries>
         <!-- changed to CHUNK_A only -->
         <timeAverage source="monthly" interval="$(PP_AMIP_CHUNK)">
+        </timeAverage>
+        <timeAverage source="monthly" interval="35yr">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthAve/*)" >
             <xi:fallback/>
 	  </xi:include>
