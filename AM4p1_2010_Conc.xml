@@ -90,18 +90,15 @@ NOTES:
 -->
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="testing_20180202"/>        <!-- git tag for general component source code-->
-  <property name="SHARED_GIT_TAG" value="eswg_20180325"/>        <!-- git tag for shared source code -->
-  <property name="ATMOS_GIT_TAG"  value="eswg_20180509"/>  <!-- git tag for atmos_shared and atmos_param source code -->
-  <property name="MOM6_DATE"      value="2018.04.06"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>              <!-- git tag for MOM6 source code -->
-<!--
-  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/>
--->
-  <property name="OCEAN_SHARED_GIT_TAG" value="user/f1p/nh4_ocean_couply_dry_deposition_merge "/> <!-- git tag for ocean_shared source code -->
-  <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG"   value="ppa_20180503_slm"/>        <!-- git tag for LAND source code -->
-  <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180502"/> <!-- customize as needed -->
+  <property name="RELEASE"        value="pre_xanadu_esm4_20180524"/> <!-- git tag for general component source code-->
+  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>               <!-- git tag for shared source code -->
+  <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>               <!-- git tag for atmos_shared and atmos_param source code -->
+  <property name="MOM6_DATE"      value="2018.04.11"/>               <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>    <!-- git tag for MOM6 source code -->
+  <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>         <!-- git tag for ocean_shared source code -->
+  <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>               <!-- git tag for AWG source code -->
+  <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>               <!-- git tag for LAND source code -->
+  <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180530"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
@@ -1032,7 +1029,7 @@ Experiment to build executable.
 <!--= ESM4 EXPERIMENTS    =-->
 <!--=======================-->
 
-  <experiment name="AM4p1_2010C_PIpcairco2_1980LU" inherit="am4.1_compile">
+  <experiment name="AM4p1_2010C_PIpcairco2_1980LU_dustfix" inherit="am4.1_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"AM4_c96L49_am4p1"</model>
@@ -2874,7 +2871,6 @@ SIS_OVERRIDE_EOF
 # jgj 2016/11/29 co2 data table (Jan 1 2010 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
 #
 ## restoring co2 data override set to CMIP6 Jan 1 2010 value 387.498e-6
-## radiation co2 data override set to CMIP6 Jan 1 2010 value 387.498e-6
 "ATM" , "co2_dvmr_restore", "",     "", "none",  387.498e-06
 #
       </dataTable>  
@@ -6692,6 +6688,19 @@ set nyblock = $atm_threads
       <xi:include xpointer="xpointer(//freInclude[@name='fire_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='atmos_co2_postprocess']/postProcess/node())"/>
     </postProcess>
+  </experiment>
+
+  <experiment name="AM4p1_2010C_p2K_1980LU_dustfix" inherit="AM4p1_2010C_PIpcairco2_1980LU_dustfix">
+    <input>
+      <namelist name="ice_spec_nml">
+      mcm_ice = .false.
+      do_leads = .false.
+      minimum_ice_concentration = 0.5
+      minimum_ice_thickness = 0.1
+      sst_degk = .true.
+      sst_pert = 2.0
+      </namelist>
+    </input>
   </experiment>
 
 </experimentSuite>
