@@ -9041,11 +9041,22 @@ endif
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/FINAL/LISOTD_LRMTS_V2.3.2013.CLIMO.20140208.nc</dataSource>
       </dataFile>
       <!-- After SLM verifies GDP and population datasets, copy from /archive/slm/DATA/fire -->
+<!--
+   slm: I had to preprocess GDP and population density time series from the same data sources as 1850 values
+   that we use in spinups: resolution must be coarsened, otherwise bilinear hortiz. interolation that we have
+   to use on cubic sphere grid would produce non-representative values.
+
+   My concern is that the population density goes only as far as 2013; since we use time_interp_external
+   for this data set, I think the model would stop after that date.
+
+   The original data sets come from Dan Ward's FireMIP directory (/lustre/f1/unswept/Daniel.Ward/data/FireMIP).
+   Are there any official CMIP6 population density data for historical runs and future scenarios?
+-->
       <dataFile label="input" target="INPUT/GDP.nc">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/gdp_1500-2500.20140201.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/GDP_1500-2500_1x1_v20180628.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/population.nc">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/pop_density_1500-2500.20140130.nc--or--pop_density_1500-2500.v20140402.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/pop_density_1500-2013_1x1_v20180628.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/Fk.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/FINAL/FcFp_20170207_2deg.nc</dataSource>
