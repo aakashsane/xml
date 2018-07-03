@@ -87,13 +87,13 @@ NOTES:
 -->
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="pre_xanadu_esm4_20180619"/>  <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="pre_xanadu_esm4_20180703"/>  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for shared source code -->
   <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>     <!-- git tag for atmos_shared and atmos_param source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>        <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>        <!-- git tag for LAND source code -->
   <property name="COUPLER_GIT_TAG"    value="$(RELEASE)"/>    <!-- git tag for AWG source code -->
-  <property name="BUILD_DATE"     value="20180619"/>
+  <property name="BUILD_DATE"     value="20180703"/>
   <property name="MOM6_DATE"      value="2018.04.11"/>        <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>  <!-- git tag for ocean_shared component -->
@@ -3222,7 +3222,7 @@ LWH (3/16/2018)
        N_fixer_C_efficiency  = 0.2  ! Phillips, 1980: Per plant allocation, about 6 gC/gN
        myc_scav_C_efficiency = 0.5
        myc_mine_C_efficiency = 0.5
-       N_limits_live_biomass = F
+       N_limits_live_biomass = .FALSE.
        mycorrhizal_turnover_time = 1.0
        N_fixer_turnover_time = 0.1
        excess_stored_N_leakage_rate = 1.5e-1
@@ -3419,13 +3419,13 @@ SIS_OVERRIDE_EOF
 "OCN", "runoff_sldon_flux_ice_ocn", "SLDON_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
 "OCN", "runoff_srdon_flux_ice_ocn", "SRDON_CONC", "./INPUT/news_nutrients.nc","none",1.0e-3
 "OCN", "runoff_ndet_flux_ice_ocn",  "NDET_CONC",  "./INPUT/news_nutrients.nc","none",1.0e-3
-"OCN", "runoff_po4_flux_ice_ocn",   "PO4_CONC",   "./INPUT/news_nutrients.nc","none",1.55e-3
-"OCN", "runoff_ldop_flux_ice_ocn",  "LDOP_CONC",  "./INPUT/news_nutrients.nc","none",1.55e-3
-"OCN", "runoff_sldop_flux_ice_ocn", "SLDOP_CONC", "./INPUT/news_nutrients.nc","none",1.55e-3
-"OCN", "runoff_srdop_flux_ice_ocn", "SRDOP_CONC", "./INPUT/news_nutrients.nc","none",1.55e-3
+"OCN", "runoff_po4_flux_ice_ocn",   "PO4_CONC",   "./INPUT/news_nutrients.nc","none",1.65e-3
+"OCN", "runoff_ldop_flux_ice_ocn",  "LDOP_CONC",  "./INPUT/news_nutrients.nc","none",1.65e-3
+"OCN", "runoff_sldop_flux_ice_ocn", "SLDOP_CONC", "./INPUT/news_nutrients.nc","none",1.65e-3
+"OCN", "runoff_srdop_flux_ice_ocn", "SRDOP_CONC", "./INPUT/news_nutrients.nc","none",1.65e-3
 "OCN", "runoff_fed_flux_ice_ocn",   "FED_CONC",   "./INPUT/river_iron.nc",    "none",1.0e-3
-"OCN", "runoff_alk_flux_ice_ocn",  "",    "",                             "none",  0.49e-3
-"OCN", "runoff_dic_flux_ice_ocn",  "",    "",                             "none",  0.34e-3
+"OCN", "runoff_alk_flux_ice_ocn",  "",    "",                             "none",  0.42e-3
+"OCN", "runoff_dic_flux_ice_ocn",  "",    "",                             "none",  0.32e-3
 "OCN", "runoff_lith_flux_ice_ocn", ""  , ""                             , "none" , 13.0e-3
 #
 # jgj data table for o2 gas exchange
@@ -5139,8 +5139,8 @@ nh3_valid_min = 0.0
     maturalage =    5.0
     seedling_height = 0.5
     prob_e =   0.4
-    mortrate_d_c =   0.00526
-    mortrate_d_u =   0.00847
+    mortrate_d_c =   0.01429
+    mortrate_d_u =   0.02301
     rho_wood =   215.95
     LAImax =   6.0
     phiRL =   1.4
@@ -9386,6 +9386,26 @@ endif
     </runtime>
 
     <postProcess>
+      <csh><![CDATA[
+# To improve land model performance with better workload allocation across processors:
+# (1) combine restarts
+# (2) unpack them and cd to the unpacked directory
+# (3) run the script to generate tile distribution file:
+#     /home/slm/bin/make-land-domain-file.py -v land.res.tile?.nc -o land_domain.nc
+# (4) pack the restart back. For a good measure I include the python script for 
+#     future reference.
+# I did all of that on analysis, but there is no reason it should not work on gaea, if
+# required python modules are available (numpy and netCDF4)
+
+# copy land domain decomposition information from INPUT to RESTART each time -- otherwise 
+# decomposition the model creates on the next start up would not be the same and the model 
+# gets stuck:
+if ( -f $work/INPUT/land_domain.nc ) then
+   cp $work/INPUT/land_domain.nc $work/RESTART/
+endif
+
+]]>   </csh>
+
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
 
       <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess_ATMOS']/postProcess/node())"/>
