@@ -9044,20 +9044,23 @@ endif
       <!-- After SLM verifies GDP and population datasets, copy from /archive/slm/DATA/fire -->
 <!--
    slm: I had to preprocess GDP and population density time series from the same data sources as 1850 values
-   that we use in spinups: resolution must be coarsened, otherwise bilinear hortiz. interolation that we have
-   to use on cubic sphere grid would produce non-representative values.
+   that we use in spinups (whic is FireMIP data): resolution must be coarsened, otherwise bilinear hortiz. 
+   interolation that we have to use on cubic sphere grid would produce non-representative values.
 
-   My concern is that the population density goes only as far as 2013; since we use time_interp_external
-   for this data set, I think the model would stop after that date.
+   Population density in the original FireMIP data set goes only as far as 2013; to allow the model to run 
+   to completion of historical period the coarse-resolution data were extended to 2016-01-01 with the copy 
+   of 2013 time slice.
 
    The original data sets come from Dan Ward's FireMIP directory (/lustre/f1/unswept/Daniel.Ward/data/FireMIP).
    Are there any official CMIP6 population density data for historical runs and future scenarios?
+
+   Commented out GDP data since they are not used in current configuration.
 -->
-      <dataFile label="input" target="INPUT/GDP.nc">
+      <!-- dataFile label="input" target="INPUT/GDP.nc">
         <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/GDP_1500-2500_1x1_v20180628.nc</dataSource>
-      </dataFile>
+      </dataFile -->
       <dataFile label="input" target="INPUT/population.nc">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/pop_density_1500-2013_1x1_v20180628.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/pop_density_1500-2016_1x1_v20180710.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/Fk.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/FINAL/FcFp_20170207_2deg.nc</dataSource>
