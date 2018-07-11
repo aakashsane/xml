@@ -89,7 +89,7 @@ NOTES:
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"        value="pre_xanadu_esm4_20180703"/>  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for shared source code -->
-  <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>     <!-- git tag for atmos_shared and atmos_param source code -->
+  <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>        <!-- git tag for atmos_shared and atmos_param source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>        <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>        <!-- git tag for LAND source code -->
   <property name="COUPLER_GIT_TAG"    value="$(RELEASE)"/>    <!-- git tag for AWG source code -->
@@ -97,33 +97,33 @@ NOTES:
   <property name="MOM6_DATE"      value="2018.04.11"/>        <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>  <!-- git tag for ocean_shared component -->
-  <property name="FRE_STEM"       value="CMIP6/ESM4/spinup"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="CMIP6/ESM4/DECK"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
-  <property name="PROD_SIMTIME"     value="1000"/>  <!--simulation length in years-->
+  <property name="PROD_SIMTIME"     value="165"/>  <!--simulation length in years-->
   <property name="PP_CMIP_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CMIP_CHUNK_B"  value="10yr"/> <!--bigger  chunk length for pp/analysis-->
-  <property name="PP_START_YEAR"    value="0001" />
+  <property name="PP_START_YEAR"    value="1850" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
   <property name="PROD_SEGTIME"     value="03:00:00"/><!--Wall clock per segment (usually 1 year)-->
 
   <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->   
-  <property name="EXP_CPLD_START"   value="0001"/> <!--simulation start year--> 
-  <property name="EXP_CPLD_END"     value="0100"/> <!--simulation end   year--> 
+  <property name="EXP_CPLD_START"   value="1850"/> <!--simulation start year--> 
+  <property name="EXP_CPLD_END"     value="2014"/> <!--simulation end   year--> 
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
   <property name="FRE_VERSION"     value="bronx-12"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="off"/>      <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
-  <property name="CVDP_startyear"  value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
+  <property name="CVDP_startyear"  value="1980"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-  <property name="reference_tag"   value="warsaw_201710_mom6_2017.10.19_answers"/>
+  <property name="reference_tag"   value=""/>
                           
   <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
@@ -1561,7 +1561,7 @@ Experiment to build executable.
 <!--= ESM4 EXPERIMENTS    =-->
 <!--=======================-->
 
-  <experiment name="ESM4_piControl_spinupB" inherit="esm4.1_sis2_compile">
+  <experiment name="ESM4_historical" inherit="esm4.1_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"ESM4_c96L49_am4p1_OMp5"</model>
@@ -1569,127 +1569,10 @@ Experiment to build executable.
       <experimentName>"$(name)"</experimentName>
       <experimentID>"$(name)" </experimentID>
       <comment>
-       Experiment name = $(name)
-For more information please refer to the
-&lt;a href="http://wiki.gfdl.noaa.gov/index.php/MDT_Coupled"&gt; Coupled Working Group Wiki.  &lt;/a&gt; and  
-&lt;a href="http://cobweb.gfdl.noaa.gov/~Oar.Gfdl.Mdteam/cm4/$USER/$(name)"&gt; Global Diagnostics Page.  &lt;/a&gt;
-
-- using a newer ocean topography (John Dunne) and newer hydrography files (Krista Dunne)
       </comment>
     </publicMetadata>
 
 <description>
-2018/03/22 slm
-* update settings for consistency with code updates -- understory_lai_factor moved
-  from namelist to species parameters.
-* define river DOC tracer to properly diagnose carbon conservation.
-* add sh0.5 and sh1.0 experiments with seedling height increased to 0.5 and 1.0 m
-  respectively.
-
-2018/03/14 slm
-Update code to address SAI issues.
-
-2018/03/11 slm
-* change dat_snow_crit to 1e7, to (effectively) turn off snow overlap parameterization.
-
-2018/03/09 slm
-* in land_dust_nml, reduced sai_thresh from 0.025 to 0.01 (see Paul Ginoux's e-mail
-  of 2018-03-09)
-* after conversation with Paul, increased ch from 1.65e-9 to to 2.15e-9 in land_dust_nml,
-  to increase emission to match model's droughty Sahel conditions.
-* set species parameters as in years 0052-0061 of Elena's
-  c96L33_am4p0_lm4p1v0_1850climo_PISST_ICShef_notrl run
-
-2017/09/21 JGJ
-Build coupled model from AM4fullchem 
-LWH: /ncrc/home1/Larry.Horowitz/awg/warsaw_201707/xml_warsaw_201707/awg_warsaw_201707.xml
-     expt c96L49_am4p0_AM4chem_terpene_1850climo
-JGJ: ESM4p1_1850_Conc.xml  (#808 for ocean, #814 for atm/land nml)
-
-Ocean is from #808, except change KD to 1.5e-5
-check with Land WG for namelist and other dataset updates
-streamline for CMIP6 
-
-Set up ESM4 C-driven 1850 PI-Control Prototype 
-C96L49_am4p0_OMp5 + COBALT + atmos_co2 tracer
-
-added MOM6 settings from MDT run #808
-Updated COBALT code from CAS: ~/fre/updates/COBALT/generic_COBALT_091217_jo2_plus_btm_fix.F90
-Updated COBALT data table settings match those for BLINGv2
-Updated COBALT IC to add fedet_btf set to zero
-Updated COBALT field_table to add fedet_btf
-Use mocsy as carbon equilibration method.
-
-Preind DIC
-GLODAPv1 for now - need to get GLODAPv2 from OCMIP website
-updated CM4 IC to add Jan 1 1850 atm co2
-latest CMIP6 OBGC diags 
-
-warsaw_201707 codebase
-override pcair co2 - set to 1850 Jan 1 co2 value
-Add in mocsy updates
-
-DID NOT CHANGE to match CM4B PI_Control spinup #814:
-   harvesting_nml: do_harvesting=F, grazing_intensity=3.65
-   static_veg_nml:  use_static_veg=F
-
-UPDATED to match CM4B PI_Control spinup #814:
-   atm_chem field tables: add chem_param lines
-   aerosolrad_driver_nml: do_swaerosol_forcing, do_lwaerosol_forcing
-   lscloud_driver_nml: use_cf_metadata
-   cana_nml: sai_turb
-   soil_data_nml: use_comp_for_push 
-   photosynthesis_nml: lai_eps
-   vegn_data_nml: csc_lai, dat_snow_crit, use_light_saber, sai_cover, sai_rad, min_lai
-
-OMITTED during development since these are for cmip diagnostics only:
-   COSP namelists
-   atmos_tropopause_nml
-   physics_driver_nml: donner_meso_is_largescale, do_cosp, do_modis_yim 
-
-NOTES:
-kept settings from #814 (compared to LWH c96L49_am4p0_AM4chem_SOA):
-  aerosolrad_driver_nml: do_swaerosol_forcing, do_lwaerosol_forcing 
-  cg_grag_nml: Bt_0, Bt_nh, Bt_sh
-  tiedtke_macro_nml: eros_scale_c, eros_scale_t
-  rotstayn_klein_mp_nml: vfact
-
-Compile on Gaea C4 (intel-16).
-
-Add interactive dust emissions
-
-LWH (2/14/2018)
-Updates from "j" to "k" configuration:
-- Code updates to testing_20180202
-- Prevent tracer emissions through sea ice (from #922)
-- Correct calc_{ch4,n2o}_* settings in radiative_gases_nml
-  (no effect in climo runs, but caused slowdown in runs with time-varying forcings)
-- Updated DMS source from ocean (from Fabien)
-- New ocean background latitudinally dependent viscosity (from #917)
-- Restart ocean from WOA, but keep spun-up sea ice and icebergs
-- MOM restart bugfix (included as a csh hack for now)
-- Decrease gamma(HO2) from 1.0 to 0.2
-
-Niki Zadeh (3/2/2018)
-This is a new xml. Updates for LM4.1
-- Origin: LM4.1 changes by Sergey from his branch user/slm/esm4p3
-- Update: New 1/2 degree ocean grid from John Krasting user/jpk/ESMp3_mods 
-- Merged atmos from Larry H. "k" run in the notes above LWH (2/14/2018)
-- Added the  recommended settings for ocean (Smag) is in experiment ESM4p0p3k_1850C_PIpcairco2_smag
-- Renamed the compile component to esm4.1_sis2_compile (to discourage using/sharing in CM4/ESM4p0 runs)
-- Removed ice_sis from the build.
-
-JPK (3/6/2018)
-Edits suggested by ENS/SLM to address high veg. reflectance in boreal high latitudes
-- New code tag: fixes bug where canopy air tracers were not being sent to the atmosphere
-- Changed leaf reflectances for Prioria,  Picea, Larix, and Acer
-- Changed LAImax for Larix 
-
-LWH (3/16/2018)
-- Use MEGAN BVOC emissions for biogenic SOA
-- Updates to aerosol drydep/wetdep (f1p)
-- Seabird emissions of NH3
-- Improved exchange of NHx with ocean
 </description>
 
     <input>
@@ -1734,7 +1617,7 @@ LWH (3/16/2018)
       <namelist name ="aerosolrad_package_nml">
     force_to_repro_quebec = .true.
     using_im_bcsul = .true.
-    volcanic_dataset_entry = 1,1,1,0,0,
+    volcanic_dataset_entry = $baseDate
     using_volcanic_lw_files = .true.,
     lw_ext_filename = "extlw_data.nc"
     lw_ext_root = "extlw"
@@ -2091,42 +1974,42 @@ LWH (3/16/2018)
       do_dynamic_om = .true.,
       bcff_source = 'gocart_2007',
         bcff_input_name(1)='anthro',
-        bcff_filename='emissions.bc.0.5x0.5.1850.nc',
-        bcff_time_dependency_type='fixed_year',bcff_dataset_entry=1850,1,1,0,0,
+        bcff_filename='emissions.bc.0.5x0.5.1970-2017.nc',
+        bcff_time_dependency_type='time_varying',bcff_dataset_entry=$baseDate
       omff_source = 'gocart_2007',
         omff_input_name(1)='anthro',
-        omff_filename='emissions.om.0.5x0.5.1850.nc',
-        omff_time_dependency_type='fixed_year',omff_dataset_entry=1850,1,1,0,0,
+        omff_filename='emissions.om.0.5x0.5.1970-2017.nc',
+        omff_time_dependency_type='time_varying',omff_dataset_entry=$baseDate
       omsh_source = 'gocart_2007',
         omsh_input_name(1)='ship',
-        omsh_filename='emissions.om.0.5x0.5.1850.nc',
-        omsh_time_dependency_type='fixed_year',omsh_dataset_entry=1850,1,1,0,0,
+        omsh_filename='emissions.om.0.5x0.5.1970-2017.nc',
+        omsh_time_dependency_type='time_varying',omsh_dataset_entry=$baseDate
       bcsh_source = 'gocart_2007',
         bcsh_input_name(1)='ship',
-        bcsh_filename='emissions.bc.0.5x0.5.1850.nc',
-        bcsh_time_dependency_type='fixed_year',bcsh_dataset_entry=1850,1,1,0,0,
+        bcsh_filename='emissions.bc.0.5x0.5.1970-2017.nc',
+        bcsh_time_dependency_type='time_varying',bcsh_dataset_entry=$baseDate
       bcav_source = 'do_aircraft'
         bcav_input_name(1)='fuel',
-        bcav_filename='emissions.aircraft.aero.0.5x0.5.1850.nc',
-        bcav_time_dependency_type='fixed_year',bcav_dataset_entry=1850,1,1,0,0,
+        bcav_filename='emissions.aircraft.aero.0.5x0.5.1970-2017.nc',
+        bcav_time_dependency_type='time_varying',bcav_dataset_entry=$baseDate
       bcbb_source = 'AEROCOM',
-        bcbb_filename='emissions.bc.0.5x0.5.1850.nc',
+        bcbb_filename='emissions.bc.0.5x0.5.1970-2017.nc',
         bcbb_input_name(1)='bb_l1'
         bcbb_input_name(2)='bb_l2'
         bcbb_input_name(3)='bb_l3'
         bcbb_input_name(4)='bb_l4'
         bcbb_input_name(5)='bb_l5'
         bcbb_input_name(6)='bb_l6'
-        bcbb_time_dependency_type='fixed_year',bcbb_dataset_entry=1850,1,1,0,0,
+        bcbb_time_dependency_type='time_varying',bcbb_dataset_entry=$baseDate
       ombb_source = 'AEROCOM',
-        ombb_filename='emissions.om.0.5x0.5.1850.nc',
+        ombb_filename='emissions.om.0.5x0.5.1970-2017.nc',
         ombb_input_name(1)='bb_l1'
         ombb_input_name(2)='bb_l2'
         ombb_input_name(3)='bb_l3'
         ombb_input_name(4)='bb_l4'
         ombb_input_name(5)='bb_l5'
         ombb_input_name(6)='bb_l6'
-        ombb_time_dependency_type='fixed_year',ombb_dataset_entry=1850,1,1,0,0,
+        ombb_time_dependency_type='time_varying',ombb_dataset_entry=$baseDate
       omna_source = '',
       omss_source = 'ODowd'
         omss_coef = 0.05
@@ -2516,9 +2399,9 @@ LWH (3/16/2018)
       verbose = 3
       gas_printout_freq = 240
 
-      time_varying_co2 = .false.,
+      time_varying_co2 = .false.,                  ! keep false for historical co2 to avoid fatal error message: rad co2 will be overidden
       co2_variation_type = 'linear',
-      co2_dataset_entry = 1850,1,1,0,0,
+      co2_dataset_entry = $baseDate
       co2_specification_type = 'base_and_trend',
       co2_floor = 100.0E-06,
       co2_ceiling = 1600.0E-06,
@@ -2526,37 +2409,37 @@ LWH (3/16/2018)
 
       time_varying_ch4 = .false.,
       ch4_variation_type = 'linear'
-      ch4_dataset_entry = 1850,1,1,0,0,
+      ch4_dataset_entry = $baseDate
       ch4_specification_type = 'base_and_trend'
       ch4_data_source = 'predicted'
 
-      time_varying_n2o = .false.,
+      time_varying_n2o = .true.,
       n2o_variation_type = 'linear'
-      n2o_dataset_entry = 1850,1,1,0,0,
+      n2o_dataset_entry = $baseDate
       n2o_specification_type = 'time_series'
       n2o_data_source = 'input'
 
-      time_varying_f11 = .false.,
+      time_varying_f11 = .true.,
       f11_variation_type = 'linear'
-      f11_dataset_entry = 1850,1,1,0,0,
+      f11_dataset_entry = $baseDate
       f11_specification_type = 'time_series'
       f11_data_source = 'input'
 
-      time_varying_f12 = .false.,
+      time_varying_f12 = .true.,
       f12_variation_type = 'linear'
-      f12_dataset_entry = 1850,1,1,0,0,
+      f12_dataset_entry = $baseDate
       f12_specification_type = 'time_series'
       f12_data_source = 'input'
 
-      time_varying_f113 = .false.,
+      time_varying_f113 = .true.,
       f113_variation_type = 'linear'
-      f113_dataset_entry = 1850,1,1,0,0,
+      f113_dataset_entry = $baseDate
       f113_specification_type = 'time_series'
       f113_data_source = 'input'
 
-      time_varying_f22 = .false.,
+      time_varying_f22 = .true.,
       f22_variation_type = 'linear'
-      f22_dataset_entry = 1850,1,1,0,0,
+      f22_dataset_entry = $baseDate
       f22_specification_type = 'time_series'
       f22_data_source = 'input'
 
@@ -2651,8 +2534,8 @@ LWH (3/16/2018)
       <namelist name ="shortwave_driver_nml">
       do_cmip_diagnostics = .true.,
       swform = 'esfsw99'
-      solar_dataset_entry = 1850,1,1,0,0,
-      time_varying_solar_constant = .false.,
+      solar_dataset_entry = $baseDate
+      time_varying_solar_constant = .true.,
       </namelist>
 
       <namelist name ="simple_sulfate_nml">
@@ -2717,13 +2600,13 @@ LWH (3/16/2018)
         file_sulfate = 'sulfate.nc',
         file_conc = 'tracerIC.19800101.v2.nc',
         file_emis_1 = 'emissions.',
-        file_emis_2 = '.0.5x0.5.1850.nc',
+        file_emis_2 = '.0.5x0.5.1849-2017.nc',
         file_emis3d_1 = 'emissions3D.',
-        file_emis3d_2 = '.0.5x0.5.1850.nc',
+        file_emis3d_2 = '.0.5x0.5.1849-2017.nc',
         file_ub = 'ub_vals.mozart.nc',
         file_dry = 'depvel_gc_am3_tran.nc',
         inv_list = '',
-        file_aircraft = 'emissions.aircraft.0.5x0.5.1850.nc',
+        file_aircraft = 'emissions.aircraft.0.5x0.5.1849-2017.nc',
         lght_no_prd_factor = 1.2,
         normalize_lght_no_prd_area = .true.,
         min_land_frac_lght = 0.1,
@@ -2739,8 +2622,7 @@ LWH (3/16/2018)
         set_min_h2o_strat = .true.,
         ch4_filename = 'ch4_gblannualdata',
         ch4_scale_factor = 1.e-9,
-        time_varying_cfc_lbc = .false.,
-        cfc_lbc_dataset_entry = 1950,1,1,0,0,0,
+        time_varying_cfc_lbc = .true.,
         do_fastjx_photo = .true.
         frac_aerosol_incloud   = 0.7,
         frac_dust_incloud = 0.0,
@@ -2757,7 +2639,7 @@ LWH (3/16/2018)
         gNO3 = 0.02
         gNO2 = 1e-5
         gNH3 = 0.,
-        time_varying_solarflux = .false.
+        time_varying_solarflux = .true.
 	gSO2_dynamic = 'zheng2015'
       </namelist>
 
@@ -3039,7 +2921,7 @@ LWH (3/16/2018)
       </namelist>
 
       <namelist name ="landuse_nml">
-       do_landuse_change = .FALSE.
+       do_landuse_change = .TRUE.
        data_type   = 'luh2'
        input_file  = '$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/landuse/LUH2/v2.0h/extras/zero-transitions.v20170711.nc'
        state_file  = '$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/landuse/LUH2/v2.0h/extras/state-1850-nosecd.v20170711.nc'
@@ -3313,7 +3195,8 @@ LWH (3/16/2018)
 
       <namelist name="generic_tracer_nml">
        do_generic_tracer=.true.
-       do_generic_CFC=.false.
+       do_generic_CFC=.true.
+       do_generic_SF6=.true.
        do_generic_COBALT=.true.
        do_generic_TOPAZ=.false.
        do_generic_BLING=.false.
@@ -3325,7 +3208,7 @@ LWH (3/16/2018)
       <namelist name="coupler_nml">
         months = $months,
         days   = $days,
-        current_date = 1,1,1,0,0,0,
+        current_date = 1850,1,1,0,0,0,
         calendar = 'NOLEAP'
         dt_atmos = 1800,
         dt_cpld  = 3600,
@@ -3432,10 +3315,13 @@ SIS_OVERRIDE_EOF
 #
 "ATM", "o2_flux_pcair_atm", ""         , ""                             , "none" , 0.214
 #
-# jgj 2016/11/29 co2 data table (Jan 1 1850 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
+## restore atmospheric CO2 tracer to historical timeseries of global mean CO2 concentration 
+"ATM", "co2_dvmr_restore", "co2", "INPUT/co2_data.nc", "bilinear", 1.e-6
 #
-## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
-"ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
+# time-varying boundary conditions for CFCs/SF6
+"ATM", "cfc11_flux_pcair_atm", "CFC11", "INPUT/cfc.bc.nc", "bilinear", 1.0e-12
+"ATM", "cfc12_flux_pcair_atm", "CFC12", "INPUT/cfc.bc.nc", "bilinear", 1.0e-12
+"ATM", "sf6_flux_pcair_atm",   "SF6",   "INPUT/cfc.bc.nc", "bilinear", 1.0e-12
       </dataTable>  
 
 
@@ -3735,7 +3621,7 @@ SIS_OVERRIDE_EOF
 "cmip","cmip6","cmip_name=nitrous_oxide"
 "init_conc","file"
 "convection","all"
-"lower_bound","file","file=n2o_gblannualdata,factor=1.e-9,fixed_year=1850."
+"lower_bound","file","file=n2o_gblannualdata,factor=1.e-9"
 /
 
 "tracer","atmos_mod","n"
@@ -3813,7 +3699,7 @@ SIS_OVERRIDE_EOF
 "dry_deposition","file"
 "init_conc","file"
 "convection","all"
-"lower_bound","file","file=ch4_gblannualdata,factor=1.e-9,fixed_year=1850."
+"lower_bound","file","file=ch4_gblannualdata,factor=1.e-9"
 /
 
 "tracer","atmos_mod","ch3o2"
@@ -5465,7 +5351,7 @@ $baseDate
 "grid_spec",            -1, "months",  1, "days", "time",
 #"atmos_8xdaily",         3,  "hours",  1, "days", "time",
 #"atmos_4xdaily",         6,  "hours",  1, "days", "time",
-#"atmos_daily",          24,  "hours",  1, "days", "time",
+"atmos_daily",          24,  "hours",  1, "days", "time",
 "atmos_month",           1, "months",  1, "days", "time",
 "atmos_month_aer",       1, "months",  1, "days", "time",
 "atmos_tracer",          1, "months",  1, "days", "time",
@@ -5523,7 +5409,7 @@ $baseDate
 # atmos_daily
 # ###########
 #
-#"radiation",  "pm2.5",                          "pm2.5",            "atmos_daily",     "all", .true.,  "none", 2
+"radiation",  "pm2.5",                          "pm2.5",            "atmos_daily",     "all", .true.,  "none", 2
 #"flux",      "land_mask",                      "land_mask",        "atmos_daily",     "all", .false., "none", 2
 #"dynamics",  "zsurf",                          "zsurf",            "atmos_daily",     "all", .false., "none", 2
 #"dynamics",  "bk",                             "bk",               "atmos_daily",     "all", .false., "none", 2
@@ -5764,15 +5650,23 @@ $baseDate
 "tracers",   "Ox_prod",     "Ox_prod",     "atmos_tracer", "all", .true.,  "none", 2
 "tracers",   "Ox_loss",     "Ox_loss",     "atmos_tracer", "all", .true.,  "none", 2
 "tracers",   "o3_ddep",     "O3_ddep",     "atmos_tracer", "all", .true.,  "none", 2
-# "tracers",   "jval_001",    "jval_001",    "atmos_tracer", "all", .true.,  "none", 2
+"tracers",   "jval_001",    "jval_001",    "atmos_tracer", "all", .true.,  "none", 2
 "tracers",   "hook_no",     "hook_no",     "atmos_tracer", "all", .true.,  "none", 2
-"tracers",   "flash_freq",    "flash_freq",     "atmos_tracer", "all", .true.,  "none", 2
-"tracers",   "CH4_loss",      "CH4_loss",       "atmos_tracer", "all", .true.,  "none", 2
+"tracers",   "flash_freq",  "flash_freq",  "atmos_tracer", "all", .true.,  "none", 2
+"tracers",   "prod_no_col", "prod_no_col", "atmos_tracer", "all", .true.,  "none", 2
+"tracers",   "H2O_prod",    "H2O_prod",    "atmos_tracer", "all", .true.,  "none", 2
+"tracers",   "H2O_chem_dt", "H2O_chem_dt", "atmos_tracer", "all", .true.,  "none", 2
+"tracers",   "CH4_loss",    "CH4_loss",    "atmos_tracer", "all", .true.,  "none", 2
+
+"tracers",   "so2_emis",      "SO2_emis",       "atmos_tracer", "all", .true., "none", 2
+"tracers",   "so2_emis3d",    "SO2_emis3d",     "atmos_tracer", "all", .true., "none", 2
 "tracers",   "SO2_prodm",     "SO2_prodm",      "atmos_tracer", "all", .true., "none", 2
 "tracers",   "SO4_prodm",     "SO4_prodm",      "atmos_tracer", "all", .true., "none", 2
 "moist",     "so4_wet_depo",  "SO4_wdep_all",   "atmos_tracer", "all", .true., "none", 2
 "tracers",   "so2_reevap_ls", "SO2_evap_ls",    "atmos_tracer", "all", .true., "none", 2
 "tracers",   "so4_ddep",      "SO4_ddep",       "atmos_tracer", "all", .true., "none", 2
+"tracers",   "so4_wdep_ls",   "SO4_wdep_ls",    "atmos_tracer", "all", .true., "none", 2
+"dynamics",  "so4_col",       "so4_col",        "atmos_tracer", "all", .true., "none", 2
 "tracers",   "SO4_col",       "SO4_col_tracer", "atmos_tracer", "all", .true., "none", 2
 "tracers",   "pso4_h2o2",     "PROD_SO4_H2O2",  "atmos_tracer", "all", .true., "none", 2
 "tracers",   "pso4_o3",       "PROD_SO4_O3",    "atmos_tracer", "all", .true., "none", 2
@@ -5801,8 +5695,9 @@ $baseDate
 # ############
 # atmos_hourly
 # ############
-#"atmos_hourly",    1,  "hours",  1, "days", "time",
-#"dynamics",  "O3", "O3", "atmos_hourly", "all", .true.,  "-1  -1 -1  -1 997. 1000.", 2
+"atmos_hourly",    1,  "hours",  1, "days", "time",
+"dynamics",  "O3", "O3", "atmos_hourly", "all", .true.,  "-1  -1 -1  -1 997. 1000.", 2
+
 # ############
 # atmos_scalar
 # ############
@@ -8830,6 +8725,45 @@ $baseDate
 #"atmos_global",     "tasl",      "tasl",     "atmos_global_cmip",  "all", .true.,  "none", 2
 #
 #===============================================================================================
+
+#======================================================================================
+# Ocean Inert Chemistry Diagnostics
+"ocean_inert",           1, "months", 1, "days", "time",
+"ocean_inert_z",         1, "months", 1, "days", "time",
+"ocean_inert_annual",   12, "months", 1, "days", "time",
+"ocean_inert_annual_z", 12, "months", 1, "days", "time",
+#
+"generic_cfc",    "cfc11",    "cfc11",    "ocean_inert",          "all",.true.,"none",2
+"generic_cfc_z",  "cfc11",    "cfc11",    "ocean_inert_z",        "all",.true.,"none",2
+"generic_cfc",    "cfc11",    "cfc11",    "ocean_inert_annual",   "all",.true.,"none",2
+"generic_cfc_z",  "cfc11",    "cfc11",    "ocean_inert_annual_z", "all",.true.,"none",2
+"generic_cfc",    "fgcfc11",  "fgcfc11",  "ocean_inert",          "all",.true.,"none",2
+"generic_cfc",    "cfc12",    "cfc12",    "ocean_inert",          "all",.true.,"none",2
+"generic_cfc_z",  "cfc12",    "cfc12",    "ocean_inert_z",        "all",.true.,"none",2
+"generic_cfc",    "cfc12",    "cfc12",    "ocean_inert_annual",   "all",.true.,"none",2
+"generic_cfc_z",  "cfc12",    "cfc12",    "ocean_inert_annual_z", "all",.true.,"none",2
+"generic_cfc",    "fgcfc12",  "fgcfc12",  "ocean_inert",          "all",.true.,"none",2
+"generic_sf6",    "sf6",      "sf6",      "ocean_inert",          "all",.true.,"none",2
+"generic_sf6_z",  "sf6",      "sf6",      "ocean_inert_z",        "all",.true.,"none",2
+"generic_sf6",    "sf6",      "sf6",      "ocean_inert_annual",   "all",.true.,"none",2
+"generic_sf6_z",  "sf6",      "sf6",      "ocean_inert_annual_z", "all",.true.,"none",2
+"generic_sf6",    "fgsf6",    "fgsf6",    "ocean_inert",          "all",.true.,"none",2
+"generic_cfc",   "cfc11_alpha",     "cfc11_alpha",     "ocean_inert","all",.true.,"none",2
+"generic_cfc",   "cfc11_csurf",     "cfc11_csurf",     "ocean_inert","all",.true.,"none",2
+"generic_cfc",   "cfc11_sc_no",     "cfc11_sc_no",     "ocean_inert","all",.true.,"none",2
+"generic_cfc",   "cfc11_stf_gas",   "cfc11_stf_gas",   "ocean_inert","all",.true.,"none",2
+"generic_cfc",   "cfc12_alpha",     "cfc12_alpha",     "ocean_inert","all",.true.,"none",2
+"generic_cfc",   "cfc12_csurf",     "cfc12_csurf",     "ocean_inert","all",.true.,"none",2
+"generic_cfc",   "cfc12_sc_no",     "cfc12_sc_no",     "ocean_inert","all",.true.,"none",2
+"generic_cfc",   "cfc12_stf_gas",   "cfc12_stf_gas",   "ocean_inert","all",.true.,"none",2
+"generic_sf6",   "sf6_alpha",       "sf6_alpha",       "ocean_inert","all",.true.,"none",2
+"generic_sf6",   "sf6_csurf",       "sf6_csurf",       "ocean_inert","all",.true.,"none",2
+"generic_sf6",   "sf6_sc_no",       "sf6_sc_no",       "ocean_inert","all",.true.,"none",2
+"generic_sf6",   "sf6_stf_gas",     "sf6_stf_gas",     "ocean_inert","all",.true.,"none",2
+"ocean_model",  "volcello", "volcello",  "ocean_inert","all","mean","none",2 # Cell measure for 3d data
+"ocean_model_z","volcello", "volcello",  "ocean_inert_z","all","mean","none",2 # Cell measure for 3d data
+"ocean_model",  "volcello", "volcello",  "ocean_inert_annual","all","mean","none",2 # Cell measure for 3d data
+"ocean_model_z","volcello", "volcello",  "ocean_inert_annual_z","all","mean","none",2 # Cell measure for 3d data
       </diagTable> 
 
 
@@ -9108,11 +9042,26 @@ endif
       <dataFile label="input" target="INPUT/lightning.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/FINAL/LISOTD_LRMTS_V2.3.2013.CLIMO.20140208.nc</dataSource>
       </dataFile>
-      <dataFile label="input" target="INPUT/GDP.nc">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/GDP_1851_1x1_v20180502.nc</dataSource>
-      </dataFile>
+      <!-- After SLM verifies GDP and population datasets, copy from /archive/slm/DATA/fire -->
+<!--
+   slm: I had to preprocess GDP and population density time series from the same data sources as 1850 values
+   that we use in spinups (whic is FireMIP data): resolution must be coarsened, otherwise bilinear hortiz. 
+   interolation that we have to use on cubic sphere grid would produce non-representative values.
+
+   Population density in the original FireMIP data set goes only as far as 2013; to allow the model to run 
+   to completion of historical period the coarse-resolution data were extended to 2016-01-01 with the copy 
+   of 2013 time slice.
+
+   The original data sets come from Dan Ward's FireMIP directory (/lustre/f1/unswept/Daniel.Ward/data/FireMIP).
+   Are there any official CMIP6 population density data for historical runs and future scenarios?
+
+   Commented out GDP data since they are not used in current configuration.
+-->
+      <!-- dataFile label="input" target="INPUT/GDP.nc">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/GDP_1500-2500_1x1_v20180628.nc</dataSource>
+      </dataFile -->
       <dataFile label="input" target="INPUT/population.nc">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/pop_density_1851_1x1_v20180502.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/pop_density_1500-2016_1x1_v20180710.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/Fk.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/FINAL/FcFp_20170207_2deg.nc</dataSource>
@@ -9156,23 +9105,23 @@ endif
       </dataFile>
 
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_1850_cmip6_v2/extsw_data.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_TimeSeries_cmip6_v2/extsw_data.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_1850_cmip6_v2/omgsw_data.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_TimeSeries_cmip6_v2/omgsw_data.nc</dataSource>
       </dataFile>
         <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_1850_cmip6_v2/asmsw_data.nc</dataSource>
+      <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_TimeSeries_cmip6_v2/asmsw_data.nc</dataSource>
       </dataFile>
         <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_1850_cmip6_v2/extlw_data.nc</dataSource>
+      <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_TimeSeries_cmip6_v2/extlw_data.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_1850_cmip6_v2/lean_solar_spectral_data.dat</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_TimeSeries_cmip6_v2/lean_solar_spectral_data.dat</dataSource>
       </dataFile>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/emissions/v2017-05-18/1850_wseabirdnh3/emissions.0.5x0.5.1850.tar</dataSource>
+        <dataSource platform="$(platform)">$CDATA/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/1849-2017_wseabirdnh3/emissions.0.5x0.5.1849-2017.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/anthro_so2.1849_2017.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/emissions_cmip6_v20170518/emissions.simple.so2.0.5x0.5.1849-2017.nc</dataSource>
@@ -9187,7 +9136,15 @@ endif
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/emissions/dms/DMS_lana_gfdl.nc</dataSource>
       </dataFile>
 
+      <!-- CMIP6 CO2 historical timeseries -->
+      <dataFile label="input" target="INPUT/co2_data.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/CO2/co2_historical_3D_0to2016.nc</dataSource>
+      </dataFile>
 
+      <!-- CFC historical timeseries (need to move to role account) -->
+      <dataFile label="input" target="INPUT/cfc.bc.nc" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/John.Krasting/cwg/input/cfc/CFC_histories_revised_2015_20x20deg.20171208.nc</dataSource>
+      </dataFile>
 
       <!--MOM6 Input datasets: 0.5 degree -->
 

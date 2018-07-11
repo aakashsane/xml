@@ -89,7 +89,7 @@ NOTES:
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"        value="pre_xanadu_esm4_20180703"/>  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for shared source code -->
-  <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>     <!-- git tag for atmos_shared and atmos_param source code -->
+  <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>        <!-- git tag for atmos_shared and atmos_param source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>        <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>        <!-- git tag for LAND source code -->
   <property name="COUPLER_GIT_TAG"    value="$(RELEASE)"/>    <!-- git tag for AWG source code -->
@@ -97,13 +97,13 @@ NOTES:
   <property name="MOM6_DATE"      value="2018.04.11"/>        <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>  <!-- git tag for ocean_shared component -->
-  <property name="FRE_STEM"       value="CMIP6/ESM4/spinup"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="CMIP6/ESM4/DECK"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
-  <property name="PROD_SIMTIME"     value="1000"/>  <!--simulation length in years-->
+  <property name="PROD_SIMTIME"     value="300"/>  <!--simulation length in years-->
   <property name="PP_CMIP_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CMIP_CHUNK_B"  value="10yr"/> <!--bigger  chunk length for pp/analysis-->
   <property name="PP_START_YEAR"    value="0001" />
@@ -123,7 +123,7 @@ NOTES:
   <property name="CVDP_startyear"  value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-  <property name="reference_tag"   value="warsaw_201710_mom6_2017.10.19_answers"/>
+  <property name="reference_tag"   value="pre_xanadu_esm4_20180619_mom6_2018.04.11_answers"/>
                           
   <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
@@ -1561,7 +1561,7 @@ Experiment to build executable.
 <!--= ESM4 EXPERIMENTS    =-->
 <!--=======================-->
 
-  <experiment name="ESM4_piControl_spinupB" inherit="esm4.1_sis2_compile">
+  <experiment name="ESM4_1pctCO2_B" inherit="esm4.1_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"ESM4_c96L49_am4p1_OMp5"</model>
@@ -1569,127 +1569,10 @@ Experiment to build executable.
       <experimentName>"$(name)"</experimentName>
       <experimentID>"$(name)" </experimentID>
       <comment>
-       Experiment name = $(name)
-For more information please refer to the
-&lt;a href="http://wiki.gfdl.noaa.gov/index.php/MDT_Coupled"&gt; Coupled Working Group Wiki.  &lt;/a&gt; and  
-&lt;a href="http://cobweb.gfdl.noaa.gov/~Oar.Gfdl.Mdteam/cm4/$USER/$(name)"&gt; Global Diagnostics Page.  &lt;/a&gt;
-
-- using a newer ocean topography (John Dunne) and newer hydrography files (Krista Dunne)
       </comment>
     </publicMetadata>
 
 <description>
-2018/03/22 slm
-* update settings for consistency with code updates -- understory_lai_factor moved
-  from namelist to species parameters.
-* define river DOC tracer to properly diagnose carbon conservation.
-* add sh0.5 and sh1.0 experiments with seedling height increased to 0.5 and 1.0 m
-  respectively.
-
-2018/03/14 slm
-Update code to address SAI issues.
-
-2018/03/11 slm
-* change dat_snow_crit to 1e7, to (effectively) turn off snow overlap parameterization.
-
-2018/03/09 slm
-* in land_dust_nml, reduced sai_thresh from 0.025 to 0.01 (see Paul Ginoux's e-mail
-  of 2018-03-09)
-* after conversation with Paul, increased ch from 1.65e-9 to to 2.15e-9 in land_dust_nml,
-  to increase emission to match model's droughty Sahel conditions.
-* set species parameters as in years 0052-0061 of Elena's
-  c96L33_am4p0_lm4p1v0_1850climo_PISST_ICShef_notrl run
-
-2017/09/21 JGJ
-Build coupled model from AM4fullchem 
-LWH: /ncrc/home1/Larry.Horowitz/awg/warsaw_201707/xml_warsaw_201707/awg_warsaw_201707.xml
-     expt c96L49_am4p0_AM4chem_terpene_1850climo
-JGJ: ESM4p1_1850_Conc.xml  (#808 for ocean, #814 for atm/land nml)
-
-Ocean is from #808, except change KD to 1.5e-5
-check with Land WG for namelist and other dataset updates
-streamline for CMIP6 
-
-Set up ESM4 C-driven 1850 PI-Control Prototype 
-C96L49_am4p0_OMp5 + COBALT + atmos_co2 tracer
-
-added MOM6 settings from MDT run #808
-Updated COBALT code from CAS: ~/fre/updates/COBALT/generic_COBALT_091217_jo2_plus_btm_fix.F90
-Updated COBALT data table settings match those for BLINGv2
-Updated COBALT IC to add fedet_btf set to zero
-Updated COBALT field_table to add fedet_btf
-Use mocsy as carbon equilibration method.
-
-Preind DIC
-GLODAPv1 for now - need to get GLODAPv2 from OCMIP website
-updated CM4 IC to add Jan 1 1850 atm co2
-latest CMIP6 OBGC diags 
-
-warsaw_201707 codebase
-override pcair co2 - set to 1850 Jan 1 co2 value
-Add in mocsy updates
-
-DID NOT CHANGE to match CM4B PI_Control spinup #814:
-   harvesting_nml: do_harvesting=F, grazing_intensity=3.65
-   static_veg_nml:  use_static_veg=F
-
-UPDATED to match CM4B PI_Control spinup #814:
-   atm_chem field tables: add chem_param lines
-   aerosolrad_driver_nml: do_swaerosol_forcing, do_lwaerosol_forcing
-   lscloud_driver_nml: use_cf_metadata
-   cana_nml: sai_turb
-   soil_data_nml: use_comp_for_push 
-   photosynthesis_nml: lai_eps
-   vegn_data_nml: csc_lai, dat_snow_crit, use_light_saber, sai_cover, sai_rad, min_lai
-
-OMITTED during development since these are for cmip diagnostics only:
-   COSP namelists
-   atmos_tropopause_nml
-   physics_driver_nml: donner_meso_is_largescale, do_cosp, do_modis_yim 
-
-NOTES:
-kept settings from #814 (compared to LWH c96L49_am4p0_AM4chem_SOA):
-  aerosolrad_driver_nml: do_swaerosol_forcing, do_lwaerosol_forcing 
-  cg_grag_nml: Bt_0, Bt_nh, Bt_sh
-  tiedtke_macro_nml: eros_scale_c, eros_scale_t
-  rotstayn_klein_mp_nml: vfact
-
-Compile on Gaea C4 (intel-16).
-
-Add interactive dust emissions
-
-LWH (2/14/2018)
-Updates from "j" to "k" configuration:
-- Code updates to testing_20180202
-- Prevent tracer emissions through sea ice (from #922)
-- Correct calc_{ch4,n2o}_* settings in radiative_gases_nml
-  (no effect in climo runs, but caused slowdown in runs with time-varying forcings)
-- Updated DMS source from ocean (from Fabien)
-- New ocean background latitudinally dependent viscosity (from #917)
-- Restart ocean from WOA, but keep spun-up sea ice and icebergs
-- MOM restart bugfix (included as a csh hack for now)
-- Decrease gamma(HO2) from 1.0 to 0.2
-
-Niki Zadeh (3/2/2018)
-This is a new xml. Updates for LM4.1
-- Origin: LM4.1 changes by Sergey from his branch user/slm/esm4p3
-- Update: New 1/2 degree ocean grid from John Krasting user/jpk/ESMp3_mods 
-- Merged atmos from Larry H. "k" run in the notes above LWH (2/14/2018)
-- Added the  recommended settings for ocean (Smag) is in experiment ESM4p0p3k_1850C_PIpcairco2_smag
-- Renamed the compile component to esm4.1_sis2_compile (to discourage using/sharing in CM4/ESM4p0 runs)
-- Removed ice_sis from the build.
-
-JPK (3/6/2018)
-Edits suggested by ENS/SLM to address high veg. reflectance in boreal high latitudes
-- New code tag: fixes bug where canopy air tracers were not being sent to the atmosphere
-- Changed leaf reflectances for Prioria,  Picea, Larix, and Acer
-- Changed LAImax for Larix 
-
-LWH (3/16/2018)
-- Use MEGAN BVOC emissions for biogenic SOA
-- Updates to aerosol drydep/wetdep (f1p)
-- Seabird emissions of NH3
-- Improved exchange of NHx with ocean
 </description>
 
     <input>
@@ -3435,7 +3318,7 @@ SIS_OVERRIDE_EOF
 # jgj 2016/11/29 co2 data table (Jan 1 1850 from CMIP6 co2 gbl file: /lustre/f1/unswept/Huan.Guo/awg/input/cmip6/co2_gblannualdata_2016)
 #
 ## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
-"ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
+"ATM", "co2_dvmr_restore", "co2", "INPUT/co2_1pct_4x.nc", "none", 1.0e-06
       </dataTable>  
 
 
@@ -9294,6 +9177,11 @@ endif
       </dataFile>
       <dataFile label="input" target="INPUT/river_iron.nc" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC/BC/iron_sources/river_iron_halfdeg.nc</dataSource>
+      </dataFile>
+
+      <!-- Idealized 1% yr-1 CO2 dataset -->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f1/unswept/John.Krasting/cwg/input/ghg/co2/co2_1pct_4x.nc</dataSource>
       </dataFile>
 
     </input>
