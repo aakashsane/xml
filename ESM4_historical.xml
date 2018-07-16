@@ -2600,13 +2600,13 @@ Experiment to build executable.
         file_sulfate = 'sulfate.nc',
         file_conc = 'tracerIC.19800101.v2.nc',
         file_emis_1 = 'emissions.',
-        file_emis_2 = '.0.5x0.5.1849-2017.nc',
+        file_emis_2 = '.0.5x0.5.${emis_year}.nc',
         file_emis3d_1 = 'emissions3D.',
-        file_emis3d_2 = '.0.5x0.5.1849-2017.nc',
+        file_emis3d_2 = '.0.5x0.5.${emis_year}.nc',
         file_ub = 'ub_vals.mozart.nc',
         file_dry = 'depvel_gc_am3_tran.nc',
         inv_list = '',
-        file_aircraft = 'emissions.aircraft.0.5x0.5.1849-2017.nc',
+        file_aircraft = 'emissions.aircraft.0.5x0.5.${emis_year}.nc',
         lght_no_prd_factor = 1.2,
         normalize_lght_no_prd_area = .true.,
         min_land_frac_lght = 0.1,
@@ -8847,6 +8847,21 @@ else
    set adjust_dry_mass = ".false."
 endif
 
+######################################################################
+#  Find correct date range for emissions files (historical run ONLY)
+######################################################################
+set emis_year = $baseDate[1]
+if (-e $work/INPUT/coupler.res) then
+   set emis_year = (`grep "Current model time" $work/INPUT/coupler.res | awk '{print $1}'`)
+endif
+if ($emis_year < 1911) then
+   set emis_date = 1849-1911
+else if ($emis_year < 1971) then
+   set emis_date = 1910-1971
+else
+   set emis_date = 1970-2017
+endif
+
 #Scan auxiliary_nml for setting MOM6/SIS2 layouts
 
 cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
@@ -9121,10 +9136,16 @@ endif
       </dataFile>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CDATA/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/1849-2017_wseabirdnh3/emissions.0.5x0.5.1849-2017.tar</dataSource>
+        <dataSource platform="$(platform)">$CDATA/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/1849-1911_wseabirdnh3/emissions.0.5x0.5.${emis_year}.tar</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$CDATA/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/1910-1971_wseabirdnh3/emissions.0.5x0.5.${emis_year}.tar</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$CDATA/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/1970-2017_wseabirdnh3/emissions.0.5x0.5.${emis_year}.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/anthro_so2.1849_2017.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/emissions_cmip6_v20170518/emissions.simple.so2.0.5x0.5.1849-2017.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/emissions_cmip6_v20170518/emissions.simple.so2.0.5x0.5.${emis_year}.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/dust_source.nc" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/dust_source/dust_source_0.25x0.25_utc.nc</dataSource>
