@@ -104,7 +104,7 @@ NOTES:
   <property name="CVDP_startyear" value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-  <property name="reference_tag"   value="warsaw_201710_mom6_2017.07.19_answers"/>
+  <property name="reference_tag"   value="warsaw_201710_mom6_2017.10.19_answers"/>
                           
   <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
@@ -1696,6 +1696,19 @@ if ( $currentSeg == 1 ) then
       ncdump -h $resfile | grep co2_flux_kw_ice > /dev/null
       if ($status != 0) then
         ncap -O -s 'co2_flux_kw_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      #gross flux0
+      ncdump -h $resfile | grep o2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep nh4_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'nh4_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
       endif
    end
    #
