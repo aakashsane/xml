@@ -132,6 +132,8 @@ begin
   ; REQUIRED@dryoa = (/"drypoa","drysoa"/)
   ; REQUIRED@wetoa = (/"wetpoa","wetsoa"/)
   REQUIRED@cheaqpso4 = (/"pso4_aq_kg_m2_s","pso4_aq_so2_reevap_ls"/)
+  REQUIRED@eminox = (/"eminox_woL","eminox_lght"/)
+  REQUIRED@emiisop = (/"emiisop_woB","emiisop_biogenic"/)
 
   EXTRA_VARS = 0 ; stores additional bounds and formula term variables needed
 
