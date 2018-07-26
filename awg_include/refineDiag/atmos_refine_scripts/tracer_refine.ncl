@@ -270,8 +270,22 @@ begin
       data@long_name = "Aqueous-phase Production Rate of Sulfate Aerosol"
       data@units = "kg m-2 s-1"
       data@standard_name = "tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_aqueous_phase_net_chemical_production"
+    else if (outvars(vo) .eq. "eminox") then
+      data = fi->$invars(0)$
+      data = data + fi->$invars(1)$
+      data@long_name = "Total Emission Rate of NOx"
+      data@units = "kg m-2 s-1"
+      data@standard_name = "tendency_of_atmosphere_mass_content_of_nox_expressed_as_nitrogen_due_to_emission"
+    else if (outvars(vo) .eq. "emiisop") then
+      data = fi->$invars(0)$
+      data = data + fi->$invars(1)$
+      data@long_name = "Total Emission Rate of Isoprene"
+      data@units = "kg m-2 s-1"
+      data@standard_name = "tendency_of_atmosphere_mass_content_of_isoprene_due_to_emission"
     else
       continue
+    end if
+    end if
     end if
     end if
     end if
