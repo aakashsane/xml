@@ -23,7 +23,7 @@ frerun  -x OM4p125.xml -p ncrc4.intel16 -t prod OM4p125_NYF_baseline -r basic
    <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_0125"/>  <!--example containing .frepp scripts for analysis-->
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-   <property name="PROD_SIMTIME"   value="5"/>
+   <property name="PROD_SIMTIME"   value="20"/>
    <!--Post-processing  chunk lengths -->
    <property name="CHUNK_LENGTH_A" value="5yr"/>
    <property name="CHUNK_LENGTH_B" value="20yr"/>
@@ -50,8 +50,8 @@ frerun  -x OM4p125.xml -p ncrc4.intel16 -t prod OM4p125_NYF_baseline -r basic
 
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
   <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
-  <property name="AWG_INPUT_HOME_NESCC" value="awg_include"/>
   <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)/mdt_xml/awg_include"/>
+  <property name="append_to_setup_csh"  value=" "/><!--The start year of forcing dataset-->
     
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16'])"/>
@@ -370,6 +370,12 @@ OM4_SIS2_cgrid_025
 "ocean_model", "tos",          "tos",              "ocean_month", "all", "mean", "none",2
 "ocean_model", "sos",          "sos",              "ocean_month", "all", "mean", "none",2
 "ocean_model", "zos",          "zos",              "ocean_month", "all", "mean", "none",2
+"ocean_5daily",            5, "days",   1, "days", "time"
+"ocean_model", "SSU",          "ssu",              "ocean_5daily", "all", "mean", "none",2
+"ocean_model", "SSV",          "ssv",              "ocean_5daily", "all", "mean", "none",2
+"ocean_model", "tos",          "tos",              "ocean_5daily", "all", "mean", "none",2
+"ocean_model", "sos",          "sos",              "ocean_5daily", "all", "mean", "none",2
+"ocean_model", "zos",          "zos",              "ocean_5daily", "all", "mean", "none",2
 "ice_month",              1, "months", 1, "days", "time"
  "ice_model", "EXT",        "EXT",          "ice_month", "all", "mean", "none", 2
  "ice_model", "siu",        "siu",          "ice_month", "all", "mean", "none", 2
@@ -632,10 +638,17 @@ OM4_SIS2_cgrid_025
         <dataSource site="gfdl">/archive/Niki.Zadeh/input/xanadu/tripolar_disp_res8_grid_data.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-/lustre/f1/unswept/Niki.Zadeh/archive/input/xanadu/mask_table.245.32x32
 /lustre/f1/unswept/Niki.Zadeh/archive/input/xanadu/mask_table.1194.64x64
 /lustre/f1/unswept/Niki.Zadeh/archive/input/xanadu/mask_table.1535.72x72
 /lustre/f1/unswept/Niki.Zadeh/archive/input/xanadu/mask_table.1971.90x72
+/lustre/f1/unswept/Niki.Zadeh/archive/input/xanadu/mask_table.245.32x32
+/lustre/f1/unswept/Niki.Zadeh/archive/input/xanadu/mask_table.2534.90x90
+/lustre/f1/unswept/Niki.Zadeh/archive/input/xanadu/mask_table.2837.100x90
+/lustre/f1/unswept/Niki.Zadeh/archive/input/xanadu/mask_table.3150.100x100
+/lustre/f1/unswept/Niki.Zadeh/archive/input/xanadu/mask_table.3830.120x100
+/lustre/f1/unswept/Niki.Zadeh/archive/input/xanadu/mask_table.4668.120x120
+/lustre/f1/unswept/Niki.Zadeh/archive/input/xanadu/mask_table.5927.180x100
+/lustre/f1/unswept/Niki.Zadeh/archive/input/xanadu/mask_table.6368.160x120
       </dataFile>
 
       <!--CORE forcing datasets-->
@@ -781,6 +794,16 @@ SIS_OVERRIDE_EOF
       <regression name="restart">
         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O4509p125']/node())"/> </run>
         <run days="1 1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O4509p125']/node())"/> </run>
+      </regression>
+
+      <regression name="timing">
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O4509p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O5566p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O6163p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O6850p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O8170p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O9732p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O12073p125']/node())"/> </run>
       </regression>
 
       <reference restart="$(REFERENCE)/archive/1x1m0d_1756x1o/restart/19000201.tar"/>

@@ -17,12 +17,12 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-   <property name="PROD_SIMTIME"   value="300"/>
+   <property name="PROD_SIMTIME"   value="60"/>
    <!--Post-processing  chunk lengths -->
    <property name="CHUNK_LENGTH_A" value="5yr"/>
    <property name="CHUNK_LENGTH_B" value="20yr"/>
@@ -72,6 +72,13 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
                <ice              layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45"/>
              </resources>
    </freInclude>
+   <freInclude name="resourceparams_O2783p5_production">
+	     <resources jobWallclock="16:00:00"  segRuntime="2:00:00">
+	       <ocn ranks="2783" layout = "60,60"   io_layout = "1,5" mask_table="mask_table.817.60x60" threads="1"/>
+	       <ice              layout = "60,60"   io_layout = "1,5" mask_table="mask_table.817.60x60"/>
+	     </resources>
+   </freInclude>
+
 
 <!--= COMPILE =-->
 <!--===========-->
@@ -802,7 +809,33 @@ $baseDate
      </diagTable>
      </input>
    </experiment>											      
-   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_JRA55do1-3" inherit="MOM6_SIS2_compile">
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_JRA55do1-3_Gregorian" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200_JRA55do1-3_Julian">
+     <input>
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1718,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'gregorian',
+       dt_cpld  = 3600, 
+       dt_atmos = 3600, 
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.false.
+       atmos_nthreads = $atm_threads
+       ocean_nthreads = $ocean_nthreads
+     </namelist>
+     </input>
+   </experiment>
+
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_JRA55do1-3_Julian_cycle1" inherit="MOM6_SIS2_compile">
    <publicMetadata DBswitch="$(MDBIswitch)">
       <!-- Realization tag -->
       <realization r="1" i="1" p="1" f="1"/>
@@ -852,7 +885,7 @@ $baseDate
        hours = 0
        minutes = 0
        seconds = 0
-       calendar = 'NOLEAP',
+       calendar = 'julian',
        dt_cpld  = 3600, 
        dt_atmos = 3600, 
        do_atmos = .false.,
@@ -1049,7 +1082,7 @@ SIS_OVERRIDE_EOF
    <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
-          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5_production']/node())"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O2783p5_production']/node())"/>
       </production>
 
       <regression name="basic">
