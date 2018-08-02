@@ -134,6 +134,8 @@ begin
   REQUIRED@cheaqpso4 = (/"pso4_aq_kg_m2_s","pso4_aq_so2_reevap_ls"/)
   REQUIRED@eminox = (/"eminox_woL","eminox_lght"/)
   REQUIRED@emiisop = (/"emiisop_woB","emiisop_biogenic"/)
+  REQUIRED@eminh3 = (/"eminh3_woOCN","nh3_mol_flux_atm0"/)
+  REQUIRED@drynh3 = (/"drynh3_woOCN","nh3_mol_flux_atm0","nh3_mol_flux_atm"/)
 
   EXTRA_VARS = 0 ; stores additional bounds and formula term variables needed
 
@@ -282,8 +284,21 @@ begin
       data@long_name = "Total Emission Rate of Isoprene"
       data@units = "kg m-2 s-1"
       data@standard_name = "tendency_of_atmosphere_mass_content_of_isoprene_due_to_emission"
+    else if (outvars(vo) .eq. "eminh3") then
+      data = fi->$invars(0)$
+      data = data + fi->$invars(1)$ * 0.017
+      data@long_name = "Total Emission Rate of NH3"
+      data@units = "kg m-2 s-1"
+      data@standard_name = "tendency_of_atmosphere_mass_content_of_ammonia_due_to_emission"
+    else if (outvars(vo) .eq. "drynh3") then
+      data = fi->$invars(0)$
+      data = data + (fi->$invars(1)$ - fi->$invars(2)$) * 0.017
+      data@long_name = "Dry Deposition Rate of NH3"
+      data@units = "kg m-2 s-1"
+      data@standard_name = "minus_tendency_of_atmosphere_mass_content_of_ammonia_due_to_dry_deposition"
     else
       continue
+    end if
     end if
     end if
     end if
