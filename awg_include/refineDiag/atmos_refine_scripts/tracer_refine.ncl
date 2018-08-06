@@ -306,6 +306,7 @@ begin
     end if
     end if
     end if
+    end if
     if (.not.tavginfo .and. isatt(data,"time_avg_info")) then
       delete(data@time_avg_info)
     end if
