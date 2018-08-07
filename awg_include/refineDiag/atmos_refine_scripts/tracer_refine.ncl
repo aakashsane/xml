@@ -287,12 +287,14 @@ begin
     else if (outvars(vo) .eq. "eminh3") then
       data = fi->$invars(0)$
       data = data + fi->$invars(1)$ * 0.017
+      data@comment = invars(0)+"+0.017*"+invars(1)
       data@long_name = "Total Emission Rate of NH3"
       data@units = "kg m-2 s-1"
       data@standard_name = "tendency_of_atmosphere_mass_content_of_ammonia_due_to_emission"
     else if (outvars(vo) .eq. "drynh3") then
       data = fi->$invars(0)$
       data = data + (fi->$invars(1)$ - fi->$invars(2)$) * 0.017
+      data@comment = invars(0)+"+0.017*"+invars(1)+"-0.017*"+invars(2)
       data@long_name = "Dry Deposition Rate of NH3"
       data@units = "kg m-2 s-1"
       data@standard_name = "minus_tendency_of_atmosphere_mass_content_of_ammonia_due_to_dry_deposition"
@@ -310,10 +312,12 @@ begin
     if (.not.tavginfo .and. isatt(data,"time_avg_info")) then
       delete(data@time_avg_info)
     end if
-    comment = invars(0)+"+"+invars(1)
-    print("output: "+outvars(vo)+" = "+comment)
+    if (.not. isatt(data,"comment")) then
+       data@comment = invars(0)+"+"+invars(1)
+    end if
+    print("output: "+outvars(vo)+" = "+data@comment)
     fo->$outvars(vo)$ = data
-    fo->$outvars(vo)$@comment = comment
+;   fo->$outvars(vo)$@comment = comment
     delete([/data,invars/])
   end do
 
