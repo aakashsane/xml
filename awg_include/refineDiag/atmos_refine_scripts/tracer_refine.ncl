@@ -135,7 +135,7 @@ begin
   REQUIRED@eminox = (/"eminox_woL","eminox_lght"/)
   REQUIRED@emiisop = (/"emiisop_woB","emiisop_biogenic"/)
   REQUIRED@eminh3 = (/"eminh3_woOCN","nh3_mol_flux_atm0"/)
-  REQUIRED@drynh3 = (/"drynh3_woOCN","nh3_mol_flux_atm0","nh3_mol_flux_atm"/)
+  REQUIRED@drynh3 = (/"drynh3_woOCN","nh3_mol_flux_atm0","nh3_mol_flux"/)
 
   EXTRA_VARS = 0 ; stores additional bounds and formula term variables needed
 
