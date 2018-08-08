@@ -1256,8 +1256,10 @@ Experiment to build executable.
 <!-- comment out for now
         <timeSeries freq="daily" source="aerosol_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)"/>
 -->
-        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
-<!--    <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" source="aerosol_month_refined"/> -->
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/cmip6_emilnox.csh"/>
+	</timeSeries>
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" source="aerosol_month_refined"/>
         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)"/>
         <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
@@ -8437,7 +8439,7 @@ $baseDate
 "tracers",       "emiisop_woB",   "emiisop_woB",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
 "tracers",  "emiisop_biogenic","emiisop_biogenic", "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. layer-integrated lightning production of NOx, mol s-1 (longitude,latitude,alevel,time) -- needs ANALYSIS script
-#"UNKNOWN",       "emilnox",       "emilnox",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+"moist",         "emilnox_area",  "emilnox_area",  "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Emission Rate of nh3, kg m-2 s-1 (longitude,latitude,time)
 # REFINED_DIAG: eminh3 = eminh3_woOCN + nh3_mol_flux_atm0*0.017(kg/mole)
 "tracers",       "eminh3",        "eminh3_woOCN",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
