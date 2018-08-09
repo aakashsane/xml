@@ -268,7 +268,6 @@
 "dynamics",  "sphum", "sphum",   "atmos_tracer", "all", .true.,  "none", 2
 "dynamics",  "temp",  "temp",    "atmos_tracer", "all", .true.,  "none", 2
 "dynamics",  "SOA",    "SOA",    "atmos_tracer", "all", .true.,  "none", 2
-### CHECK: commented out in ESM4 spinup, uncommented to match CM4_pi_Control_C
 "dynamics",  "dust1",  "dust1",  "atmos_tracer", "all", .true.,  "none", 2
 "dynamics",  "dust2",  "dust2",  "atmos_tracer", "all", .true.,  "none", 2
 "dynamics",  "dust3",  "dust3",  "atmos_tracer", "all", .true.,  "none", 2
@@ -279,12 +278,13 @@
 "dynamics",  "ssalt3", "ssalt3", "atmos_tracer", "all", .true.,  "none", 2
 "dynamics",  "ssalt4", "ssalt4", "atmos_tracer", "all", .true.,  "none", 2
 "dynamics",  "ssalt5", "ssalt5", "atmos_tracer", "all", .true.,  "none", 2
-## end CHECK
 "dynamics",  "omphil", "omphil", "atmos_tracer", "all", .true.,  "none", 2
 "dynamics",  "omphob", "omphob", "atmos_tracer", "all", .true.,  "none", 2
 "dynamics",  "bcphil", "bcphil", "atmos_tracer", "all", .true.,  "none", 2
 "dynamics",  "bcphob", "bcphob", "atmos_tracer", "all", .true.,  "none", 2
 "dynamics",  "radon",  "radon",  "atmos_tracer", "all", .true.,  "none", 2
+"dynamics",  "aoanh",  "aoanh",  "atmos_tracer", "all", .true.,  "none", 2
+"dynamics",  "nh50",   "nh50",   "atmos_tracer", "all", .true.,  "none", 2
 
 # ------------
 # atmos_tracer
@@ -3793,7 +3793,8 @@
 ##. ambient fine aerosol optical thickness at 550 nm, 1.0 (longitude,latitude,time)
  "radiation",     "od550lt1aer",   "od550lt1aer",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. nitrate aod@550nm, 1.0 (longitude,latitude,time) -- need to update to a “CMIP” diagnostic
- "radiation",       "nitrate_exopdep_col_vis",      "od550no3",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "radiation",     "od550no3",      "od550no3",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "radiation", "nitrate_exopdep_col_vis","od550no3_old", "aerosol_month_cmip",  "all",  .true.,  "none", 2
 ##. pom aod@550nm, 1.0 (longitude,latitude,time)
  "radiation",     "od550oa",       "od550oa",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. sulfate aod@550nm, 1.0 (longitude,latitude,time)
@@ -4378,7 +4379,7 @@
 #"UNKNOWN",       "agesno",        "agesno",        "land_month_cmip",         "all",  .true.,  "none", 2
 
 ##. Liquid Water Content of Snow Layer, kg m-2 (longitude,latitude,time): Priority 2
-#"cmor_land",     "lwsnl",         "lwsnl",         "land_month_cmip",         "all",  .true.,  "none", 2
+ "cmor_land",     "lwsnl",         "lwsnl",         "land_month_cmip",         "all",  .true.,  "none", 2
 
 ##. Snow Depth, m (longitude,latitude,time)
  "cmor_land",     "snd",           "snd",           "land_month_cmip",         "all",  .true.,  "none", 2
@@ -4681,9 +4682,6 @@
 "atmos",       "p500",               "p500",             "atmos_month_cmip",   "all", .false., "none", 1
 "atmos",       "p1000",              "p1000",            "atmos_month_cmip",   "all", .false., "none", 1
 # land model fields
- "cmor_land",   "snw",         "snw",         "land_month_cmip",  "all", .true., "none", 2
- "cmor_land",   "snm",         "snm",         "land_month_cmip",  "all", .true., "none", 2
- "cmor_land",   "lwsnl",       "lwsnl",       "land_month_cmip",  "all", .true., "none", 2
  "cmor_land",   "mrsfl",       "mrsfl",       "land_month_cmip",  "all", .true., "none", 2
  "cmor_land",   "mrsll",       "mrsll",       "land_month_cmip",  "all", .true., "none", 2
  "cmor_land",   "mrsol",       "mrsol",       "land_month_cmip",  "all", .true., "none", 2
@@ -4734,24 +4732,4 @@
 "flux",     "nh3_mol_flux_atm","nh3_mol_flux_atm", "atmos_dust_sample",      "all",  .true.,  "none", 2
 ##. dry deposition rate of nh4, kg m-2 s-1 (longitude,latitude,time)
  "tracers",       "nh4_ddep_kg_m2_s", "drynh4",        "atmos_dust_sample",      "all",  .true.,  "none", 2
-#####################################################
-# Timeseries of globally averaged scalar quantities
-#####################################################
-"atmos_global_cmip",  1,  "months",  1, "days", "time",
-#####################################################
-"atmos_global",     "pr",        "pr",       "atmos_global_cmip",  "all", .true.,  "none", 2
-"atmos_global",     "prc",       "prc",      "atmos_global_cmip",  "all", .true.,  "none", 2
-"atmos_global",     "prsn",      "prsn",     "atmos_global_cmip",  "all", .true.,  "none", 2
-"atmos_global",     "rlut",      "rlut",     "atmos_global_cmip",  "all", .true.,  "none", 2
-"atmos_global",     "rsut",      "rsut",     "atmos_global_cmip",  "all", .true.,  "none", 2
-"atmos_global",     "rsdt",      "rsdt",     "atmos_global_cmip",  "all", .true.,  "none", 2
-"atmos_global",     "rss",       "rss",      "atmos_global_cmip",  "all", .true.,  "none", 2
-"atmos_global",     "rls",       "rls",      "atmos_global_cmip",  "all", .true.,  "none", 2
-"flux",             "height2m",  "height2m", "atmos_global_cmip",  "all", .false., "none", 1
-"atmos_global",     "hfls",      "hfls",     "atmos_global_cmip",  "all", .true.,  "none", 2
-"atmos_global",     "hfss",      "hfss",     "atmos_global_cmip",  "all", .true.,  "none", 2
-"atmos_global",     "ts",        "ts",       "atmos_global_cmip",  "all", .true.,  "none", 2
-"atmos_global",     "tas",       "tas",      "atmos_global_cmip",  "all", .true.,  "none", 2
-#"atmos_global",     "tasl",      "tasl",     "atmos_global_cmip",  "all", .true.,  "none", 2
-#
 #===============================================================================================
