@@ -1371,10 +1371,23 @@ Experiment to build executable.
   </freInclude>
 
   <!-- OCEAN BGC post-processing-->
-  <freInclude name="COBALT_postprocess">
 
+  <!-- temporary 5day component to evaluate 2-D variables (mesozoo_200, chlos, phycos): native horizontal grid only -->
+  <freInclude name="COBALT_5day_postprocess">
       <postProcess> 
-      <!--PostProcessing component models-->
+
+      <component type="ocean_cobalt_5day" start="$(PP_START_YEAR)" source="ocean_cobalt_5day" sourceGrid="ocean-tripolar">
+         <timeSeries freq="120hr" chunkLength="$(PP_CMIP_CHUNK_A)" />
+      </component>
+
+     </postProcess>
+  </freInclude>
+
+
+  <!-- 2-D: native horizontal -  not being served publicly -->
+  <freInclude name="COBALT_postprocess">
+      <postProcess> 
+
       <component type="ocean_cobalt_sfc" start="$(PP_START_YEAR)" source="ocean_cobalt_sfc" sourceGrid="ocean-tripolar">
          <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
@@ -1413,15 +1426,10 @@ Experiment to build executable.
      </postProcess>
   </freInclude>
 
+
+  <!-- 3-D: native horizontal, _z grid not requested by CMIP/OMIP: not being served publicly -->
   <freInclude name="COBALT_z_postprocess">
-
       <postProcess> 
-
-      <!--PostProcessing component models-->
-<!--
-      <component type="ocean_cobalt_1day_z" start="$(PP_START_YEAR)" source="ocean_cobalt_1day_z" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CMIP_CHUNK_A)" />
-      </component>
 
       <component type="ocean_cobalt_tracers_month_z" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_month_z" sourceGrid="ocean-tripolar">
          <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
@@ -1430,49 +1438,28 @@ Experiment to build executable.
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_cobalt_tracers_year_z" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_year_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
-      </component>
--->
- 
      </postProcess>
   </freInclude>
 
 
   <!-- CMIP6 OCEAN BGC post-processing-->
-  <freInclude name="COBALT_CMIP6_postprocess">
 
+  <!-- native horizontal and vertical - not being served publicly -->
+  <!-- CHECK: do we actually want to save any fields on full native grid -->
+
+
+  <!-- 2-D: native horizontal: not being served publicly -->
+  <freInclude name="COBALT_CMIP6_postprocess">
       <postProcess> 
 
-      <!--PostProcessing component models-->
-<!--
       <component type="ocean_cobalt_omip_daily" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_daily" sourceGrid="ocean-tripolar">
         <timeSeries freq="daily" chunkLength="$(PP_CMIP_CHUNK_A)" />
       </component>
-
-      <component type="ocean_cobalt_omip_tracers_month" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_month" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
-         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
-      </component>
-
-      <component type="ocean_cobalt_omip_tracers_year" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_year" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
-      </component>
--->
 
       <component type="ocean_cobalt_omip_sfc" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_sfc" sourceGrid="ocean-tripolar">
          <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
-         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
-      </component>
-
-      <component type="ocean_cobalt_omip_rates_year" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_rates_year" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
@@ -1483,45 +1470,17 @@ Experiment to build executable.
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
-<!-- add 1x1 postprocessing for publicly served output -->
-      <component type="ocean_cobalt_omip_sfc_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_sfc" sourceGrid="ocean-tripolar" xyInterp="180,360">
-         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
-         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
-      </component>
-
-      <component type="ocean_cobalt_omip_rates_year_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_rates_year" sourceGrid="ocean-tripolar" xyInterp="180,360">
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
-      </component>
-
-      <component type="ocean_cobalt_omip_2d_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_2d" sourceGrid="ocean-tripolar" xyInterp="180,360">
-         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
-         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
-      </component>
-
     </postProcess>
   </freInclude>
 
- 
-  <freInclude name="COBALT_CMIP6_z_postprocess">
 
+  <!-- 3-D: native horizontal, _z vertical: not being served publicly -->
+  <freInclude name="COBALT_CMIP6_z_postprocess">
       <postProcess> 
-      <!--PostProcessing component models-->
-<!--
-      <component type="ocean_cobalt_1day_z" start="$(PP_START_YEAR)" source="ocean_cobalt_1day_z" sourceGrid="ocean-tripolar">
-        <timeSeries freq="daily" chunkLength="$(PP_CMIP_CHUNK_A)" />
-      </component>
--->
 
       <component type="ocean_cobalt_omip_tracers_month_z" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_month_z" sourceGrid="ocean-tripolar">
          <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
-         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
       <component type="ocean_cobalt_omip_tracers_year_z" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_year_z" sourceGrid="ocean-tripolar">
@@ -1534,26 +1493,61 @@ Experiment to build executable.
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
-<!-- add 1x1 postprocessing for publicly served output -->
-      <component type="ocean_cobalt_omip_tracers_month_z_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+     </postProcess>
+  </freInclude>
+
+
+  <!-- 2-D: 1x1 postprocessing for publicly served output -->
+  <freInclude name="COBALT_CMIP6_1x1_postprocess">
+      <postProcess> 
+
+      <component type="ocean_cobalt_omip_daily_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_daily" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="daily" chunkLength="$(PP_CMIP_CHUNK_A)" />
+      </component>
+
+      <component type="ocean_cobalt_omip_sfc_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_sfc" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
          <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_omip_2d_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_2d" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
+      <!-- only fgco2 is needed annually -->
+         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <variables>
+             fgco2
+          </variables> 
+         </timeSeries>
          <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_cobalt_omip_tracers_year_z_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+    </postProcess>
+  </freInclude>
+
+
+  <!-- 3-D: 1x1_z postprocessing for publicly served output -->
+  <freInclude name="COBALT_CMIP6_1x1_z_postprocess">
+      <postProcess> 
+
+      <component type="ocean_cobalt_omip_tracers_month_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_omip_tracers_year_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
          <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_cobalt_omip_rates_year_z_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_rates_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+      <component type="ocean_cobalt_omip_rates_year_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_rates_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
          <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
      </postProcess>
   </freInclude>
+
 <!--====================================-->
 <!--= END TEMPLATES FOR POSTPROCESSING =-->
 <!--====================================-->
@@ -5955,10 +5949,14 @@ endif
       <xi:include xpointer="xpointer(//freInclude[@name='fire_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='ICE_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='atmos_co2_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='COBALT_5day_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='COBALT_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='COBALT_z_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='COBALT_CMIP6_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='COBALT_CMIP6_z_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='COBALT_CMIP6_1x1_postprocess']/postProcess/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='COBALT_CMIP6_1x1_z_postprocess']/postProcess/node())"/>
+
     </postProcess>
 
   </experiment>
