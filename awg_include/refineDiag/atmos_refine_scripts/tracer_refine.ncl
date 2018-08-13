@@ -136,6 +136,7 @@ begin
   REQUIRED@emiisop = (/"emiisop_woB","emiisop_biogenic"/)
   REQUIRED@eminh3 = (/"eminh3_woOCN","nh3_mol_flux_atm0"/)
   REQUIRED@drynh3 = (/"drynh3_woOCN","nh3_mol_flux_atm0","nh3_mol_flux"/)
+  REQUIRED@emidust = (/"dust1_flux","dust2_flux","dust3_flux","dust4_flux","dust5_flux"/)
 
   EXTRA_VARS = 0 ; stores additional bounds and formula term variables needed
 
@@ -298,8 +299,17 @@ begin
       data@long_name = "Dry Deposition Rate of NH3"
       data@units = "kg m-2 s-1"
       data@standard_name = "minus_tendency_of_atmosphere_mass_content_of_ammonia_due_to_dry_deposition"
+    else if (outvars(vo) .eq. "emidust") then
+      data = fi->$invars(0)$
+      data = data + fi->$invars(1)$ + fi->$invars(2)$ + fi->$invars(3)$ + fi->$invars(4)$
+      data = (data > 0.)
+      data@comment = invars(0)+"+"+invars(1)+"+"+invars(2)+"+"+invars(3)+"+"+invars(4)
+      data@long_name = "Total Emission Rate of Dust"
+      data@units = "kg m-2 s-1"
+      data@standard_name = "tendency_of_atmosphere_mass_content_of_dust_dry_aerosol_particles_due_to_emission"
     else
       continue
+    end if
     end if
     end if
     end if
