@@ -123,7 +123,7 @@ NOTES:
   <property name="CVDP_startyear"  value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-  <property name="reference_tag"   value="pre_xanadu_esm4_20180703_mom6_2018.04.11_answers"/>
+  <property name="reference_tag"   value="warsaw_201710_mom6_2017.10.19_answers"/>
                           
   <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
@@ -1256,10 +1256,8 @@ Experiment to build executable.
 <!-- comment out for now
         <timeSeries freq="daily" source="aerosol_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)"/>
 -->
-        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/cmip6_emilnox.csh"/>
-	</timeSeries>
-        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" source="aerosol_month_refined"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+<!--    <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" source="aerosol_month_refined"/> -->
         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)"/>
         <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
@@ -4542,7 +4540,6 @@ SIS_OVERRIDE_EOF
 "tracer_type","diagnostic"
 "profile_type","fixed","surface_value=1.e-20"
 /
-
 "tracer","atmos_mod","o3s"
 "longname","O3S"
 "units","VMR"
@@ -4562,9 +4559,7 @@ SIS_OVERRIDE_EOF
 
 "tracer","atmos_mod","o3s_e90"
 "longname","O3S_E90"
-"cmip","cmip6","cmip_name=ozone,cmip_longname=Ozone"
 "units","VMR"
-"chem_param","gas","mw=48."
 "dry_deposition","file","name=o3,diurnal=yes"
 "profile_type","fixed","surface_value=1.e-20"
 "convection",   "all"
@@ -4585,8 +4580,6 @@ SIS_OVERRIDE_EOF
  "TRACER", "atmos_mod",    "co2"
            "longname",     "carbon dioxide"
            "units",        "kg/kg"
-           "cmip","cmip6","cmip_name=carbon_dioxide"
-           "chem_param","gas","mw=44."
            "convection",   "all"
            "profile_type","fixed","surface_value = 431.9218e-06"/
 
@@ -8093,215 +8086,147 @@ $baseDate
 #===============================================================================================
 ##################
 # Table: Amon
-# Version: 1.00.15
+# Version: 1.00.07
 ##################
-
  "atmos_month_cmip",         1, "months",    1,  "days",  "time",
- "atmos_level_cmip",         1, "months",    1,  "days",  "time",
 #"atmos_scalar",             1, "months",    1,  "days",  "time",
-
 ##################
-
 ##. Auxiliary fields required for model level output
- "cmip",          "ap",            "ap",            "atmos_level_cmip",        "all",  .false., "none", 1
- "cmip",          "b",             "b",             "atmos_level_cmip",        "all",  .false., "none", 1
- "cmip",          "ap_bnds",       "ap_bnds",       "atmos_level_cmip",        "all",  .false., "none", 1
- "cmip",          "b_bnds",        "b_bnds",        "atmos_level_cmip",        "all",  .false., "none", 1
- "cmip",          "lev_bnds",      "lev_bnds",      "atmos_level_cmip",        "all",  .false., "none", 1
- "cmip",          "ap_half",       "ap_half",       "atmos_level_cmip",        "all",  .false., "none", 1
- "cmip",          "b_half",        "b_half",        "atmos_level_cmip",        "all",  .false., "none", 1
-
-# "dynamics",      "area",          "area",          "atmos_month_cmip",        "all",  .false.,  "none",1
-
+ "cmip",          "ap",            "ap",            "atmos_month_cmip",        "all",  .false., "none", 1
+ "cmip",          "b",             "b",             "atmos_month_cmip",        "all",  .false., "none", 1
+ "cmip",          "ap_bnds",       "ap_bnds",       "atmos_month_cmip",        "all",  .false., "none", 1
+ "cmip",          "b_bnds",        "b_bnds",        "atmos_month_cmip",        "all",  .false., "none", 1
+ "cmip",          "lev_bnds",      "lev_bnds",      "atmos_month_cmip",        "all",  .false., "none", 1
 ##. Near-Surface Air Temperature, K (longitude,latitude,time,height2m)
  "flux",          "tas",           "tas",           "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Temperature, K (longitude,latitude,time)
  "flux",          "ts",            "ts",            "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Daily Minimum Near-Surface Air Temperature, K (longitude,latitude,time,height2m)
 # REFINE_DIAG NEEDED -- already in diag_table_day
-#"flux",          "tas",           "tasmin",        "atmos_daily_cmip",        "all",     min,  "none", 2
-
+#"flux",         "tas",           "tasmin",        "atmos_daily_cmip",        "all",    min,   "none", 2
 ##. Daily Maximum Near-Surface Air Temperature, K (longitude,latitude,time,height2m)
 # REFINE_DIAG NEEDED -- already in diag_table_day
-#"flux",          "tas",           "tasmax",        "atmos_daily_cmip",        "all",     max,  "none", 2
-
+#"flux",         "tas",           "tasmax",        "atmos_daily_cmip",        "all",    max,   "none", 2
 ##. Sea Level Pressure, Pa (longitude,latitude,time)
  "flux",          "psl",           "psl",           "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Air Pressure, Pa (longitude,latitude,time)
  "atmos",         "ps",            "ps",            "atmos_month_cmip",        "all",  .true.,  "none", 2
- "atmos",         "ps",            "ps",            "atmos_level_cmip",        "all",  .true.,  "none", 2
-
 ##. Eastward Near-Surface Wind, m s-1 (longitude,latitude,time,height10m)
  "flux",          "uas",           "uas",           "atmos_month_cmip",        "all",  .true.,  "none", 2
  "flux",          "height10m",     "height10m",     "atmos_month_cmip",        "all",  .false., "none", 1
-
 ##. Northward Near-Surface Wind, m s-1 (longitude,latitude,time,height10m)
  "flux",          "vas",           "vas",           "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Near-Surface Wind Speed, m s-1 (longitude,latitude,time,height10m)
  "flux",          "sfcWind",       "sfcWind",       "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Near-Surface Relative Humidity, % (longitude,latitude,time,height2m)
  "flux",          "hurs",          "hurs",          "atmos_month_cmip",        "all",  .true.,  "none", 2
  "flux",          "height2m",      "height2m",      "atmos_month_cmip",        "all",  .false., "none", 1
-
 ##. Near-Surface Specific Humidity, 1.0 (longitude,latitude,time,height2m)
  "flux",          "huss",          "huss",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Precipitation, kg m-2 s-1 (longitude,latitude,time)
  "moist",         "pr",            "pr",            "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Snowfall Flux, kg m-2 s-1 (longitude,latitude,time)
  "moist",         "prsn",          "prsn",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Convective Precipitation, kg m-2 s-1 (longitude,latitude,time)
  "moist",         "prc",           "prc",           "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Evaporation, kg m-2 s-1 (longitude,latitude,time)
  "flux",          "evspsbl",       "evspsbl",       "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Snow and Ice Sublimation Flux, kg m-2 s-1 (longitude,latitude,time)
-#"UNKNOWN",       "sbl",           "sbl",           "landIce_month_cmip",      "all",  .true.,  "none", 2
-
+# NOT AVAILABLE
+#"UNKNOWN",       "sbl",           "sbl",           "atmos_month_cmip",        "all",  .true.,  "none", 2
 ##. Surface Downward Eastward Wind Stress, Pa (longitude,latitude,time)
  "flux",          "tauu",          "tauu",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Downward Northward Wind Stress, Pa (longitude,latitude,time)
  "flux",          "tauv",          "tauv",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Upward Latent Heat Flux, W m-2 (longitude,latitude,time)
  "flux",          "hfls",          "hfls",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Upward Sensible Heat Flux, W m-2 (longitude,latitude,time)
  "flux",          "hfss",          "hfss",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Downwelling Longwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rlds",          "rlds",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Upwelling Longwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rlus",          "rlus",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Downwelling Shortwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rsds",          "rsds",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Upwelling Shortwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rsus",          "rsus",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Downwelling Clear-Sky Shortwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rsdscs",        "rsdscs",        "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Upwelling Clear-Sky Shortwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rsuscs",        "rsuscs",        "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Downwelling Clear-Sky Longwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rldscs",        "rldscs",        "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. TOA Incident Shortwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rsdt",          "rsdt",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Top-of-Atmosphere Outgoing Shortwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rsut",          "rsut",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
-##. TOA Outgoing Longwave Radiation, W m-2 (longitude,latitude,time)
+##. TOA Outgoing Longwave Radiatio, W m-2 (longitude,latitude,time)
  "radiation",     "rlut",          "rlut",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. TOA Outgoing Clear-sky Longwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rlutcs",        "rlutcs",        "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. TOA Outgoing Clear-Sky Shortwave Radiation, W m-2 (longitude,latitude,time)
  "radiation",     "rsutcs",        "rsutcs",        "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Water Vapor Path, kg m-2 (longitude,latitude,time)
  "moist",         "prw",           "prw",           "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Total Cloud Cover Percentage, % (longitude,latitude,time)
  "moist",         "clt",           "clt",           "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Condensed Water Path, kg m-2 (longitude,latitude,time)
  "moist",         "clwvi",         "clwvi",         "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Ice Water Path, kg m-2 (longitude,latitude,time)
  "moist",         "clivi",         "clivi",         "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Net Downward Radiative Flux at Top of Model, W m-2 (longitude,latitude,time)
  "radiation",     "rtmt",          "rtmt",          "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Air Pressure at Convective Cloud Base, Pa (longitude,latitude,time)
  "moist",         "ccb",           "ccb",           "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Air Pressure at Convective Cloud Top, Pa (longitude,latitude,time)
  "moist",         "cct",           "cct",           "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Fraction of Time Convection Occurs in Cell, 1.0 (longitude,latitude,time)
  "moist",         "ci",            "ci",            "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Fraction of Time Shallow Convection Occurs, 1.0 (longitude,latitude,time)
  "uw_conv",       "sci_uw",        "sci",           "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Carbon Mass Flux into Atmosphere Due to All Anthropogenic Emissions of CO2, kg m-2 s-1 (longitude,latitude,time)
 # NOT AVAILABLE?
 #"UNKNOWN",       "fco2antt",      "fco2antt",      "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Carbon Mass Flux into Atmosphere Due to Fossil Fuel Emissions of CO2, kg m-2 s-1 (longitude,latitude,time)
 # NOT AVAILABLE?
 #"UNKNOWN",       "fco2fos",       "fco2fos",       "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Surface Carbon Mass Flux into the Atmosphere Due to Natural Sources, kg m-2 s-1 (longitude,latitude,time)
 # NOT AVAILABLE?
 #"UNKNOWN",       "fco2nat",       "fco2nat",       "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Percentage Cloud Cover, % (longitude,latitude,alevel,time)
- "moist",         "cl",            "cl",            "atmos_level_cmip",        "all",  .true.,  "none", 2
-
+ "moist",         "cl",            "cl",            "atmos_month_cmip",        "all",  .true.,  "none", 2
 ##. Mass Fraction of Cloud Liquid Water, kg kg-1 (longitude,latitude,alevel,time)
- "moist",         "clw",           "clw",           "atmos_level_cmip",        "all",  .true.,  "none", 2
-
+ "moist",         "clw",           "clw",           "atmos_month_cmip",        "all",  .true.,  "none", 2
 ##. Mass Fraction of Cloud Ice, kg kg-1 (longitude,latitude,alevel,time)
- "moist",         "cli",           "cli",           "atmos_level_cmip",        "all",  .true.,  "none", 2
-
+ "moist",         "cli",           "cli",           "atmos_month_cmip",        "all",  .true.,  "none", 2
 ##. Convective Mass Flux, kg m-2 s-1 (longitude,latitude,alevhalf,time)
- "moist",         "mc",            "mc",            "atmos_level_cmip",        "all",  .true.,  "none", 2
-
+ "moist",         "mc",            "mc",            "atmos_month_cmip",        "all",  .true.,  "none", 2
 ##. Air Temperature, K (longitude,latitude,plev19,time)
  "atmos_plev19",  "ta",            "ta_unmsk",      "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Eastward Wind, m s-1 (longitude,latitude,plev19,time)
  "atmos_plev19",  "ua",            "ua_unmsk",      "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Northward Wind, m s-1 (longitude,latitude,plev19,time)
  "atmos_plev19",  "va",            "va_unmsk",      "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Specific Humidity, 1.0 (longitude,latitude,plev19,time)
  "atmos_plev19",  "hus",           "hus_unmsk",     "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Relative Humidity, % (longitude,latitude,plev19,time)
- "moist_plev19",  "hur",           "hur_unmsk",     "atmos_month_cmip",        "all",  .true.,  "none", 2
-
+ "atmos_plev19",  "hur",           "hur_unmsk",     "atmos_month_cmip",        "all",  .true.,  "none", 2
 ##. omega (=dp/dt), Pa s-1 (longitude,latitude,plev19,time)
  "atmos_plev19",  "wap",           "wap_unmsk",     "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Geopotential Height, m (longitude,latitude,plev19,time)
  "atmos_plev19",  "zg",            "zg_unmsk",      "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Ozone volume mixing ratio, mol mol-1 (longitude,latitude,plev19,time)
- "radiation_plev19", "o3",          "o3_unmsk",      "atmos_month_cmip",        "all",  .true.,  "none", 2
-
+ "radiation_plev19",  "o3",        "o3_unmsk",      "atmos_month_cmip",        "all",  .true.,  "none", 2
 ##. Ozone volume mixing ratio, mol mol-1 (longitude,latitude,plev19,time2)
 # CLIMATOLOGY DONE IN POST-PROCESSING
 #"radiation_plev19", "o3",            "o3Clim",        "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. CO2 volume mixing ratio, mol mol-1 (longitude,latitude,plev19,time)
-# This field was not reported CMIP5. It was replaced by "co2mass" below.
+# This field was not reported CMIP5. It was replaced by #60 below,
 # which is applicable for well-mixed co2 models.
 #"UNKNOWN",       "co2",           "co2",           "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. CO2 volume mixing ratio, mol mol-1 (longitude,latitude,plev19,time2)
-# This field was not reported CMIP5. It was replaced by "co2massClim" below.
+# This field was not reported CMIP5.
 #"UNKNOWN",       "co2",           "co2Clim",       "atmos_month_cmip",        "all",  .true.,  "none", 2
-
 ##. Total Atmospheric Mass of CO2, kg (time)
  "radiation",     "co2mass",       "co2mass",       "atmos_month_cmip",        "all",  .true.,  "none", 2
 ##. Total Atmospheric Mass of CO2, kg (time2)
@@ -8343,21 +8268,21 @@ $baseDate
  "phys",          "phalf",         "phalf",         "atmos_month_cmip",        "all",  .true.,  "none", 2
 ####################
 # Table: AERmon
-# Version: 1.00.26
+# Version: 1.00.07
 ####################
-"aerosol_month_cmip",       1, "months",    1,  "days",  "time",
+ "aerosol_month_cmip",       1, "months",    1,  "days",  "time",
 ####################
 ##. Auxiliary fields required for model level output
-"cmip",          "ap",            "ap",            "aerosol_month_cmip",      "all",  .false., "none", 1
-"cmip",          "b",             "b",             "aerosol_month_cmip",      "all",  .false., "none", 1
-"cmip",          "ap_bnds",       "ap_bnds",       "aerosol_month_cmip",      "all",  .false., "none", 1
-"cmip",          "b_bnds",        "b_bnds",        "aerosol_month_cmip",      "all",  .false., "none", 1
-"cmip",          "lev_bnds",      "lev_bnds",      "aerosol_month_cmip",      "all",  .false., "none", 1
+ "cmip",          "ap",            "ap",            "aerosol_month_cmip",      "all",  .false., "none", 1
+ "cmip",          "b",             "b",             "aerosol_month_cmip",      "all",  .false., "none", 1
+ "cmip",          "ap_bnds",       "ap_bnds",       "aerosol_month_cmip",      "all",  .false., "none", 1
+ "cmip",          "b_bnds",        "b_bnds",        "aerosol_month_cmip",      "all",  .false., "none", 1
+ "cmip",          "lev_bnds",      "lev_bnds",      "aerosol_month_cmip",      "all",  .false., "none", 1
 #"atmos",         "ps",            "ps",            "aerosol_month_cmip",      "all",  .true.,  "none", 1
 ##. Ambient Aerosol Absorption Optical Thickness at 550 nm, 1.0 (longitude,latitude,time)
-"radiation",     "abs550aer",     "abs550aer",     "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "radiation",     "abs550aer",     "abs550aer",     "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Vertically integrated mass content of air in layer, kg m-2 (longitude,latitude,alevel,time)
-"tracers",       "airmass",       "airmass",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "airmass",       "airmass",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Planetary Albedo, 1.0 (longitude,latitude,time)
 #"UNKNOWN",       "albs",          "albs",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. surface albedo, 1.0 (longitude,latitude,time)
@@ -8365,69 +8290,67 @@ $baseDate
 ##. Northern Hemisphere Tracer Lifetime, yr (longitude,latitude,alevel,time)
 #"UNKNOWN",       "aoanh",         "aoanh",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Boundary Layer Depth, m (longitude,latitude,time)
-"vert_turb",     "bldep",         "bldep",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "vert_turb",     "bldep",         "bldep",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. C2H2 volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
 # NOT AVAILABLE
 #"UNKNOWN",       "c2h2",          "c2h2",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. C2H6 volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "c2h6_mol_mol",  "c2h6",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "c2h6_mol_mol",  "c2h6",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. C3H6  volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "c3h6_mol_mol",  "c3h6",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "c3h6_mol_mol",  "c3h6",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. C3H8  volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "c3h8_mol_mol",  "c3h8",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "c3h8_mol_mol",  "c3h8",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Cloud Condensation Nuclei Concentration at Liquid Cloud Top, m-3 (longitude,latitude,time)
 #"UNKNOWN",       "ccn",           "ccn",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Cloud Droplet Number Concentration, m-3 (longitude,latitude,alevel,time)
-"strat",         "cdnc",          "cdnc",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "strat",         "cdnc",          "cdnc",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. CH3COCH3  volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "ch3coch3_mol_mol", "ch3coch3",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "ch3coch3_mol_mol", "ch3coch3",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. CH4 volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "ch4_mol_mol",   "ch4",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#NOT APPLICABLE - Scalar
+#"UNKNOWN",       "ch4",           "ch4",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Aqueous-phase production rate of SO4, kg m-2 s-1 (longitude,latitude,alevel,time)
-# REFINED_DIAG: cheaqpso4 = pso4_aq_kg_m2_s + pso4_aq_so2_reevap_ls
-"tracers",   "pso4_aq_kg_m2_s", "pso4_aq_kg_m2_s", "aerosol_month_cmip",      "all",  .true.,  "none", 2
-"tracers",       "pso4_aq_so2_reevap_ls", "pso4_aq_so2_reevap_ls","aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "pso4_aq_kg_m2_s", "cheaqpso4",     "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Gas-phase production rate of SO4, kg m-2 s-1 (longitude,latitude,alevel,time)
-"tracers",       "pso4_gas_kg_m2_s", "chegpso4",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "pso4_gas_kg_m2_s", "chegpso4",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Net Production of Anthropogenic Secondary Organic Aerosol, kg m-2 s-1 (longitude,latitude,time)
 #"UNKNOWN",       "chepasoa",      "chepasoa",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. chemical production of dry aerosol secondary organic matter, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "chepsoa",       "chepsoa",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "chepsoa",       "chepsoa",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Convective Cloud Cover Percentage, % (longitude,latitude,time)
-"uw_conv",       "cltc_uw",       "cltc",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "uw_conv",       "cltc_uw",       "cltc",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. CO volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "co_mol_mol",    "co",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "co_mol_mol",    "co",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. CO2 volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "co2_vmr",       "co2",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#NOT APPLICABLE - Scalar
+#"UNKNOWN",       "co2",           "co2",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Cloud Optical Depth, 1.0 (longitude,latitude,time)
 #"UNKNOWN",       "cod",           "cod",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. DMS volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "dms_mol_mol",   "dms",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "dms_mol_mol",   "dms",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. dry deposition rate of black carbon aerosol mass, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "drybc",         "drybc",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "drybc",         "drybc",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. dry deposition rate of dust, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "drydust",       "drydust",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "drydust",       "drydust",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Dry Deposition Rate of nh3, kg m-2 s-1 (longitude,latitude,time)
-# REFINED_DIAG: drynh3 = drynh3_woOCN + (nh3_mol_flux_atm0-nh3_mol_flux)*0.017(kg/mole)
-"tracers",       "nh3_ddep_kg_m2_s","drynh3_woOCN","aerosol_month_cmip",      "all",  .true.,  "none", 2
-"flux",          "nh3_mol_flux",   "nh3_mol_flux", "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "nh3_ddep_kg_m2_s", "drynh3",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. dry deposition rate of nh4, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "nh4_ddep_kg_m2_s", "drynh4",     "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "nh4_ddep_kg_m2_s", "drynh4",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. dry deposition rate of noy, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "fam_noy_ddep_kg_m2_s", "drynoy", "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "fam_noy_ddep_kg_m2_s", "drynoy",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Dry Deposition Rate of o3, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "o3_ddep_kg_m2_s", "dryo3",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "o3_ddep_kg_m2_s", "dryo3",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Dry Deposition Rate of Dry Aerosol Total Organic Matter, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "dryoa",         "dryoa",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "dryoa",         "dryoa",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 # REFINED_DIAG: dryoa = drypoa + drysoa
-"tracers",       "drypoa",        "drypoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
-"tracers",       "drysoa",        "drysoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "drypoa",        "drypoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "drysoa",        "drysoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Dry Deposition Rate of so2, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "so2_ddep_kg_m2_s", "dryso2",     "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "so2_ddep_kg_m2_s", "dryso2",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. dry deposition rate of so4, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "so4_ddep_kg_m2_s", "dryso4",     "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "so4_ddep_kg_m2_s", "dryso4",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. dry deposition rate of seasalt, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "dryss",         "dryss",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "dryss",         "dryss",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Emission rate of anthropogenic co, kg m-2 s-1 (longitude,latitude,time)
 #"UNKNOWN",       "emiaco",        "emiaco",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. anthropogenic emission rate of nox, kg m-2 s-1 (longitude,latitude,time)
@@ -8435,201 +8358,196 @@ $baseDate
 ##. Total Emission of anthropogenic  organic aerosol, kg m-2 s-1 (longitude,latitude,time)
 #"UNKNOWN",       "emiaoa",        "emiaoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. emission rate of black carbon aerosol mass, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "emibc",         "emibc",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "emibc",         "emibc",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Emission rate of biogenic nmvoc, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "emibvoc",       "emibvoc",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "emibvoc",       "emibvoc",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Emission Rate of co, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "emico",         "emico",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "emico",         "emico",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Emission Rate of dms, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "emidms",        "emidms",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "emidms",        "emidms",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. total emission rate of dust, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "emidust",       "emidust",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "emidust",       "emidust",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Emission Rate of isoprene, kg m-2 s-1 (longitude,latitude,time)
-# REFINED_DIAG: emiisop = emiisop_woB + emiisop_biogenic
-"tracers",       "emiisop_woB",   "emiisop_woB",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
-"tracers",  "emiisop_biogenic","emiisop_biogenic", "aerosol_month_cmip",      "all",  .true.,  "none", 2
-##. layer-integrated lightning production of NOx, mol s-1 (longitude,latitude,alevel,time) -- needs ANALYSIS script
-"moist",         "emilnox_area",  "emilnox_area",  "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "emiisop",       "emiisop",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+##. layer-integrated lightning production of NOx, mol s-1 (longitude,latitude,alevel,time)
+#"UNKNOWN",       "emilnox",       "emilnox",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Emission Rate of nh3, kg m-2 s-1 (longitude,latitude,time)
-# REFINED_DIAG: eminh3 = eminh3_woOCN + nh3_mol_flux_atm0*0.017(kg/mole)
-"tracers",       "eminh3",        "eminh3_woOCN",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
-"flux",     "nh3_mol_flux_atm0","nh3_mol_flux_atm0","aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "eminh3",        "eminh3",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Emission Rate of nox, kg m-2 s-1 (longitude,latitude,time)
-# REFINED_DIAG: eminox = eminox_woL + eminox_lght
-"tracers",       "eminox_woL",    "eminox_woL",    "aerosol_month_cmip",      "all",  .true.,  "none", 2
-"tracers",       "eminox_lght",   "eminox_lght",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "eminox",        "eminox",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. primary emission and chemical production of dry aerosol organic matter, kg m-2 s-1 (longitude,latitude,time)
+#"UNKNOWN",       "emioa",         "emioa",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 # REFINED_DIAG: emioa = emipoa + chepsoa
-"tracers",       "emipoa",        "emipoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "emipoa",        "emipoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Emission Rate of so2, kg m-2 s-1 (longitude,latitude,time)
- "tracers",       "emiso2",        "emiso2",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+  "tracers",       "emiso2",        "emiso2",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Direct Emission Rate of so4, kg m-2 s-1 (longitude,latitude,time)
 #"UNKNOWN",       "emiso4",        "emiso4",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. total emission rate of seasalt, kg m-2 s-1 (longitude,latitude,time)
-"tracers",       "emiss",         "emiss",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "emiss",         "emiss",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Emission rate of nmvoc, kg m-2 s-1 (longitude,latitude,time)
 #"UNKNOWN",       "emivoc",        "emivoc",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Mass Fraction of Water, 1.0 (longitude,latitude,alevel,time)
 #"UNKNOWN",       "h2o",           "h2o",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Formaldehyde volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "ch2o_mol_mol",  "hcho",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "ch2o_mol_mol",  "hcho",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. HCl volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "hcl_mol_mol",   "hcl",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "hcl_mol_mol",   "hcl",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. HNO3 volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "hno3_mol_mol",  "hno3",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "hno3_mol_mol",  "hno3",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Isoprene volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "isop_mol_mol",  "isop",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "isop_mol_mol",  "isop",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. photolysis rate of NO2, s-1 (longitude,latitude,alevel,time)
-"tracers",       "jno2",          "jno2",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "jno2",          "jno2",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Monthly Loss of atmospheric Methane, mol m-3 s-1 (longitude,latitude,alevel,time)
-"tracers",       "lossch4",       "lossch4",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "lossch4",       "lossch4",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Monthly Loss of atmospheric Carbon Monoxide, mol m-3 s-1 (longitude,latitude,alevel,time)
-"tracers",       "lossco",        "lossco",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "lossco",        "lossco",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Monthly Loss of atmospheric Nitrous Oxide, mol m-3 s-1 (longitude,latitude,alevel,time)
-"tracers",       "lossn2o",       "lossn2o",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "lossn2o",       "lossn2o",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. liquid water path, kg m-2 (longitude,latitude,time)
-"moist",         "lwp",           "lwp",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "moist",         "lwp",           "lwp",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Aerosol water mass mixing ratio, kg kg-1 (longitude,latitude,alevel,time)
 #"UNKNOWN",       "mmraerh2o",     "mmraerh2o",     "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Elemental carbon mass mixing ratio, kg kg-1 (longitude,latitude,alevel,time)
-"tracers",       "fam_bc_kg_kg",  "mmrbc",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "fam_bc_kg_kg",  "mmrbc",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Dust aerosol mass mixing ratio, kg kg-1 (longitude,latitude,alevel,time)
-"tracers",       "fam_dust_kg_kg",       "mmrdust",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "mmrdust",       "mmrdust",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. NH4 mass mixing ratio, kg kg-1 (longitude,latitude,alevel,time)
-"tracers",       "nh4_kg_kg",     "mmrnh4",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "nh4_kg_kg",     "mmrnh4",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. NO3 aerosol mass mixing ratio, kg kg-1 (longitude,latitude,alevel,time)
-"tracers",       "nh4no3_kg_kg",  "mmrno3",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "nh4no3_kg_kg",  "mmrno3",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total organic aerosol mass mixing ratio, kg kg-1 (longitude,latitude,alevel,time)
-"tracers",       "fam_om_kg_kg",  "mmroa",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "fam_om_kg_kg",  "mmroa",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. PM1.0 mass mixing ratio, kg kg-1 (longitude,latitude,alevel,time)
-"tracers",       "pm1_kg_kg",     "mmrpm1",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "pm1_kg_kg",     "mmrpm1",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. PM10 mass mixing ratio, kg kg-1 (longitude,latitude,alevel,time)
-"tracers",       "pm10_kg_kg",    "mmrpm10",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "pm10_kg_kg",    "mmrpm10",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. PM2.5 mass mixing ratio, kg kg-1 (longitude,latitude,alevel,time)
-"tracers",       "pm25_kg_kg",    "mmrpm2p5",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "pm25_kg_kg",    "mmrpm2p5",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Aerosol sulfate mass mixing ratio, kg kg-1 (longitude,latitude,alevel,time)
-"tracers",       "so4_kg_kg",     "mmrso4",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "so4_kg_kg",     "mmrso4",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Secondary organic aerosol mass mixing ratio, kg kg-1 (longitude,latitude,alevel,time)
-"tracers",       "SOA_kg_kg",     "mmrsoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "mmrsoa",        "mmrsoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Sea Salt mass mixing ratio, kg kg-1 (longitude,latitude,alevel,time)
-"tracers",       "fam_seasalt_kg_kg", "mmrss",     "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "mmrss",         "mmrss",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. N2O volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
- "tracers",       "n2o_mol_mol",   "n2o",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "n2o",           "n2o",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Fixed surface layer mixing ratio over 30o-50oN (100ppbv), uniform fixed 50-day exponential decay., mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "nh50_mol_mol",  "nh50",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "nh50",          "nh50",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. NO volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "no_mol_mol",    "no",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "no_mol_mol",    "no",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. NO2 volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "no2_mol_mol",   "no2",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "no2_mol_mol",   "no2",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Ozone volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "o3_mol_mol",    "o3",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "o3_mol_mol",            "o3",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. O3 destruction rate, mol m-3 s-1 (longitude,latitude,alevel,time)
-"tracers",       "o3loss",        "o3loss",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "o3loss",        "o3loss",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. O3 production rate, mol m-3 s-1 (longitude,latitude,alevel,time)
-"tracers",       "o3prod",        "o3prod",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "o3prod",        "o3prod",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Ozone volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",     "o3s_e90_mol_mol", "o3ste",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "o3ste",         "o3ste",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. ambient aerosol optical thickness at 440 nm, 1.0 (longitude,latitude,time)
-"radiation",     "od440aer",      "od440aer",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "od440aer",      "od440aer",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. ambient aerosol optical thickness at 550 nm, 1.0 (longitude,latitude,time)
-"radiation",     "od550aer",      "od550aer",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "radiation",     "od550aer",      "od550aer",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. aerosol water aod at 550nm, 1.0 (longitude,latitude,time)
 #"UNKNOWN",       "od550aerh2o",   "od550aerh2o",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. bb aod@550nm, 1.0 (longitude,latitude,time)
 #"UNKNOWN",       "od550bb",       "od550bb",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. black carbon aod at 550nm, 1.0 (longitude,latitude,time)
-"radiation",     "od550bc",       "od550bc",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "od550bc",       "od550bc",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. ambient aerosol optical thickness at 550 nm, 1.0 (longitude,latitude,time)
 #"UNKNOWN",       "od550csaer",    "od550csaer",    "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. dust aod@550nm, 1.0 (longitude,latitude,time)
-"radiation",     "od550dust",     "od550dust",     "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "od550dust",     "od550dust",     "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. ambient fine aerosol optical thickness at 550 nm, 1.0 (longitude,latitude,time)
-"radiation",     "od550lt1aer",   "od550lt1aer",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
-##. nitrate aod@550nm, 1.0 (longitude,latitude,time) -- need to update to a “CMIP” diagnostic
-"radiation",       "nitrate_exopdep_col_vis",      "od550no3",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
+  "radiation",     "od550lt1aer",   "od550lt1aer",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
+##. nitrate aod@550nm, 1.0 (longitude,latitude,time)
+#"UNKNOWN",       "od550no3",      "od550no3",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. pom aod@550nm, 1.0 (longitude,latitude,time)
-"radiation",     "od550oa",       "od550oa",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "od550oa",       "od550oa",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. sulfate aod@550nm, 1.0 (longitude,latitude,time)
-"radiation",     "od550so4",      "od550so4",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "od550so4",      "od550so4",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. soa aod@550nm, 1.0 (longitude,latitude,time)
-"radiation",     "od550soa",      "od550soa",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "od550soa",      "od550soa",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. sea salt aod@550nm, 1.0 (longitude,latitude,time)
-"radiation",     "od550ss",       "od550ss",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "od550ss",       "od550ss",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. ambient aerosol optical thickness at 870 nm, 1.0 (longitude,latitude,time)
-"radiation",     "od870aer",      "od870aer",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "radiation",     "od870aer",      "od870aer",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. OH volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "oh_mol_mol",    "oh",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "oh_mol_mol",    "oh",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. PAN volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "pan_mol_mol",   "pan",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "pan_mol_mol",   "pan",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Pressure on Model Levels, Pa (longitude,latitude,alevel,time)
-"phys",          "pfull",         "pfull",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "phys",          "pfull",         "pfull",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Pressure on Model Half-Levels, Pa (longitude,latitude,alevel,time)
-"phys",          "phalf",         "phalf",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "phys",          "phalf",         "phalf",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. photolysis rate of O3 to O1d, s-1 (longitude,latitude,alevel,time)
-"tracers",       "photo1d",       "photo1d",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "photo1d",       "photo1d",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Phytotoxic ozone dose, mol m-2 s-1 (longitude,latitude,time)
 #"UNKNOWN",       "pod0",          "pod0",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Tropopause Air Pressure, Pa (longitude,latitude,time)
-"tracers",       "ptp",           "ptp",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "ptp",           "ptp",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. cloud-top effective droplet radius, m (longitude,latitude,time)
-"cloudrad",      "reffclwtop",    "reffclwtop",    "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "cloudrad",      "reffclwtop",    "reffclwtop",    "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. TOA Outgoing Aerosol-Free Longwave Radiation, W m-2 (longitude,latitude,time)
-"radiation",     "rlutaf",        "rlutaf",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "radiation",     "rlutaf",        "rlutaf",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. TOA Outgoing Clear-Sky, Aerosol-Free Longwave Radiation, W m-2 (longitude,latitude,time)
-"radiation",     "rlutcsaf",      "rlutcsaf",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "radiation",     "rlutcsaf",      "rlutcsaf",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. TOA Outgoing Aerosol-Free Shortwave Radiation, W m-2 (longitude,latitude,time)
-"radiation",     "rsutaf",        "rsutaf",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "radiation",     "rsutaf",        "rsutaf",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. TOA Outgoing Clear-Sky, Aerosol-Free Shortwave Radiation, W m-2 (longitude,latitude,time)
-"radiation",     "rsutcsaf",      "rsutcsaf",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "radiation",     "rsutcsaf",      "rsutcsaf",      "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. SO2 volume mixing ratio, mol mol-1 (longitude,latitude,alevel,time)
-"tracers",       "so2_mol_mol",   "so2",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "tracers",       "so2_mol_mol",   "so2",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Tropopause Air Temperature, K (longitude,latitude,time)
-"tracers",       "tatp",          "tatp",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "tatp",          "tatp",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. tendency_of_air_temperature_due_to_longwave_heating, K s-1 (longitude,latitude,alevel,time)
-"radiation",     "tntrl",         "tntrl",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "radiation",     "tntrl",         "tntrl",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. tendency_of_air_temperature_due_to_shortwave_heating, K s-1 (longitude,latitude,alevel,time)
-"radiation",     "tntrs",         "tntrs",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "radiation",     "tntrs",         "tntrs",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Total Ozone Column, m (longitude,latitude,time)
-"tracers",       "toz",           "toz",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "toz",           "toz",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. tropospheric ozone column, m (longitude,latitude,time)
-"tracers",       "tropoz",        "tropoz",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "tropoz",        "tropoz",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. air temperature at cloud top, K (longitude,latitude,time)
 #"UNKNOWN",       "ttop",          "ttop",          "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Eastward Wind, m s-1 (longitude,latitude,alevel,time)
-"atmos",         "ua",            "ua",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "atmos",         "ua",            "ua",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Northward Wind, m s-1 (longitude,latitude,alevel,time)
-"atmos",         "va",            "va",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "atmos",         "va",            "va",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Upward Air Velocity, m s-1 (longitude,latitude,alevel,time)
 #"UNKNOWN",       "wa",            "wa",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. wet deposition rate of black carbon aerosol mass, kg m-2 s-1 (longitude,latitude,time)
-"moist",         "wetbc",         "wetbc",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "moist",         "wetbc",         "wetbc",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. wet deposition rate of dust, kg m-2 s-1 (longitude,latitude,time)
-"moist",         "wetdust",       "wetdust",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "moist",         "wetdust",       "wetdust",       "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. wet deposition rate of nh3, kg m-2 s-1 (longitude,latitude,time)
-"moist",         "nh3_wetdep_kg_m2_s", "wetnh3",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "moist",         "nh3_wetdep_kg_m2_s",   "wetnh3",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. wet deposition rate of nh4, kg m-2 s-1 (longitude,latitude,time)
-"moist",         "nh4_wetdep_kg_m2_s", "wetnh4",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "moist",         "nh4_wetdep_kg_m2_s",   "wetnh4",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. wet deposition of noy incl aerosol nitrate, kg m-2 s-1 (longitude,latitude,time)
-"moist",      "fam_noy_wetdep_kg_m2_s", "wetnoy",  "aerosol_month_cmip",      "all",  .true.,  "none", 2
-"moist",      "fam_nhx_wetdep_kg_m2_s", "wetnhx",  "aerosol_month_cmip",      "all",  .true.,  "none", 2
+"moist",       "fam_noy_wetdep_kg_m2_s",        "wetnoy",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+"moist",       "fam_nhx_wetdep_kg_m2_s",        "wetnhx",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. wet deposition rate of dry aerosol total organic matter, kg m-2 s-1 (longitude,latitude,time)
-"moist",         "wetoa",         "wetoa",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "wetoa",         "wetoa",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 # REFINED_DIAG: wetoa = wetpoa + wetsoa
-#"moist",         "wetpoa",        "wetpoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
-#"moist",         "wetsoa",        "wetsoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "moist",         "wetpoa",        "wetpoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "moist",         "wetsoa",        "wetsoa",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. wet deposition rate of so2, kg m-2 s-1 (longitude,latitude,time)
-"moist",         "so2_wetdep_kg_m2_s", "wetso2",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "moist",         "so2_wetdep_kg_m2_s", "wetso2",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. wet deposition rate of so4, kg m-2 s-1 (longitude,latitude,time)
-"moist",         "so4_wetdep_kg_m2_s", "wetso4",   "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "moist",         "so4_wetdep_kg_m2_s", "wetso4",        "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. wet deposition rate of seasalt, kg m-2 s-1 (longitude,latitude,time)
-"moist",         "wetss",         "wetss",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "moist",         "wetss",         "wetss",         "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Geopotential Height, m (longitude,latitude,alevel,time)
 # Currently only on half level
-"atmos",         "zg",            "zg",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "atmos",         "zg",            "zg",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Tropopause Altitude, m (longitude,latitude,time)
-"tracers",       "ztp",           "ztp",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
+#"UNKNOWN",       "ztp",           "ztp",           "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##. Surface Air Pressure, Pa (longitude,latitude,time)
-"atmos",         "ps",            "ps",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
+ "atmos",         "ps",            "ps",            "aerosol_month_cmip",      "all",  .true.,  "none", 2
 ##################
 # Table: Lmon
 # Version: 1.00.07
@@ -8898,9 +8816,7 @@ $baseDate
 ##. dry deposition rate of noy, kg m-2 s-1 (longitude,latitude,time)
  "tracers",       "fam_noy_ddep_kg_m2_s", "drynoy",        "atmos_dust_sample",      "all",  .true.,  "none", 2
 ##. Dry Deposition Rate of nh3, kg m-2 s-1 (longitude,latitude,time)
-# REFINED_DIAG: drynh3 = drynh3_woOCN + (nh3_mol_flux_atm0-nh3_mol_flux)*0.017(kg/mole)
-"tracers",        "nh3_ddep_kg_m2_s",     "drynh3_woOCN",  "atmos_dust_sample",      "all",  .true.,  "none", 2
-"flux",           "nh3_mol_flux",         "nh3_mol_flux",  "atmos_dust_sample",      "all",  .true.,  "none", 2
+ "tracers",       "nh3_ddep_kg_m2_s", "drynh3",        "atmos_dust_sample",      "all",  .true.,  "none", 2
 ##. dry deposition rate of nh4, kg m-2 s-1 (longitude,latitude,time)
  "tracers",       "nh4_ddep_kg_m2_s", "drynh4",        "atmos_dust_sample",      "all",  .true.,  "none", 2
 #####################################################
