@@ -87,8 +87,8 @@ set varlist = (emilnox_area)
 set cmorvarlist = (emilnox)
 
 foreach var ($varlist)
-  if (-e $in_dir/aerosol_cmip.$yrs[1]0101-$yrs[2]1231.$var.nc) then
-      set infile = `/bin/ls $in_dir/*.$yrs[1]0101-$yrs[2]1231.$var.nc`
+  if (-e $in_dir/aerosol_cmip.$yrs[1]01-$yrs[2]12.$var.nc) then
+      set infile = `/bin/ls $in_dir/*.$yrs[1]01-$yrs[2]12.$var.nc`
       dmget $infile
       gcp $infile $workdir
   endif 
@@ -104,7 +104,7 @@ cat << EOF > gofile.ncl
 
 begin
 
-exptime       = $qq$yrs[1]0101-$yrs[2]1231$qq
+exptime       = $qq$yrs[1]01-$yrs[2]12$qq
 work_dir      = $qq$workdir$qq
 
    varname = ${qq}emilnox_area$qq
@@ -170,8 +170,8 @@ endif
 
 # move files to the output directory
 foreach cmorvar ($cmorvarlist) 
-   if (-e $workdir/aerosol_cmip.$yrs[1]0101-$yrs[2]1231.$cmorvar.nc) then
-      gcp $workdir/aerosol_cmip.$yrs[1]0101-$yrs[2]1231.$cmorvar.nc $out_data_dir
+   if (-e $workdir/aerosol_cmip.$yrs[1]01-$yrs[2]12.$cmorvar.nc) then
+      gcp $workdir/aerosol_cmip.$yrs[1]01-$yrs[2]12.$cmorvar.nc $out_data_dir
    else
       echo "ERROR: file not found in $workdir"
 #     exit 1
