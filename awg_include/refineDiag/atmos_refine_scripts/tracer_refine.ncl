@@ -128,10 +128,15 @@ begin
   ; get variable names in this file
   REQUIRED = 0
   REQUIRED@emioa = (/"emipoa","chepsoa"/)
-  REQUIRED@emiaoa = (/"emiapoa","chepasoa"/)
-  REQUIRED@dryoa = (/"drypoa","drysoa"/)
-  REQUIRED@wetoa = (/"wetpoa","wetsoa"/)
+  ; REQUIRED@emiaoa = (/"emiapoa","chepasoa"/)
+  ; REQUIRED@dryoa = (/"drypoa","drysoa"/)
+  ; REQUIRED@wetoa = (/"wetpoa","wetsoa"/)
   REQUIRED@cheaqpso4 = (/"pso4_aq_kg_m2_s","pso4_aq_so2_reevap_ls"/)
+  REQUIRED@eminox = (/"eminox_woL","eminox_lght"/)
+  REQUIRED@emiisop = (/"emiisop_woB","emiisop_biogenic"/)
+  REQUIRED@eminh3 = (/"eminh3_woOCN","nh3_mol_flux_atm0"/)
+  REQUIRED@drynh3 = (/"drynh3_woOCN","nh3_mol_flux_atm0","nh3_mol_flux"/)
+  REQUIRED@emidust = (/"dust1_flux","dust2_flux","dust3_flux","dust4_flux","dust5_flux"/)
 
   EXTRA_VARS = 0 ; stores additional bounds and formula term variables needed
 
@@ -268,8 +273,47 @@ begin
       data@long_name = "Aqueous-phase Production Rate of Sulfate Aerosol"
       data@units = "kg m-2 s-1"
       data@standard_name = "tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_aqueous_phase_net_chemical_production"
+    else if (outvars(vo) .eq. "eminox") then
+      data = fi->$invars(0)$
+      data = data + fi->$invars(1)$
+      data@long_name = "Total Emission Rate of NOx"
+      data@units = "kg m-2 s-1"
+      data@standard_name = "tendency_of_atmosphere_mass_content_of_nox_expressed_as_nitrogen_due_to_emission"
+    else if (outvars(vo) .eq. "emiisop") then
+      data = fi->$invars(0)$
+      data = data + fi->$invars(1)$
+      data@long_name = "Total Emission Rate of Isoprene"
+      data@units = "kg m-2 s-1"
+      data@standard_name = "tendency_of_atmosphere_mass_content_of_isoprene_due_to_emission"
+    else if (outvars(vo) .eq. "eminh3") then
+      data = fi->$invars(0)$
+      data = data + fi->$invars(1)$ * 0.017
+      data@comment = invars(0)+"+0.017*"+invars(1)
+      data@long_name = "Total Emission Rate of NH3"
+      data@units = "kg m-2 s-1"
+      data@standard_name = "tendency_of_atmosphere_mass_content_of_ammonia_due_to_emission"
+    else if (outvars(vo) .eq. "drynh3") then
+      data = fi->$invars(0)$
+      data = data + (fi->$invars(1)$ - fi->$invars(2)$) * 0.017
+      data@comment = invars(0)+"+0.017*"+invars(1)+"-0.017*"+invars(2)
+      data@long_name = "Dry Deposition Rate of NH3"
+      data@units = "kg m-2 s-1"
+      data@standard_name = "minus_tendency_of_atmosphere_mass_content_of_ammonia_due_to_dry_deposition"
+    else if (outvars(vo) .eq. "emidust") then
+      data = fi->$invars(0)$
+      data = data + fi->$invars(1)$ + fi->$invars(2)$ + fi->$invars(3)$ + fi->$invars(4)$
+      data = (data > 0.)
+      data@comment = invars(0)+"+"+invars(1)+"+"+invars(2)+"+"+invars(3)+"+"+invars(4)
+      data@long_name = "Total Emission Rate of Dust"
+      data@units = "kg m-2 s-1"
+      data@standard_name = "tendency_of_atmosphere_mass_content_of_dust_dry_aerosol_particles_due_to_emission"
     else
       continue
+    end if
+    end if
+    end if
+    end if
+    end if
     end if
     end if
     end if
@@ -278,10 +322,12 @@ begin
     if (.not.tavginfo .and. isatt(data,"time_avg_info")) then
       delete(data@time_avg_info)
     end if
-    comment = invars(0)+"+"+invars(1)
-    print("output: "+outvars(vo)+" = "+comment)
+    if (.not. isatt(data,"comment")) then
+       data@comment = invars(0)+"+"+invars(1)
+    end if
+    print("output: "+outvars(vo)+" = "+data@comment)
     fo->$outvars(vo)$ = data
-    fo->$outvars(vo)$@comment = comment
+;   fo->$outvars(vo)$@comment = comment
     delete([/data,invars/])
   end do
 
