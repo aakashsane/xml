@@ -89,7 +89,7 @@ NOTES:
   <!--User should set the following properties according to the plan for the production run-->	
   <property name="RELEASE"        value="pre_xanadu_esm4_20180814"/>  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for shared source code -->
-  <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>     <!-- git tag for atmos_shared and atmos_param source code -->
+  <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>        <!-- git tag for atmos_shared and atmos_param source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>        <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>        <!-- git tag for LAND source code -->
   <property name="COUPLER_GIT_TAG"    value="$(RELEASE)"/>    <!-- git tag for AWG source code -->
@@ -2598,9 +2598,9 @@ LWH (3/16/2018)
       </namelist>
 
       <namelist name ="regional_tracer_driver_nml">
-      ntracers     = 1,
-      tracer_names = "e90",
-      loss_freq   =  1.286008e-07,
+      ntracers     = 3,
+      tracer_names = "e90", "aoanh", "nh50"
+      loss_freq   =  1.286008e-07, 0., 2.314815e-07
       </namelist>
 
       <namelist name ="rh_based_clouds_nml">
@@ -4303,6 +4303,7 @@ SIS_OVERRIDE_EOF
 "profile_type","fixed","surface_value=0.0E+00"
 "init_conc", "file", "file=tracerIC.19800101.v2.nc"
 "convection","all"
+"adjust_mass", "false"
 /
 
 "tracer", "atmos_mod", "Extinction"
@@ -4541,6 +4542,7 @@ SIS_OVERRIDE_EOF
 "tracer_type","diagnostic"
 "profile_type","fixed","surface_value=1.e-20"
 /
+
 "tracer","atmos_mod","o3s"
 "longname","O3S"
 "units","VMR"
@@ -4560,11 +4562,30 @@ SIS_OVERRIDE_EOF
 
 "tracer","atmos_mod","o3s_e90"
 "longname","O3S_E90"
+"cmip","cmip6","cmip_name=ozone,cmip_longname=Ozone"
 "units","VMR"
+"chem_param","gas","mw=48."
 "dry_deposition","file","name=o3,diurnal=yes"
 "profile_type","fixed","surface_value=1.e-20"
 "convection",   "all"
 /
+
+"tracer","atmos_mod","aoanh"
+"longname","Northern Hemisphere tracer"
+"units","years"
+"profile_type","fixed","surface_value=1.e-20"
+"convection",   "all"
+"adjust_mass", "false"
+/
+
+"tracer","atmos_mod","nh50"
+"longname","Northern Hemisphere tracer"
+"cmip","cmip6","cmip_name=artificial_tracer_with_fixed_lifetime"
+"units","VMR"
+"profile_type","fixed","surface_value=1.e-20"
+"convection",   "all"
+/
+
 ####.................................................
 ### ESM atmos co2 field table for CMIP6 Jan 1 1850
 ## jgj 2016/11/29
@@ -4581,6 +4602,8 @@ SIS_OVERRIDE_EOF
  "TRACER", "atmos_mod",    "co2"
            "longname",     "carbon dioxide"
            "units",        "kg/kg"
+           "cmip","cmip6","cmip_name=carbon_dioxide"
+           "chem_param","gas","mw=44."
            "convection",   "all"
            "profile_type","fixed","surface_value = 431.9218e-06"/
 

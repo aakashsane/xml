@@ -11,11 +11,11 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="testing_20180703"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/> <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="2018.03.06"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl/2018.03.06"/>   <!-- git tag for MOM6 source code -->
+  <property name="MOM6_DATE"      value="2018.04.11"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -52,8 +52,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
   <property name="AWG_INPUT_HOME_NESCC" value="awg_include"/>
   <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)/mdt_xml/awg_include"/>
-  <property name="MIZ_ARCHIVE_ROOT_GAEA" value="$CPERM/Ming.Zhao/archive/mdt"/>
-  <property name="MIZ_ARCHIVE_ROOT_GFDL" value="/archive/miz/mdt/"/>
+  <property name="append_to_setup_csh"  value=""/>
     
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16'])"/>
@@ -403,7 +402,7 @@ endif
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/q_10_mod.clim.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/runoff.daitren.clim.v2011.02.10a.1440x1080.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/runoff.daitren.clim.1440x1080.v20180328.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/slp.clim.nc</dataSource>
@@ -520,13 +519,13 @@ endif
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/layer_coord.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/salt_restore.v20140616.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/salt_restore_PHC2.1440x1080.v20180405.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_saltrestore</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/seawifs_1998-2006_smoothed_2X.v20140616.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/seawifs-clim-1997-2010.1440x1080.v20180328.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/tidal_amplitude.v20140616.nc</dataSource>
@@ -557,9 +556,6 @@ endif
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/All_edits.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/WOA05_pottemp_salt.nc </dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/woa13_decav_ptemp_monthly_fulldepth_01.nc</dataSource>
@@ -2456,34 +2452,31 @@ OVERRIDE_EOF
    <freInclude name="OMp5_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/WOA05_pottemp_salt.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/woa13_decav_ptemp_monthly_fulldepth_01.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/woa13_decav_s_monthly_fulldepth_01.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/MOM_saltrestore</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/salt_restore.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/salt_restore_PHC2.720x576.v20180405.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/runoff.daitren.clim.v2011.02.10.720x576.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/runoff.daitren.clim.720x576.v20180328.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/runoff.daitren.iaf.v2011.02.10.720x576.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/runoff.daitren.iaf.720x576.v20180328.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/seawifs_1998-2006_smoothed_2X.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/seawifs-clim-1997-2010.720x576.v20180328.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/tidal_amplitude.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/geothermal_davies2013_v1.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/woa13_decav_ptemp_monthly_fulldepth_01.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/woa13_decav_s_monthly_fulldepth_01.nc</dataSource>
       </dataFile>
       <!-- the following fails with hsmget. not sure why
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -3671,10 +3664,10 @@ biomass_p_valid_min = 0.0
       </fieldTable>  
     </input>
   </freInclude>
-   <experiment name="OMp5_baseline_ens4" inherit="OMp5_baseline">
+   <experiment name="OMp5_baseline_ens2" inherit="OMp5_baseline">
     <input>
       <namelist name="ensemble_nml">
-        ensemble_size=4
+        ensemble_size=2
      </namelist>
     </input>
    </experiment>
@@ -4589,7 +4582,7 @@ dissi14cabio_valid_min = 0.0
 "ICE" , "sw_flux_nir_dif_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.215
 "ICE" , "lprec"         , "RAIN"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
 "ICE" , "fprec"         , "SNOW"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
-"ICE" , "runoff"        , "runoff"      , "./INPUT/runoff.daitren.clim.v2011.02.10.720x576.nc" , "none"  ,  1.0
+"ICE" , "runoff"        , "runoff"      , "./INPUT/runoff.daitren.clim.720x576.v20180328.nc" , "none"  ,  1.0
 "ICE" , "calving"       , ""            , ""                             , "none"  ,  0.0
 "ICE" , "dhdt"          , ""            , ""                             , "none"  , 80.0
 "ICE" , "dedt"          , ""            , ""                             , "none"  ,  2.0e-6
