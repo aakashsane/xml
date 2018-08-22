@@ -2642,6 +2642,7 @@
  "flux",                     "co2_mol_flux",       "co2_mol_flux",       "atmos_co2_month", "all", .true.,  "none", 2
  "flux",                     "co2_atm_dvmr",       "co2_atm_dvmr",       "atmos_co2_month", "all", .true.,  "none", 2
  "flux",                     "co2_surf_dvmr",      "co2_surf_dvmr",      "atmos_co2_month", "all", .true.,  "none", 2
+ "atmos",                    "ps",                 "ps",                 "atmos_co2_month", "all", .true.,  "none", 2
 #
 # 2017/10/06, move to atmos_tracer component
 "flux",      "co2_flux_pcair_atm", "co2_flux_pcair_atm",       "atmos_tracer", "all", .true.,  "none", 2  # per Jasmin request to track co2 
@@ -3282,7 +3283,10 @@
 # CMIP6 diag tables: 
 ## 2018/08/07 updated to match CM4_pi_Control_C 
 ## includes 
+##          diag_table_3hr
 ##          diag_table_Amon
+##          diag_table_AERday
+##          diag_table_AERhr
 ##          diag_table_AERmon
 ##          diag_table_E1hrClimMon
 ##          diag_table_Eday
@@ -3309,9 +3313,98 @@
 #
 #===============================================================================================
 
+#################
+# Table: 3hr
+# Version: 1.00.27
+#################
+
+ "atmos_8xdaily_cmip",       3, "hours",    1,  "days",  "time",
+ "atmos_8xdaily_inst",       3, "hours",    1,  "days",  "time",
+ "land_8xdaily_cmip",        3, "hours",    1,  "days",  "time",
+ "land_8xdaily_inst",        3, "hours",    1,  "days",  "time",
+#"ocean_8xdaily_cmip",       3, "hours",    1,  "days",  "time",
+
+#################
+
+"land",    "geolon_t",   "geolon_t",   "land_8xdaily_cmip", "all", .false., "none", 1
+"land",    "geolat_t",   "geolat_t",   "land_8xdaily_cmip", "all", .false., "none", 1
+"land",    "geolon_t",   "geolon_t",   "land_8xdaily_inst", "all", .false., "none", 1
+"land",    "geolat_t",   "geolat_t",   "land_8xdaily_inst", "all", .false., "none", 1
+
+##. Precipitation, kg m-2 s-1 (longitude,latitude,time)
+ "moist",         "pr",            "pr",            "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Near-Surface Air Temperature, K (longitude,latitude,time1,height2m)
+ "flux",          "tas",           "tas",           "atmos_8xdaily_inst",      "all", .false.,  "none", 2
+ "flux",          "height2m",      "height2m",      "atmos_8xdaily_inst",      "all", .false.,  "none", 1
+
+##. Surface Upward Latent Heat Flux, W m-2 (longitude,latitude,time)
+ "flux",          "hfls",          "hfls",          "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Surface Upward Sensible Heat Flux, W m-2 (longitude,latitude,time)
+ "flux",          "hfss",          "hfss",          "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Surface Downwelling Longwave Radiation, W m-2 (longitude,latitude,time)
+ "radiation",     "rlds",          "rlds",          "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Surface Upwelling Longwave Radiation, W m-2 (longitude,latitude,time)
+ "radiation",     "rlus",          "rlus",          "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Surface Downwelling Shortwave Radiation, W m-2 (longitude,latitude,time)
+ "radiation",     "rsds",          "rsds",          "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Surface Upwelling Shortwave Radiation, W m-2 (longitude,latitude,time)
+ "radiation",     "rsus",          "rsus",          "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Eastward Near-Surface Wind, m s-1 (longitude,latitude,time1,height10m)
+ "flux",          "uas",           "uas",           "atmos_8xdaily_inst",      "all", .false.,  "none", 2
+ "flux",          "height10m",     "height10m",     "atmos_8xdaily_inst",      "all", .false.,  "none", 1
+
+##. Northward Near-Surface Wind, m s-1 (longitude,latitude,time1,height10m)
+ "flux",          "vas",           "vas",           "atmos_8xdaily_inst",      "all", .false.,  "none", 2
+
+##. Near-Surface Specific Humidity, 1.0 (longitude,latitude,time1,height2m)
+ "flux",          "huss",          "huss",          "atmos_8xdaily_inst",      "all", .false.,  "none", 2
+
+##. Moisture in Upper Portion of Soil Column, kg m-2 (longitude,latitude,time1,sdepth1)
+ "cmor_land",     "mrsos",         "mrsos",         "land_8xdaily_inst",       "all", .false.,  "none", 2
+
+##. Surface Temperature where Land or Sea Ice, K (longitude,latitude,time1)
+ "flux",          "tslsi",         "tslsi",         "atmos_8xdaily_inst",      "all", .false.,  "none", 2
+
+##. Sea Surface Temperature, K (longitude,latitude,time1)
+ "flux",          "tos",           "tos",           "atmos_8xdaily_cmip",      "all", .false.,  "none", 2
+
+##. Convective Precipitation, kg m-2 s-1 (longitude,latitude,time)
+ "moist",         "prc",           "prc",           "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Snowfall Flux, kg m-2 s-1 (longitude,latitude,time)
+ "moist",         "prsn",          "prsn",          "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Total Run-off, kg m-2 s-1 (longitude,latitude,time)
+ "cmor_land",     "mrro",          "mrro",          "land_8xdaily_cmip",       "all",  .true.,  "none", 2
+
+##. Surface Downwelling Clear-Sky Longwave Radiation, W m-2 (longitude,latitude,time)
+ "radiation",     "rldscs",        "rldscs",        "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Surface Downwelling Clear-Sky Shortwave Radiation, W m-2 (longitude,latitude,time)
+ "radiation",     "rsdscs",        "rsdscs",        "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Surface Upwelling Clear-Sky Shortwave Radiation, W m-2 (longitude,latitude,time)
+ "radiation",     "rsuscs",        "rsuscs",        "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Surface Air Pressure, Pa (longitude,latitude,time1)
+ "atmos",         "ps",            "ps",            "atmos_8xdaily_inst",      "all", .false.,  "none", 2
+
+##. Total Cloud Cover Percentage, % (longitude,latitude,time)
+ "moist",         "clt",           "clt",           "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
+##. Surface Diffuse Downwelling Shortwave Radiation, W m-2 (longitude,latitude,time)
+ "radiation",     "rsdsdiff",      "rsdsdiff",      "atmos_8xdaily_cmip",      "all",  .true.,  "none", 2
+
 ##################
 # Table: Amon
-# Version: 1.00.15
+# Version: 1.00.27
 ##################
 
  "atmos_month_cmip",         1, "months",    1,  "days",  "time",
@@ -3378,7 +3471,7 @@
 ##. Convective Precipitation, kg m-2 s-1 (longitude,latitude,time)
  "moist",         "prc",           "prc",           "atmos_month_cmip",        "all",  .true.,  "none", 2
 
-##. Evaporation, kg m-2 s-1 (longitude,latitude,time)
+##. Evaporation including Sublimation and Transpiration, kg m-2 s-1 (longitude,latitude,time)
  "flux",          "evspsbl",       "evspsbl",       "atmos_month_cmip",        "all",  .true.,  "none", 2
 
 ##. Surface Snow and Ice Sublimation Flux, kg m-2 s-1 (longitude,latitude,time)
@@ -3509,12 +3602,11 @@
 #"radiation_plev19", "o3",            "o3Clim",        "atmos_month_cmip",        "all",  .true.,  "none", 2
 
 ##. CO2 volume mixing ratio, mol mol-1 (longitude,latitude,plev19,time)
-# This field was not reported CMIP5. It was replaced by "co2mass" below.
-# which is applicable for well-mixed co2 models.
-#"UNKNOWN",       "co2",           "co2",           "atmos_month_cmip",        "all",  .true.,  "none", 2
+# Output below with "atmos_co2_month" fields
+#"tracers_plev19",           "co2_vmr",            "co2_unmsk",          "atmos_co2_month", "all", .true.,  "none", 2
 
 ##. CO2 volume mixing ratio, mol mol-1 (longitude,latitude,plev19,time2)
-# This field was not reported CMIP5. It was replaced by "co2massClim" below.
+# CLIMATOLOGY DONE IN POST-PROCESSING
 #"UNKNOWN",       "co2",           "co2Clim",       "atmos_month_cmip",        "all",  .true.,  "none", 2
 
 ##. Total Atmospheric Mass of CO2, kg (time)
@@ -3525,11 +3617,10 @@
 #"radiation",     "co2mass",       "co2massClim",   "atmos_month_cmip",        "all",  .true.,  "none", 2
 
 ##. CH4 volume mixing ratio, mol mol-1 (longitude,latitude,plev19,time)
-# This field was not reported CMIP5. It was replaced by "ch4global" below.
-#"UNKNOWN",       "ch4",           "ch4",           "atmos_month_cmip",        "all",  .true.,  "none", 2
+ "tracers_plev19",   "ch4_mol_mol", "ch4_unmsk",     "atmos_month_cmip",        "all",  .true.,  "none", 2
 
 ##. CH4 volume mixing ratio, mol mol-1 (longitude,latitude,plev19,time2)
-# This field was not reported CMIP5. It was replaced by "ch4globalClim" below.
+# CLIMATOLOGY DONE IN POST-PROCESSING
 #"UNKNOWN",       "ch4",           "ch4Clim",       "atmos_month_cmip",        "all",  .true.,  "none", 2
 
 ##. Global Mean Mole Fraction of CH4, 1e-09 (time)
@@ -3540,11 +3631,10 @@
 #"radiation",     "ch4global",     "ch4globalClim", "atmos_scalar",            "all",  .true.,  "none", 2
 
 ##. N2O volume mixing ratio, mol mol-1 (longitude,latitude,plev19,time)
-# This field was not reported CMIP5. It was replaced by "n2oglobal" below.
-#"UNKNOWN",       "n2o",           "n2o",           "atmos_month_cmip",        "all",  .true.,  "none", 2
+ "tracers_plev19",   "n2o_mol_mol", "n2o_unmsk",     "atmos_month_cmip",        "all",  .true.,  "none", 2
 
 ##. N2O volume mixing ratio, mol mol-1 (longitude,latitude,plev19,time2)
-# This field was not reported CMIP5. It was replaced by "n2oglobalClim" below.
+# CLIMATOLOGY DONE IN POST-PROCESSING
 #"UNKNOWN",       "n2o",           "n2oClim",       "atmos_month_cmip",        "all",  .true.,  "none", 2
 
 ##. Global Mean Mole Fraction of N2O, 1e-09 (time)
@@ -3571,6 +3661,55 @@
 
 ##. Pressure on Model Half-Levels, Pa (longitude,latitude,alevhalf,time2)
  "phys",          "phalf",         "phalf",         "atmos_level_cmip",        "all",  .true.,  "none", 2
+
+####################
+# Table: AERday
+# Version: 1.00.27
+####################
+ "aerosol_daily_cmip",      24, "hours",    1,  "days",  "time",
+####################
+##. Cloud Optical Depth, 1.0 (longitude,latitude,time)
+#"UNKNOWN",       "cod",           "cod",           "aerosol_daily_cmip",      "all",  .true.,  "none", 2
+##. maximum PBL height, m (longitude,latitude,time)
+ "vert_turb",     "bldep",         "bldep",         "aerosol_daily_cmip",      "all",  "max",   "none", 2
+##. minimum PBL height, m (longitude,latitude,time)
+ "vert_turb",     "bldep",         "bldep",         "aerosol_daily_cmip",      "all",  "min",   "none", 2
+##. ambient aerosol optical thickness at 550 nm, 1.0 (longitude,latitude,time)
+ "radiation",     "od550aer",      "od550aer",      "aerosol_daily_cmip",      "all",  .true.,  "none", 2
+##. Daily maximum O3 volume mixing ratio in lowest model layer, mol mol-1 (longitude,latitude,time)
+ "tracers",      "o3_surf_mol_mol","sfo3max",       "aerosol_daily_cmip",      "all",  "max",   "none", 2
+ "tracers",      "o3_surf_mol_mol","sfo3",          "aerosol_daily_cmip",      "all",  .true.,  "none", 2
+##. Total Ozone Column, m (longitude,latitude,time)
+ "tracers",       "toz",           "toz",           "aerosol_daily_cmip",      "all",  .true.,  "none", 2
+##. Eastward Wind at 10 hPa, m s-1 (longitude,latitude,time)
+ "dynamics",      "ua10",          "ua10",          "aerosol_daily_cmip",      "all",  .true.,  "none", 2
+##. Geopotential Height at 10 hPa, m (longitude,latitude,time)
+ "dynamics",      "zg10",          "zg10",          "aerosol_daily_cmip",      "all",  .true.,  "none", 2
+##. Geopotential Height at 100 hPa, m (longitude,latitude,time)
+ "dynamics",      "zg100",         "zg100",         "aerosol_daily_cmip",      "all",  .true.,  "none", 2
+##. Geopotential Height at 1000 hPa, m (longitude,latitude,time)
+ "dynamics",      "zg1000",        "zg1000",        "aerosol_daily_cmip",      "all",  .true.,  "none", 2
+##. Geopotential Height at 500 hPa, m (longitude,latitude,time)
+ "dynamics",      "zg500",         "zg500",         "aerosol_daily_cmip",      "all",  .true.,  "none", 2
+##. PM2.5 mass mixing ratio in lowest model layer, kg kg-1 (longitude,latitude,alevel,time)
+ "tracers",     "pm25_surf_kg_kg", "sfpm25",        "aerosol_daily_cmip",      "all",  .true.,  "none", 2
+
+####################
+# Table: AERhr
+# Version: 1.00.27
+####################
+ "aerosol_hourly_cmip",      24, "hours",    1,  "days",  "time",
+####################
+##. Surface Air Pressure, Pa (longitude,latitude,time)
+ "atmos",         "ps",            "ps",            "aerosol_hourly_cmip",     "all",  .true.,  "none", 2
+##. NO2 volume mixing ratio in lowest model layer, mol mol-1 (longitude,latitude,time)
+ "tracers",     "no2_surf_mol_mol","sfno2",         "aerosol_hourly_cmip",     "all",  .true.,  "none", 2
+##. O3 volume mixing ratio in lowest model layer, mol mol-1 (longitude,latitude,time)
+ "tracers",     "o3_surf_mol_mol", "sfo3",          "aerosol_hourly_cmip",     "all",  .true.,  "none", 2
+##. PM2.5 mass mixing ratio in lowest model layer, kg kg-1 (longitude,latitude,alevel,time)
+ "tracers",     "pm25_surf_kg_kg", "sfpm25",        "aerosol_hourly_cmip",     "all",  .true.,  "none", 2
+##. Near-Surface Air Temperature, K (longitude,latitude,time,height2m)
+ "flux",          "tas",           "tas",           "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ####################
 # Table: AERmon
@@ -3903,7 +4042,7 @@
 ##################
 
  "atmos_daily_cmip",        24, "hours",    1,  "days",  "time",
- "aerosol_daily_cmip",      24, "hours",    1,  "days",  "time",
+#"aerosol_daily_cmip",      24, "hours",    1,  "days",  "time",
 
 ##################
 
@@ -4189,7 +4328,7 @@
 
 #################
 # Table: day
-# Version: 1.00.15
+# Version: 1.00.27
 #################
 
  "atmos_daily_cmip",        24, "hours",    1,  "days",  "time",
@@ -4243,7 +4382,7 @@
  "cmor_land",     "mrsos",         "mrsos",         "land_daily_cmip",         "all",  .true.,  "none", 2
 
 ##. Terrestrial Water Storage, kg m-2 (longitude,latitude,time): Eday
- "cmor_land",     "mrtws",         "mrtws",         "land_daily_cmip",         "all",  .true.,  "none", 2
+#"cmor_land",     "mrtws",         "mrtws",         "land_daily_cmip",         "all",  .true.,  "none", 2
 
 ##. Near-Surface Relative Humidity, % (longitude,latitude,time,height2m)
  "flux",          "hurs",          "hurs",          "atmos_daily_cmip",        "all",  .true.,  "none", 2
@@ -4254,7 +4393,7 @@
 ##. Daily Maximum Near-Surface Relative Humidity, % (longitude,latitude,time,height2m)
  "flux",          "hurs",          "hursmax",       "atmos_daily_cmip",        "all",     max,  "none", 2
 
-##. Snow Area Fraction, % (longitude,latitude,time)
+##. Snow Area Percentage, % (longitude,latitude,time)
  "cmor_land",     "snc",           "snc",           "land_daily_cmip",         "all",  .true.,  "none", 2
 
 ##. Total Cloud Cover Percentage, % (longitude,latitude,time)
@@ -4330,6 +4469,7 @@
  "atmos_plev19",   "ua",           "ua_unmsk",      "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 ##. Geopotential Height, m (longitude,latitude,plev19,time): Priority 2
+# Output on "plev19" in "Eday" table
 #"atmos_plev8",   "zg",            "zg_unmsk",      "atmos_daily_cmip",        "all",  .true.,  "none", 2
 
 

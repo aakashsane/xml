@@ -432,7 +432,8 @@ NOTES:
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A1728x2_O1437p5_production"><!--1/2 degree ocean grid Only-->
-	     <resources jobWallclock="16:00:00" segRuntime="3:00:00">
+<!--	     <resources jobWallclock="16:00:00" segRuntime="3:00:00"> -->
+	     <resources jobWallclock="4:00:00" segRuntime="3:00:00">
                <atm ranks="1728" threads="2"   layout = "12,24"   io_layout = "1,4" />
 	       <lnd                            layout = "12,24"   io_layout = "1,4" />
 	       <ice                            layout = "432,4"   io_layout = "1,4" />
@@ -1117,7 +1118,6 @@ Experiment to build executable.
       <!--refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_CFsite.csh"/-->
 
       <component type="atmos_cmip"  start="$(PP_START_YEAR)" source="atmos_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
-<!--
         <timeSeries freq="3hr" source="atmos_8xdaily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos8xDailyTScmip/*)">
             <xi:fallback/>
@@ -1125,7 +1125,6 @@ Experiment to build executable.
         </timeSeries>
 
         <timeSeries freq="3hr" source="atmos_8xdaily_inst" chunkLength="$(PP_CMIP_CHUNK_A)"/>
--->
 
             <!-- 6hrLevPt, 2D -->
 <!--
@@ -1136,14 +1135,24 @@ Experiment to build executable.
         </timeSeries>
 -->
 
-            <!-- diag_table_day, 2D field at both 2-deg and 1-deg resolution-->
+            <!-- diag_table_day, 2D field at 1-deg resolution -->
         <timeSeries freq="daily" source="atmos_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)">
+<!--
           <variables> 
              huss tasmin tasmax tas pr psl sfcWind hurs hursmin hursmax clt tslsi prc prsn uas vas sfcWindmax hfls hfss rlds rlus rsds rsus rlut  
           </variables>
+-->
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosDailyTScmip/*)">
             <xi:fallback/>
           </xi:include>
+        </timeSeries>
+        <timeSeries freq="daily" source="atmos_daily_refined" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTScmip/*)">
+            <xi:fallback/>
+          </xi:include>
+          <analysis switch="$(ANALYSIS_SWITCH_CMIP)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/cmip6_combine.csh"/>
         </timeSeries>
 
         <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_CMIP_CHUNK_A)"/>
@@ -1152,12 +1161,6 @@ Experiment to build executable.
 	      <analysis switch="on" cumulative="no" script="/home/mdteam/DET/analysis/ILAMB/ILAMB-GFDL.py"/>
         </timeSeries>
 -->
-        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
-          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTScmip/*)">
-            <xi:fallback/>
-          </xi:include>
-          <analysis switch="$(ANALYSIS_SWITCH_CMIP)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/cmip6_combine.csh"/>
-        </timeSeries>
 
         <!-- changed to CHUNK_A -->
         <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)">
@@ -1170,29 +1173,31 @@ Experiment to build executable.
       </component>
 
 
+                 <!-- diag_table_day, 2D field at both 2-deg and 1-deg resolution-->
+                 <!-- diag_table_CFday,  2D outputs at 2-deg resolution -->
+                 <!-- diag_table_Eday,  2D outputs at 2-deg resolution -->
+                 <!-- diag_table_CFday,  2D outputs at 2-deg resolution -->
+<!--
       <component type="atmos_cmip_2deg_daily_2D"  start="$(PP_START_YEAR)" source="atmos_daily_cmip" sourceGrid="atmos-cubedsphere" xyInterp="90,144" cmip="on">
         <timeSeries freq="daily" source="atmos_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)">
           <variables>
-                 <!-- diag_table_day, 2D field at both 2-deg and 1-deg resolution-->
              huss tasmin tasmax tas pr psl sfcWind hurs hursmin hursmax clt tslsi prc prsn uas vas sfcWindmax hfls hfss rlds rlus rsds rsus rlut 
-                 <!-- diag_table_CFday,  2D outputs at 2-deg resolution -->
              ps rsdt rsut rsdscs rsuscs rldscs rlutcs rsutcs clwvi clivi wap500 p500 ta700_unmsk ccb cct cltisccp albisccp pctisccp cltcalipso cllcalipso clmcalipso clhcalipso 
-                 <!-- diag_table_Eday,  2D outputs at 2-deg resolution -->
              rsdsdiff rsdscsdiff cldnvi ts prw
           </variables>
         </timeSeries>
 
         <timeSeries freq="daily" source="atmos_daily_refined" chunkLength="$(PP_CMIP_CHUNK_A)">
           <variables>
-                 <!-- diag_table_CFday,  2D outputs at 2-deg resolution -->
              ta700 p700
           </variables>
         </timeSeries>
-
       </component>
+-->
 
-      <component type="atmos_cmip_2deg_daily_3D"  start="$(PP_START_YEAR)" source="atmos_daily_cmip" sourceGrid="atmos-cubedsphere" xyInterp="90,144" cmip="off">
             <!-- diag_table_day, at plev19 -->
+<!--
+      <component type="atmos_cmip_2deg_daily_3D"  start="$(PP_START_YEAR)" source="atmos_daily_cmip" sourceGrid="atmos-cubedsphere" xyInterp="90,144" cmip="off">
         <timeSeries freq="daily" source="atmos_daily_refined" chunkLength="$(PP_CMIP_CHUNK_A)">
           <variables>
              hur hus ta ua va wap albs zg
@@ -1204,12 +1209,14 @@ Experiment to build executable.
           </xi:include>
         </timeSeries>
       </component>
+-->
 
 <!-- just for cmip6 pre-publish Plev8 daily data -->
+<!--
       <component type="atmos_cmip_2deg_daily_3D_Plev8"  start="$(PP_START_YEAR)" source="atmos_daily_cmip" sourceGrid="atmos-cubedsphere" xyInterp="90,144" cmip="on">
-        <timeSeries freq="daily" source="atmos_daily_refined" chunkLength="$(PP_CMIP_CHUNK_A)">
-        </timeSeries>
+        <timeSeries freq="daily" source="atmos_daily_refined" chunkLength="$(PP_CMIP_CHUNK_A)"/>
       </component>
+-->
 
       <component type="atmos"  start="$(PP_START_YEAR)" zInterp="era40" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
         <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_CMIP_CHUNK_A)">
@@ -1254,14 +1261,16 @@ Experiment to build executable.
       </component>
 -->
 
-      <component type="atmos_level_cmip_2deg_daily" start="$(PP_START_YEAR)" source="atmos_level_cmip" sourceGrid="atmos-cubedsphere" xyInterp="90,144" cmip="on">
             <!-- diag_table_CFday,  3D native model vertical level (33 levels) outputs -->
+<!--
+      <component type="atmos_level_cmip_2deg_daily" start="$(PP_START_YEAR)" source="atmos_level_cmip" sourceGrid="atmos-cubedsphere" xyInterp="90,144" cmip="on">
         <timeSeries freq="daily" source="atmos_level_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)">
           <variables> 
              ua va ta hus wap zg hur cl clw cli mc
           </variables>
         </timeSeries>
       </component>
+-->
 
       <component type="atmos_level"  start="$(PP_START_YEAR)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
@@ -1325,7 +1334,7 @@ Experiment to build executable.
         </timeAverage>
       </component>
       <component type="aerosol_cmip" start="$(PP_START_YEAR)" source="aerosol_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
-        <!-- post-process daily fields on 1deg grid, or just 2deg? -->
+        <!-- post-process daily fields on 1deg grid -->
         <timeSeries freq="daily" source="aerosol_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)"/>
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
           <analysis switch="$(ANALYSIS_SWITCH_CMIP)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/cmip6_emilnox.csh"/>
@@ -1335,9 +1344,11 @@ Experiment to build executable.
         <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
+<!--
       <component type="aerosol_cmip_2deg" start="$(PP_START_YEAR)" source="aerosol_daily_cmip" sourceGrid="atmos-cubedsphere" xyInterp="90,144" interpMethod="conserve_order1" cmip="on">
         <timeSeries freq="daily" source="aerosol_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)"/>
       </component>
+-->
        
     </postProcess>
   </freInclude> 
