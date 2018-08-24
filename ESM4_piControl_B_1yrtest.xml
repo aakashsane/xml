@@ -906,6 +906,9 @@ Experiment to build executable.
       #This causes problems for ferret and python tools for analysis.
       #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
       cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+      ## added 2018/08/23
+      #Basin codes are needed to calculate offline diagnostics for CMIP6 
+      cp $work/INPUT/basin_codes.nc $work/
          ]]></csh>
       <!--REFINE DIAG SCRIPT -->
       <!--refineDiag_data_stager.csh calculates global averages of basic quantities and stores them in a sqlit database file-->
@@ -1458,7 +1461,7 @@ Experiment to build executable.
 
   <!-- OCEAN BGC post-processing-->
 
-  <!-- temporary 5day component to evaluate 2-D variables (mesozoo_200, chlos, phycos): native horizontal grid only -->
+  <!-- temporary 5day component to evaluate 2-D variables (mesozoo_200, chlos, phycos): native horizontal grid only
   <freInclude name="COBALT_5day_postprocess">
       <postProcess> 
 
@@ -1468,6 +1471,7 @@ Experiment to build executable.
 
      </postProcess>
   </freInclude>
+  -->
 
 
   <!-- 2-D: native horizontal -  not being served publicly -->
@@ -1517,10 +1521,8 @@ Experiment to build executable.
   <freInclude name="COBALT_z_postprocess">
       <postProcess> 
 
-      <component type="ocean_cobalt_tracers_month_z" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_month_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
+      <component type="ocean_cobalt_tracers_year_z" start="$(PP_START_YEAR)" source="ocean_cobalt_tracers_year_z" sourceGrid="ocean-tripolar">
          <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
@@ -5848,6 +5850,9 @@ endif
       </dataFile>
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/ESM4/OM4_05/mosaic_c96.v20180227.unpacked/ocean_static.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/basin_codes.nc" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/ESM4/OM4_05/mosaic_c96.v20180227.unpacked/basin_codes.nc</dataSource>
       </dataFile>
 
       <!-- WOA13 potential temperature and salinity initial conditions -->
