@@ -1291,6 +1291,23 @@ Experiment to build executable.
         </timeAverage>
       </component>
 
+      <component type="atmos_plev26_6hr" start="$(ANA_AMIP_START)" source="atmos_4xdaily_plev26_refined" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
+          <!-- 6hr, at at Plev26 instantaneous -->
+        <timeSeries freq="6hr" chunkLength="$(PP_AMIP_CHUNK)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/dynvar_driver.csh"/>
+        </timeSeries>
+      </component>
+
+      <component type="atmos_plev26_cmip" start="$(ANA_AMIP_START)" source="atmos_month_plev26_refined" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeSeries freq="daily" source= "atmos_daily_plev26_refined" chunkLength="$(PP_AMIP_CHUNK)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(PP_AMIP_CHUNK)"/>
+          <variables> 
+             ua utendogw utendnogw
+          </variables>
+        </timeSeries>
+      </component>
+
       <component type="atmos_month_aer" start="$(PP_START_YEAR)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="off">
          <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_B)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAerAve/*)">
@@ -5452,6 +5469,9 @@ $baseDate
       </diagTable> 
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_ESM4_piControl</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_DynVar</dataSource>
       </dataFile>
 
 <!--  CSH SECTION 
