@@ -2,8 +2,8 @@
 set -v
 # Automatic Build and Run on Gaea using fre
 XML_FILE=OMIP4_CORE2.xml                   #The xml to test
-RELEASE='testing_20180802'                 #The FMS release to test
-MOM6_DATE='2018.04.11'                     #The MOM6 tag date to test
+RELEASE='testing_20180813'                 #The FMS release to test
+MOM6_DATE='2018.08.24'                     #The MOM6 tag date to test
 MOM6_GIT_TAG="dev\\\/gfdl\\\/$MOM6_DATE" #The MOM6 tag to test
 FRESTEM="${RELEASE}_mom6_${MOM6_DATE}"         #The FRESTEM to use
 GROUP="gfdl_f"
@@ -12,7 +12,7 @@ EXPERIMENT_LIST="OM4p5_IAF_BLING_CFC_abio_csf_mle200 OM4p25_IAF_BLING_CFC_csf OM
 
 DEBUGLEVEL='_0'
 PLATFORM="ncrc4.intel16"
-TARGET="prod"
+TARGET="prod-openmp"
 REFERENCE_TAG='warsaw_201803_mom6_2018.04.11_answers'
 FRE_VERSION='bronx-12'
 
