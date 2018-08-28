@@ -51,5 +51,5 @@ endif
 set options = "-i $in_data_dir -o $out_data_dir -y $databegyr,$dataendyr"
 
 echo Calling $diagnostic_script $options
-$diagnostic_script $options
+csh $diagnostic_script $options
 

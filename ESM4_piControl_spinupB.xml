@@ -93,7 +93,7 @@ NOTES:
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>        <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>        <!-- git tag for LAND source code -->
   <property name="COUPLER_GIT_TAG"    value="$(RELEASE)"/>    <!-- git tag for AWG source code -->
-  <property name="BUILD_DATE"     value="20180827"/>
+  <property name="BUILD_DATE"     value="20180827"/>          <!-- name for source/exec directory -->
   <property name="MOM6_DATE"      value="2018.08.25"/>        <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>  <!-- git tag for ocean_shared component -->
@@ -904,6 +904,9 @@ Experiment to build executable.
       #This causes problems for ferret and python tools for analysis.
       #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
       cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+      ## added 2018/08/23
+      #Basin codes are needed to calculate offline diagnostics for CMIP6 
+      cp $work/INPUT/basin_codes.nc $work/
          ]]></csh>
       <!--REFINE DIAG SCRIPT -->
       <!--refineDiag_data_stager.csh calculates global averages of basic quantities and stores them in a sqlit database file-->
@@ -1709,19 +1712,17 @@ LWH (3/16/2018)
       </namelist>
 
       <namelist name ="aerosol_nml">
-    family_names = "small_dust", "large_dust", "black_carbon","organic_carbon", "sea_salt", "sulfate", "aerosol", "pm2.5", "dust", "POA", "fine_aer", "coarse_aer"
-    in_family1 = F,T,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F
-    in_family2 = F,F,T,T,T,T,F,F,F,F,F,F,F,F,F,F,F,F,F
-    in_family3 = F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,F,F,F,F
-    in_family4 = T,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,F,F
-    in_family5 = F,F,F,F,F,F,F,T,T,T,T,T,F,F,F,F,F,F,F
-    in_family6 = F,F,F,F,F,F,T,F,F,F,F,F,F,F,F,F,F,T,F
-    in_family7 = T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T
-    in_family8 = T,T,F,F,F,F,T,T,T,F,F,F,T,T,T,T,T,T,T
-    in_family9 = F,T,T,T,T,T,F,F,F,F,F,F,F,F,F,F,F,F,F
-    in_family10= F,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,F,F
-    in_family11= T,T,F,F,F,F,T,T,T,F,F,F,T,T,T,T,T,T,F
-    in_family12= F,F,T,T,T,T,F,F,F,T,T,T,F,F,F,F,F,F,F
+    family_names = "small_dust", "large_dust", "black_carbon","organic_carbon", "sea_salt", "SOA", "aerosol", "pm2.5", "dust", "POA"
+    in_family1 = F,T,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,
+    in_family2 = F,F,T,T,T,T,F,F,F,F,F,F,F,F,F,F,F,
+    in_family3 = F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,F,F,
+    in_family4 = T,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,
+    in_family5 = F,F,F,F,F,F,F,T,T,T,T,T,F,F,F,F,F,
+    in_family6 = T,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,
+    in_family7 = T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,
+    in_family8 = T,T,F,F,F,F,T,T,T,F,F,F,T,T,T,T,T,
+    in_family9 = F,T,T,T,T,T,F,F,F,F,F,F,F,F,F,F,F,
+    in_family10= F,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,
     aerosol_data_source = "predicted"
     partition_nh4 = .true.
       </namelist>
@@ -9262,6 +9263,9 @@ endif
       </dataFile>
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/ESM4/OM4_05/mosaic_c96.v20180227.unpacked/ocean_static.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/basin_codes.nc" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/ESM4/OM4_05/mosaic_c96.v20180227.unpacked/basin_codes.nc</dataSource>
       </dataFile>
 
       <!-- WOA13 potential temperature and salinity initial conditions -->
