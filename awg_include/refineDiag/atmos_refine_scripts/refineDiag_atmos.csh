@@ -88,7 +88,8 @@ endif
 #    set files_with_albedo = ($files_with_albedo $atmos:r:r:e)
 #  endif
 #end
-set files_with_albedo = ( atmos_month_cmip atmos_daily_cmip atmos_8xdaily_cmip aerosol_month_cmip )
+# set files_with_albedo = ( atmos_month_cmip atmos_daily_cmip atmos_8xdaily_cmip aerosol_month_cmip )
+set files_with_albedo = ( atmos_month_cmip atmos_daily_cmip atmos_8xdaily_cmip )
 
 
 # compute surface albedo from shortwave up/down

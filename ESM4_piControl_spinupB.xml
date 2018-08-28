@@ -87,14 +87,14 @@ NOTES:
 -->
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="pre_xanadu_esm4_20180729"/>  <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="pre_xanadu_esm4_20180827"/>  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for shared source code -->
-  <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>     <!-- git tag for atmos_shared and atmos_param source code -->
+  <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>        <!-- git tag for atmos_shared and atmos_param source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>        <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>        <!-- git tag for LAND source code -->
   <property name="COUPLER_GIT_TAG"    value="$(RELEASE)"/>    <!-- git tag for AWG source code -->
-  <property name="BUILD_DATE"     value="20180729"/>
-  <property name="MOM6_DATE"      value="2018.04.11"/>        <!-- git tag date for MOM6 source code -->
+  <property name="BUILD_DATE"     value="20180827"/>          <!-- name for source/exec directory -->
+  <property name="MOM6_DATE"      value="2018.08.25"/>        <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/> <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>  <!-- git tag for ocean_shared component -->
   <property name="FRE_STEM"       value="CMIP6/ESM4/spinup"/> <!-- customize as needed -->
@@ -123,7 +123,7 @@ NOTES:
   <property name="CVDP_startyear"  value="0001"/>  <!-- Property to allow users to configure CVDP to skip n-years of spinup -->
 
   <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
-  <property name="reference_tag"   value="pre_xanadu_esm4_20180703_mom6_2018.04.11_answers"/>
+  <property name="reference_tag"   value="warsaw_201710_mom6_2017.10.19_answers"/>
                           
   <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
@@ -904,6 +904,9 @@ Experiment to build executable.
       #This causes problems for ferret and python tools for analysis.
       #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
       cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+      ## added 2018/08/23
+      #Basin codes are needed to calculate offline diagnostics for CMIP6 
+      cp $work/INPUT/basin_codes.nc $work/
          ]]></csh>
       <!--REFINE DIAG SCRIPT -->
       <!--refineDiag_data_stager.csh calculates global averages of basic quantities and stores them in a sqlit database file-->
@@ -1709,19 +1712,17 @@ LWH (3/16/2018)
       </namelist>
 
       <namelist name ="aerosol_nml">
-    family_names = "small_dust", "large_dust", "black_carbon","organic_carbon", "sea_salt", "sulfate", "aerosol", "pm2.5", "dust", "POA", "fine_aer", "coarse_aer"
-    in_family1 = F,T,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F
-    in_family2 = F,F,T,T,T,T,F,F,F,F,F,F,F,F,F,F,F,F,F
-    in_family3 = F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,F,F,F,F
-    in_family4 = T,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,F,F
-    in_family5 = F,F,F,F,F,F,F,T,T,T,T,T,F,F,F,F,F,F,F
-    in_family6 = F,F,F,F,F,F,T,F,F,F,F,F,F,F,F,F,F,T,F
-    in_family7 = T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T
-    in_family8 = T,T,F,F,F,F,T,T,T,F,F,F,T,T,T,T,T,T,T
-    in_family9 = F,T,T,T,T,T,F,F,F,F,F,F,F,F,F,F,F,F,F
-    in_family10= F,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,F,F
-    in_family11= T,T,F,F,F,F,T,T,T,F,F,F,T,T,T,T,T,T,F
-    in_family12= F,F,T,T,T,T,F,F,F,T,T,T,F,F,F,F,F,F,F
+    family_names = "small_dust", "large_dust", "black_carbon","organic_carbon", "sea_salt", "SOA", "aerosol", "pm2.5", "dust", "POA"
+    in_family1 = F,T,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,
+    in_family2 = F,F,T,T,T,T,F,F,F,F,F,F,F,F,F,F,F,
+    in_family3 = F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,F,F,
+    in_family4 = T,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,
+    in_family5 = F,F,F,F,F,F,F,T,T,T,T,T,F,F,F,F,F,
+    in_family6 = T,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,
+    in_family7 = T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,
+    in_family8 = T,T,F,F,F,F,T,T,T,F,F,F,T,T,T,T,T,
+    in_family9 = F,T,T,T,T,T,F,F,F,F,F,F,F,F,F,F,F,
+    in_family10= F,F,F,F,F,F,F,F,F,F,F,F,F,F,T,T,F,
     aerosol_data_source = "predicted"
     partition_nh4 = .true.
       </namelist>
@@ -2598,9 +2599,9 @@ LWH (3/16/2018)
       </namelist>
 
       <namelist name ="regional_tracer_driver_nml">
-      ntracers     = 1,
-      tracer_names = "e90",
-      loss_freq   =  1.286008e-07,
+      ntracers     = 3,
+      tracer_names = "e90", "aoanh", "nh50"
+      loss_freq   =  1.286008e-07, 0., 2.314815e-07
       </namelist>
 
       <namelist name ="rh_based_clouds_nml">
@@ -2996,7 +2997,11 @@ LWH (3/16/2018)
       </namelist>
 
       <namelist name ="land_conservation_nml">
-       do_check_conservation = .FALSE.
+       do_check_conservation = .TRUE.
+       water_cons_tol = 1e-7
+       carbon_cons_tol = 1e-11
+       nitrogen_cons_tol = 9999.9
+       heat_cons_tol = 9999.9
       </namelist>
 
       <namelist name ="land_debug_nml">
@@ -3121,6 +3126,7 @@ LWH (3/16/2018)
        min_anaerobic_resp_factor=0.1
        microbe_driven_protection=.FALSE.
        use_rhizosphere_cohort=.TRUE.  ! Use just 2 cohorts: rhiz and bulk
+       tLongest=300. ! Longest turnover time of unprotected carbon (yr)
       </namelist>
 
       <namelist name ="soil_data_nml">
@@ -3178,6 +3184,7 @@ LWH (3/16/2018)
        bwood_macinf = 1.
        allow_neg_wl = .true.
        prohibit_negative_water_div = .true.
+       write_soil_carbon_restart = .true.
       </namelist>
 
       <namelist name ="static_veg_nml">
@@ -3233,6 +3240,8 @@ LWH (3/16/2018)
        sai_cover = .TRUE.
        treeline_thresh_T = -9999.0
        treeline_season_length = -9999.0
+
+       permafrost_depth_thresh = 0.3
       </namelist>
 
       <namelist name ="vegn_nml">
@@ -4296,6 +4305,7 @@ SIS_OVERRIDE_EOF
 "profile_type","fixed","surface_value=0.0E+00"
 "init_conc", "file", "file=tracerIC.19800101.v2.nc"
 "convection","all"
+"adjust_mass", "false"
 /
 
 "tracer", "atmos_mod", "Extinction"
@@ -4534,6 +4544,7 @@ SIS_OVERRIDE_EOF
 "tracer_type","diagnostic"
 "profile_type","fixed","surface_value=1.e-20"
 /
+
 "tracer","atmos_mod","o3s"
 "longname","O3S"
 "units","VMR"
@@ -4553,11 +4564,30 @@ SIS_OVERRIDE_EOF
 
 "tracer","atmos_mod","o3s_e90"
 "longname","O3S_E90"
+"cmip","cmip6","cmip_name=ozone,cmip_longname=Ozone"
 "units","VMR"
+"chem_param","gas","mw=48."
 "dry_deposition","file","name=o3,diurnal=yes"
 "profile_type","fixed","surface_value=1.e-20"
 "convection",   "all"
 /
+
+"tracer","atmos_mod","aoanh"
+"longname","Northern Hemisphere tracer"
+"units","years"
+"profile_type","fixed","surface_value=1.e-20"
+"convection",   "all"
+"adjust_mass", "false"
+/
+
+"tracer","atmos_mod","nh50"
+"longname","Northern Hemisphere tracer"
+"cmip","cmip6","cmip_name=artificial_tracer_with_fixed_lifetime"
+"units","VMR"
+"profile_type","fixed","surface_value=1.e-20"
+"convection",   "all"
+/
+
 ####.................................................
 ### ESM atmos co2 field table for CMIP6 Jan 1 1850
 ## jgj 2016/11/29
@@ -4574,6 +4604,8 @@ SIS_OVERRIDE_EOF
  "TRACER", "atmos_mod",    "co2"
            "longname",     "carbon dioxide"
            "units",        "kg/kg"
+           "cmip","cmip6","cmip_name=carbon_dioxide"
+           "chem_param","gas","mw=44."
            "convection",   "all"
            "profile_type","fixed","surface_value = 431.9218e-06"/
 
@@ -5195,7 +5227,7 @@ nh3_valid_min = 0.0
     maturalage =    5.0
     seedling_height = 0.5
     prob_e =   0.4
-    mortrate_d_c =   0.2e-01
+    mortrate_d_c =   0.01429
     mortrate_d_u =   0.81e-01
     rho_wood =  185.0
 #   laimax was changed to its original value
@@ -5310,7 +5342,7 @@ nh3_valid_min = 0.0
     maturalage =    5.0
     seedling_height = 0.5
     prob_e =   0.4
-    mortrate_d_c =   0.2e-01
+    mortrate_d_c =   0.01
     mortrate_d_u =   0.81e-01
     rho_wood =   245.0
     LAImax =   3.5
@@ -9231,6 +9263,9 @@ endif
       </dataFile>
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/ESM4/OM4_05/mosaic_c96.v20180227.unpacked/ocean_static.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/basin_codes.nc" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/ESM4/OM4_05/mosaic_c96.v20180227.unpacked/basin_codes.nc</dataSource>
       </dataFile>
 
       <!-- WOA13 potential temperature and salinity initial conditions -->

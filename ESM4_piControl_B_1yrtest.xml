@@ -103,8 +103,8 @@ NOTES:
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
-  <property name="PROD_SIMTIME"     value="1000"/>  <!--simulation length in years-->
-  <property name="PP_CMIP_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
+  <property name="PROD_SIMTIME"     value="1"/>  <!--simulation length in years-->
+  <property name="PP_CMIP_CHUNK_A"  value="1yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CMIP_CHUNK_B"  value="10yr"/> <!--bigger  chunk length for pp/analysis-->
   <property name="PP_START_YEAR"    value="0001" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
@@ -344,7 +344,8 @@ NOTES:
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A1152x2_O1057p5_production"><!--1/2 degree ocean grid Only-->
-	     <resources jobWallclock="16:00:00" segRuntime="3:10:00">
+<!--	     <resources jobWallclock="16:00:00" segRuntime="3:10:00"> -->
+	     <resources jobWallclock="5:00:00" segRuntime="4:00:00">
                <atm ranks="1152" threads="2"   layout = "8,24"   io_layout = "1,4" />
 	       <lnd                            layout = "8,24"   io_layout = "1,4" />
 	       <ice                            layout = "144,8"  io_layout = "1,4" />
@@ -432,7 +433,8 @@ NOTES:
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A1728x2_O1437p5_production"><!--1/2 degree ocean grid Only-->
-	     <resources jobWallclock="16:00:00" segRuntime="3:00:00">
+<!--	     <resources jobWallclock="16:00:00" segRuntime="3:00:00"> -->
+	     <resources jobWallclock="4:00:00" segRuntime="3:00:00">
                <atm ranks="1728" threads="2"   layout = "12,24"   io_layout = "1,4" />
 	       <lnd                            layout = "12,24"   io_layout = "1,4" />
 	       <ice                            layout = "432,4"   io_layout = "1,4" />
@@ -1289,13 +1291,30 @@ Experiment to build executable.
         </timeAverage>
       </component>
 
+      <component type="atmos_plev26_cmip" start="$(PP_START_YEAR)" source="atmos_month_plev26_refined" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
+             <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/zonal_average.csh -v ua,ta,tntmp,tntrl,tntrs,tntrlcs,tntrscs,tntc,tntscp,tntnogw,tntogw"/>
+        </timeSeries>
+      </component>
+
+      <component type="atmos_plev26_6hr" start="$(PP_START_YEAR)" source="atmos_4xdaily_plev26_refined" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
+        <timeSeries freq="6hr" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/dynvar_driver.csh"/>
+        </timeSeries>
+      </component>
+
+      <component type="atmos_plev26_cmip_daily" start="$(PP_START_YEAR)" source="atmos_daily_plev26_refined" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
+        <timeSeries freq="daily" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/zonal_average.csh -v ua,utendnogw,utendogw"/>
+        </timeSeries>
+      </component>
+
       <component type="atmos_plev39_cmip" start="$(PP_START_YEAR)" source="atmos_month_plev39_refined" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
              <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/zonal_average.csh -v ua,ta,tntmp,tntrl,tntrs,tntrlcs,tntrscs,tntc,tntscp,tntnogw,tntogw"/>
         </timeSeries>
       </component>
 
-<!--
       <component type="atmos_plev39_6hr" start="$(PP_START_YEAR)" source="atmos_4xdaily_plev39_refined" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
         <timeSeries freq="6hr" chunkLength="$(PP_CMIP_CHUNK_A)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/dynvar_driver.csh"/>
@@ -1307,7 +1326,6 @@ Experiment to build executable.
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/zonal_average.csh -v ua,utendnogw,utendogw"/>
         </timeSeries>
       </component>
--->
 
       <component type="atmos_month_aer" start="$(PP_START_YEAR)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="off">
          <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_B)">
@@ -1663,7 +1681,7 @@ Experiment to build executable.
 <!--= ESM4 EXPERIMENTS    =-->
 <!--=======================-->
 
-  <experiment name="ESM4_piControl_B" inherit="esm4.1_sis2_compile">
+  <experiment name="ESM4_piControl_B_1yrtest" inherit="esm4.1_sis2_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"ESM4_c96L49_am4p1_OMp5"</model>
@@ -5472,11 +5490,9 @@ $baseDate
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_ESM4_piControl</dataSource>
       </dataFile>
-<!--
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_DynVar</dataSource>
       </dataFile>
--->
 
 <!--  CSH SECTION 
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
@@ -5949,7 +5965,8 @@ endif
     <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
-          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1728x2_O1437p5_production']/node())"/>
+<!--      <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1728x2_O1437p5_production']/node())"/> -->
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1152x2_O1057p5_production']/node())"/>
       </production>
       <regression name="2months">
           <run months="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O842p5']/node())"/> </run>
@@ -6074,6 +6091,9 @@ endif
 
     </postProcess>
 
+  </experiment>
+
+  <experiment name="ESM4_piControl_B_1yrtest2" inherit="ESM4_piControl_B_1yrtest">
   </experiment>
 
 </experimentSuite>

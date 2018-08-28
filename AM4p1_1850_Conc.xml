@@ -90,15 +90,15 @@ NOTES:
 -->
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="pre_xanadu_esm4_20180524"/> <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="pre_xanadu_esm4_20180827"/> <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>               <!-- git tag for shared source code -->
   <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>               <!-- git tag for atmos_shared and atmos_param source code -->
+  <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>               <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
+  <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>               <!-- git tag for LAND source code -->
   <property name="MOM6_DATE"      value="2018.04.11"/>               <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>    <!-- git tag for MOM6 source code -->
-  <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>         <!-- git tag for ocean_shared source code -->
-  <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>               <!-- git tag for AWG source code -->
-  <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>               <!-- git tag for LAND source code -->
-  <property name="FRE_STEM"       value="fms/ESM4/warsaw_201710/20180530"/> <!-- customize as needed -->
+  <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>         <!-- git tag for ocean_shared component -->
+  <property name="FRE_STEM"       value="fms/ESM4/preX/20180827"/>   <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"   value="gfdl_b"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
@@ -1029,7 +1029,7 @@ Experiment to build executable.
 <!--= ESM4 EXPERIMENTS    =-->
 <!--=======================-->
 
-  <experiment name="AM4p1_1850C_PIpcairco2_1850LU_dustfix" inherit="am4.1_compile">
+  <experiment name="AM4p1_1850C_PIpcairco2_1850LU" inherit="am4.1_compile">
     <publicMetadata DBswitch="$MDBIswitch">
       <project>"$(ProjectID)"</project>
       <model>"AM4_c96L49_am4p1"</model>
@@ -1604,10 +1604,10 @@ LWH (3/16/2018)
       <namelist name ="cg_drag_nml">
         cg_drag_freq = 1800,
         cg_drag_offset = 0,
-        Bt_0 =  0.004,                  ! from c96L49_am4p0_AM4chem_SOA
+        Bt_0 =  0.004,
         Bt_aug= 0.000,
-        Bt_nh=  0.0010,                 ! from c96L49_am4p0_AM4chem_SOA
-        Bt_sh= -0.0005,                 ! from c96L49_am4p0_AM4chem_SOA
+        Bt_nh=  0.0010,
+        Bt_sh= -0.0005,
         Bt_eq=  0.000,
         Bt_eq_width= 4.0,
         phi0n =  30.,
@@ -1974,7 +1974,7 @@ LWH (3/16/2018)
       use_single_lw_sw_ts = .false.,
       use_co2_tracer_field = .true.                 ! jgj added
       treat_sfc_refl_dir_as_dif = .false.           ! jgj added
-      use_ch4_tracer_field = .false.
+      use_ch4_tracer_field = .true.
       </namelist>
 
       <namelist name ="radiative_gases_nml">
@@ -1994,8 +1994,8 @@ LWH (3/16/2018)
       time_varying_ch4 = .false.,
       ch4_variation_type = 'linear'
       ch4_dataset_entry = 1850,1,1,0,0,
-      ch4_specification_type = 'time_series'
-      ch4_data_source = 'input'
+      ch4_specification_type = 'base_and_trend'
+      ch4_data_source = 'predicted'
 
       time_varying_n2o = .false.,
       n2o_variation_type = 'linear'
@@ -2033,7 +2033,7 @@ LWH (3/16/2018)
 
       calc_ch4_tfs_on_first_step = .false.,
       calc_ch4_tfs_monthly = .true.,
-      ch4_tf_time_displacement = 360.0,
+      ch4_tf_time_displacement = 0.0,
 
       calc_n2o_tfs_on_first_step = .false.,
       calc_n2o_tfs_monthly = .true.,
@@ -2065,9 +2065,9 @@ LWH (3/16/2018)
       </namelist>
 
       <namelist name ="regional_tracer_driver_nml">
-      ntracers     = 1,
-      tracer_names = "e90",
-      loss_freq   =  1.286008e-07,
+      ntracers     = 3,
+      tracer_names = "e90", "aoanh", "nh50"
+      loss_freq   =  1.286008e-07, 0., 2.314815e-07
       </namelist>
 
       <namelist name ="rh_based_clouds_nml">
@@ -2217,7 +2217,7 @@ LWH (3/16/2018)
         verbose = 1,
         retain_cm3_bugs =.false.,
         check_convergence = .true.
-        sim_data_filename = 'sim.AM4_isop_e90_so2h.dat'
+        sim_data_filename = 'sim.AM4_v20180614.dat'
         het_chem_type = 'j1m'
         gN2O5 = 0.02
         gHO2 = 0.2
@@ -2427,7 +2427,7 @@ LWH (3/16/2018)
        frac_wood_wasted_harv  = 0.25
        frac_wood_wasted_clear = 0.25
        crop_schedule          = 'prescribed'
-       crop_schedule_file     = '/lustre/f1/unswept/Sergey.Malyshev/DATA/agriculture/NewGrid_2by25_All_26crops_f1p_3d_doy_v20171107.nc'
+       crop_schedule_file     = '$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/agriculture/NewGrid_2by25_All_26crops_f1p_3d_doy_v20171107.nc'
        c3_crop_species        = 'c3grass'
        c4_crop_species        = 'c4grass'
        crop_seed_density      = 0.1
@@ -2502,14 +2502,15 @@ LWH (3/16/2018)
        max_canopy_water_steps = 4
        improve_solution = .TRUE.
        npes_io_group = 8
+       lw_delta_T_thresh = 50.
       </namelist>
 
       <namelist name ="landuse_nml">
        do_landuse_change = .FALSE.
        data_type   = 'luh2'
-       input_file  = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/extras/zero-transitions.v20170711.nc'
-       state_file  = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/extras/state-1850-nosecd.v20170711.nc'
-       static_file = '/lustre/f1/unswept/Sergey.Malyshev/DATA/landuse/LUH2/v2.0h/landfrac.nc'
+       input_file  = '$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/landuse/LUH2/v2.0h/extras/zero-transitions.v20170711.nc'
+       state_file  = '$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/landuse/LUH2/v2.0h/extras/state-1850-nosecd.v20170711.nc'
+       static_file = '$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/landuse/LUH2/v2.0h/landfrac.nc'
        distribute_transitions = 'min-n-tiles'
        rangeland_is_pasture = .TRUE.
       </namelist>
@@ -2566,19 +2567,19 @@ LWH (3/16/2018)
 
       <namelist name="soil_carbon_nml">
        soil_carbon_model_to_use = 'CORPSE'  !Nitrogen turned off
-       vmaxref=18.0,0.20,4.5     !Vmax at reference temperature (yr-1)
+       vmaxref=4.5,0.20,4.5     !Vmax at reference temperature (yr-1)
        Ea=6e3,40e3,6e3
        kC=3*.015
        minMicrobeC=1e-3
        Tmic=0.25
        eup=.6,.05,.6
-       protection_rate=5.5
+       protection_rate=0.0
        protection_species=0.2,0.0002,1.0
        tProtected=75.0
        soilMaxCohorts=2
        gas_diffusion_exp=0.6
        substrate_diffusion_exp=1.5
-       et=0.6
+       et=0.8
        C_leaching_solubility=0.1 !0.3 
        DOC_deposition_rate=1.0
        C_flavor_relative_solubility=1.0,0.2,1.0
@@ -2587,6 +2588,7 @@ LWH (3/16/2018)
        min_anaerobic_resp_factor=0.1
        microbe_driven_protection=.FALSE.
        use_rhizosphere_cohort=.TRUE.  ! Use just 2 cohorts: rhiz and bulk
+       tLongest=300. ! Longest turnover time of unprotected carbon (yr)
       </namelist>
 
       <namelist name ="soil_data_nml">
@@ -2648,12 +2650,6 @@ LWH (3/16/2018)
 
       <namelist name ="static_veg_nml">
        use_static_veg = .FALSE.
-       timeline   = 'loop'
-       start_loop = 1981, 1, 1, 0, 0, 0
-       end_loop   = 1982, 1, 1, 0, 0, 0
-       fill_land_mask = .TRUE.
-       write_static_veg = .FALSE.
-       input_file = 'INPUT/19810101.static_veg_out.nc'
       </namelist>
 
       <namelist name ="topo_rough_nml">
@@ -2694,7 +2690,7 @@ LWH (3/16/2018)
        N_fixer_C_efficiency  = 0.2  ! Phillips, 1980: Per plant allocation, about 6 gC/gN
        myc_scav_C_efficiency = 0.5
        myc_mine_C_efficiency = 0.5
-       N_limits_live_biomass = F
+       N_limits_live_biomass = .FALSE.
        mycorrhizal_turnover_time = 1.0
        N_fixer_turnover_time = 0.1
        excess_stored_N_leakage_rate = 1.5e-1
@@ -2705,6 +2701,8 @@ LWH (3/16/2018)
        sai_cover = .TRUE.
        treeline_thresh_T = -9999.0
        treeline_season_length = -9999.0
+
+       permafrost_depth_thresh = 0.3
       </namelist>
 
       <namelist name ="vegn_nml">
@@ -2872,14 +2870,12 @@ SIS_OVERRIDE_EOF
 #
 ## restoring co2 data override set to CMIP6 Jan 1 1850 value 284.262e-6
 "ATM" , "co2_dvmr_restore", "",     "", "none",  284.262e-06
-#
       </dataTable>  
 
 
 <!-- FIELD TABLES by component -->
 <!-- atmos, land, atmos_chem 
      ESM4 CMIP6 Jan 1 1850 co2 field table 
-     COBALT field table (currently GLODAPv1 Preind DIC)
  -->
       <fieldTable>
 # specific humidity for moist runs
@@ -3007,7 +3003,7 @@ SIS_OVERRIDE_EOF
 "longname","SO4"
 "units", "VMR"
 "profile_type","fixed","surface_value=1.e-20"
-"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snowh=0.01, frac_incloud_snow=0., alphar=0.001, alphas=0.001"
+"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snowh=0.1, frac_incloud_snow=0., alphar=0.001, alphas=0.001"
 "dry_deposition","williams_wind_driven","surfr=200.,icer=1200."	
 "convection", "all"
 "radiative_param", "online", "name_in_rad_mod=so4, name_in_clim_mod=sulfate, scale_factor=3.31"
@@ -3603,7 +3599,7 @@ SIS_OVERRIDE_EOF
 "cmip","cmip6","cmip_name=nitrate,cmip_longname=nitrate,cmip_longname2=NO3"
 "chem_param","aerosol","mw=62,nb_N_ox=1,frac_pm1=0.877,frac_pm25=0.954,frac_pm10=1."
 "profile_type","fixed","surface_value=1.e-20"
-"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snowh=0.01, frac_incloud_snow=0.,alphar=0.001, alphas=0.001"
+"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snowh=0.1, frac_incloud_snow=0.,alphar=0.001, alphas=0.001"
 "dry_deposition","williams_wind_driven","surfr=100.,icer=1200."
 "convection","all"
 "radiative_param", "online", "name_in_rad_mod=nitrate, name_in_clim_mod=nitrate, scale_factor=2.14"
@@ -3615,7 +3611,7 @@ SIS_OVERRIDE_EOF
 "cmip","cmip6","cmip_name=ammonium,cmip_longname=ammonium,cmip_longname2=NH4"
 "chem_param","aerosol","mw=18,nb_N_red=1,frac_pm1=0.92,frac_pm25=0.973,frac_pm10=1."
 "profile_type","fixed","surface_value=1.e-20"
-"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snowh=0.01, frac_incloud_snow=0.,alphar=0.001, alphas=0.001"
+"wet_deposition","aerosol_below","frac_incloud=0.3, frac_incloud_uw=0.4, frac_incloud_snowh=0.1, frac_incloud_snow=0.,alphar=0.001, alphas=0.001"
 "dry_deposition","williams_wind_driven","surfr=200.,icer=1200."
 "convection","all"
 /
@@ -3733,6 +3729,7 @@ SIS_OVERRIDE_EOF
 "profile_type","fixed","surface_value=0.0E+00"
 "init_conc", "file", "file=tracerIC.19800101.v2.nc"
 "convection","all"
+"adjust_mass", "false"
 /
 
 "tracer", "atmos_mod", "Extinction"
@@ -3971,6 +3968,7 @@ SIS_OVERRIDE_EOF
 "tracer_type","diagnostic"
 "profile_type","fixed","surface_value=1.e-20"
 /
+
 "tracer","atmos_mod","o3s"
 "longname","O3S"
 "units","VMR"
@@ -3990,11 +3988,30 @@ SIS_OVERRIDE_EOF
 
 "tracer","atmos_mod","o3s_e90"
 "longname","O3S_E90"
+"cmip","cmip6","cmip_name=ozone,cmip_longname=Ozone"
 "units","VMR"
+"chem_param","gas","mw=48."
 "dry_deposition","file","name=o3,diurnal=yes"
 "profile_type","fixed","surface_value=1.e-20"
 "convection",   "all"
 /
+
+"tracer","atmos_mod","aoanh"
+"longname","Northern Hemisphere tracer"
+"units","years"
+"profile_type","fixed","surface_value=1.e-20"
+"convection",   "all"
+"adjust_mass", "false"
+/
+
+"tracer","atmos_mod","nh50"
+"longname","Northern Hemisphere tracer"
+"cmip","cmip6","cmip_name=artificial_tracer_with_fixed_lifetime"
+"units","VMR"
+"profile_type","fixed","surface_value=1.e-20"
+"convection",   "all"
+/
+
 ####.................................................
 ### ESM atmos co2 field table for CMIP6 Jan 1 1850
 ## jgj 2016/11/29
@@ -4011,6 +4028,8 @@ SIS_OVERRIDE_EOF
  "TRACER", "atmos_mod",    "co2"
            "longname",     "carbon dioxide"
            "units",        "kg/kg"
+           "cmip","cmip6","cmip_name=carbon_dioxide"
+           "chem_param","gas","mw=44."
            "convection",   "all"
            "profile_type","fixed","surface_value = 431.9218e-06"/
 
@@ -4039,6 +4058,7 @@ SIS_OVERRIDE_EOF
     kM_myc_growth = 1.0e-4
     tau_nsc_exudate = 0.0
     understory_lai_factor = 0.25
+    fsc_liv = 0.8, fsc_froot = 0.8, fsc_wood = 0.2
 /
  "species", "land_mod", "prioria"
     long_name = prioria
@@ -4072,8 +4092,8 @@ SIS_OVERRIDE_EOF
     maturalage =    5.0
     seedling_height = 0.5
     prob_e =   0.4
-    mortrate_d_c =   0.00526
-    mortrate_d_u =   0.00847
+    mortrate_d_c =   0.01429
+    mortrate_d_u =   0.02301
     rho_wood =   215.95
     LAImax =   6.0
     phiRL =   1.4
@@ -4127,7 +4147,7 @@ SIS_OVERRIDE_EOF
     maturalage =    5.0
     seedling_height = 0.5
     prob_e =   0.4
-    mortrate_d_c =   0.2e-01
+    mortrate_d_c =   0.01429
     mortrate_d_u =   0.81e-01
     rho_wood =  185.0
 #   laimax was changed to its original value
@@ -4232,17 +4252,17 @@ SIS_OVERRIDE_EOF
     dat_root_zeta =   0.25813
     dat_rs_min =    43.6
     allometry_type = HML
-    alphaHT = 25.60119
-    thetaHT = 1.56075
-    gammaHT = 0.04394
+    alphaHT = 49.11781 
+    thetaHT = 0.7590974
+    gammaHT = 0.5309686
     alphaCA = 150.0
     thetaCA = 1.5
-    alphaBM = 0.584
+    alphaBM = 0.3683791
     phiCSA = 0.4106051
     maturalage =    5.0
     seedling_height = 0.5
     prob_e =   0.4
-    mortrate_d_c =   0.2e-01
+    mortrate_d_c =   0.01
     mortrate_d_u =   0.81e-01
     rho_wood =   245.0
     LAImax =   3.5
@@ -6459,13 +6479,13 @@ set nyblock = $atm_threads
 
 <!-- c96_LM4_Op5 -->
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">/lustre/f1/pdata/gfdl_O/datasets/OM4_05/mosaic_c96.v20180227.tar</dataSource>
+        <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/ESM4/OM4_05/mosaic_c96.v20180227.tar</dataSource>
         <dataSource site="gfdl">/archive/gold/datasets/OM4_05/mosaic_c96.v20180227.tar</dataSource>
       </dataFile>
 
       <!--AWG Input datasets -->
       <dataFile label="input" target="INPUT/soil_type.nc" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$CPERM/Sergey.Malyshev/DATA/soil/soil_type_gsde_5minute.nc</dataSource>
+         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/soil/soil_type_gsde_5minute.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/common_LM4/biodata.nc</dataSource>
@@ -6491,12 +6511,6 @@ set nyblock = $atm_threads
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/common_LM4/soil_brdf.nc</dataSource>
       </dataFile>
 
-<!-- static veg is from #808/c96_LM4_Op5 not c96L49_am4p0_AM4chem_SOA 
-     The IC and static vegetation correspond to 1981 state of land use
--->
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$CPERM/Sergey.Malyshev/fre/tikal/LM3/LM3p2_C96_CM2G_historical_HC1_quick/ncrc2.default-prod/static_veg/19810101.static_veg.lm3p2.remapped_to_c96_OM4_05_720x576.v20151120.tar</dataSource>
-      </dataFile>
 <!--Krista Dunne gage data-->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/OM4_05_20160517/river_data_hydrography.c96_OM4_05-v20151028_20161005.tar</dataSource>
@@ -6524,50 +6538,41 @@ set nyblock = $atm_threads
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/common_AM4/am4_optical_table_20151029.dat</dataSource>
       </dataFile>
 <!-- fire-related data sets -->
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/lightning.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Daniel.Ward/data/FINAL/LISOTD_LRMTS_V2.3.2013.CLIMO.20140208.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/FINAL/LISOTD_LRMTS_V2.3.2013.CLIMO.20140208.nc</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/GDP.nc">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/GDP_1851_1x1_v20180502.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/GDP_1851_1x1_v20180502.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/population.nc">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/Sergey.Malyshev/DATA/fire/pop_density_1851_1x1_v20180502.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/pop_density_1851_1x1_v20180502.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/Fk.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Daniel.Ward/data/FINAL/FcFp_20170207_2deg.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/FINAL/FcFp_20170207_2deg.nc</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/Koppen_zones_2deg_1950-2000.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Daniel.Ward/data/FINAL/Koppen_zones_2deg_1950-2000.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/fire/FINAL/Koppen_zones_2deg_1950-2000.nc</dataSource>
       </dataFile>
 
 <!-- nitrogen-related data sets -->
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/nbiodata_nat.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Benjamin.Sulman/green_nsource_preind_fixed.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/nitrogen/green_nsource_preind_fixed.nc</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/nbiodata_ant.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Benjamin.Sulman/green_nsource_anthro_fixed.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/LAND/nitrogen/green_nsource_anthro_fixed.nc</dataSource>
       </dataFile>
 
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/INPUT/emissions.diag.tracers.cpio</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/emissions.diag.tracers.cpio</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT (merge into tropchem cpio) -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Jordan.Schnell/input/xactive_emissions/xactive_overhaul/megan.xactive.bvoc.tar
-</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/xactive_emissions/xactive_overhaul/megan.xactive.bvoc.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/common_AM4/FastJX-v7.1.tar</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/INPUT/tropchem/sim.AM4_isop_e90_so2h.dat</dataSource>
+         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/tropchem/sim.AM4_v20180614.dat</dataSource>
       </dataFile>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -6581,10 +6586,6 @@ set nyblock = $atm_threads
       </dataFile>
        <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/common_cmip6/emissions.terpenes.1x1.2000.nc</dataSource>
-      </dataFile>
-<!-- Merge into forcings tar file? -->
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/common_cmip6/h2_gblannualdata</dataSource>
       </dataFile>
 
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -6603,23 +6604,20 @@ set nyblock = $atm_threads
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_1850_cmip6_v2/lean_solar_spectral_data.dat</dataSource>
       </dataFile>
 
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/pdata/gfdl_M/Vaishali.Naik/input/cmip6_forcing_dataset/emissions/v2017-05-18/1850_wseabirdnh3/emissions.0.5x0.5.1850.tar</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/emissions/v2017-05-18/1850_wseabirdnh3/emissions.0.5x0.5.1850.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/anthro_so2.1849_2017.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/emissions_cmip6_v20170518/emissions.simple.so2.0.5x0.5.1849-2017.nc</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/dust_source.nc" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$CPERM/Paul.Ginoux/fms/input/dust_source/dust_source_0.25x0.25_utc.nc</dataSource>
+       <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/dust_source/dust_source_0.25x0.25_utc.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/gas_conc_3D_am3p9.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/L48_gas_conc/gas_conc_3D48L_am3p9.nc</dataSource>
       </dataFile>
-<!-- Move input file to CMIP6_ARCHIVE_ROOT -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$CPERM/Fabien.Paulot/archive/emissions/dms/DMS_lana_gfdl.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/ESM4/ATMCHEM/emissions/dms/DMS_lana_gfdl.nc</dataSource>
       </dataFile>
       <!-- SIS Input data -->
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -6690,7 +6688,7 @@ set nyblock = $atm_threads
     </postProcess>
   </experiment>
 
-  <experiment name="AM4p1_1850C_PIpcairco2_1980LU_dustfix" inherit="AM4p1_1850C_PIpcairco2_1850LU_dustfix">
+  <experiment name="AM4p1_1850C_PIpcairco2_1980LU" inherit="AM4p1_1850C_PIpcairco2_1850LU">
     <input>
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$CPERM/Larry.Horowitz/awg/IC/AM4p0p3k_L49_v7_1980LU_20180504.tar</dataSource>
