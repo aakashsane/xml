@@ -1289,6 +1289,26 @@ Experiment to build executable.
         </timeAverage>
       </component>
 
+      <component type="atmos_plev39_cmip" start="$(PP_START_YEAR)" source="atmos_month_plev39_refined" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
+             <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/zonal_average.csh -v ua,ta,tntmp,tntrl,tntrs,tntrlcs,tntrscs,tntc,tntscp,tntnogw,tntogw"/>
+        </timeSeries>
+      </component>
+
+<!--
+      <component type="atmos_plev39_6hr" start="$(PP_START_YEAR)" source="atmos_4xdaily_plev39_refined" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
+        <timeSeries freq="6hr" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/dynvar_driver.csh"/>
+        </timeSeries>
+      </component>
+
+      <component type="atmos_plev39_cmip_daily" start="$(PP_CPLD_START)" source="atmos_daily_plev39_refined" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
+        <timeSeries freq="daily" chunkLength="$(PP_CPLD_CHUNK_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/zonal_average.csh -v ua,utendnogw,utendogw"/>
+        </timeSeries>
+      </component>
+-->
+
       <component type="atmos_month_aer" start="$(PP_START_YEAR)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="off">
          <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_B)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAerAve/*)">
@@ -1359,7 +1379,7 @@ Experiment to build executable.
   <freInclude name="c96_climo_cmip6_postprocess_LAND">
     <postProcess>
       <component type="land" start="$(PP_START_YEAR)" source="land_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
-<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK_A)"/> -->
+<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CMIP_CHUNK_A)"/> -->
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
           <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/landMonthTS/*)" >
             <xi:fallback/>
@@ -1379,7 +1399,7 @@ Experiment to build executable.
             <xi:fallback/>
 	  </xi:include>
         </timeSeries>
-<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_AMIP_CHUNK_A)"/> -->
+<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CMIP_CHUNK_A)"/> -->
       </component>
       
       <component type="land_instant_cubic" start="$(PP_START_YEAR)" source="land_month_inst" sourceGrid="land-cubedsphere">
@@ -1447,7 +1467,7 @@ Experiment to build executable.
   <!-- Atmos co2 post-processing: note atmos_level, atmos_month and atmos_scalar already in c96_climo_postprocess -->
   <freInclude name="atmos_co2_postprocess">
       <postProcess> 
-      <component type="atmos_co2_level" start="$(PP_START_YEAR)" source="atmos_co2_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+      <component type="atmos_co2_level" start="$(PP_START_YEAR)" source="atmos_co2_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
         <timeSeries freq="annual"  chunkLength="$(PP_CMIP_CHUNK_A)">
         </timeSeries>
@@ -5451,6 +5471,11 @@ $baseDate
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_ESM4_piControl</dataSource>
       </dataFile>
+<!--
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_DynVar</dataSource>
+      </dataFile>
+-->
 
 <!--  CSH SECTION 
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
