@@ -1602,54 +1602,58 @@ Experiment to build executable.
      </postProcess>
   </freInclude>
 
- 
-  <freInclude name="COBALT_CMIP6_z_postprocess">
 
+  <!-- 2-D: 1x1 postprocessing for publicly served output -->
+  <freInclude name="COBALT_CMIP6_1x1_postprocess">
       <postProcess> 
-      <!--PostProcessing component models-->
-<!--
-      <component type="ocean_cobalt_1day_z" start="$(PP_START_YEAR)" source="ocean_cobalt_1day_z" sourceGrid="ocean-tripolar">
+
+      <component type="ocean_cobalt_omip_daily_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_daily" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
         <timeSeries freq="daily" chunkLength="$(PP_CMIP_CHUNK_A)" />
       </component>
--->
 
-      <component type="ocean_cobalt_omip_tracers_month_z" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_month_z" sourceGrid="ocean-tripolar">
+      <component type="ocean_cobalt_omip_sfc_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_sfc" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
          <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
+         <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="ocean_cobalt_omip_2d_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_2d" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+         <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
+      <!-- only fgco2 is needed annually -->
+         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <variables>
+             fgco2
+          </variables> 
+         </timeSeries>
          <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_cobalt_omip_tracers_year_z" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_year_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
-      </component>
+    </postProcess>
+  </freInclude>
 
-      <component type="ocean_cobalt_omip_rates_year_z" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_rates_year_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
-      </component>
 
-<!-- add 1x1 postprocessing for publicly served output -->
-      <component type="ocean_cobalt_omip_tracers_month_z_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+  <!-- 3-D: 1x1_z postprocessing for publicly served output -->
+  <freInclude name="COBALT_CMIP6_1x1_z_postprocess">
+      <postProcess> 
+
+      <component type="ocean_cobalt_omip_tracers_month_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
          <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
-         <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeAverage source="monthly"  interval="$(PP_CMIP_CHUNK_A)"/>
-         <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_cobalt_omip_tracers_year_z_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+      <component type="ocean_cobalt_omip_tracers_year_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_tracers_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
          <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
-      <component type="ocean_cobalt_omip_rates_year_z_1x1" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_rates_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
+      <component type="ocean_cobalt_omip_rates_year_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_cobalt_omip_rates_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
          <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)" />
          <timeAverage source="annual"  interval="$(PP_CMIP_CHUNK_A)"/>
       </component>
 
      </postProcess>
   </freInclude>
+
 <!--====================================-->
 <!--= END TEMPLATES FOR POSTPROCESSING =-->
 <!--====================================-->
@@ -2340,7 +2344,7 @@ Experiment to build executable.
         k_split  = 1,
         n_split  = 14,
         a2b_ord  = 4,
-        adjust_dry_mass = $adjust_dry_mass,
+        adjust_dry_mass = .false.,
         adj_mass_vmr    = .true.,
         print_freq = 0,
         grid_type = 0,
@@ -5527,9 +5531,9 @@ EOF_frejobs
    #The INPUT/ ends up with inconsistent restart files which at best cause the model to crash right away.
    if(-e $work/INPUT/MOM.res.nc.0000 ) \rm -rf $work/INPUT/MOM.res*.nc
    #Start ocean from WOA
-   if ( $currentSeg == 1 ) then
-      set restart_flag_MOM6 = 'n'
-   endif
+#  if ( $currentSeg == 1 ) then
+#     set restart_flag_MOM6 = 'n'
+#  endif
 
 ######################################################################
 #  The finite-volume cubed-sphere model should have the dry mass
@@ -5548,11 +5552,11 @@ EOF_frejobs
 #       endif      
 #    end
 # endif
-if ( $currentSeg == 1 ) then 
-   set adjust_dry_mass = ".true."
-else
-   set adjust_dry_mass = ".false."
-endif
+# if ( $currentSeg == 1 ) then 
+#    set adjust_dry_mass = ".true."
+# else
+#    set adjust_dry_mass = ".false."
+# endif
 
 #Scan auxiliary_nml for setting MOM6/SIS2 layouts
 
