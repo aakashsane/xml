@@ -4590,6 +4590,19 @@ SIS_OVERRIDE_EOF
            "profile_type","fixed","surface_value = 431.9218e-06"/
 
 ###.................................................
+### INERT TRACERS field table   (2018/08/30)
+### Niki Zadeh - There is no sf6 and cfcs in the initCond, so 
+###              ask MOM6 not to look for them and initialize to module values (which are 0)
+##
+"namelists","ocean_mod","generic_sf6"
+sf6_requires_restart = f
+/
+"namelists","ocean_mod","generic_cfc"
+cfc11_requires_restart = f
+cfc12_requires_restart = f
+/
+
+###.................................................
 ### COBALT field table for initializing tracers
 ## jgj 2013/01/23 updated for COBALT
 ## jgj 2018/05/09 updated for GLODAP v2 and regridded COBALT history file
@@ -5532,9 +5545,9 @@ EOF_frejobs
    #The INPUT/ ends up with inconsistent restart files which at best cause the model to crash right away.
    if(-e $work/INPUT/MOM.res.nc.0000 ) \rm -rf $work/INPUT/MOM.res*.nc
    #Start ocean from WOA
-   if ( $currentSeg == 1 ) then
-      set restart_flag_MOM6 = 'n'
-   endif
+#   if ( $currentSeg == 1 ) then
+#      set restart_flag_MOM6 = 'n'
+#   endif
 
 ######################################################################
 #  The finite-volume cubed-sphere model should have the dry mass
@@ -5553,12 +5566,13 @@ EOF_frejobs
 #       endif      
 #    end
 # endif
-if ( $currentSeg == 1 ) then 
-   set adjust_dry_mass = ".true."
-else
-   set adjust_dry_mass = ".false."
-endif
-
+#if ( $currentSeg == 1 ) then 
+#   set adjust_dry_mass = ".false."
+#else
+#   set adjust_dry_mass = ".false."
+#endif
+#adjust_dry_mass should be .false. except for the very 1st year of the initial spinup
+set adjust_dry_mass = ".false."
 ######################################################################
 #  Find correct date range for emissions files (historical run ONLY)
 ######################################################################
@@ -5702,7 +5716,11 @@ endif
 
 <!-- INPUT DATASETS -->
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+<!--
         <dataSource site="ncrc">$(CMIP6_ARCHIVE_ROOT)/ESM4/IC/ESM4_piControl_spinup.initCond.20180516.tar</dataSource>
+-->
+<!-- temporary IC starting from updated year 401 of ESM4_piControl_spinupB and modified coupler.res -->
+        <dataSource site="ncrc">$CPERM/Jasmin.John/datasets/ESM4/IC/ESM4_piControl_spinupB/04010101_1940.tar</dataSource>
       </dataFile>
 
 <!-- c96_LM4_Op5 -->
