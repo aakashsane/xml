@@ -10,6 +10,7 @@ cd $work/$hsmdate
 pwd
 
 #-- Get a version-controlled copy of the analysis scripts
+module load git
 git clone file:///home/mdteam/DET/analysis/vitals
 
 #-- Find out which commit is currently in use; if this is 
