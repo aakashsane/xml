@@ -3357,7 +3357,7 @@ Experiment to build executable.
       </namelist>
 
       <namelist name="frecheck_nml">
-         ! start_date =  0001,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
+         start_date =  1940,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
       </namelist>
 
       <namelist name="mpp_io_nml">
@@ -3380,6 +3380,16 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override USE_generic_tracer = True
 #override CHL_FROM_FILE = False
 MOM_OVERRIDE_EOF
+
+#To let the model start ocean/ocean bgc tracers when some are missing from the initCond file
+#in order to cold start sf6 and cfcs which are not in the initCond
+#the override TRACERS_MAY_REINIT = True  makes the presence of tracers in restart file not mandatory
+#they are still read if they are present
+if ( $currentSeg == 1 ) then
+cat >> $work/INPUT/MOM_override << MOM_OVERRIDE_2
+#override TRACERS_MAY_REINIT = True !This makes the presence of tracers in restart file not mandatory
+MOM_OVERRIDE_2
+endif
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override NIGLOBAL = 720
@@ -5709,6 +5719,9 @@ if ( $currentSeg == 1 ) then
       endif
    end
 
+   #Xanadu has a bug fix for airsea flux restart checksums and they don't match the old checksums in the files
+   chmod +w $work/INPUT/ocean_cobalt_airsea_flux.res.nc
+   ncatted -O -a checksum,,d,, $work/INPUT/ocean_cobalt_airsea_flux.res.nc
 endif
 ####COMMON ALWAYS CSH ENDS######
       ]]></csh>
