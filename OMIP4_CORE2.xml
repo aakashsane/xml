@@ -14,13 +14,13 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf -r basic
   <property name="RELEASE"        value="warsaw_201803"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="2018.04.11"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"      value="2018.04.06"/>              <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
-  <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_0125"/>  <!--example containing .frepp scripts for analysis-->
+  <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
    <property name="PROD_SIMTIME"   value="300"/>
@@ -720,8 +720,8 @@ CORE2 dynamic inter_annual forcing data
      <namelist name="generic_tracer_nml">
        do_generic_tracer=.true.
        do_generic_BLING=.true.
-       do_generic_CFC=.true.
-       do_generic_SF6=.true.
+       do_generic_CFC=.false.
+       do_generic_SF6=.false.
        do_generic_age=.false.
        do_generic_argon=.false.
        do_generic_COBALT=.false.
@@ -804,7 +804,7 @@ $baseDate
       </dataFile>
 
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_data_table']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='CFC_data_table']/input/node())"/>
+      <!--xi:include xpointer="xpointer(//freInclude[@name='CFC_data_table']/input/node())"/-->
 
 
      <!--field_tables-->
@@ -846,6 +846,10 @@ MOM_OVERRIDE_EOF
          <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2304']/node())"/> </run>
          <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1152']/node())"/> </run>
          <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O864x2']/node())"/> </run>
+      </regression>
+      <regression name="debug">
+        <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
+        <run days="1 1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
       </regression>
       <reference restart="$(REFERENCE)/archive/1x1m0d_1756x1o/restart/17080201.tar"/>
     </runtime>
@@ -1035,6 +1039,20 @@ MOM_OVERRIDE_EOF
      </input>
    </freInclude>
 
+   <experiment name="OM4p25_zstar" inherit="OM4p25_IAF_BLING_CFC_csf">
+    <input>
+     <csh>
+        <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = True
+#override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
+#override REGRIDDING_COORDINATE_MODE = "Z*"
+#override ALE_COORDINATE_CONFIG = "FNC1:2,6500,6,.01"
+MOM_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+   </experiment>
    
 
    <!--****************************************************************************************-->
