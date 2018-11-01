@@ -2,9 +2,9 @@
 set -v
 # Automatic Build and Run on Gaea using fre
 XML_FILE=OM4.xml                   #The xml to test
-RELEASE='testing_20180803'                 #The FMS release to test
-MOM6_DATE='2018.04.11'                     #The MOM6 tag date to test
-MOM6_GIT_TAG="dev\\\/gfdl\\\/$MOM6_DATE" #The MOM6 tag to test
+RELEASE='xanadu'                 #The FMS release to test
+MOM6_DATE='om4_v1.0.5'                     #The MOM6 tag date to test
+MOM6_GIT_TAG="om4\\\/v1.0.5" #The MOM6 tag to test
 FRESTEM="${RELEASE}_mom6_${MOM6_DATE}"         #The FRESTEM to use
 GROUP="gfdl_f"
 #List of the experiments in the xml to run regression for

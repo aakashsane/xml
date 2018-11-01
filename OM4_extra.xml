@@ -11,10 +11,10 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod MOM6_GOLD_SIS2_bergs -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="xanadu"/>                 <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="20171222"/>                <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"      value="20181023"/>                <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="om4/v1.0.4"/>              <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
@@ -59,7 +59,8 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod MOM6_GOLD_SIS2_bergs -r basic
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc4-intel16'])"/>
   </setup>
 
-      <property name="OM4_033_ARCHIVE"   value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_033_20151028"/>
+   <property name="OM4_033_ARCHIVE"   value="/lustre/f1/unswept/Niki.Zadeh/archive/input/verona/John.Dunne_OM4_033_20151028"/>
+   <property name="OBGC_ARCHIVE_ROOT"    value="$(CMIP6_ARCHIVE_ROOT)/ESM4/OBGC"/>
    
 <!--= COMPILE =-->
 <!--===========-->
@@ -1152,13 +1153,13 @@ platform="$(platform)">$(OBGC_ARCHIVE_ROOT)/mom4p1_restart_to_latlon_360x180/ESM
 
 <!-- COBALT BC files: Preind  -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(FMS_ESM_ARCHIVE_ROOT)/TOPAZ/deposition_fan/Soluble_Fe_Flux_PI.nc</dataSource>
+        <dataSource platform="$(platform)">$(FMS_ARCHIVE_ROOT)/esm/TOPAZ/deposition_fan/Soluble_Fe_Flux_PI.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(FMS_ESM_ARCHIVE_ROOT)/TOPAZ/deposition_fan/Mineral_Fe_Flux_PI.nc</dataSource>
+        <dataSource platform="$(platform)">$(FMS_ARCHIVE_ROOT)/esm/TOPAZ/deposition_fan/Mineral_Fe_Flux_PI.nc</dataSource>
       </dataFile>
        <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(FMS_ESM_ARCHIVE_ROOT)/TOPAZ/deposition_horowitz/depflux_total.mean.1860.nc</dataSource>
+        <dataSource platform="$(platform)">$(FMS_ARCHIVE_ROOT)/esm/TOPAZ/deposition_horowitz/depflux_total.mean.1860.nc</dataSource>
       </dataFile>
 
       <fieldTable order="append">
@@ -1815,5 +1816,552 @@ SIS_OVERRIDE_EOF
 
    </experiment>
    
+   <experiment name="MOM6_SIS2_base" inherit="MOM6_SIS2_compile">
+     <input>
+
+     <namelist name="dummy_ocean_model_nml">
+       ocean_layout = 0,0
+       ocean_io_layout = 1,1
+       ocean_mask_table='MOM_mask_table'
+     </namelist>
+     <namelist name="dummy_ice_model_nml">
+       ice_layout = 0,0
+       ice_io_layout = 1,1
+       ice_mask_table='MOM_mask_table'
+     </namelist>
+       
+     <csh type="always">
+        <![CDATA[
+#------------------------------------------
+## Find out whether to restart.
+
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
+else
+   set restart_flag = 'r'
+endif
+
+#------------------------------------------
+ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc 
+
+touch $work/INPUT/MOM_override
+touch $work/INPUT/SIS_override
+
+#scan auxiliary_nml
+set OCN_MASK_TABLE = `awk '/ocean_mask_table/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
+set OCN_LAYOUT     = `awk '/ocean_layout/     {gsub(/=/," ");           print $2,$3}' $work/input.nml`
+set OCN_IO_LAYOUT  = `awk '/ocean_io_layout/  {gsub(/=/," ");           print $2,$3}' $work/input.nml`
+
+cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
+#override IO_LAYOUT = $OCN_IO_LAYOUT
+#override LAYOUT    = $OCN_LAYOUT
+#override MASKTABLE = $OCN_MASK_TABLE
+MOM_LAYOUT_EOF
+
+#scan auxiliary_nml
+set ICE_MASK_TABLE = `awk '/ice_mask_table/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
+set ICE_LAYOUT     = `awk '/ice_layout/     {gsub(/=/," ");           print $2,$3}' $work/input.nml`
+set ICE_IO_LAYOUT  = `awk '/ice_io_layout/  {gsub(/=/," ");           print $2,$3}' $work/input.nml`
+
+cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
+#override IO_LAYOUT = $ICE_IO_LAYOUT
+#override LAYOUT    = $ICE_LAYOUT
+#override MASKTABLE = $ICE_MASK_TABLE
+SIS_LAYOUT_EOF
+
+       ]]>
+      </csh>    
+     </input>
+
+      <runtime>
+      <regression name="basic">
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O32']/node())"/> </run>
+      </regression>
+      <regression name="rts">
+        <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O32']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O64']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O32x2']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
+      </regression>
+
+      <regression name="debugomp">
+        <run days="2" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O32']/node())"/> </run>
+        <run days="2" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O32x2']/node())"/> </run>
+      </regression>
+
+       <regression name="mom6dev">
+         <run days="MOM6"> <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O32']/node())"/> </run> 
+       </regression>
+
+      </runtime>
+      <postProcess> 
+         <csh><![CDATA[
+         cd $work/RESTART
+         ncrcat icebergs.res.nc.* icebergs.res.nc
+         rm -f icebergs.res.nc.*
+         cd $work
+         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
+         rm -f iceberg_trajectories.nc.* 
+         #Save the last line of ocean.stats without the first (step number) column as a signature of MOM6 answers
+         tail -1 ocean.stats | cut -c8- > RESTART/$enddate.ocean.stats.res
+         #Save the whole ocean.stats under ascii/
+         mv ocean.stats $enddate.ocean.stats
+         mv ocean.stats.nc $enddate.ocean.stats.nc
+
+         #Make a directory to trick FRE to pick up and archive in ascii
+         mkdir extra.results
+
+         mv *velocity_truncations CPU_stats MOM_parameter_doc* extra.results/
+         #Make perftools report and trick FRE to archive them 
+         ls *.xf
+         if ( ! $status ) then
+           module load perftools
+           pat_report $executable:t+*.xf > extra.results/pat_report.out 
+         endif
+         mv $executable:t+* extra.results/
+         ]]></csh>
+      </postProcess> 
+   </experiment>
+
+   <experiment name="MOM6_SIS2_base_dev" inherit="MOM6_SIS2_compile">
+     <input>
+     <csh type="always">
+        <![CDATA[
+#NOT TO BE USED WITH REGULAR FRE RUNS!! ONLY FOR MOM6 DEVELOPERS UNIT TESTING!!
+#Override the runCommand so that the effective workDir is under mom6/exmaples/xyz as mom6 developers do
+unalias runCommand
+alias runCommand '\rm $stateDir/../../status ; cd $mom6ExpDir;mkdir RESTART;/usr/bin/time -p `which aprun` -n $npes -d 1 $executable'
+       ]]>
+      </csh>    
+     </input>
+
+      <runtime>
+       <regression name="mom6dev">
+         <run days="MOM6"> <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O32']/node())"/> </run> 
+       </regression>
+      </runtime>
+
+      <postProcess>
+         <csh><![CDATA[
+#NOT TO BE USED WITH REGULAR FRE RUNS!! ONLY FOR MOM6 DEVELOPERS UNIT TESTING
+
+set compiler = `echo $platform | sed 's/ncrc4\.//'| sed 's/[0-9]\+//'`
+  
+#Save the output files for later review
+set mydate = `date "+%Y%m%d%H%M%S"`
+set thisrun = results.$platform.$target.$mydate
+mkdir $thisrun
+\rm latest_run.$platform.$target
+ln -s $thisrun latest_run.$platform.$target
+
+diff ocean.stats ocean.stats.$compiler > $thisrun/diff
+if ( $status == 0 ) then
+   touch PASSED_$platform.$target.$mydate
+   echo "ANSWERS MATCH"
+   echo "${PWD}/${thisrun} PASS" > $stateDir/../../status
+else
+   touch FAILED_$platform.$target.$mydate
+   echo "ANSWERS DIFFER"
+   echo "${PWD}/${thisrun} FAIL" > $stateDir/../../status
+endif
+#cp ocean.stats ocean.stats.$compiler #This would affect the diff status of the next run
+cp MOM_parameter_doc* $thisrun/
+mv RESTART ocean.stats *.out *.nc *.nc.*  *velocity_truncations CPU_stats core $thisrun/
+
+#Exit here. The rest is of no use to mom6 developers and unit testers
+exit 0
+         ]]></csh> 
+      </postProcess>
+   </experiment>
+<experiment name="MOM6_SIS2" inherit="MOM6_SIS2_base$(MODIFIER)">
+<description>                                                
+ MOM6 with SIS2 test case with dynamic build                                    
+</description>        
+     <input>                                                 
+     <!--Needed only for unit testing with "mom6_dev" regression-->
+     <csh><![CDATA[set mom6ExpDir=$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2]]></csh>  
+
+     <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/input.nml</dataSource>
+     </dataFile>                                                                                   
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">                   
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/diag_table</dataSource>
+     </dataFile>                                                                                    
+     <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">                   
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/field_table</dataSource>
+     </dataFile>                                                                                     
+     <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">                     
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/data_table</dataSource> 
+     </dataFile>                                                                                     
+     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">                         
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/MOM_input</dataSource> 
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/MOM_override</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/SIS_input</dataSource> 
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/SIS_override</dataSource>
+     </dataFile>      
+                                                                             
+      <!--gridSpec mosaic datasets-->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/mosaic.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/grid_spec.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/atmos_hgrid.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/atmos_mosaic.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/atmos_mosaic_tile1Xland_mosaic_tile1.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/atmos_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/land_hgrid.nc</dataSource>                           
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/land_mask.nc</dataSource>                            
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/land_mosaic.nc</dataSource>                          
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/land_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource> 
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/ocean_hgrid.nc</dataSource>                          
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/ocean_mask.nc</dataSource>                           
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/ocean_mosaic.nc</dataSource>                         
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/ocean_vgrid.nc</dataSource>                          
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/README</dataSource>                                  
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/topog.nc</dataSource>                                
+      </dataFile>                                                                                                                        
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/cfc.bc.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/geothermal_heating_cm2g.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/gustiness_qscat.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/OM3_zgrid.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/seawifs_1998-2006_GOLD_smoothed_2X.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/sgs_h2.nc</dataSource>                            
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/tideamp.nc</dataSource>                           
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/tke_tidal_cm2p2.nc</dataSource>                   
+      </dataFile>                                                                                                                     
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/ncar_precip_clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/ncar_rad_clim.nc</dataSource>   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/q_10_mod.clim.nc</dataSource>   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/runoff.nc</dataSource>          
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/salt_restore.nc</dataSource>    
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/slp.clim.nc</dataSource>        
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/sst_ice_clim.nc</dataSource>    
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/t_10_mod.clim.nc</dataSource>   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/u_10_mod.clim.nc</dataSource>   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/v_10_mod.clim.nc</dataSource>   
+      </dataFile>                                                                                                   
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+	 <!--Are the following two IC files both needed?--> 
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/GOLD_IC.2010.11.15.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/ocmip2_cfc.res.nc</dataSource>
+      </dataFile>                                                                                              
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'NOLEAP',
+       dt_cpld  = 7200,
+       dt_atmos = 7200,
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.true. 
+     </namelist>
+
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = '$restart_flag'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override'  
+     </namelist>
+
+     <namelist name="SIS_input_nml" >
+        output_directory = './',
+        input_filename = 'n'
+        restart_input_dir = 'INPUT/',
+        restart_output_dir = 'RESTART/',
+        parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override' 
+     </namelist>
+     <namelist name="fms_io_nml" >
+         fms_netcdf_restart=.true.
+         threading_read='multi'
+         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+     </namelist>
+   </input>
+</experiment>
+
+<experiment name="MOM6_SIS2_bergs_cgrid" inherit="MOM6_SIS2">
+<description>                                                
+ MOM6 with SIS2_bergs_cgrid test case with icebergs                                    
+</description>        
+   
+     <input>                                                 
+     <!--Needed only for unit testing with "mom6_dev" regression-->
+     <csh><![CDATA[set mom6ExpDir=$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid]]></csh>  
+
+     <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/input.nml</dataSource>
+     </dataFile>                                                                                   
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">                   
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/diag_table</dataSource>
+     </dataFile>                                                                                    
+     <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">                   
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/field_table</dataSource>
+     </dataFile>                                                                                     
+     <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">                     
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/data_table</dataSource> 
+     </dataFile>                                                                                     
+     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">                         
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/MOM_input</dataSource> 
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/MOM_override</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/SIS_input</dataSource> 
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/SIS_override</dataSource>
+     </dataFile>      
+                                                                             
+      <!--gridSpec mosaic datasets-->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/mosaic.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/grid_spec.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/atmos_hgrid.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/atmos_mosaic.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/atmos_mosaic_tile1Xland_mosaic_tile1.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/atmos_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/land_hgrid.nc</dataSource>                           
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/land_mask.nc</dataSource>                            
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/land_mosaic.nc</dataSource>                          
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/land_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource> 
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/ocean_hgrid.nc</dataSource>                          
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/ocean_mask.nc</dataSource>                           
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/ocean_mosaic.nc</dataSource>                         
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/ocean_vgrid.nc</dataSource>                          
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/topog.nc</dataSource>                                
+      </dataFile>                                                                                                                        
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/cfc.bc.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/geothermal_heating_cm2g.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/gustiness_qscat.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/OM3_zgrid.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/seawifs_1998-2006_GOLD_smoothed_2X.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/sgs_h2.nc</dataSource>                            
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/tideamp.nc</dataSource>                           
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/tke_tidal_cm2p2.nc</dataSource>                   
+      </dataFile>                                                                                                                     
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/ncar_precip_clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/ncar_rad_clim.nc</dataSource>   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/q_10_mod.clim.nc</dataSource>   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/runoff.nc</dataSource>          
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/salt_restore.nc</dataSource>    
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/slp.clim.nc</dataSource>        
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/sst_ice_clim.nc</dataSource>    
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/t_10_mod.clim.nc</dataSource>   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/u_10_mod.clim.nc</dataSource>   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/v_10_mod.clim.nc</dataSource>   
+      </dataFile>                                                                                                   
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/GOLD_IC.2010.11.15.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/ocmip2_cfc.res.nc</dataSource>
+      </dataFile>                                                                                              
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/31Layer_zgrid.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/temp_restore.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/GOLD_SIS_IC.nc</dataSource>
+      </dataFile>
+                                                                                              
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2_bergs_cgrid/INPUT/example_calving.nc</dataSource>
+      </dataFile>
+
+      
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'NOLEAP',
+       dt_cpld  = 7200,
+       dt_atmos = 7200,
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.true. 
+     </namelist>
+
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = '$restart_flag'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_override'  
+     </namelist>
+
+     <namelist name="SIS_input_nml" >
+        output_directory = './',
+        input_filename = 'n'
+        restart_input_dir = 'INPUT/',
+        restart_output_dir = 'RESTART/',
+        parameter_filename = 'INPUT/SIS_input','INPUT/SIS_override' 
+     </namelist>
+
+     <namelist name="fms_io_nml" >
+         fms_netcdf_restart=.true.
+         threading_read='multi'
+         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+     </namelist>
+   </input>
+</experiment>
+<experiment name="MOM6_SIS2_Baltic" inherit="MOM6_SIS2">
+<description>                                                
+ MOM6 with SIS2_Baltic test case                                   
+</description>        
+  
+     <input>                                                 
+     <!--Needed only for unit testing with "mom6_dev" regression-->
+     <csh><![CDATA[set mom6ExpDir=$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic]]></csh>  
+
+     <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/input.nml</dataSource>
+     </dataFile>                                                                                   
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">                   
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/diag_table</dataSource>
+     </dataFile>                                                                                    
+     <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">                   
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/field_table</dataSource>
+     </dataFile>                                                                                     
+     <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">                     
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/data_table</dataSource> 
+     </dataFile>                                                                                     
+     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">                         
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/MOM_input</dataSource> 
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/MOM_override</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/SIS_input</dataSource> 
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/SIS_override</dataSource>
+     </dataFile>      
+                                                                             
+      <!--gridSpec mosaic datasets-->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/mosaic.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/grid_spec.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/atmos_hgrid.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/atmos_mosaic.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/atmos_mosaic_tile1Xland_mosaic_tile1.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/atmos_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/land_hgrid.nc</dataSource>                           
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/land_mask.nc</dataSource>                <!--not present            
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/land_mosaic.nc</dataSource>              -->            
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/land_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource> 
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/ocean_hgrid.nc</dataSource>                          
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/ocean_mask.nc</dataSource>                           
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/ocean_mosaic.nc</dataSource>                         
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/ocean_vgrid.nc</dataSource>                                               
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/topog.nc</dataSource>                                
+      </dataFile>                                                                                                                        
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/cfc.bc.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/geothermal_heating_cm2g.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/gustiness_qscat.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/OM3_zgrid.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/seawifs_1998-2006_GOLD_smoothed_2X.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/sgs_h2.nc</dataSource>                            
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/tideamp.nc</dataSource>                           
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/tke_tidal_cm2p2.nc</dataSource>                   
+      </dataFile>                                                                                                                     
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/ncar_precip_clim.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/ncar_rad_clim.nc</dataSource>   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/q_10_mod.clim.nc</dataSource>   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/runoff.nc</dataSource>          
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/salt_restore.nc</dataSource>    
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/slp.clim.nc</dataSource>        
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/sst_ice_clim.nc</dataSource>    
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/t_10_mod.clim.nc</dataSource>   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/u_10_mod.clim.nc</dataSource>   
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/v_10_mod.clim.nc</dataSource>   
+      </dataFile>                                                                                                   
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/GOLD_IC.2010.11.15.nc</dataSource>
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/ocmip2_cfc.res.nc</dataSource>
+      </dataFile>                                                                                              
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/Baltic/INPUT/WOA05_pottemp_salt.nc</dataSource>
+      </dataFile>
+
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'NOLEAP',
+       dt_cpld  = 7200,
+       dt_atmos = 7200,
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.true. 
+     </namelist>
+
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = '$restart_flag'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_override'  
+     </namelist>
+
+     <namelist name="SIS_input_nml" >
+        output_directory = './',
+        input_filename = 'n'
+        restart_input_dir = 'INPUT/',
+        restart_output_dir = 'RESTART/',
+        parameter_filename = 'INPUT/SIS_input','INPUT/SIS_override' 
+     </namelist>
+
+     <namelist name="fms_io_nml" >
+         fms_netcdf_restart=.true.
+         threading_read='multi'
+         checksum_required = .false. ! This is needed to be able to restart the Ice under GNU. ref. Redmine issue 2000
+     </namelist>
+   </input>
+      <runtime>
+      <regression name="basic">
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O8']/node())"/> </run>
+      </regression>
+      <regression name="rts">
+        <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O8']/node())"/> </run>
+      </regression>
+
+      <regression name="debugomp">
+        <run days="2" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O8']/node())"/> </run>
+      </regression>
+
+       <regression name="mom6dev">
+         <run days="MOM6"> <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O8']/node())"/> </run> 
+       </regression>
+
+      </runtime>
+
+</experiment>
 
 </experimentSuite>
