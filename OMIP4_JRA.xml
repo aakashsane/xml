@@ -68,7 +68,13 @@ frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p5_IAF_BLING_CFC_abio_csf_m
 	       <ice              layout = "120,120"   io_layout = "1,5" mask_table="mask_table.4668.120x120"/>
 	     </resources>
   </freInclude>
-  <freInclude name="resourceparams_O4509p125_production">
+  <freInclude name="resourceparams_O9084p125_production">
+	     <resources jobWallclock="10:00:00"  segRuntime="10:00:00">
+               <ocn ranks="9084" layout = "120,112"   io_layout = "4,4" mask_table="mask_table.4356.120x112" threads="1"/>
+               <ice              layout = "120,112"   io_layout = "4,4" mask_table="mask_table.4356.120x112"/>
+             </resources>
+  </freInclude>
+   <freInclude name="resourceparams_O4509p125_production">
            <resources jobWallclock="16:00:00"  segRuntime="8:00:00">
              <ocn ranks="4509" layout = "90,72"   io_layout = "1,4" mask_table="mask_table.1971.90x72" threads="1"/>
              <ice              layout = "90,72"   io_layout = "1,4" mask_table="mask_table.1971.90x72"/>
@@ -606,10 +612,11 @@ SIS_OVERRIDE_EOF
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O9732p125_production']/node())"/>
       </production>
       <regression name="basic">
-        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1024']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2085p125']/node())"/> </run>
       </regression>
       <regression name="rts">
-        <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1024']/node())"/> </run>
+        <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2085p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2880']/node())"/> </run>
          <!--the following should reproduce eachother but not the basic because basic uses mask_table-->
          <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2304']/node())"/> </run>
          <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1152']/node())"/> </run>
@@ -673,6 +680,94 @@ SIS_OVERRIDE_EOF
          restart_output_dir = 'RESTART/',
          parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
      </namelist>
+     <csh>
+        <![CDATA[
+
+if ( $currentSeg == 1 ) then
+   #Take current date from coupler_nml
+   if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
+endif
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override TOPO_EDITS_FILE = ""
+#override READ_TIDEAMP = False    !until we have a source file with the proper resolution
+#override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20180716.nc"
+#override SALT_RESTORE_FILE = "salt_restore_PHC2.2880x2240.v20180716.nc"
+#override ADJUST_NET_FRESH_WATER_TO_ZERO  = False
+#override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
+#override DT_THERM = 3600.0               !   [s] !reduced from 7200.0 for OM4_025
+#override BAD_VAL_SST_MIN = -5.0  ! decreased from default of -3.0 to avoid extremes in 1/8 degree model
+#override U_TRUNC_FILE = "MOM_U_truncations"
+#override V_TRUNC_FILE = "MOM_V_truncations"
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override DT_ICE_DYNAMICS = 450 !reduced from 1200.0 for OM4_025
+#override DT_RHEOLOGY = 25.0
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
+    </input>
+   </experiment>
+   <experiment name="OM4p125_IAF_csf_JRA55do1-3_r2_cycle2_diagd2" inherit="OM4p125_IAF_csf_JRA55do1-3_r2_cycle1">
+    <input>
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1958,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'julian',
+       dt_cpld  = 3600
+       dt_atmos = 3600
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.false. 
+       atmos_nthreads = $atm_threads
+       ocean_nthreads = $ocean_nthreads
+     </namelist>
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/OM4p125_IAF_csf_JRA55do1-3_r2_cycle2_1996_combined.tar</dataSource>
+     </dataFile>
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
+     </namelist>
+     <diagTable>
+$name
+$baseDate
+     </diagTable>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6.d2</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6.d2</dataSource>
+      </dataFile>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+     </dataFile>
      <csh>
         <![CDATA[
 
@@ -880,10 +975,12 @@ $(ARCHIVE_NNZ)/input/xanadu/mask_table.1194.64x64
 $(ARCHIVE_NNZ)/input/xanadu/mask_table.1535.72x72
 $(ARCHIVE_NNZ)/input/xanadu/mask_table.1971.90x72
 $(ARCHIVE_NNZ)/input/xanadu/mask_table.245.32x32
+$(ARCHIVE_NNZ)/input/xanadu/mask_table.795.72x40
 $(ARCHIVE_NNZ)/input/xanadu/mask_table.2534.90x90
 $(ARCHIVE_NNZ)/input/xanadu/mask_table.2837.100x90
 $(ARCHIVE_NNZ)/input/xanadu/mask_table.3150.100x100
 $(ARCHIVE_NNZ)/input/xanadu/mask_table.3830.120x100
+$(ARCHIVE_NNZ)/input/xanadu/mask_table.4356.120x112
 $(ARCHIVE_NNZ)/input/xanadu/mask_table.4668.120x120
 $(ARCHIVE_NNZ)/input/xanadu/mask_table.5927.180x100
 $(ARCHIVE_NNZ)/input/xanadu/mask_table.6368.160x120
@@ -1215,7 +1312,6 @@ MOM_OVERRIDE_EOF
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/grid_spec.nc</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/grid_spec.nc</dataSource>
-        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/grid_spec.nc</dataSource>
         <dataSource site="gfdl">/archive/gold/datasets/OM4_025/mosaic.v20170622.tar</dataSource> 
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -1360,14 +1456,12 @@ MOM_OVERRIDE_EOF
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
-        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
       </dataFile>
 <!-- "heat_content_vprec" are repeated in diag_table.MOM6
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
-        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
       </dataFile>
 -->
@@ -1399,7 +1493,6 @@ MOM_OVERRIDE_EOF
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
      </dataFile>
 
@@ -1972,7 +2065,6 @@ SIS_OVERRIDE_EOF
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
-        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
       </dataFile>
 <!-- "heat_content_vprec" are repeated in diag_table.MOM6 
@@ -1980,7 +2072,6 @@ SIS_OVERRIDE_EOF
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
-        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
       </dataFile>
 -->
