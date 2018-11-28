@@ -6,14 +6,14 @@ This xml consists of 1/4 degree and 1/2 degree Ocean-Ice experiments.
 
 module load fre/bronx-12
 fremake -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
-frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r4r_cycle1 -r basic 
+frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r5_cycle1 -r basic 
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
   <property name="RELEASE"        value="xanadu"/>                  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="20181101"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"      value="downsample_r4"/>              <!-- git tag date for MOM6 source code -->
   <!--property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/-->   <!-- git tag for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl"/>   <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
@@ -134,6 +134,11 @@ Make the executable for ocean-ice experiments.
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
+
+          #Checkout Downsampling work
+          if ("$(MOM6_DATE)" =~ "downsample_r4") then
+            (cd src/MOM6 && git fetch https://github.com/nikizadehgfdl/MOM6.git downsample_r4 && git checkout FETCH_HEAD)
+	  endif
           popd
 
           pushd mom6
@@ -415,7 +420,7 @@ cd $work
    <!--***************************** 1/8 degree experiments        ****************************-->
    <!--****************************************************************************************-->
 						
-   <experiment name="OM4p125_IAF_csf_JRA55do1-3_r4r_cycle1" inherit="MOM6_SIS2_compile$(MODIFIER)">
+   <experiment name="OM4p125_IAF_csf_JRA55do1-3_r5_cycle1" inherit="MOM6_SIS2_compile$(MODIFIER)">
     <description>
 global 1/8 degree z ocean_ice experiment 
 regridded runoff and salinity
@@ -424,7 +429,7 @@ No additional diurnal cycle imposed
 Use downsampled diagnostics _d2
 ADJUST_NET_FRESH_WATER_TO_ZERO  = True
 READ_TIDEAMP = True
-Note: CORE2 runoff is used because of issues with regridding JRA runoff
+#override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
     </description>  
     <publicMetadata DBswitch="$(MDBIswitch)">
       <!-- Realization tag -->
@@ -543,9 +548,9 @@ $baseDate
 "ice_model", "sithick",    "sithick",      "ice_month", "all", "mean", "none", 2
 "ice_model", "sivol",      "sivol",        "ice_month", "all", "mean", "none", 2
 "ice_model", "MIB",        "MIB",          "ice_month", "all", "mean", "none", 2
-"ocean_month",               1, "months",   1, "days", "time"
-"ocean_model",   "TKE_tidal",        "TKE_tidal",          "ocean_month",   "mean", "none", "none",2
-"ocean_model",   "TKE_itidal",       "TKE_itidal",         "ocean_month",   "mean", "none", "none",2
+"ocean_annual",               12, "months",   1, "days", "time"
+"ocean_model",   "TKE_tidal",        "TKE_tidal",          "ocean_annual",   "mean", "none", "none",2
+"ocean_model",   "TKE_itidal",       "TKE_itidal",         "ocean_annual",   "mean", "none", "none",2
      </diagTable>
 
      <!--A set of downsampled diagnotics-->
@@ -578,6 +583,7 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NJGLOBAL = 2240
 #override TOPO_EDITS_FILE = ""
 #override TIDEAMP_FILE = "tidal_amplitude.v20181107.nc"
+#override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
 #override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20180716.nc"
 #override SALT_RESTORE_FILE = "salt_restore_PHC2.2880x2240.v20180716.nc"
 #override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
@@ -877,11 +883,6 @@ $name
 $baseDate
      </diagTable>
 
-     <diagTable order="append">
- "ocean_model",   "TKE_tidal",        "TKE_tidal",          "ocean_month",   "all", "mean", "none",2
- "ocean_model",   "TKE_itidal",       "TKE_itidal",         "ocean_month",   "all", "mean", "none",2
-     </diagTable>
-
      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_GENERICS']/input/node())"/>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_BLING</dataSource>
@@ -962,9 +963,12 @@ endif
       <regression name="rts">
         <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1756']/node())"/> </run>
          <!--the following should reproduce eachother but not the basic because basic uses mask_table-->
-         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2304']/node())"/> </run>
-         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1152']/node())"/> </run>
          <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O864x2']/node())"/> </run>
+         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1440']/node())"/> </run>
+         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1296']/node())"/> </run>
+      </regression>
+      <regression name="basic_d2">
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1440']/node())"/> </run>
       </regression>
       <regression name="debug">
         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O864']/node())"/> </run>
@@ -982,31 +986,10 @@ endif
       <xi:include xpointer="xpointer(//freInclude[@name='inert_z_postprocess_1x1deg']/postProcess/node())"/>    </postProcess>
    </experiment>
 
-   <experiment name="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle3" inherit="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle1">
+   <experiment name="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle2" inherit="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle1">
     <input>
-      <namelist name="coupler_nml">
-       months = $months,
-       days   = $days,
-       current_date = 1958,1,1,0,0,0,
-       hours = 0
-       minutes = 0
-       seconds = 0
-       calendar = 'julian',
-       dt_cpld  = 3600, 
-       dt_atmos = 3600, 
-       do_atmos = .false.,
-       do_land = .false.,
-       do_ice = .true.,
-       do_ocean = .true.,
-       atmos_npes = 0,
-       ocean_npes = 0,
-       concurrent = .false.
-       use_lag_fluxes=.false.
-       atmos_nthreads = $atm_threads
-       ocean_nthreads = $ocean_nthreads
-     </namelist>
      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">/lustre/f1/oar.gfdl.ogrp-account/CMIP6/OMIP/warsaw_201803_mom6_2018.04.11/OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r2_cycle2/ncrc4.intel16-prod/archive/restart/20180101.tar</dataSource>
+      <dataSource platform="$(platform)">/lustre/f2/scratch/oar.gfdl.ogrp-account/CMIP6/OMIP/xanadu_mom6_20181101/OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle1/ncrc4.intel16f2-prod/archive/restart/20180101.tar</dataSource>
      </dataFile>
      <!--There is  MOM6/SIS2 restart provided in initCond.-->
      <namelist name="MOM_input_nml" >
@@ -1034,13 +1017,26 @@ endif
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 # Turn on generic tracers
 USE_generic_tracer = True
-# Do not look for generic tracers IC file
-GENERIC_TRACER_IC_FILE = "_NULL_"
 #override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
 MOM_OVERRIDE_EOF
-
-
      ]]></csh>
+    </input>
+   </experiment>
+
+   <experiment name="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle1_d2test" inherit="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle1">
+    <input>
+     <diagTable order="append">
+# _d2 sample
+ "ocean_daily_d2",               1, "days",   1, "days", "time"
+ "ocean_model_d2",   "zos",          "zos",              "ocean_daily_d2", "all", "mean", "none",2
+ "ocean_model_d2",   "mlotst",       "mlotst",           "ocean_daily_d2", "all", "mean", "none",2
+ "ocean_model_d2",   "tos",          "tos",              "ocean_daily_d2", "all", "mean", "none",2
+ "ocean_model_d2",   "sos",          "sos",              "ocean_daily_d2", "all", "mean", "none",2
+ "ocean_model_d2",   "SSU",          "ssu",              "ocean_daily_d2", "all", "mean", "none",2
+ "ocean_model_d2",   "SSV",          "ssv",              "ocean_daily_d2", "all", "mean", "none",2
+ "ocean_model_d2",   "thetao",       "thetao",           "ocean_daily_d2", "all", "mean", "none",2
+ "ocean_model_d2", "ePBL_h_ML",    "omldamax",         "ocean_daily_d2", "all", "max",  "none",2
+     </diagTable>
     </input>
    </experiment>
 
@@ -2186,6 +2182,7 @@ biomass_p_valid_min = 0.0
         <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_daily"/>
       </component>
       <component type="ocean_monthly_z_d2" start="$(PP_START_YEAR)"  source="ocean_month_z_d2" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_month_z_d2"/>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
       </component>
       <component type="ocean_annual_rho2_d2"  start="$(PP_START_YEAR)" source="ocean_annual_rho2_d2" sourceGrid="ocean-tripolar">

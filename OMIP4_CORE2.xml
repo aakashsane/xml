@@ -6,14 +6,14 @@ This xml consists of 1/4 degree and 1/2 degree Ocean-Ice experiments.
 
 module load fre/bronx-12
 fremake -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
-frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf -r basic 
+frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r basic 
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
   <property name="RELEASE"        value="xanadu"/>                  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="20181101"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"      value="downsample_r4"/>              <!-- git tag date for MOM6 source code -->
   <!--property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/-->   <!-- git tag for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl"/>   <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
@@ -133,6 +133,11 @@ Make the executable for ocean-ice experiments.
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
+
+          #Checkout Downsampling work
+          if ("$(MOM6_DATE)" =~ "downsample_r4") then
+            (cd src/MOM6 && git fetch https://github.com/nikizadehgfdl/MOM6.git downsample_r4 && git checkout FETCH_HEAD)
+	  endif
           popd
 
           pushd mom6
@@ -385,7 +390,7 @@ endif
    <!--***************************** 1/8 degree experiments        ****************************-->
    <!--****************************************************************************************-->
 						
-   <experiment name="OM4p125_IAF_csf_CORE2_r4" inherit="MOM6_SIS2_compile$(MODIFIER)">
+   <experiment name="OM4p125_IAF_csf_CORE2_r5" inherit="MOM6_SIS2_compile$(MODIFIER)">
     <description>
 global 1/8 degree z ocean_ice experiment 
 regridded runoff and salinity
@@ -394,6 +399,7 @@ Using the same MOM6/SIS2 timesteps as JRA runs
 Use downsampled diagnostics _d2
 ADJUST_NET_FRESH_WATER_TO_ZERO  = True
 READ_TIDEAMP = True
+#override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
     </description>  
     <publicMetadata DBswitch="$(MDBIswitch)">
       <!-- Realization tag -->
@@ -512,6 +518,9 @@ $baseDate
 "ice_model", "sithick",    "sithick",      "ice_month", "all", "mean", "none", 2
 "ice_model", "sivol",      "sivol",        "ice_month", "all", "mean", "none", 2
 "ice_model", "MIB",        "MIB",          "ice_month", "all", "mean", "none", 2
+"ocean_annual",               12, "months",   1, "days", "time"
+"ocean_model",   "TKE_tidal",        "TKE_tidal",          "ocean_annual",   "mean", "none", "none",2
+"ocean_model",   "TKE_itidal",       "TKE_itidal",         "ocean_annual",   "mean", "none", "none",2
      </diagTable>
 
      <!--A set of downsampled diagnotics-->
@@ -545,6 +554,7 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NJGLOBAL = 2240
 #override TOPO_EDITS_FILE = ""
 #override TIDEAMP_FILE = "tidal_amplitude.v20181107.nc"
+#override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
 #override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20180716.nc"
 #override SALT_RESTORE_FILE = "salt_restore_PHC2.2880x2240.v20180716.nc"
 #override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
@@ -915,22 +925,20 @@ endif
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O4671_production']/node())"/>
       </production>
       <regression name="basic">
-        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1440']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1756']/node())"/> </run>
       </regression>
       <regression name="rts">
         <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1756']/node())"/> </run>
-        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1756']/node())"/> </run>
          <!--the following should reproduce eachother but not the basic because basic uses mask_table-->
-         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2304']/node())"/> </run>
-         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1152']/node())"/> </run>
          <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O864x2']/node())"/> </run>
-      </regression>
-      <regression name="debug">
-        <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
-        <run days="1 1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O512']/node())"/> </run>
+         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1440']/node())"/> </run>
+         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1296']/node())"/> </run>
       </regression>
       <regression name="basic_d2">
-        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1440']/node())"/> </run>
+      </regression>
+      <regression name="debug">
+        <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O864']/node())"/> </run>
       </regression>
       <reference restart="$(REFERENCE)/archive/1x1m0d_1756x1o/restart/17080201.tar"/>
     </runtime>
@@ -2190,6 +2198,7 @@ biomass_p_valid_min = 0.0
         <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_daily"/>
       </component>
       <component type="ocean_monthly_z_d2" start="$(PP_START_YEAR)"  source="ocean_month_z_d2" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_month_z_d2"/>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
       </component>
       <component type="ocean_annual_rho2_d2"  start="$(PP_START_YEAR)" source="ocean_annual_rho2_d2" sourceGrid="ocean-tripolar">
