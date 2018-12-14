@@ -1374,6 +1374,11 @@ $baseDate
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_BLING</dataSource>
      </dataFile>
+      <diagTable order="append">
+"ocean_model_rho2","vo",   "vo",     "ocean_annual_rho2",  "all", "mean", "none",2                               
+"ocean_model_rho2","vo",   "vo",     "ocean_month_rho2",   "all", "mean", "none",2                               
+"ocean_model_z", "opottemppmdiff", "opottemppmdiff", "ocean_annual_z", "all", "mean", "none",2
+      </diagTable>
 
      <!--data_tables and data files-->
      <!--JRA forcing-->
@@ -1407,6 +1412,10 @@ $baseDate
         <dataSource platform="$(platform)">$(KRASTING)/cwg/input/cfc/MOM_GENERICS_OM4p5.20170829.res.nc</dataSource>
       </dataFile>
 
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f1/unswept/oar.gfdl.ogrp-account/archive/input/warsaw/diag_rho2.nc</dataSource>
+      </dataFile>
+
      <!--MOM_overrides-->
      <csh>
        <![CDATA[
@@ -1414,6 +1423,7 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 # Turn on generic tracers
 USE_generic_tracer = True
 GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
@@ -1682,22 +1692,6 @@ dissi14cabio_dest_var_unit = mol kg-1
 dissi14cabio_src_var_record = 1
 dissi14cabio_src_var_gridspec = NONE
 dissi14cabio_valid_min = 0.0
-/
-###.................................................
-### INERT TRACERS field table   (2018/07/06)
-### jgj 2018/07/06 - need sf6 and cfc field table entries due to 2 changes in generic_tracer_utils.F90
-###                  these code changes set require_src_info and requires_restart to true for each tracer
-##
-"namelists","ocean_mod","generic_sf6"
-sf6_requires_src_info = f
-sf6_requires_restart = f
-/
-"namelists","ocean_mod","generic_cfc"
-cfc11_requires_src_info = f
-cfc11_requires_restart = f
-
-cfc12_requires_src_info = f
-cfc12_requires_restart = f
 /
      </fieldTable>
     </input>
