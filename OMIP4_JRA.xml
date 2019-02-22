@@ -13,12 +13,12 @@ frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r5_
   <property name="RELEASE"        value="xanadu"/>                  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="downsample_r4"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"      value="20190131"/>              <!-- git tag date for MOM6 source code -->
   <!--property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/-->   <!-- git tag for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl"/>   <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
 
@@ -348,18 +348,20 @@ echo "Forcings file year = $forceyr"
 @ forceyrp1 = $forceyr + 1
 
 cd $work/INPUT/
-ln -sf $(JRA_dataset)/huss_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_huss.nc 
-ln -sf $(JRA_dataset)/prra_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010130-${forceyrp1}01010000.padded.nc JRA_prra.nc
-ln -sf $(JRA_dataset)/prsn_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010130-${forceyrp1}01010000.padded.nc JRA_prsn.nc
-ln -sf $(JRA_dataset)/psl_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_psl.nc
-ln -sf $(JRA_dataset)/rlds_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010130-${forceyrp1}01010000.padded.nc JRA_rlds.nc
-ln -sf $(JRA_dataset)/rsds_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010130-${forceyrp1}01010000.padded.nc JRA_rsds.nc
-ln -sf $(JRA_dataset)/tas_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_tas.nc
-ln -sf $(JRA_dataset)/uas_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_uas.nc
-ln -sf $(JRA_dataset)/vas_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_vas.nc
-ln -sf $(JRA_dataset)/friver_regrid2880x2240/friver_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}0101-${forceyrp1}0101.nc.regrid2880x2240.v20181114.padded.nc JRA_friver_2880x2240.nc
-ln -sf $(JRA_dataset)/friver_regrid1440x1080/friver_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}0101-${forceyrp1}0101.nc.regrid1440x1080.v20181114.padded.nc JRA_friver_1440x1080.nc
-ln -sf $(JRA_dataset)/friver_regrid720x576/friver_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}0101-${forceyrp1}0101.nc.regrid720x576.v20181114.padded.nc JRA_friver_720x576.nc
+#set fetch_cmd = 'ln -sf ' #This might be the cause of frequent crashes with HDF errors?!
+set fetch_cmd = 'cp ' 
+$fetch_cmd $(JRA_dataset)/huss_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_huss.nc 
+$fetch_cmd $(JRA_dataset)/prra_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010130-${forceyrp1}01010000.padded.nc JRA_prra.nc
+$fetch_cmd $(JRA_dataset)/prsn_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010130-${forceyrp1}01010000.padded.nc JRA_prsn.nc
+$fetch_cmd $(JRA_dataset)/psl_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_psl.nc
+$fetch_cmd $(JRA_dataset)/rlds_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010130-${forceyrp1}01010000.padded.nc JRA_rlds.nc
+$fetch_cmd $(JRA_dataset)/rsds_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010130-${forceyrp1}01010000.padded.nc JRA_rsds.nc
+$fetch_cmd $(JRA_dataset)/tas_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_tas.nc
+$fetch_cmd $(JRA_dataset)/uas_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_uas.nc
+$fetch_cmd $(JRA_dataset)/vas_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_vas.nc
+$fetch_cmd $(JRA_dataset)/friver_regrid2880x2240/friver_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}0101-${forceyrp1}0101.nc.regrid2880x2240.v20181114.padded.nc JRA_friver_2880x2240.nc
+$fetch_cmd $(JRA_dataset)/friver_regrid1440x1080/friver_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}0101-${forceyrp1}0101.nc.regrid1440x1080.v20181114.padded.nc JRA_friver_1440x1080.nc
+$fetch_cmd $(JRA_dataset)/friver_regrid720x576/friver_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}0101-${forceyrp1}0101.nc.regrid720x576.v20181114.padded.nc JRA_friver_720x576.nc
 
 cd $work
 
@@ -634,6 +636,169 @@ SIS_OVERRIDE_EOF
     </postProcess>
    </experiment>
 
+   <experiment name="OM4p125_IAF_csf_JRA55do1-3_r5_cycle2" inherit="OM4p125_IAF_csf_JRA55do1-3_r5_cycle1">
+    <input>
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <dataSource platform="$(platform)">/lustre/f2/scratch/oar.gfdl.ogrp-account/CMIP6/OMIP/xanadu_mom6_20181101/OM4p125_IAF_csf_JRA55do1-3_r5_cycle1/ncrc4.intel16f2-prod/archive/restart/20180101.tar</dataSource>
+     </dataFile>
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
+     </namelist>
+     <csh>
+        <![CDATA[
+
+if ( $currentSeg == 1 ) then
+   #Take current date from coupler_nml
+   if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
+endif
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override TOPO_EDITS_FILE = ""
+#override TIDEAMP_FILE = "tidal_amplitude.v20181107.nc"
+#override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
+#override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20180716.nc"
+#override SALT_RESTORE_FILE = "salt_restore_PHC2.2880x2240.v20180716.nc"
+#override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
+#override DT_THERM = 3600.0               !   [s] !reduced from 7200.0 for OM4_025
+#override BAD_VAL_SST_MIN = -5.0  ! decreased from default of -3.0 to avoid extremes in 1/8 degree model
+#override U_TRUNC_FILE = "MOM_U_truncations"
+#override V_TRUNC_FILE = "MOM_V_truncations"
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override DT_ICE_DYNAMICS = 450 !reduced from 1200.0 for OM4_025
+#override DT_RHEOLOGY = 25.0
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+SIS_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+   </experiment>
+   <experiment name="OM4p125_IAF_csf_JRA55do1-3_r5_cycle3" inherit="OM4p125_IAF_csf_JRA55do1-3_r5_cycle1">
+    <input>
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <dataSource platform="$(platform)">/lustre/f2/scratch/oar.gfdl.ogrp-account/CMIP6/OMIP/xanadu_mom6_20181101/OM4p125_IAF_csf_JRA55do1-3_r5_cycle2/ncrc4.intel16f2-prod/archive/restart/20180101.tar</dataSource>
+     </dataFile>
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
+     </namelist>
+     <csh>
+        <![CDATA[
+
+if ( $currentSeg == 1 ) then
+   #Take current date from coupler_nml
+   if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
+endif
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override TOPO_EDITS_FILE = ""
+#override TIDEAMP_FILE = "tidal_amplitude.v20181107.nc"
+#override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
+#override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20180716.nc"
+#override SALT_RESTORE_FILE = "salt_restore_PHC2.2880x2240.v20180716.nc"
+#override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
+#override DT_THERM = 3600.0               !   [s] !reduced from 7200.0 for OM4_025
+#override BAD_VAL_SST_MIN = -5.0  ! decreased from default of -3.0 to avoid extremes in 1/8 degree model
+#override U_TRUNC_FILE = "MOM_U_truncations"
+#override V_TRUNC_FILE = "MOM_V_truncations"
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override DT_ICE_DYNAMICS = 450 !reduced from 1200.0 for OM4_025
+#override DT_RHEOLOGY = 25.0
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+SIS_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+   </experiment>
+   <experiment name="OM4p125_IAF_csf_JRA55do1-3_r5_cycle4" inherit="OM4p125_IAF_csf_JRA55do1-3_r5_cycle1">
+    <input>
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <dataSource platform="$(platform)">/lustre/f2/scratch/oar.gfdl.ogrp-account/CMIP6/OMIP/xanadu_mom6_20181101/OM4p125_IAF_csf_JRA55do1-3_r5_cycle3/ncrc4.intel16f2-prod/archive/restart/20180101.tar</dataSource>
+     </dataFile>
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
+     </namelist>
+     <csh>
+        <![CDATA[
+
+if ( $currentSeg == 1 ) then
+   #Take current date from coupler_nml
+   if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
+endif
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override TOPO_EDITS_FILE = ""
+#override TIDEAMP_FILE = "tidal_amplitude.v20181107.nc"
+#override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
+#override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20180716.nc"
+#override SALT_RESTORE_FILE = "salt_restore_PHC2.2880x2240.v20180716.nc"
+#override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
+#override DT_THERM = 3600.0               !   [s] !reduced from 7200.0 for OM4_025
+#override BAD_VAL_SST_MIN = -5.0  ! decreased from default of -3.0 to avoid extremes in 1/8 degree model
+#override ENERGYSAVEDAYS = 1.0    ! decreased from 0.25 to save compute time (the default is supposed to be 1. but its not
+#override U_TRUNC_FILE = "MOM_U_truncations"
+#override V_TRUNC_FILE = "MOM_V_truncations"
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override DT_ICE_DYNAMICS = 450 !reduced from 1200.0 for OM4_025
+#override DT_RHEOLOGY = 25.0
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+SIS_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+   </experiment>
    <freInclude name="OM4p125_grid">
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">

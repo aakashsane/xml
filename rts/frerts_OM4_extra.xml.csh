@@ -3,8 +3,8 @@ set -v
 # Automatic Build and Run on Gaea using fre
 XML_FILE=OM4_extra.xml                   #The xml to test
 RELEASE='xanadu'                 #The FMS release to test
-MOM6_DATE='ESM4_v1.0.2'                     #The MOM6 tag date to test
-MOM6_GIT_TAG="ESM4\\\/v1.0.2" #"dev\\\/gfdl" #\\\/$MOM6_DATE" #The MOM6 tag to test
+MOM6_DATE='20190211'                     #The MOM6 tag date to test
+MOM6_GIT_TAG="dev\\\/gfdl" #\\\/$MOM6_DATE" #The MOM6 tag to test
 FRESTEM="${RELEASE}_mom6_${MOM6_DATE}"         #The FRESTEM to use
 GROUP="gfdl_f"
 #List of the experiments in the xml to run regression for
@@ -12,10 +12,10 @@ EXPERIMENT_LIST="MOM6_GOLD_SIS2_bergs MOM6_GOLD_SIS2_generics MOM6_GOLD_SIS2_ber
 #"MOM6_GOLD_SIS2_bergs MOM6_GOLD_SIS2_generics MOM6_GOLD_SIS2_bergs_ens2 MOM6_GOLD_SIS2_generics_ens2"
 
 DEBUGLEVEL='_0'
-PLATFORM="ncrc4.intel16"
+PLATFORM="ncrc4.intel16f2"
 TARGET="prod-openmp"
 REFERENCE_TAG='warsaw_201803_mom6_2018.04.11_answers'
-FRE_VERSION='bronx-13'
+FRE_VERSION='test'
 
 #########################################
 #Users do not need to edit anything below
@@ -24,7 +24,7 @@ FRE_VERSION='bronx-13'
 XML_DIR=. #${rootdir}/../
 #cd ${XML_DIR}
 pwd
-MYBIN=/ncrc/home2/Niki.Zadeh/nnz_tools/frerts_test
+MYBIN=/ncrc/home2/Niki.Zadeh/nnz_tools/frerts
 
 FRERTS_BATCH_ARGS="-p ${PLATFORM} -t ${TARGET} --release ${RELEASE} --fre_stem ${FRESTEM} --fre_version ${FRE_VERSION}  --mom_git_tag ${MOM6_GIT_TAG} --mom_date_tag ${MOM6_DATE} --debuglevel ${DEBUGLEVEL} --project ${GROUP} --interactive" 
 
