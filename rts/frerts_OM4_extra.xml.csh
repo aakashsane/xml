@@ -3,7 +3,7 @@ set -v
 # Automatic Build and Run on Gaea using fre
 XML_FILE=OM4_extra.xml                   #The xml to test
 RELEASE='xanadu'                 #The FMS release to test
-MOM6_DATE='20190211'                     #The MOM6 tag date to test
+MOM6_DATE='20190301'                     #The MOM6 tag date to test
 MOM6_GIT_TAG="dev\\\/gfdl" #\\\/$MOM6_DATE" #The MOM6 tag to test
 FRESTEM="${RELEASE}_mom6_${MOM6_DATE}"         #The FRESTEM to use
 GROUP="gfdl_f"
@@ -14,8 +14,8 @@ EXPERIMENT_LIST="MOM6_GOLD_SIS2_bergs MOM6_GOLD_SIS2_generics MOM6_GOLD_SIS2_ber
 DEBUGLEVEL='_0'
 PLATFORM="ncrc4.intel16f2"
 TARGET="prod-openmp"
-REFERENCE_TAG='warsaw_201803_mom6_2018.04.11_answers'
-FRE_VERSION='test'
+REFERENCE_TAG='xanadu_mom6_20190211'
+FRE_VERSION='bronx-13'
 
 #########################################
 #Users do not need to edit anything below

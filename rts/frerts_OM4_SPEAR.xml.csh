@@ -3,7 +3,7 @@ set -v
 # Automatic Build and Run on Gaea using fre
 XML_FILE=OM4_SPEAR.xml                     #The xml to test
 RELEASE='xanadu'                 #The FMS release to test
-MOM6_DATE='20190211'                     #The MOM6 tag date to test
+MOM6_DATE='20190301'                     #The MOM6 tag date to test
 MOM6_GIT_TAG="dev\\\/gfdl" #\\\/$MOM6_DATE" #The MOM6 tag to test
 FRESTEM="${RELEASE}_mom6_${MOM6_DATE}"         #The FRESTEM to use
 GROUP="gfdl_f"
@@ -13,7 +13,7 @@ EXPERIMENT_LIST="SPEAR_o1_CORE2_OM4"
 DEBUGLEVEL='_0'
 PLATFORM="ncrc4.intel16f2"
 TARGET="prod-openmp"
-REFERENCE_TAG='warsaw_201803_mom6_2018.04.11_answers'
+REFERENCE_TAG='xanadu_mom6_20190211'
 FRE_VERSION='test'
 
 #########################################
@@ -31,7 +31,7 @@ FRERTS_ARGS="--compile,-l,MOM6_SIS2_compile,--res_num,6,--fre_ops,-u;--no-transf
 #If you do not want to recompile
 #FRERTS_ARGS="--res_num,6,--fre_ops,-q;urgent;-u;--no-transfer;--no-combine-history,--do_frecheck,--reference_tag,${REFERENCE_TAG}" 
 #If you want only a "basic" regression to run
-#FRERTS_ARGS="--compile,--no_rts,--fre_ops,-u;--no-transfer;--no-combine-history,--do_frecheck,--reference_tag,${REFERENCE_TAG}" 
+#FRERTS_ARGS="--compile,-l,MOM6_SIS2_compile,--no_rts,--fre_ops,-u;--no-transfer;--no-combine-history,--do_frecheck,--reference_tag,${REFERENCE_TAG}" 
 
 ${MYBIN}/frerts_batch.csh -x ${XML_DIR}/${XML_FILE} ${FRERTS_BATCH_ARGS} --frerts_ops "${FRERTS_ARGS}" ${EXPERIMENT_LIST}
 

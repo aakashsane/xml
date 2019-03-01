@@ -3,7 +3,7 @@ set -v
 # Automatic Build and Run on Gaea using fre
 XML_FILE=OMIP4_CORE2.xml                   #The xml to test
 RELEASE='xanadu'                 #The FMS release to test
-MOM6_DATE='20181023'                     #The MOM6 tag date to test
+MOM6_DATE='20190301'                     #The MOM6 tag date to test
 MOM6_GIT_TAG="dev\\\/gfdl" #\\\/$MOM6_DATE" #The MOM6 tag to test
 FRESTEM="${RELEASE}_mom6_${MOM6_DATE}"         #The FRESTEM to use
 GROUP="gfdl_f"
@@ -11,10 +11,10 @@ GROUP="gfdl_f"
 EXPERIMENT_LIST="OM4p5_IAF_BLING_CFC_abio_csf_mle200 OM4p25_IAF_BLING_CFC_csf OM4p5_IAF_BLING_CFC_abio_csf_p25config"
 
 DEBUGLEVEL='_0'
-PLATFORM="ncrc4.intel16"
+PLATFORM="ncrc4.intel16f2"
 TARGET="prod-openmp"
-REFERENCE_TAG='warsaw_201803_mom6_2018.04.11_answers'
-FRE_VERSION='bronx-12'
+REFERENCE_TAG='xanadu_mom6_20190211'
+FRE_VERSION='bronx-13'
 
 #########################################
 #Users do not need to edit anything below
@@ -23,7 +23,7 @@ FRE_VERSION='bronx-12'
 XML_DIR=. #${rootdir}/../
 #cd ${XML_DIR}
 pwd
-MYBIN=/ncrc/home2/Niki.Zadeh/nnz_tools/frerts_test
+MYBIN=/ncrc/home2/Niki.Zadeh/nnz_tools/frerts
 
 FRERTS_BATCH_ARGS="-p ${PLATFORM} -t ${TARGET} --release ${RELEASE} --fre_stem ${FRESTEM} --fre_version ${FRE_VERSION}  --mom_git_tag ${MOM6_GIT_TAG} --mom_date_tag ${MOM6_DATE} --debuglevel ${DEBUGLEVEL} --project ${GROUP} --interactive" 
 

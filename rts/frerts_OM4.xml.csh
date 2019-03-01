@@ -14,7 +14,7 @@ DEBUGLEVEL='_0'
 PLATFORM="ncrc4.intel16"
 TARGET="prod-openmp"
 REFERENCE_TAG='warsaw_201803_mom6_2018.04.11_answers'
-FRE_VERSION='bronx-12'
+FRE_VERSION='bronx-13'
 
 #########################################
 #Users do not need to edit anything below
@@ -23,7 +23,7 @@ FRE_VERSION='bronx-12'
 XML_DIR=. #${rootdir}/../
 #cd ${XML_DIR}
 pwd
-MYBIN=/ncrc/home2/Niki.Zadeh/nnz_tools/frerts_test
+MYBIN=/ncrc/home2/Niki.Zadeh/nnz_tools/frerts
 
 FRERTS_BATCH_ARGS="-p ${PLATFORM} -t ${TARGET} --release ${RELEASE} --fre_stem ${FRESTEM} --fre_version ${FRE_VERSION}  --mom_git_tag ${MOM6_GIT_TAG} --mom_date_tag ${MOM6_DATE} --debuglevel ${DEBUGLEVEL} --project ${GROUP} --interactive" 
 
