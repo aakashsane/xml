@@ -145,7 +145,7 @@ Make the executable for ocean-ice experiments.
       </component>
 
 
-      <component name="sis2" paths="mom6/src/SIS2 ice_param" requires="fms mom6 icebergs" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
+      <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src ice_param" requires="fms mom6 icebergs" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
          <description domainName="Sea Ice SIS2" communityName="GFDL-SIS2" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
 	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
@@ -664,6 +664,7 @@ OVERRIDE_EOF
         <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O128']/node())"/> </run>
       </regression>
       <reference restart="$(REFERENCE)/archive/1x1m0d_64x1o/restart/00010201.tar"/>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_128x1o/restart/00010201.tar"/>
       <reference restart="$(archiveDir)/../../$(platform)-prod/archive/1x1m0d_128x1o/restart/00010201.tar"/>
    </runtime>
     <postProcess>
@@ -726,7 +727,6 @@ SIS_OVERRIDE_EOF
         ensemble_size=2
      </namelist>
       <namelist name="coupler_nml">
-       restart_interval = 0,0,5,0,0,0 !make restarts every 5 days
        months = $months,           
        days   = $days,             
        current_date = 1,1,1,0,0,0,
@@ -922,6 +922,11 @@ cd $work/INPUT
 
    </input>
 
+   <runtime>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_64x1o/restart/19700201.tar"/>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_128x1o/restart/19700201.tar"/>
+      <reference restart="$(archiveDir)/../../$(platform)-prod/archive/1x1m0d_128x1o/restart/19700201.tar"/>
+   </runtime>
    </experiment>
 
    <experiment name="MOM6_GOLD_SIS2_bling_broken_inputfile_dependencies" inherit="MOM6_GOLD_SIS2_bergs">
