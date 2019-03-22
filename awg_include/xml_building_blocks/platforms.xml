@@ -4,23 +4,23 @@
       <compiler type="intel" version="16.0.3.210" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
       <csh><![CDATA[
 module use -a /usw/eslogin/modulefiles-c3
         module load git
@@ -30,7 +30,7 @@ module use -a /usw/eslogin/modulefiles-c3
         $(append_to_setup_csh)
       ]]></csh>
     </platform>
-    <platform name="ncrc4.intel16f2">
+    <platform name="ncrc4.intel16noovlim">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="16.0.3.210" />
       <project>$(GFDL_GROUP)</project>
@@ -51,38 +51,7 @@ module use -a /usw/eslogin/modulefiles-c3
       <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
       <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
       <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f1/pdata/cmip6/datasets"/>
-      <csh><![CDATA[
-module use -a /usw/eslogin/modulefiles-c3
-        module load git
-        setenv KMP_STACKSIZE 512m
-        setenv NC_BLKSZ 1M
-        setenv F_UFMTENDIAN big
-        $(append_to_setup_csh)
-      ]]></csh>
-    </platform>
-    <platform name="ncrc4.intel16noovlim">
-      <freVersion>$(FRE_VERSION)</freVersion>
-      <compiler type="intel" version="16.0.3.210" />
-      <project>$(GFDL_GROUP)</project>
-      <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
-      </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
       <csh><![CDATA[
 module use -a /usw/eslogin/modulefiles-c3
         module load git
@@ -98,23 +67,23 @@ module use -a /usw/eslogin/modulefiles-c3
       <compiler type="intel" version="17.0.0.098" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
       <csh><![CDATA[
 module use -a /usw/eslogin/modulefiles-c3
         module load git
@@ -130,23 +99,23 @@ module use -a /usw/eslogin/modulefiles-c3
       <compiler type="intel" version="17.0.0.098" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
       <csh><![CDATA[
 module use -a /usw/eslogin/modulefiles-c3
         module load git
@@ -160,24 +129,23 @@ module use -a /usw/eslogin/modulefiles-c3
       <compiler type="intel" version="16.0.3.210" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
-
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
      
       <csh><![CDATA[
 module use -a /usw/eslogin/modulefiles-c3
@@ -193,24 +161,23 @@ module use -a /usw/eslogin/modulefiles-c3
       <compiler type="pgi" version="16.5.0" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
-     
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
       <csh><![CDATA[
 module use -a /usw/eslogin/modulefiles-c3
 #          source $MODULESHOME/init/csh
@@ -232,24 +199,23 @@ module use -a /usw/eslogin/modulefiles-c3
       <compiler type="gnu" version="5.3.0" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -fbacktrace"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
-     
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
       <csh><![CDATA[
 module use -a /usw/eslogin/modulefiles-c3
 #          source $MODULESHOME/init/csh
@@ -271,24 +237,23 @@ module use -a /usw/eslogin/modulefiles-c3
       <compiler type="cce" version="8.5.0" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
-     
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
       <csh><![CDATA[
 module use -a /usw/eslogin/modulefiles-c3
           setenv KMP_STACKSIZE 512m
@@ -305,24 +270,23 @@ module use -a /usw/eslogin/modulefiles-c3
       <compiler type="intel" version="15.0.2.164" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
-     
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
       <csh><![CDATA[
         module load git
         setenv KMP_STACKSIZE 512m
@@ -352,7 +316,25 @@ module use -a /usw/eslogin/modulefiles-c3
       <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
       <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
       <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f1/pdata/cmip6/datasets"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
+      <directory stem="$(FRE_STEM)">
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
       <csh><![CDATA[
         module load git
         setenv KMP_STACKSIZE 512m
@@ -366,24 +348,41 @@ module use -a /usw/eslogin/modulefiles-c3
       <compiler type="gnu" version="4.9.3" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -fbacktrace"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
-     
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
+      <directory stem="$(FRE_STEM)">
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
       <csh><![CDATA[
 #          source $MODULESHOME/init/csh
 #          module use -a /ncrc/home2/fms/local/modulefiles
@@ -405,24 +404,23 @@ module use -a /usw/eslogin/modulefiles-c3
       <compiler type="intel" version="14.0.2.144" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
-     
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
       <csh><![CDATA[
         module load git
         setenv KMP_STACKSIZE 512m
@@ -436,24 +434,23 @@ module use -a /usw/eslogin/modulefiles-c3
       <compiler type="pgi" version="15.3.0" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(FRE_STEM)</root>
-        <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <state>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CTMP/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
-      <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
-     
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
       <csh><![CDATA[
         module load git
         setenv KMP_STACKSIZE 512m
@@ -468,6 +465,37 @@ module use -a /usw/eslogin/modulefiles-c3
       <compiler type="cce" version="8.5.0" />
       <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
+        <root>/lustre/f2/dev/$USER/$(FRE_STEM)</root>
+        <scripts>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
+        <state>/lustre/f2/dev/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
+        <src>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/src</src>
+        <exec>/lustre/f2/dev/$USER/$(FRE_STEM)/$(name)/$(platform)-$(target)/exec</exec>
+        <archive>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
+        <stdout>/lustre/f2/scratch/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
+        <work>/lustre/f2/scratch//$USER/work/$(stem)/$FRE_JOBID</work>
+      </directory>
+      <property name="EXEC_ROOT"          value="/lustre/f2/dev/$USER/$(stem)"/>
+      <property name="F2003_FLAGS"        value=" -DINTERNAL_FILE_NML -g -traceback"/>
+      <property name="AWG_INPUT_HOME"     value="$(AWG_INPUT_HOME_GAEA)"/>
+      <property name="NB_ROOT"            value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
+      <property name="ARCHIVE_NNZ"        value="/lustre/f2/dev/Niki.Zadeh/archive"/>
+      <property name="REFERENCE"          value="/lustre/f2/dev/Niki.Zadeh/archive/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
+      <property name="FMS_ARCHIVE_ROOT"   value="$CDATA/fms"/>
+      <property name="CMIP6_ARCHIVE_ROOT" value="/lustre/f2/pdata/gfdl/cmip6/datasets"/>
+      <csh><![CDATA[
+          setenv KMP_STACKSIZE 512m
+          setenv NC_BLKSZ 1M
+          # MAIN_PROGRAM env is needed by the GNU compiler
+          setenv MAIN_PROGRAM coupler/coupler_main.o
+          module load git
+      ]]></csh>
+
+    </platform>
+    <platform name="ncrc4.intel16f1">
+      <freVersion>$(FRE_VERSION)</freVersion>
+      <compiler type="intel" version="16.0.3.210" />
+      <project>$(GFDL_GROUP)</project>
+      <directory stem="$(FRE_STEM)">
         <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
         <root>$CPERM/$USER/$(FRE_STEM)</root>
         <scripts>$CPERM/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
@@ -478,22 +506,21 @@ module use -a /usw/eslogin/modulefiles-c3
         <work>$CTMP/$USER/work/$(stem)/$FRE_JOBID</work>
       </directory>
       <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g "/>
+      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
       <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_GAEA)"/>
       <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/>
       <property name="ARCHIVE_NNZ"       value="/lustre/f1/unswept/Niki.Zadeh/archive"/>
       <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
       <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
       <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
-     
       <csh><![CDATA[
-          setenv KMP_STACKSIZE 512m
-          setenv NC_BLKSZ 1M
-          # MAIN_PROGRAM env is needed by the GNU compiler
-          setenv MAIN_PROGRAM coupler/coupler_main.o
-          module load git
+module use -a /usw/eslogin/modulefiles-c3
+        module load git
+        setenv KMP_STACKSIZE 512m
+        setenv NC_BLKSZ 1M
+        setenv F_UFMTENDIAN big
+        $(append_to_setup_csh)
       ]]></csh>
-
     </platform>
     <platform name="theia.intel">
       <freVersion>$(FRE_VERSION)</freVersion>
@@ -573,7 +600,7 @@ module use -a /usw/eslogin/modulefiles-c3
     <platform name="gfdl.ncrc4-intel16">
       <xi:include xpointer="xpointer(//freInclude/platform[@name='gfdl.default']/node())" />
     </platform>
-    <platform name="gfdl.ncrc4-intel16f2">
+    <platform name="gfdl.ncrc4-intel16f1">
       <xi:include xpointer="xpointer(//freInclude/platform[@name='gfdl.default']/node())" />
     </platform>
     <platform name="gfdl.ncrc4-intel17">

@@ -57,10 +57,8 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod SPEAR_o1_CORE2_OM4 -r basic
     
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16'])"/>
-    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16f2'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc3.intel16'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc4-intel16'])"/>
-    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc4-intel16f2'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc3-intel16'])"/>
   </setup>
 
@@ -77,22 +75,22 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod SPEAR_o1_CORE2_OM4 -r basic
    <property name="MY_LIBS"        value="$(EXEC_ROOT)/$(FMS_LIB_DIR)"/>
 
    <experiment name="MOM6_SIS2_compile">
-      <description>
+    <description>
 Make the executable for ocean-ice experiments.
-      </description>
-      <component name="fms" paths="shared" includeDir="$root/$(LIBS_ROOT)/src/shared/include">
-         <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid="NA"/>
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-            <codeBase version="$(RELEASE)"> shared.git </codeBase>
+    </description>
+    <component name="fms" paths="FMS/amip_interp FMS/column_diagnostics FMS/diag_integral FMS/fft FMS/horiz_interp FMS/memutils FMS/oda_tools FMS/sat_vapor_pres FMS/topography FMS/astronomy FMS/constants  FMS/diag_manager FMS/field_manager FMS/include FMS/monin_obukhov FMS/platform FMS/station_data FMS/tracer_manager FMS/axis_utils FMS/coupler FMS/drifters FMS/fms FMS/interpolator FMS/mosaic FMS/random_numbers FMS/time_interp FMS/tridiagonal FMS/block_control  FMS/data_override       FMS/exchange  FMS/fv3gfs  FMS/mpp FMS/time_manager">
+     <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid=""/>
+      <source versionControl="git" root="https://github.com/NOAA-GFDL">
+            <codeBase version="$(RELEASE)"> FMS.git </codeBase>
       	    <csh><![CDATA[
-              ( cd shared && git checkout $(SHARED_GIT_TAG) )
+              ( cd FMS && git checkout $(SHARED_GIT_TAG) )
               ]]>
             </csh>
          </source>
          <compile>
             <cppDefs>-Duse_libMPI -Duse_netCDF $(F2003_FLAGS) -DMAXFIELDMETHODS_=400</cppDefs>
          </compile>
-      </component>
+    </component>
 
     <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared/generic_tracers ocean_shared/mocsy/src">
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
@@ -163,9 +161,9 @@ Make the executable for ocean-ice experiments.
          </source>
       </component>
 
-      <component name="atmos_null" paths="atmos_null atmos_param/monin_obukhov atmos_param/diag_integral" requires="fms">
+      <component name="atmos_null" paths="atmos_null" requires="fms">
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-           <codeBase version="$(RELEASE)"> atmos_null.git atmos_param.git </codeBase>
+           <codeBase version="$(RELEASE)"> atmos_null.git </codeBase>
          </source>
          <compile>
             <cppDefs>$(F2003_FLAGS) </cppDefs>
@@ -173,13 +171,24 @@ Make the executable for ocean-ice experiments.
       </component>
       <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6 icebergs">
          <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
             <codeBase version="$(RELEASE)"> coupler.git </codeBase>
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
          </compile>
       </component>
+<!-- post xanadu
+      <component name="coupler" paths="coupler/shared coupler/full" requires="fms land_null atmos_null sis2 mom6 icebergs">
+         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
+            <codeBase version="$(RELEASE)"> coupler.git </codeBase>
+         </source>
+         <compile>
+            <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+         </compile>
+      </component>
+-->
    </experiment>
 
    <experiment name="MOM6_SIS2_compile_symmetric" inherit="MOM6_SIS2_compile">
@@ -211,59 +220,13 @@ Make the executable for ocean-ice experiments.
          </compile>
       </component>
 
-      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6_symmetric icebergs">
+      <component name="coupler" paths="coupler/shared coupler/full" requires="fms land_null atmos_null sis2 mom6_symmetric icebergs">
          <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
             <codeBase version="$(RELEASE)"> coupler.git </codeBase>
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-         </compile>
-      </component>
-   </experiment>
-   <experiment name="MOM6_SIS2_compile_static_90x45" inherit="MOM6_SIS2_compile">
-      <component paths="shared" name="fms" includeDir="$root/$(LIBS_ROOT)/src/shared/include">
-         <library path="$(MY_LIBS)/fms/libfms.a" headerDir="$(MY_LIBS)/fms"/>
-      </component>
-      <component name="land_null" paths="land_null" requires="fms">
-         <library path="$(MY_LIBS)/land_null/libland_null.a" headerDir="$(MY_LIBS)/land_null"/>
-      </component>
-      <component name="atmos_null" paths="atmos_null atmos_param" requires="fms">
-          <library path="$(MY_LIBS)/atmos_null/libatmos_null.a" headerDir="$(MY_LIBS)/atmos_null"/>
-      </component>
-      <component paths="ocean_shared" requires="fms" name="ocean_shared">
-         <library path="$(MY_LIBS)/ocean_shared/libocean_shared.a" headerDir="$(MY_LIBS)/ocean_shared"/>
-      </component> 
-      <component paths="icebergs" requires="fms" name="icebergs">
-         <library path="$(MY_LIBS)/icebergs/libicebergs.a" headerDir="$(MY_LIBS)/icebergs"/>
-      </component> 
-      <component paths="sis2" requires="fms icebergs" name="sis2">
-         <library path="$(MY_LIBS)/sis2/libsis2.a" headerDir="$(MY_LIBS)/sis2"/>
-      </component>
-      <component name="mom6_static_90x45" requires="fms ocean_shared" paths="$root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h $root/$(LIBS_ROOT)/src/mom6/src/MOM6/config_src/coupled_driver $root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/*/ $root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/*/*/">
-       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
-        <csh><![CDATA[
-          \rm -rf ocean_null
-          echo "No need to checkout any new source code for this component!" 
-          /bin/cp  $root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory.h $root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
-          /bin/sed "s/NIPROC_ 32/NIPROC_ 90/g" -i $root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
-          /bin/sed "s/NJPROC_ 18/NJPROC_ 45/g" -i $root/$(LIBS_ROOT)/src/mom6/ice_ocean_SIS2/OM4_025/MOM_memory_90x45.h 
-        ]]></csh>
-         </source>
-         <compile>
-            <cppDefs><![CDATA[ $(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-         </compile>
-      </component>
-
-      
-      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6_static_90x45 ocean_shared icebergs">
-         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-            <codeBase version="$(RELEASE)"> coupler.git </codeBase>
-         </source>
-         <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
          </compile>
       </component>
    </experiment>
@@ -353,7 +316,7 @@ endif
     </input>
    </freInclude>
 
-<experiment name="SPEAR_o1_CORE2_OM4" inherit="MOM6_SIS2_compile_symmetric">
+<experiment name="SPEAR_o1_CORE2_OM4" inherit="MOM6_SIS2_compile">
   <description>
  For Core2: change ocean_albedo, monin obukhov 
  Recompile without land and atmos
@@ -654,7 +617,6 @@ EOF
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
-        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
      </dataFile>
 
@@ -686,7 +648,6 @@ EOF
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
-        <dataSource site="olcf">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
       </dataFile>
       <diagTable order="append">

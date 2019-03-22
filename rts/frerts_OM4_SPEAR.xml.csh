@@ -3,18 +3,18 @@ set -v
 # Automatic Build and Run on Gaea using fre
 XML_FILE=OM4_SPEAR.xml                     #The xml to test
 RELEASE='xanadu'                 #The FMS release to test
-MOM6_DATE='20190301'                     #The MOM6 tag date to test
-MOM6_GIT_TAG="dev\\\/gfdl" #\\\/$MOM6_DATE" #The MOM6 tag to test
+MOM6_DATE='om4_v1.0.5'                     #The MOM6 tag date to test
+MOM6_GIT_TAG="om4\\\/v1.0.5" #\\\/$MOM6_DATE" #The MOM6 tag to test
 FRESTEM="${RELEASE}_mom6_${MOM6_DATE}"         #The FRESTEM to use
 GROUP="gfdl_f"
 #List of the experiments in the xml to run regression for
 EXPERIMENT_LIST="SPEAR_o1_CORE2_OM4"
 
 DEBUGLEVEL='_0'
-PLATFORM="ncrc4.intel16f2"
-TARGET="prod-openmp"
+PLATFORM="ncrc4.intel16"
+TARGET="prod"
 REFERENCE_TAG='xanadu_mom6_20190211'
-FRE_VERSION='test'
+FRE_VERSION='bronx-14'
 
 #########################################
 #Users do not need to edit anything below
@@ -27,7 +27,8 @@ MYBIN=/ncrc/home2/Niki.Zadeh/nnz_tools/frerts
 
 FRERTS_BATCH_ARGS="-p ${PLATFORM} -t ${TARGET} --release ${RELEASE} --fre_stem ${FRESTEM} --fre_version ${FRE_VERSION}  --mom_git_tag ${MOM6_GIT_TAG} --mom_date_tag ${MOM6_DATE} --debuglevel ${DEBUGLEVEL} --project ${GROUP} --interactive" 
 
-FRERTS_ARGS="--compile,-l,MOM6_SIS2_compile,--res_num,6,--fre_ops,-u;--no-transfer;--no-combine-history,--do_frecheck,--reference_tag,${REFERENCE_TAG}" 
+#FRERTS_ARGS="--compile,-l,MOM6_SIS2_compile,--res_num,6,--fre_ops,-u;--no-transfer;--no-combine-history,--do_frecheck,--reference_tag,${REFERENCE_TAG}" 
+FRERTS_ARGS="--compile,--res_num,6,--fre_ops,-u;--no-transfer;--no-combine-history,--do_frecheck,--reference_tag,${REFERENCE_TAG}" 
 #If you do not want to recompile
 #FRERTS_ARGS="--res_num,6,--fre_ops,-q;urgent;-u;--no-transfer;--no-combine-history,--do_frecheck,--reference_tag,${REFERENCE_TAG}" 
 #If you want only a "basic" regression to run

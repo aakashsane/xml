@@ -3,18 +3,18 @@ set -v
 # Automatic Build and Run on Gaea using fre
 XML_FILE=OMIP4_CORE2_warsaw_201803.xml #OMIP4_CORE2.xml                   #The xml to test
 RELEASE='warsaw_201803'                 #The FMS release to test
-MOM6_DATE='ESM4_v1.0.2'                     #The MOM6 tag date to test
-MOM6_GIT_TAG="ESM4\\\/v1.0.2" #\\\/$MOM6_DATE" #The MOM6 tag to test
+MOM6_DATE='2018.04.11'                     #The MOM6 tag date to test
+MOM6_GIT_TAG="dev\\\/gfdl\\\/${MOM6_DATE}" #\\\/$MOM6_DATE" #The MOM6 tag to test
 FRESTEM="${RELEASE}_mom6_${MOM6_DATE}"         #The FRESTEM to use
 GROUP="gfdl_f"
 #List of the experiments in the xml to run regression for
-EXPERIMENT_LIST="OM4p5_IAF_BLING_CFC_abio_csf_mle200 OM4p25_IAF_BLING_CFC_csf OM4p25_IAF_BLING_csf_rerun"
+EXPERIMENT_LIST="OM4p25_IAF_BLING_csf_rerun OM4p5_IAF_BLING_CFC_abio_csf_mle200"
 # OM4p5_IAF_BLING_CFC_abio_csf_p25config"
 
 DEBUGLEVEL='_0'
 PLATFORM="ncrc4.intel16"
 TARGET="prod"
-REFERENCE_TAG='warsaw_201803_mom6_2018.04.06'
+REFERENCE_TAG='warsaw_201803_mom6_2018.04.11_answers'
 FRE_VERSION='bronx-14'
 
 #########################################
