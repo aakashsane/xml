@@ -13,8 +13,8 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
   <property name="RELEASE"        value="warsaw_201803"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/> <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="2018.04.11"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>   <!-- git tag for MOM6 source code -->
+  <property name="MOM6_DATE"      value="OMIP1_v1.0.0"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="OMIP1/v1.0.0"/>              <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -674,6 +674,52 @@ $(ARCHIVE_NNZ)/input/xanadu/OM4p125_grid/mask_table.6368.160x120
    <!--***************************** 1/4 degree experiments        ****************************-->
    <!--****************************************************************************************-->
 											      
+   <experiment name="OM4p25_IAF_BLING_csf_rerun_hifreqdiag_2003-2008" inherit="OM4p25_IAF_BLING_csf_rerun">
+    <input>								      
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override','INPUT/SIS_diurnal'
+     </namelist>
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <dataSource platform="$(platform)">/lustre/f2/dev/oar.gfdl.ogrp-account/archive/input/warsaw/OM4p25_IAF_BLING_csf_rerun_restart_20030101_combined.tar</dataSource>
+     </dataFile>
+
+     <diagTable>
+$name
+$baseDate
+#
+"ice_5daily",    5, "days", 1, "days", "time"
+"ice_model", "siconc",  "siconc"    "ice_5daily", "all", "none", "none", 2
+"ice_model", "sisnconc","sisnconc", "ice_5daily", "all", "none", "none", 2
+"ice_model", "MIB"     ,"MIB",      "ice_5daily", "all", "none", "none", 2
+#
+"ocean_5daily",  5, "days", 1, "days", "time"
+"ocean_model",   "zos",              "zos",                "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "thetao",           "thetao",             "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "so",               "so",                 "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "vintage",          "vintage",            "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "uh",               "uh",                 "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "vh",               "vh",                 "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "e",                "e",                  "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "MLD_003",          "MLD_003",            "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "tauuo",            "tauuo",              "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "tauvo",            "tauvo",              "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "net_heat_coupler", "net_heat_coupler",   "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "Kd_interface",     "Kd_interface",       "ocean_5daily",         "all", "none", "none",2
+     </diagTable>
+    </input>
+   </experiment>
    <experiment name="OM4p25_IAF_BLING_csf_rerun" inherit="OM4p25_IAF_BLING_CFC_csf">
     <publicMetadata DBswitch="$(MDBIswitch)">
       <!-- Realization tag -->
