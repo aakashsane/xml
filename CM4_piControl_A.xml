@@ -71,10 +71,10 @@ NOTES:
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="xanadu"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
-  <property name="MOM6_DATE"      value="om4_v1.0.1"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="om4/v1.0.1"/>              <!-- git tag for MOM6 source code -->
+  <property name="MOM6_DATE"      value="om4_v1.0.5"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="om4/v1.0.5"/>              <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>              <!-- git tag for LAND_LAD2 source code -->  
   <property name="FRE_STEM"       value="$(RELEASE)_$(MOM6_DATE)"/> <!-- customize as needed -->
@@ -97,7 +97,7 @@ NOTES:
   <property name="EXP_CPLD_END"     value="0100"/> <!--simulation end   year--> 
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
-  <property name="FRE_VERSION"     value="bronx-13"/> <!-- fre version to be used -->
+  <property name="FRE_VERSION"     value="bronx-15"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
   <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
@@ -350,7 +350,15 @@ NOTES:
    </freInclude>
    <freInclude name="resourceparams_A216x2_O648">
 	     <resources jobWallclock="01:00:00">
-               <atm ranks="216" threads="2"    layout = "3,12"   io_layout = "1,4" />
+               <atm ranks="216" threads="2" hyperthread="off"   layout = "3,12"   io_layout = "1,4" />
+	       <lnd                            layout = "3,12"   io_layout = "1,4" />
+	       <ice                            layout = "72,3"   io_layout = "1,3" />
+	       <ocn ranks="648" threads="1"    layout = "18,36"  io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A216x4h_O648">
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="216" threads="4" hyperthread="on"   layout = "3,12"   io_layout = "1,4" />
 	       <lnd                            layout = "3,12"   io_layout = "1,4" />
 	       <ice                            layout = "72,3"   io_layout = "1,3" />
 	       <ocn ranks="648" threads="1"    layout = "18,36"  io_layout = "1,4" mask_table="MOM_mask_table"/>
@@ -594,7 +602,7 @@ NOTES:
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A432x2_O2997">
-	     <resources jobWallclock="01:30:00">
+	     <resources jobWallclock="02:30:00">
                <atm ranks="432" threads="2"    layout = "3,24"   io_layout = "1,4" />
                <lnd                            layout = "3,24"   io_layout = "1,4" />
                <ice                            layout = "144,3"  io_layout = "1,3" />
@@ -1615,40 +1623,12 @@ cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
 #override LAYOUT    = $ice_layout
 SIS_LAYOUT_EOF
 
-#Handle concurrent radiation case
-
-set do_concurrent_radiation = `awk '/do_concurrent_radiation/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-set radiation_nthreads = `awk '/radiation_nthreads/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-set atmos_nthreads = $atm_threads
-if ( $do_concurrent_radiation == ".true." ) then
-   @ atmos_nthreads -= $radiation_nthreads
-   set atm_threads = $atmos_nthreads
-   setenv MALLOC_CHECK_ 5
-   setenv MPICH_GNI_NDREG_LAZYMEM disabled
-   alias runCommand /usr/bin/time -p `which aprun` -n $atmos_npes -d $atmos_nthreads ./$executable:t  
-endif
 
 #timing runs show that nyblocks = 2 * atm_threads perform better than nyblocks = atm_threads
 set nxblock = 1
 set nyblock = $atm_threads
 @ nyblock = 2 * $atm_threads
 
-#Handle hyperthreaded cases
-set atmos_nthreads = $atm_threads
-set atm_hythr = 1
-set ocn_hythr = 1
-
-set use_hyper_thread = `awk '/use_hyper_thread/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-if ( $use_hyper_thread == ".T." || $use_hyper_thread == ".true." ) then
-   @ atmos_nthreads *= 2
-   set atm_hythr = 2
-   if ( $tot_ocn_ranks == 0 ) then
-      alias runCommand /usr/bin/time -p `which aprun` -j2 -d $atmos_nthreads -n $atm_ranks ./$executable:t
-   else
-      alias runCommand /usr/bin/time -p `which aprun` -j2 -d $atmos_nthreads -n $atm_ranks ./$executable:t : -n $ocn_ranks -j1 -d 1 ./$executable:t
-   endif
-endif
-set atmos_threads = $atmos_nthreads
 
 ###The following vars are set for the timing database ingestion tool only and are not necessary for a successful run
 set OCN_MASK_TABLE  =  $ocn_mask_table
@@ -1666,9 +1646,6 @@ set land_io_layout = $lnd_io_layout
 set nxblocks = $nxblock
 #set dummy  = `awk '/nyblocks/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
 set nyblocks = $nyblock
-set use_hyperthread = $use_hyper_thread
-set atm_hyperthread = $atm_hythr
-set ocn_hyperthread = $ocn_hythr
 
 #Add required BLING gas flux fields if they do not exist in the restarts 
 #to be able to start from older runs that did not have these gas fluxes
@@ -1702,9 +1679,11 @@ if ( $currentSeg == 1 ) then
       if ($status != 0) then
         ncap -O -s 'co2_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
       endif
-      ncdump -h $resfile | grep nh4_flux_flux0_ice > /dev/null
+   end
+   foreach resfile ( `ls $work/ice_ocmip_sf6.res.nc*` ) 
+      ncdump -h $resfile | grep sf6_flux_flux0_ice > /dev/null
       if ($status != 0) then
-        ncap -O -s 'nh4_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+        ncap -O -s 'sf6_flux_flux0_ice=sf6_flux_flux_ice*0.0+0.001' $resfile $resfile
       endif
    end
    #
@@ -1714,6 +1693,10 @@ if ( $currentSeg == 1 ) then
       ncdump -h $resfile | grep o2_flux_sc_no_ocn > /dev/null
       if ($status != 0) then
         ncap -O -s 'o2_flux_sc_no_ocn=o2_flux_alpha_ocn*0.0+660.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_sc_no_ocn > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_sc_no_ocn=co2_flux_alpha_ocn*0.0+660.0' $resfile $resfile
       endif
       ncdump -h $resfile | grep co2_flux_sc_no_ocn > /dev/null
       if ($status != 0) then
@@ -3242,9 +3225,9 @@ removeatmos_tracer co2
         do_ocean = .true.
         ocean_npes = $ocn_ranks  
         atmos_npes = $atm_ranks 
-        atmos_nthreads = $atmos_threads
+        atmos_nthreads = $atm_threads
         ncores_per_node = $(NCORE_PER_NODE)
-        use_hyper_thread=.T.
+        use_hyper_thread=$atm_hyperthread
       </namelist>
 
       <namelist name="icebergs_nml">
@@ -3583,6 +3566,11 @@ MOM_OVERRIDE_EOF
   	<run days="2"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O2304']/node())"/> </run>
   	<run days="2"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O2304']/node())"/> </run>
         <run days="2"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1152']/node())"/> </run>
+      </regression>
+      <regression name="debug">
+        <run days="2"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+        <run days="2"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4h_O648']/node())"/> </run>
+        <run days="1 1"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4h_O648']/node())"/> </run>
       </regression>
       <regression name="timing">
         <run months="1"> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O2997']/node())"/> </run>

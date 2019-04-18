@@ -12,11 +12,11 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod SPEAR_o1_CORE2_OM4 -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <property name="RELEASE"        value="warsaw_201710"/>           <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="xanadu"/>           <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/> <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="20171222"/>                <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="om4/v1.0.4"/>              <!-- git tag for MOM6 source code -->
+  <property name="MOM6_DATE"      value="om4_v1.0.5"/>       <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="om4/v1.0.5"/>       <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -30,7 +30,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod SPEAR_o1_CORE2_OM4 -r basic
    <property name="CHUNK_LENGTH_B" value="20yr"/>
    <!--Start year of PP -->
    <property name="PP_START_YEAR"  value="1948"/>      <!--Use these values for CORE2 dynamic forcing runs -->
-   <property name="FRE_VERSION"     value="bronx-13"/> <!-- fre version to be used -->
+   <property name="FRE_VERSION"     value="test"/> <!-- fre version to be used -->
    <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
    <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
    <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
@@ -41,11 +41,11 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod SPEAR_o1_CORE2_OM4 -r basic
 
 
    <!--Users need not change the following properties -->
-   <property name="reference_tag"  value="xanadu_mom6_20190211"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
+   <property name="reference_tag"  value="xanadu_mom6_om4_v1.0.5"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
-   <property name="DEBUGLEVEL"   value=""/>
+   <property name="DEBUGLEVEL"   value="_t4"/>
    <property name="STATIC"       value=""/>  
 
 
@@ -259,24 +259,11 @@ cat >> $HOME/frejobs_stdout <<EOF_frejobs
 $stdoutDir/$FRE_JOBID
 EOF_frejobs
 
-#Handle hyperthreaded cases
-set ocean_nthreads = $ocn_threads
-set use_hyper_thread = ".F."
-set use_hyper_thread = `awk '/use_hyper_thread/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-
-if ( $use_hyper_thread == ".T." || $use_hyper_thread == ".true." ) then
-   @ ocean_nthreads *= 2
-   alias runCommand /usr/bin/time -p `which aprun` -n $ocn_ranks -j2 -d $ocean_nthreads ./$executable:t
-endif
-
-set ocn_hyperthread = $use_hyper_thread
-
-
 cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
 #override IO_LAYOUT = $ocn_io_layout
 #override LAYOUT    = $ocn_layout
 #override MASKTABLE = $ocn_mask_table
-#override OCEAN_OMP_THREADS = $ocean_nthreads
+#override OCEAN_OMP_THREADS = $ocn_threads
 MOM_LAYOUT_EOF
 
 cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF

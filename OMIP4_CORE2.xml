@@ -13,10 +13,9 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
   <property name="RELEASE"        value="xanadu"/>                  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="20190225_downsample_r4"/>              <!-- git tag date for MOM6 source code -->
-  <!--property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/-->   <!-- git tag for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl"/>   <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="MOM6_DATE"      value="ESM4_v1.0.2_omipfix"/>       <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="ESM4/v1.0.2"/>       <!-- git tag for MOM6 source code -->
+  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/>     <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
@@ -29,7 +28,7 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
    <property name="CHUNK_LENGTH_B" value="20yr"/>
    <!--Start year of PP -->
    <property name="PP_START_YEAR"  value="1708"/>      <!--Use these values for CORE2 dynamic forcing runs -->
-   <property name="FRE_VERSION"     value="bronx-13"/> <!-- fre version to be used -->
+   <property name="FRE_VERSION"     value="bronx-15"/> <!-- fre version to be used -->
    <property name="ProjectID"       value="CMIP6"/>      <!-- database top level -->
    <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
    <property name="MDBIswitch"      value="off"/>       <!-- on/off switch for MDBI database -->
@@ -194,7 +193,7 @@ Make the executable for ocean-ice experiments.
 
       <component name="atmos_null" paths="atmos_null" requires="fms">
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-           <codeBase version="$(RELEASE)"> atmos_null.git atmos_param.git </codeBase>
+           <codeBase version="$(RELEASE)"> atmos_null.git </codeBase>
          </source>
          <compile>
             <cppDefs>$(F2003_FLAGS) </cppDefs>
@@ -250,24 +249,12 @@ cat >> $HOME/frejobs_stdout <<EOF_frejobs
 $stdoutDir/$FRE_JOBID
 EOF_frejobs
 
-#Handle hyperthreaded cases
-set ocean_nthreads = $ocn_threads
-set use_hyper_thread = ".F."
-set use_hyper_thread = `awk '/use_hyper_thread/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-
-if ( $use_hyper_thread == ".T." || $use_hyper_thread == ".true." ) then
-   @ ocean_nthreads *= 2
-   alias runCommand /usr/bin/time -p `which aprun` -n $ocn_ranks -j2 -d $ocean_nthreads ./$executable:t
-endif
-
-set ocn_hyperthread = $use_hyper_thread
-
 
 cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
 #override IO_LAYOUT = $ocn_io_layout
 #override LAYOUT    = $ocn_layout
 #override MASKTABLE = $ocn_mask_table
-#override OCEAN_OMP_THREADS = $ocean_nthreads
+#override OCEAN_OMP_THREADS = $ocn_threads
 MOM_LAYOUT_EOF
 
 cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
@@ -302,6 +289,89 @@ if ( $?flagOutputXferOn && $?flagOutputPostProcessOn && $currentSeg == 1 ) then
   endif
 endif
 
+#Add required BLING gas flux fields if they do not exist in the restarts 
+#to be able to start from older runs that did not have these gas fluxes
+if ( $currentSeg == 1 ) then 
+   #The following values for kw and deltap fields are arbitrary and do not matter, the fields just need to exist!
+   #These kw and deltap fields do not need to be restarted as they are calculated from alpha and csurf values!    
+   #This has to be fixed in the source code in future with a new coupler flux design.
+   foreach resfile ( `ls $work/INPUT/ice_bling.res.nc*` ) 
+      ncdump -h $resfile | grep o2_flux_deltap_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_deltap_ice=co2_flux_flux_ice*0.0+1000.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_deltap_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_deltap_ice=co2_flux_flux_ice*0.0+1000.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep o2_flux_kw_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_kw_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_kw_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_kw_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      #gross flux0
+      ncdump -h $resfile | grep o2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep nh4_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'nh4_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   foreach resfile ( `ls $work/INPUT/ice_ocmip_sf6.res.nc*` ) 
+      ncdump -h $resfile | grep sf6_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'sf6_flux_flux0_ice=sf6_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   foreach resfile ( `ls $work/INPUT/ice_ocmip2_cfc.res.nc*` ) 
+      ncdump -h $resfile | grep cfc11_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'cfc11_flux_flux0_ice=cfc11_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep cfc12_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'cfc12_flux_flux0_ice=cfc12_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   foreach resfile ( `ls $work/INPUT/ice_ocmip_abiotic.res.nc*` ) 
+      ncdump -h $resfile | grep ab14co2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'ab14co2_flux_flux0_ice=ab14co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep abco2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'abco2_flux_flux0_ice=abco2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   #
+   #Add Schmidt number to restart if it does not exist so that the model can use old restart files. 
+   #A value of 660 make it consistent with the old ( "non-generic") formulation that did not have a separate sc_no
+   foreach resfile ( `ls $work/INPUT/ocean_bling_airsea_flux.res.nc*` )
+      ncdump -h $resfile | grep o2_flux_sc_no_ocn > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_sc_no_ocn=o2_flux_alpha_ocn*0.0+660.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_sc_no_ocn > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_sc_no_ocn=co2_flux_alpha_ocn*0.0+660.0' $resfile $resfile
+      endif
+   end
+
+  
+   #Xanadu has a bug fix for airsea flux restart checksums and they don't match the old checksums in the files
+   chmod +w $work/INPUT/ocean_bling_airsea_flux.res.nc
+   ncatted -O -a checksum,,d,, $work/INPUT/ocean_bling_airsea_flux.res.nc
+
+endif
 
       ]]></csh>
     </input>
@@ -430,7 +500,7 @@ READ_TIDEAMP = True
        concurrent = .false.
        use_lag_fluxes=.false. 
        atmos_nthreads = $atm_threads
-       ocean_nthreads = $ocean_nthreads
+       ocean_nthreads = $ocn_threads
      </namelist>
      <namelist name="xgrid_nml">
        make_exchange_reproduce = .true.
@@ -494,10 +564,15 @@ $baseDate
      </diagTable>
 
      <!--A set of downsampled diagnotics-->
+<!--
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6.d2sample</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6.d2sample</dataSource>
      </dataFile>
+-->
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table.MOM6.d2sample</dataSource>
+      </dataFile>
 
      <!--data_tables and data files-->
      <!--CORE2 forcing-->
@@ -682,6 +757,52 @@ $(ARCHIVE_NNZ)/input/xanadu/OM4p125_grid/mask_table.6368.160x120
    <!--***************************** 1/4 degree experiments        ****************************-->
    <!--****************************************************************************************-->
 											      
+   <experiment name="OM4p25_IAF_BLING_CFC_csf_hifreqdiag_2003-2008" inherit="OM4p25_IAF_BLING_CFC_csf">
+    <input>								      
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override','INPUT/SIS_diurnal'
+     </namelist>
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/warsaw/OM4p25_IAF_BLING_csf_rerun_restart_20030101_combined.tar</dataSource>
+     </dataFile>
+
+     <diagTable>
+$name
+$baseDate
+#
+"ice_5daily",    5, "days", 1, "days", "time"
+"ice_model", "siconc",  "siconc"    "ice_5daily", "all", "none", "none", 2
+"ice_model", "sisnconc","sisnconc", "ice_5daily", "all", "none", "none", 2
+"ice_model", "MIB"     ,"MIB",      "ice_5daily", "all", "none", "none", 2
+#
+"ocean_5daily",  5, "days", 1, "days", "time"
+"ocean_model",   "zos",              "zos",                "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "thetao",           "thetao",             "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "so",               "so",                 "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "vintage",          "vintage",            "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "uh",               "uh",                 "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "vh",               "vh",                 "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "e",                "e",                  "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "MLD_003",          "MLD_003",            "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "tauuo",            "tauuo",              "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "tauvo",            "tauvo",              "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "net_heat_coupler", "net_heat_coupler",   "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "Kd_interface",     "Kd_interface",       "ocean_5daily",         "all", "none", "none",2
+     </diagTable>
+    </input>
+   </experiment>
    <experiment name="OM4p25_IAF_BLING_CFC_csf" inherit="MOM6_SIS2_compile$(MODIFIER)">
     <description>
 global 1/4 degree z ocean_ice experiment 
@@ -747,7 +868,7 @@ CORE2 dynamic inter_annual forcing data
        concurrent = .false.
        use_lag_fluxes=.false. 
        atmos_nthreads = $atm_threads
-       ocean_nthreads = $ocean_nthreads
+       ocean_nthreads = $ocn_threads
      </namelist>
      <namelist name="generic_tracer_nml">
        do_generic_tracer=.true.
@@ -1131,6 +1252,112 @@ $baseDate
    <!--***************************** 1/2 degree experiments        ****************************-->
    <!--****************************************************************************************-->
 											      
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
+    <input>								      
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override','INPUT/SIS_diurnal'
+     </namelist>
+<!--
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.20080101.tar</dataSource>
+      </dataFile>
+-->
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/OM4p5_IAF_BLING_CFC_abio_csf_mle200.20080101_combined.tar</dataSource>
+      </dataFile>
+    </input>
+   </experiment>
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
+    <input>								      
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override','INPUT/SIS_diurnal'
+     </namelist>
+<!--
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.20080101.tar</dataSource>
+      </dataFile>
+
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/OM4p5_IAF_BLING_CFC_abio_csf_mle200.20080101_combined.tar</dataSource>
+      </dataFile>
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/gfdl/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.19980101.combined.tar</dataSource>
+      </dataFile>
+-->
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.19980101.tar</dataSource>
+      </dataFile>
+     <!--MOM_overrides-->
+     <csh>
+       <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = True
+GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+#override DEBUG  = True
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+#override ADD_DIURNAL_SW = True 
+#override ICE_STATS_INTERVAL = 30
+#override DEBUG  = True
+SIS_OVERRIDE_EOF
+
+####################################################################################################
+##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
+##
+if ( $currentSeg == 1 ) then
+  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+      ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kd_turb,Kd_shear || exit 1
+      endif
+
+      ncdump -h $resfile | grep 'double Kv_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kv_turb,Kv_shear || exit 1
+      endif
+  end
+
+endif
+     ]]></csh>
+    </input>
+   </experiment>
+
    <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200" inherit="MOM6_SIS2_compile$(MODIFIER)">
    <publicMetadata DBswitch="$(MDBIswitch)">
       <!-- Realization tag -->
@@ -1193,7 +1420,7 @@ $baseDate
        concurrent = .false.
        use_lag_fluxes=.false.
        atmos_nthreads = $atm_threads
-       ocean_nthreads = $ocean_nthreads
+       ocean_nthreads = $ocn_threads
      </namelist>
      <namelist name="generic_tracer_nml">
        do_generic_tracer=.true.
@@ -1347,6 +1574,10 @@ SIS_OVERRIDE_EOF
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5_production']/node())"/>
       </production>
 
+      <regression name="basic_prod">
+        <run months="1" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5']/node())"/> </run>
+        <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5']/node())"/> </run>
+      </regression>
       <regression name="basic">
         <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1057p5']/node())"/> </run>
       </regression>
@@ -1360,6 +1591,9 @@ SIS_OVERRIDE_EOF
       <regression name="debug">
         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
         <run days="1 1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
+      </regression>
+      <regression name="debug_prod">
+        <run days="1" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5']/node())"/> </run>
       </regression>
 
       <regression name="rts2">
@@ -2153,7 +2387,9 @@ biomass_p_valid_min = 0.0
          #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
          #This causes problems for ferret and python tools for analysis.
          #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
-         cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+         #cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+#bronx-15 does not let us do this copy! outputstager.HS jobs fail with
+#*ERROR*: An ocean mask file was specified, so the output.stager was configured to swap in unmasked grid info into the ocean_static.nc history file. Unfortunately, there were multiple *.ocean_static.nc targets for unmasked lat/lon swap, but there should be just one. This shouldn't happen, so please open a help desk ticket. Alternatively, to temporarily disable this feature, change argFile actionFillGridOn = 0, or in the runscript, delete the variable flagOutputFillGridOn.
 
          ]]></csh>
 
@@ -2263,7 +2499,10 @@ biomass_p_valid_min = 0.0
          #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
          #This causes problems for ferret and python tools for analysis.
          #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
-         cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+         #cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+#bronx-15 does not let us do this copy! outputstager.HS jobs fail with
+#*ERROR*: An ocean mask file was specified, so the output.stager was configured to swap in unmasked grid info into the ocean_static.nc history file. Unfortunately, there were multiple *.ocean_static.nc targets for unmasked lat/lon swap, but there should be just one. This shouldn't happen, so please open a help desk ticket. Alternatively, to temporarily disable this feature, change argFile actionFillGridOn = 0, or in the runscript, delete the variable flagOutputFillGridOn.
+
 
          ]]></csh>
 

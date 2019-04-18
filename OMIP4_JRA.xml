@@ -13,7 +13,7 @@ frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r5_
   <property name="RELEASE"        value="xanadu"/>                  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="20190225_downsample_r4"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_DATE"      value="downsample_r4"/>              <!-- git tag date for MOM6 source code -->
   <!--property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/-->   <!-- git tag for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="dev/gfdl"/>   <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
@@ -29,7 +29,7 @@ frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r5_
    <property name="CHUNK_LENGTH_B" value="20yr"/>
    <!--Start year of PP -->
    <property name="PP_START_YEAR"  value="1958"/>      <!--Use these values for CORE2 dynamic forcing runs -->
-   <property name="FRE_VERSION"     value="bronx-13"/> <!-- fre version to be used -->
+   <property name="FRE_VERSION"     value="test"/> <!-- fre version to be used -->
    <property name="ProjectID"       value="CMIP6"/>      <!-- database top level -->
    <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
    <property name="MDBIswitch"      value="off"/>       <!-- on/off switch for MDBI database -->
@@ -279,24 +279,11 @@ cat >> $HOME/frejobs_stdout <<EOF_frejobs
 $stdoutDir/$FRE_JOBID
 EOF_frejobs
 
-#Handle hyperthreaded cases
-set ocean_nthreads = $ocn_threads
-set use_hyper_thread = ".F."
-set use_hyper_thread = `awk '/use_hyper_thread/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-
-if ( $use_hyper_thread == ".T." || $use_hyper_thread == ".true." ) then
-   @ ocean_nthreads *= 2
-   alias runCommand /usr/bin/time -p `which aprun` -n $ocn_ranks -j2 -d $ocean_nthreads ./$executable:t
-endif
-
-set ocn_hyperthread = $use_hyper_thread
-
-
 cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
 #override IO_LAYOUT = $ocn_io_layout
 #override LAYOUT    = $ocn_layout
 #override MASKTABLE = $ocn_mask_table
-#override OCEAN_OMP_THREADS = $ocean_nthreads
+#override OCEAN_OMP_THREADS = $ocn_threads
 MOM_LAYOUT_EOF
 
 cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
@@ -490,7 +477,7 @@ READ_TIDEAMP = True
        concurrent = .false.
        use_lag_fluxes=.false. 
        atmos_nthreads = $atm_threads
-       ocean_nthreads = $ocean_nthreads
+       ocean_nthreads = $ocn_threads
      </namelist>
      <namelist name="xgrid_nml">
        make_exchange_reproduce = .true.
@@ -554,10 +541,15 @@ $baseDate
      </diagTable>
 
      <!--A set of downsampled diagnotics-->
+<!--
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6.d2sample</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6.d2sample</dataSource>
      </dataFile>
+-->
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table.MOM6.d2sample</dataSource>
+      </dataFile>
 
      <!--data_tables and data files-->
      <!--JRA forcing-->
@@ -970,7 +962,7 @@ No additional diurnal cycle imposed
        concurrent = .false.
        use_lag_fluxes=.false. 
        atmos_nthreads = $atm_threads
-       ocean_nthreads = $ocean_nthreads
+       ocean_nthreads = $ocn_threads
      </namelist>
      <namelist name="generic_tracer_nml">
        do_generic_tracer=.true.
@@ -1488,7 +1480,7 @@ No additional diurnal cycle imposed
        concurrent = .false.
        use_lag_fluxes=.false.
        atmos_nthreads = $atm_threads
-       ocean_nthreads = $ocean_nthreads
+       ocean_nthreads = $ocn_threads
      </namelist>
      <namelist name="generic_tracer_nml">
        do_generic_tracer=.true.
@@ -2454,7 +2446,10 @@ biomass_p_valid_min = 0.0
          #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
          #This causes problems for ferret and python tools for analysis.
          #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
-         cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+         #cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+#bronx-15 does not let us do this copy! outputstager.HS jobs fail with
+#*ERROR*: An ocean mask file was specified, so the output.stager was configured to swap in unmasked grid info into the ocean_static.nc history file. Unfortunately, there were multiple *.ocean_static.nc targets for unmasked lat/lon swap, but there should be just one. This shouldn't happen, so please open a help desk ticket. Alternatively, to temporarily disable this feature, change argFile actionFillGridOn = 0, or in the runscript, delete the variable flagOutputFillGridOn.
+
 
          ]]></csh>
 
@@ -2564,7 +2559,7 @@ biomass_p_valid_min = 0.0
          #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
          #This causes problems for ferret and python tools for analysis.
          #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
-         cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+         #cp $work/INPUT/ocean_static_no_mask_table.nc $work/
 
          ]]></csh>
 
