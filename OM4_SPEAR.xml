@@ -6,7 +6,6 @@ This xml consists of 1 degree Ocean-Ice experiments based on the GFDL SPEAR coup
 
 module load fre/bronx-12
 fremake -x OM4.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
-fremake -x OM4.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile_symmetric
 frerun  -x OM4.xml -p ncrc4.intel16 -t prod SPEAR_o1_CORE2_OM4 -r basic 
 
 -->
@@ -127,7 +126,7 @@ Make the executable for ocean-ice experiments.
       </source>
       <compile>
         <cppDefs><![CDATA[ $(F2003_FLAGS) -DMAX_FIELDS_=100 -DNOT_SET_AFFINITY -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER  -DUSE_PRECISION=2 -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
-        <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for MOM6 may cause crash -->
+        <!--<makeOverrides>OPENMP=""</makeOverrides>--> <!-- openmp switch for MOM6 may cause crash -->
       </compile>
     </component>
       
@@ -191,45 +190,6 @@ Make the executable for ocean-ice experiments.
 -->
    </experiment>
 
-   <experiment name="MOM6_SIS2_compile_symmetric" inherit="MOM6_SIS2_compile">
-      <component paths="shared" name="fms" includeDir="$root/$(LIBS_ROOT)/src/shared/include">
-         <library path="$(MY_LIBS)/fms/libfms.a" headerDir="$(MY_LIBS)/fms"/>
-      </component>
-      <component name="land_null" paths="land_null" requires="fms">
-         <library path="$(MY_LIBS)/land_null/libland_null.a" headerDir="$(MY_LIBS)/land_null"/>
-      </component>
-      <component name="atmos_null" paths="atmos_null atmos_param" requires="fms">
-          <library path="$(MY_LIBS)/atmos_null/libatmos_null.a" headerDir="$(MY_LIBS)/atmos_null"/>
-      </component>
-      <component paths="icebergs" requires="fms" name="icebergs">
-         <library path="$(MY_LIBS)/icebergs/libicebergs.a" headerDir="$(MY_LIBS)/icebergs"/>
-      </component> 
-      <component paths="sis2" requires="fms icebergs" name="sis2">
-         <library path="$(MY_LIBS)/sis2/libsis2.a" headerDir="$(MY_LIBS)/sis2"/>
-      </component>
-      <component name="mom6_symmetric" requires="fms" paths="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/config_src/dynamic_symmetric $root/$(LIBS_ROOT)/src/mom6/src/MOM6/config_src/coupled_driver $root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/*/ $root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/*/*/ $root/$(LIBS_ROOT)/src/ocean_shared/generic_tracers $root/$(LIBS_ROOT)/src/ocean_shared/mocsy/src">
-       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
-        <csh><![CDATA[
-          \rm -rf ocean_null
-          echo "No need to checkout any new source code for this component!" 
-        ]]></csh>
-         </source>
-         <compile>
-            <cppDefs><![CDATA[ $(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-         </compile>
-      </component>
-
-      <component name="coupler" paths="coupler/shared coupler/full" requires="fms land_null atmos_null sis2 mom6_symmetric icebergs">
-         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
-         <source versionControl="git" root="https://github.com/NOAA-GFDL">
-            <codeBase version="$(RELEASE)"> coupler.git </codeBase>
-         </source>
-         <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-         </compile>
-      </component>
-   </experiment>
     
    <freInclude name="OM4_common">
     <input>

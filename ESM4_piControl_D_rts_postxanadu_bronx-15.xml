@@ -93,7 +93,7 @@ NOTES:
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>        <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>        <!-- git tag for LAND source code -->
   <property name="COUPLER_GIT_TAG" value="$(RELEASE)"/>       <!-- git tag for AWG source code -->
-  <property name="BUILD_DATE"     value="20190423"/>          <!-- name for source/exec directory -->
+  <property name="BUILD_DATE"     value="20190304"/>          <!-- name for source/exec directory -->
   <property name="MOM6_DATE"      value="ESM4_v1.0.3"/>       <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="ESM4/v1.0.3"/>       <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>  <!-- git tag for ocean_shared component -->
@@ -590,7 +590,7 @@ NOTES:
     <platform name="ncrc4.intel16">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="16.0.3.210" />
-      <project>gfdl_f</project>
+      <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
         <root>$DEV/$USER/$(FRE_STEM)</root>
         <scripts>$DEV/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
@@ -627,7 +627,7 @@ module use -a /usw/eslogin/modulefiles-c3
     <platform name="ncrc3.intel16">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="16.0.3.210" />
-      <project>gfdl_f</project>
+      <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
         <root>$DEV/$USER/$(FRE_STEM)</root>
         <scripts>$DEV/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
@@ -713,16 +713,16 @@ module use -a /usw/eslogin/modulefiles-c3
 Experiment to build executable.
     </description>
 
-    <component name="fms" paths="shared">
+      <component name="fms" paths="FMS/amip_interp FMS/column_diagnostics FMS/diag_integral FMS/fft FMS/horiz_interp FMS/memutils FMS/oda_tools FMS/sat_vapor_pres FMS/topography FMS/astronomy FMS/constants  FMS/diag_manager FMS/field_manager FMS/include FMS/monin_obukhov FMS/platform FMS/station_data FMS/tracer_manager FMS/axis_utils FMS/coupler FMS/drifters FMS/fms FMS/interpolator FMS/mosaic FMS/random_numbers FMS/time_interp FMS/tridiagonal FMS/block_control  FMS/data_override FMS/exchange  FMS/mpp FMS/time_manager">
      <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid=""/>
-      <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-            <codeBase version="$(RELEASE)"> shared.git </codeBase>
+     <source versionControl="git" root="https://github.com/NOAA-GFDL">
+            <codeBase version="$(RELEASE)"> FMS.git </codeBase>
       	    <csh><![CDATA[
-              ( cd shared && git checkout $(SHARED_GIT_TAG) ) 
+              ( cd FMS && git checkout $(SHARED_GIT_TAG) )
               ]]>
             </csh>
-      </source>
-      <compile>
+     </source>
+     <compile>
         <cppDefs>$(F2003_FLAGS) -Duse_libMPI -Duse_netCDF -DMAXFIELDMETHODS_=500</cppDefs>
       </compile>
     </component>
@@ -761,9 +761,14 @@ Experiment to build executable.
       </compile>
     </component>
 
+    <component paths="ice_param" requires="fms mom6" name="ice_param">
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
+            <codeBase version="$(RELEASE)"> ice_param.git </codeBase>
+         </source>
+    </component>
     <component paths="ice_sis ice_param" requires="fms mom6" name="ice_sis">
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-            <codeBase version="$(RELEASE)"> ice_sis.git ice_param.git </codeBase>
+            <codeBase version="$(RELEASE)"> ice_sis.git </codeBase>
          </source>
          <compile>
             <cppDefs>$(F2003_FLAGS)</cppDefs>
@@ -822,7 +827,7 @@ Experiment to build executable.
     </component>
 
     <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src ice_param" requires="fms mom6 icebergs" includeDir="$root/$(BUILD_DATE)/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
-       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+       <source versionControl="git" root="https://github.com/NOAA-GFDL">
            <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
            <csh>\rm -rf ocean_null</csh>
        </source>
@@ -832,7 +837,7 @@ Experiment to build executable.
     </component>
 
     <component name="icebergs" paths="mom6/src/icebergs" requires="fms">
-       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+       <source versionControl="git" root="https://github.com/NOAA-GFDL">
         <codeBase version="$(RELEASE)"> ocean_null.git </codeBase>
         <csh>\rm -rf ocean_null</csh>
        </source>
@@ -845,7 +850,7 @@ Experiment to build executable.
   </experiment>
 
   <experiment name="esm4.1_sis2_compile" inherit="esm4.1_libs_compile">
-      <component paths="shared" name="fms" includeDir="$root/$(BUILD_DATE)/$(LIBS_ROOT)/src/shared/include">
+      <component paths="shared" name="fms" includeDir="$root/$(BUILD_DATE)/$(LIBS_ROOT)/src/FMS/include">
          <library path="$(MY_LIBS)/fms/libfms.a" headerDir="$(MY_LIBS)/fms"/>
       </component>
       <component name="lm4P" paths="lm4P" requires="fms">
@@ -870,9 +875,9 @@ Experiment to build executable.
       <component paths="sis2" requires="fms icebergs" name="sis2">
          <library path="$(MY_LIBS)/sis2/libsis2.a" headerDir="$(MY_LIBS)/sis2"/>
       </component> 
-      <component name="coupler" paths="coupler" requires="fms atmos_dyn atmos_phys lm4P sis2 mom6 icebergs">
+      <component name="coupler" paths="coupler/shared coupler/full" requires="fms atmos_dyn atmos_phys lm4P sis2 mom6 icebergs">
         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
-        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <source versionControl="git" root="https://github.com/NOAA-GFDL">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
       	    <csh><![CDATA[
               ( cd coupler && git checkout $(COUPLER_GIT_TAG) ) 
@@ -886,7 +891,7 @@ Experiment to build executable.
   </experiment>
 
   <experiment name="am4.1_compile" inherit="esm4.1_libs_compile">
-      <component paths="shared" name="fms" includeDir="$root/$(BUILD_DATE)/$(LIBS_ROOT)/src/shared/include">
+      <component paths="shared" name="fms" includeDir="$root/$(BUILD_DATE)/$(LIBS_ROOT)/src/FMS/include">
          <library path="$(MY_LIBS)/fms/libfms.a" headerDir="$(MY_LIBS)/fms"/>
       </component>
       <component paths="ice_sis ice_param" requires="fms mom6" name="ice_sis">
@@ -908,9 +913,9 @@ Experiment to build executable.
       <component paths="mom6" requires="fms" name="mom6">
          <library path="$(MY_LIBS)/mom6/libmom6.a" headerDir="$(MY_LIBS)/mom6"/>
       </component> 
-      <component name="coupler" paths="coupler" requires="fms atmos_dyn atmos_phys lm4P ice_sis mom6">
+      <component name="coupler" paths="coupler/shared coupler/full" requires="fms atmos_dyn atmos_phys lm4P ice_sis mom6">
         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
-        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <source versionControl="git" root="https://github.com/NOAA-GFDL">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
       	    <csh><![CDATA[
               ( cd coupler && git checkout $(COUPLER_GIT_TAG) ) 
@@ -1870,7 +1875,7 @@ Experiment to build executable.
       <realization r="1" i="1" p="1" f="1"/>
 
       <!-- project info -->
-      <project>gfdl_f</project>
+      <project>CMIP6</project>
       <mip_era>CMIP6</mip_era>
       <activity_id>CMIP</activity_id>
 
@@ -2405,6 +2410,7 @@ Experiment to build executable.
         do_limit_donner = .false.,
         do_limit_uw = .false.,
         force_donner_moist_conserv = .false.,
+        obtain_warsaw_results=.true. !post xanadu due to Rick Heimler mods
       </namelist>
 
       <namelist name="cu_mo_trans_nml">
@@ -2931,7 +2937,7 @@ Experiment to build executable.
         file_emis3d_1 = 'emissions3D.',
         file_emis3d_2 = '.0.5x0.5.1850.nc',
         file_ub = 'ub_vals.mozart.nc',
-        file_dry = 'depvel_gc_am3_tran.nc',
+!        file_dry = 'depvel_gc_am3_tran.nc', !gone post-xanadu, Fabien
         inv_list = '',
         file_aircraft = 'emissions.aircraft.0.5x0.5.1850.nc',
         lght_no_prd_factor = 1.2,
@@ -3058,11 +3064,18 @@ Experiment to build executable.
       do_stable_bl     = .true.,
       do_shallow_conv  = .false.
       </namelist>
-
+<!-- Fabien changed the name post-xanadu to atmos_tracer_utilities_nml
       <namelist name ="wetdep_nml">
         scale_aerosol_wetdep = 1.
         drydep_exp = .true.
         kbs_val = 0.5
+      </namelist>
+-->
+      <namelist name ="atmos_tracer_utilities_nml">
+        scale_aerosol_wetdep = 1.
+        drydep_exp = .true.
+        kbs_val = 0.5
+        file_dry = 'depvel_gc_am3_tran.nc',
       </namelist>
 
       <namelist name ="xactive_bvoc_nml">
@@ -10731,40 +10744,11 @@ cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
 #override LAYOUT    = $ice_layout
 SIS_LAYOUT_EOF
 
-#Handle concurrent radiation case
-
-#set do_concurrent_radiation = `awk '/do_concurrent_radiation/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-#set radiation_nthreads = `awk '/radiation_nthreads/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-#set atmos_nthreads = $atm_threads
-#if ( $do_concurrent_radiation == ".true." ) then
-#   @ atmos_nthreads -= $radiation_nthreads
-#   set atm_threads = $atmos_nthreads
-#   setenv MALLOC_CHECK_ 5
-#   setenv MPICH_GNI_NDREG_LAZYMEM disabled
-#   alias runCommand /usr/bin/time -p `which aprun` -n $atmos_npes -d $atmos_nthreads ./$executable:t  
-#endif
-
 #timing runs show that nyblocks = 2 * atm_threads perform better than nyblocks = atm_threads
 set nxblock = 1
 set nyblock = $atm_threads
 @ nyblock = 2 * $atm_threads
 
-#Handle hyperthreaded cases
-set atmos_nthreads = $atm_threads
-#set atm_hythr = 1
-#set ocn_hythr = 1
-
-set use_hyper_thread = `awk '/use_hyper_thread/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-#if ( $use_hyper_thread == ".T." || $use_hyper_thread == ".true." ) then
-#   @ atmos_nthreads *= 2
-#   set atm_hythr = 2
-#   if ( $tot_ocn_ranks == 0 ) then
-#      alias runCommand /usr/bin/time -p `which aprun` -j2 -d $atmos_nthreads -n $atm_ranks ./$executable:t
-#   else
-#      alias runCommand /usr/bin/time -p `which aprun` -j2 -d $atmos_nthreads -n $atm_ranks ./$executable:t : -n $ocn_ranks -j1 -d 1 ./$executable:t
-#   endif
-#endif
-set atmos_threads = $atmos_nthreads
 
 ###The following vars are set for the timing database ingestion tool only and are not necessary for a successful run
 set OCN_MASK_TABLE  =  $ocn_mask_table
@@ -10782,9 +10766,6 @@ set land_io_layout = $lnd_io_layout
 set nxblocks = $nxblock
 #set dummy  = `awk '/nyblocks/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
 set nyblocks = $nyblock
-set use_hyperthread = $use_hyper_thread
-#set atm_hyperthread = $atm_hythr
-#set ocn_hyperthread = $ocn_hythr
 
 
 #f1p: note added ncap instructions 
@@ -10840,6 +10821,28 @@ if ( $currentSeg == 1 ) then
    end
 
 endif
+####################################################################################################
+##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
+##
+if ( $currentSeg == 1 ) then
+  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+      ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
+      if ($status == 0) then
+        #unlink the file from ptmp
+        cp $resfile $resfile.orig;\rm $resfile;mv $resfile.orig $resfile
+        ncrename -O $resfile -v Kd_turb,Kd_shear || exit 1
+      endif
+
+      ncdump -h $resfile | grep 'double Kv_turb' > /dev/null
+      if ($status == 0) then
+        #unlink the file from ptmp
+        cp $resfile $resfile.orig;\rm $resfile;mv $resfile.orig $resfile
+        ncrename -O $resfile -v Kv_turb,Kv_shear || exit 1
+      endif
+  end
+
+endif
+####################################################################################################
 ####COMMON ALWAYS CSH ENDS######
       ]]></csh>
 
@@ -11157,9 +11160,8 @@ endif
       </regression>
 
       <regression name="debug2">
-  	  <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
-  	  <run days="1 1"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
-  	  <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+          <run days="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A504x1_O504']/node())"/> </run>
+          <run days="1 1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A504x1_O504']/node())"/> </run>
       </regression>
       <regression name="debug3">
   	<run days="20"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O442p5']/node())"/> </run>
@@ -12330,7 +12332,7 @@ endif
         file_emis3d_1 = 'emissions3D.',
         file_emis3d_2 = '.0.5x0.5.1850.nc',
         file_ub = 'ub_vals.mozart.nc',
-        file_dry = 'depvel_gc_am3_tran.nc',
+!        file_dry = 'depvel_gc_am3_tran.nc',
         inv_list = '',
         file_aircraft = 'emissions.aircraft.0.5x0.5.1850.nc',
         lght_no_prd_factor = 1.2,
@@ -12458,10 +12460,18 @@ endif
       do_shallow_conv  = .false.
       </namelist>
 
+<!-- Fabien changed the name post-xanadu to atmos_tracer_utilities_nml
       <namelist name ="wetdep_nml">
         scale_aerosol_wetdep = 1.
         drydep_exp = .true.
         kbs_val = 0.5
+      </namelist>
+-->
+      <namelist name ="atmos_tracer_utilities_nml">
+        scale_aerosol_wetdep = 1.
+        drydep_exp = .true.
+        kbs_val = 0.5
+        file_dry = 'depvel_gc_am3_tran.nc',
       </namelist>
 
       <namelist name ="xactive_bvoc_nml">
@@ -16781,10 +16791,9 @@ set nyblock = $atm_threads
         <run days="8" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4h']/node())"/> </run>
         <run days="8" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4']/node())"/> </run>
       </regression>
-      <regression name="debug2">
+      <regression name="debug">
           <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
           <run days="1 1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
-          <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
       </regression>
       <regression name="debug_ht">
           <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
@@ -16793,7 +16802,8 @@ set nyblock = $atm_threads
         <run days="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4h']/node())"/> </run>
         <run days="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4']/node())"/> </run>
       </regression>
+      <reference restart="$(REFERENCE)/archive/1x0m8d_216x2a/restart/00010109.tar"/>
+      <reference restart="$(REFERENCE)/archive/1x0m2d_216x2a/restart/00010103.tar"/>
     </runtime>
   </experiment>
-
 </experimentSuite>

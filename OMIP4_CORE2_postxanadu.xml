@@ -10,11 +10,11 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <property name="RELEASE"        value="warsaw_201803"/>           <!-- git tag for general component source code-->
-  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
-  <property name="OCEAN_SHARED_GIT_TAG" value="dev/esm4/20180208"/> <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="OMIP1_v1.0.0"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="OMIP1/v1.0.0"/>              <!-- git tag for MOM6 source code -->
+  <property name="RELEASE"        value="xanadu_esm4_20190304"/>     <!-- git tag for general component source code-->
+  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>               <!-- git tag for shared source code -->
+  <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>         <!-- git tag for ocean_shared source code -->
+  <property name="MOM6_DATE"      value="ESM4_v1.0.3"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="ESM4/v1.0.3"/>              <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -109,7 +109,7 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
       <description>
 Make the executable for ocean-ice experiments.
       </description>
-      <component name="fms" paths="FMS/amip_interp FMS/column_diagnostics FMS/fft FMS/horiz_interp FMS/memutils FMS/oda_tools FMS/sat_vapor_pres FMS/topography FMS/astronomy FMS/constants  FMS/diag_manager FMS/field_manager FMS/include FMS/platform FMS/station_data FMS/tracer_manager FMS/axis_utils FMS/coupler FMS/drifters FMS/fms FMS/interpolator FMS/mosaic FMS/random_numbers FMS/time_interp FMS/tridiagonal FMS/block_control  FMS/data_override       FMS/exchange  FMS/fv3gfs  FMS/mpp FMS/time_manager">
+      <component name="fms" paths="FMS/amip_interp FMS/column_diagnostics FMS/diag_integral FMS/fft FMS/horiz_interp FMS/memutils FMS/oda_tools FMS/sat_vapor_pres FMS/topography FMS/astronomy FMS/constants  FMS/diag_manager FMS/field_manager FMS/include FMS/monin_obukhov FMS/platform FMS/station_data FMS/tracer_manager FMS/axis_utils FMS/coupler FMS/drifters FMS/fms FMS/interpolator FMS/mosaic FMS/random_numbers FMS/time_interp FMS/tridiagonal FMS/block_control  FMS/data_override       FMS/exchange  FMS/fv3gfs  FMS/mpp FMS/time_manager">
      <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid=""/>
      <source versionControl="git" root="https://github.com/NOAA-GFDL">
             <codeBase version="$(RELEASE)"> FMS.git </codeBase>
@@ -156,49 +156,35 @@ Make the executable for ocean-ice experiments.
       </source>
       <compile>
         <cppDefs><![CDATA[ $(F2003_FLAGS) -DMAX_FIELDS_=100 -DNOT_SET_AFFINITY -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER  -DUSE_PRECISION=2 -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
-        <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for MOM6 may cause crash -->
       </compile>
     </component>
       
-      <component name="icebergs" paths="mom6/src/icebergs" requires="fms">
-       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="master"> ocean_null.git </codeBase>
-        <csh>\rm -rf ocean_null</csh>
-       </source>
-       <compile>
-            <cppDefs><![CDATA[-D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
-       </compile>
-       <description domainName="N/A" communityName="N/A" communityVersion="$(RELEASE)" communityGrid="N/A"/>
-      </component>
-
-
-      <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src ice_param" requires="fms mom6 icebergs" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
+      <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" >
          <description domainName="Sea Ice SIS2" communityName="GFDL-SIS2" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
 	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-<!--            <makeOverrides>OPENMP=""</makeOverrides> openmp switch for MOM6 may cause crash -->
          </compile>
       </component>
 
       <component name="land_null" paths="land_null" requires="fms">
          <description domainName="NA" communityName="NA" communityVersion="NA" communityGrid="NA"/>
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
             <codeBase version="$(RELEASE)"> land_null.git </codeBase>
          </source>
       </component>
 
-      <component name="atmos_null" paths="atmos_null atmos_param/monin_obukhov atmos_param/diag_integral" requires="fms">
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-           <codeBase version="$(RELEASE)"> atmos_null.git atmos_param.git </codeBase>
+      <component name="atmos_null" paths="atmos_null fms" requires="fms">
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
+           <codeBase version="$(RELEASE)"> atmos_null.git </codeBase>
          </source>
          <compile>
             <cppDefs>$(F2003_FLAGS) </cppDefs>
         </compile>
       </component>
-      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6 icebergs">
+      <component name="coupler" paths="coupler/shared coupler/full" requires="fms land_null atmos_null sis2 mom6">
         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
         <source versionControl="git" root="https://github.com/NOAA-GFDL">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
@@ -207,17 +193,6 @@ Make the executable for ocean-ice experiments.
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
         </compile>
       </component>
-<!-- post xanadu
-      <component name="coupler" paths="coupler/shared coupler/full" requires="fms land_null atmos_null sis2 mom6 icebergs">
-        <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
-        <source versionControl="git" root="https://github.com/NOAA-GFDL">
-          <codeBase version="$(RELEASE)"> coupler.git </codeBase>
-        </source>
-        <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-        </compile>
-      </component>
--->
    </experiment>
 
    <freInclude name="OM4_common">
@@ -289,6 +264,89 @@ if ( $?flagOutputXferOn && $?flagOutputPostProcessOn && $currentSeg == 1 ) then
   endif
 endif
 
+#Add required BLING gas flux fields if they do not exist in the restarts 
+#to be able to start from older runs that did not have these gas fluxes
+if ( $currentSeg == 1 ) then 
+   #The following values for kw and deltap fields are arbitrary and do not matter, the fields just need to exist!
+   #These kw and deltap fields do not need to be restarted as they are calculated from alpha and csurf values!    
+   #This has to be fixed in the source code in future with a new coupler flux design.
+   foreach resfile ( `ls $work/INPUT/ice_bling.res.nc*` ) 
+      ncdump -h $resfile | grep o2_flux_deltap_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_deltap_ice=co2_flux_flux_ice*0.0+1000.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_deltap_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_deltap_ice=co2_flux_flux_ice*0.0+1000.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep o2_flux_kw_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_kw_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_kw_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_kw_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      #gross flux0
+      ncdump -h $resfile | grep o2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep nh4_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'nh4_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   foreach resfile ( `ls $work/INPUT/ice_ocmip_sf6.res.nc*` ) 
+      ncdump -h $resfile | grep sf6_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'sf6_flux_flux0_ice=sf6_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   foreach resfile ( `ls $work/INPUT/ice_ocmip2_cfc.res.nc*` ) 
+      ncdump -h $resfile | grep cfc11_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'cfc11_flux_flux0_ice=cfc11_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep cfc12_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'cfc12_flux_flux0_ice=cfc12_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   foreach resfile ( `ls $work/INPUT/ice_ocmip_abiotic.res.nc*` ) 
+      ncdump -h $resfile | grep ab14co2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'ab14co2_flux_flux0_ice=ab14co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep abco2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'abco2_flux_flux0_ice=abco2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   #
+   #Add Schmidt number to restart if it does not exist so that the model can use old restart files. 
+   #A value of 660 make it consistent with the old ( "non-generic") formulation that did not have a separate sc_no
+   foreach resfile ( `ls $work/INPUT/ocean_bling_airsea_flux.res.nc*` )
+      ncdump -h $resfile | grep o2_flux_sc_no_ocn > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_sc_no_ocn=o2_flux_alpha_ocn*0.0+660.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_sc_no_ocn > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_sc_no_ocn=co2_flux_alpha_ocn*0.0+660.0' $resfile $resfile
+      endif
+   end
+
+  
+   #Xanadu has a bug fix for airsea flux restart checksums and they don't match the old checksums in the files
+   chmod +w $work/INPUT/ocean_bling_airsea_flux.res.nc
+   ncatted -O -a checksum,,d,, $work/INPUT/ocean_bling_airsea_flux.res.nc
+
+endif
 
       ]]></csh>
     </input>
@@ -1306,6 +1364,25 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override DEBUG  = True
 SIS_OVERRIDE_EOF
 
+####################################################################################################
+##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
+##
+if ( $currentSeg == 1 ) then
+  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+      ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kd_turb,Kd_shear || exit 1
+      endif
+
+      ncdump -h $resfile | grep 'double Kv_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kv_turb,Kv_shear || exit 1
+      endif
+  end
+
+endif
 ####################################################################################################
 ##The following is to avoid model crash with a layout other than the one that produced the initCond.
 ##The problem could occur if the generating model run used a mask_table that was different from the
