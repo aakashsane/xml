@@ -10,11 +10,11 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <property name="RELEASE"        value="xanadu"/>                  <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="xanadu_esm4_20190304"/>                  <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="ESM4_v1.0.2_omipfix"/>       <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="ESM4/v1.0.2"/>       <!-- git tag for MOM6 source code -->
+  <property name="MOM6_DATE"      value="ESM4_v1.0.3"/>       <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="ESM4/v1.0.3"/>       <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/>     <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -1153,7 +1153,7 @@ endif
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.3785.90x144
       </dataFile>
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
-          <dataSource site="ncrc">$(gfdlO_pdata)/datasets/OM4_025/mosaic.v20140610.unpacked/ocean_static.nc</dataSource>
+          <dataSource site="ncrc">$(gfdlO_pdata)/datasets/OM4_025/mosaic.v20170622.unpacked/ocean_static.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/geothermal_davies2013_v1.nc</dataSource>
@@ -1279,8 +1279,11 @@ $baseDate
       </dataFile>
     </input>
    </experiment>
-   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998_uncombined" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
     <input>								      
+      <namelist name="frecheck_nml">
+        start_date =  1998,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
+      </namelist>
      <!--There is  MOM6/SIS2 restart provided in initCond.-->
      <namelist name="MOM_input_nml" >
          output_directory = './',
@@ -1332,6 +1335,7 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 
 #override ADD_DIURNAL_SW = True 
 #override ICE_STATS_INTERVAL = 30
+
 #override DEBUG  = True
 SIS_OVERRIDE_EOF
 
@@ -1356,6 +1360,135 @@ if ( $currentSeg == 1 ) then
 endif
      ]]></csh>
     </input>
+   <runtime>
+      <production simTime="$(PROD_SIMTIME)" units="years">
+          <segment simTime="12" units="months"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5_production']/node())"/>
+      </production>
+
+      <regression name="basic">
+        <run months="1" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5']/node())"/> </run>
+        <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5']/node())"/> </run>
+      </regression>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_1300x1o/restart/19980201.tar"/>
+   </runtime>
+   </experiment>
+
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998_combined" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
+    <input>
+      <namelist name="frecheck_nml">
+        start_date =  1998,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
+      </namelist>
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override','INPUT/SIS_diurnal'
+     </namelist>
+<!--
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.20080101.tar</dataSource>
+      </dataFile>
+
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/OM4p5_IAF_BLING_CFC_abio_csf_mle200.20080101_combined.tar</dataSource>
+      </dataFile>
+-->
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/gfdl/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.19980101.combined.tar</dataSource>
+      </dataFile>
+<!--
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.19980101.tar</dataSource>
+      </dataFile>
+-->
+     <!--MOM_overrides-->
+     <csh>
+       <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = True
+GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+#override ADD_DIURNAL_SW = True 
+#override ICE_STATS_INTERVAL = 30
+SIS_OVERRIDE_EOF
+
+####################################################################################################
+##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
+##
+if ( $currentSeg == 1 ) then
+  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+      ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kd_turb,Kd_shear || exit 1
+      endif
+
+      ncdump -h $resfile | grep 'double Kv_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kv_turb,Kv_shear || exit 1
+      endif
+  end
+
+endif
+####################################################################################################
+##The following is to avoid model crash with a layout other than the one that produced the initCond.
+##The problem could occur if the generating model run used a mask_table that was different from the
+##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical 
+##values on land on the masked pes (9.96E36) that should have been set as "missing values". 
+##I am pretty sure that there is a bug in SIS2 that tickles this, but I do not have a smoking gun.
+##
+if ( $currentSeg == 1 ) then
+  cd $work/INPUT
+  cp ice_model.res.nc ice_model.res1.nc
+
+  #All ice restart variables should be 0 where they have a "missing value" (9.96E36)
+  foreach var ( T_skin coszen rough_moist rough_heat rough_mom sym_str_s str_t str_d sym_v_ice_C sym_u_ice_C sal_ice enth_ice H_to_kg_m2 h_ice enth_snow h_snow h_pond flux_sw_nir_dif flux_sw_nir_dir flux_sw_vis_dif flux_sw_vis_dir p_surf calving_hflx runoff_hflx calving runoff fprec lprec flux_lw flux_salt flux_q flux_t flux_v flux_u )
+     ncap2 -s "where( $var > 1e36) $var =0.0" ice_model.res1.nc ice_model.res2.nc
+     mv -f ice_model.res2.nc ice_model.res1.nc
+  end
+
+  #except part_size that should be 1 for category 1 and 0 otherwise. But I don't know how to do that!
+  #The next best guess would be 1/6 for all categories so that they add up to 1:
+  ncap2 -s 'where( (part_size>1e36) ) part_size =1.0/6.0' ice_model.res1.nc ice_model.res2.nc
+
+  cp -f ice_model.res2.nc  ice_model.res.nc
+
+  #Same story with calving.res.nc
+  cp -f calving.res.nc calving.res1.nc
+  ncap2 -s 'where( stored_ice>1e36 ) stored_ice =0.0' calving.res1.nc calving.res2.nc
+  mv -f calving.res2.nc calving.res1.nc
+  ncap2 -s 'where( stored_heat>1e36 ) stored_heat =0.0' calving.res1.nc calving.res2.nc
+  mv -f calving.res2.nc calving.res.nc
+
+  cd $work
+endif
+     ]]></csh>
+    </input>
+    <runtime>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_1300x1o/restart/19980201.tar"/>
+    </runtime>
    </experiment>
 
    <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200" inherit="MOM6_SIS2_compile$(MODIFIER)">
@@ -1540,7 +1673,7 @@ $baseDate
       </dataFile>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/oar.gfdl.ogrp-account/archive/input/warsaw/diag_rho2.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/cmip6/datasets/OMIP/diagnostic/diag_rho2.nc</dataSource>
       </dataFile>
 
      <!--MOM_overrides-->

@@ -952,7 +952,7 @@ $baseDate
        <csh>
          <![CDATA[
 # Get new diagnostic coordinate file
-cp /lustre/f1/unswept/oar.gfdl.ogrp-account/archive/input/warsaw/diag_rho2.nc $work/INPUT/
+cp /lustre/f2/pdata/gfdl/cmip6/datasets/OMIP/diagnostic/diag_rho2.nc $work/INPUT/
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 # Turn on generic tracers
 USE_generic_tracer = True
@@ -1420,6 +1420,9 @@ $baseDate
 											      
    <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998_uncombined" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
     <input>								      
+      <namelist name="frecheck_nml">
+        start_date =  1998,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
+      </namelist>
      <!--There is  MOM6/SIS2 restart provided in initCond.-->
      <namelist name="MOM_input_nml" >
          output_directory = './',
@@ -1512,6 +1515,9 @@ endif
 
    <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998_combined" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
     <input>
+      <namelist name="frecheck_nml">
+        start_date =  1998,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
+      </namelist>
      <!--There is  MOM6/SIS2 restart provided in initCond.-->
      <namelist name="MOM_input_nml" >
          output_directory = './',
@@ -1619,6 +1625,9 @@ if ( $currentSeg == 1 ) then
 endif
      ]]></csh>
     </input>
+    <runtime>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_1300x1o/restart/19980201.tar"/>
+    </runtime>
    </experiment>
 
    <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200" inherit="MOM6_SIS2_compile$(MODIFIER)">
@@ -1774,7 +1783,7 @@ $baseDate
       </diagTable>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f1/unswept/oar.gfdl.ogrp-account/archive/input/warsaw/diag_rho2.nc</dataSource>
+        <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/cmip6/datasets/OMIP/diagnostic/diag_rho2.nc</dataSource>
       </dataFile>
 
      <!--data_tables and data files-->
