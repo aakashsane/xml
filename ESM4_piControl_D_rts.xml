@@ -93,7 +93,7 @@ NOTES:
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>        <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>        <!-- git tag for LAND source code -->
   <property name="COUPLER_GIT_TAG" value="$(RELEASE)"/>       <!-- git tag for AWG source code -->
-  <property name="BUILD_DATE"     value="20190423"/>          <!-- name for source/exec directory -->
+  <property name="BUILD_DATE"     value="20190304"/>          <!-- name for source/exec directory -->
   <property name="MOM6_DATE"      value="ESM4_v1.0.3"/>       <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="ESM4/v1.0.3"/>       <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>  <!-- git tag for ocean_shared component -->
@@ -590,7 +590,7 @@ NOTES:
     <platform name="ncrc4.intel16">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="16.0.3.210" />
-      <project>gfdl_f</project>
+      <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
         <root>$DEV/$USER/$(FRE_STEM)</root>
         <scripts>$DEV/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
@@ -627,7 +627,7 @@ module use -a /usw/eslogin/modulefiles-c3
     <platform name="ncrc3.intel16">
       <freVersion>$(FRE_VERSION)</freVersion>
       <compiler type="intel" version="16.0.3.210" />
-      <project>gfdl_f</project>
+      <project>$(GFDL_GROUP)</project>
       <directory stem="$(FRE_STEM)">
         <root>$DEV/$USER/$(FRE_STEM)</root>
         <scripts>$DEV/$USER/$(FRE_STEM)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
@@ -10731,40 +10731,11 @@ cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
 #override LAYOUT    = $ice_layout
 SIS_LAYOUT_EOF
 
-#Handle concurrent radiation case
-
-#set do_concurrent_radiation = `awk '/do_concurrent_radiation/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-#set radiation_nthreads = `awk '/radiation_nthreads/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-#set atmos_nthreads = $atm_threads
-#if ( $do_concurrent_radiation == ".true." ) then
-#   @ atmos_nthreads -= $radiation_nthreads
-#   set atm_threads = $atmos_nthreads
-#   setenv MALLOC_CHECK_ 5
-#   setenv MPICH_GNI_NDREG_LAZYMEM disabled
-#   alias runCommand /usr/bin/time -p `which aprun` -n $atmos_npes -d $atmos_nthreads ./$executable:t  
-#endif
-
 #timing runs show that nyblocks = 2 * atm_threads perform better than nyblocks = atm_threads
 set nxblock = 1
 set nyblock = $atm_threads
 @ nyblock = 2 * $atm_threads
 
-#Handle hyperthreaded cases
-set atmos_nthreads = $atm_threads
-#set atm_hythr = 1
-#set ocn_hythr = 1
-
-set use_hyper_thread = `awk '/use_hyper_thread/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-#if ( $use_hyper_thread == ".T." || $use_hyper_thread == ".true." ) then
-#   @ atmos_nthreads *= 2
-#   set atm_hythr = 2
-#   if ( $tot_ocn_ranks == 0 ) then
-#      alias runCommand /usr/bin/time -p `which aprun` -j2 -d $atmos_nthreads -n $atm_ranks ./$executable:t
-#   else
-#      alias runCommand /usr/bin/time -p `which aprun` -j2 -d $atmos_nthreads -n $atm_ranks ./$executable:t : -n $ocn_ranks -j1 -d 1 ./$executable:t
-#   endif
-#endif
-set atmos_threads = $atmos_nthreads
 
 ###The following vars are set for the timing database ingestion tool only and are not necessary for a successful run
 set OCN_MASK_TABLE  =  $ocn_mask_table
@@ -10782,9 +10753,6 @@ set land_io_layout = $lnd_io_layout
 set nxblocks = $nxblock
 #set dummy  = `awk '/nyblocks/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
 set nyblocks = $nyblock
-set use_hyperthread = $use_hyper_thread
-#set atm_hyperthread = $atm_hythr
-#set ocn_hyperthread = $ocn_hythr
 
 
 #f1p: note added ncap instructions 
@@ -10840,6 +10808,28 @@ if ( $currentSeg == 1 ) then
    end
 
 endif
+####################################################################################################
+##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
+##
+if ( $currentSeg == 1 ) then
+  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+      ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
+      if ($status == 0) then
+        #unlink the file from ptmp
+        cp $resfile $resfile.orig;\rm $resfile;mv $resfile.orig $resfile
+        ncrename -O $resfile -v Kd_turb,Kd_shear || exit 1
+      endif
+
+      ncdump -h $resfile | grep 'double Kv_turb' > /dev/null
+      if ($status == 0) then
+        #unlink the file from ptmp
+        cp $resfile $resfile.orig;\rm $resfile;mv $resfile.orig $resfile
+        ncrename -O $resfile -v Kv_turb,Kv_shear || exit 1
+      endif
+  end
+
+endif
+####################################################################################################
 ####COMMON ALWAYS CSH ENDS######
       ]]></csh>
 
@@ -11143,8 +11133,8 @@ endif
       </regression>
 
       <regression name="debug">
-          <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x1_O216']/node())"/> </run>
-          <run days="1 1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x1_O216']/node())"/> </run>
+          <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+          <run days="1 1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
       </regression>
       <regression name="debug_ht">
   	  <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
@@ -11157,18 +11147,14 @@ endif
       </regression>
 
       <regression name="debug2">
-  	  <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
-  	  <run days="1 1"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
-  	  <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
+          <run days="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A504x1_O504']/node())"/> </run>
+          <run days="1 1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A504x1_O504']/node())"/> </run>
       </regression>
       <regression name="debug3">
   	<run days="20"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O442p5']/node())"/> </run>
   	<run days="20"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O842p5']/node())"/> </run>
       </regression>
 
-      <regression name="debug4">
-  	<run days="2"     ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
-      </regression>
       <regression name="debug5">
   	<run days="2"  overrideParams="coupler_nml:use_hyper_thread=.F."><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
       </regression>
@@ -16781,10 +16767,9 @@ set nyblock = $atm_threads
         <run days="8" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4h']/node())"/> </run>
         <run days="8" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4']/node())"/> </run>
       </regression>
-      <regression name="debug2">
-          <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
-          <run days="1 1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
-          <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
+      <regression name="debug">
+          <run days="8"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
+          <run days="4 4" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
       </regression>
       <regression name="debug_ht">
           <run days="2"   ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
@@ -16793,6 +16778,8 @@ set nyblock = $atm_threads
         <run days="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4h']/node())"/> </run>
         <run days="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4']/node())"/> </run>
       </regression>
+      <reference restart="$(REFERENCE)/archive/1x0m8d_216x2a/restart/00010109.tar"/>
+      <reference restart="$(REFERENCE)/archive/1x0m2d_216x2a/restart/00010103.tar"/>
     </runtime>
   </experiment>
 
