@@ -11,8 +11,8 @@ GROUP="gfdl_f"
 EXPERIMENT_LIST="MOM6_GOLD_SIS2_bergs MOM6_GOLD_SIS2_generics MOM6_GOLD_SIS2_bergs_ens2 MOM6_GOLD_SIS2_generics_ens2"
 #"MOM6_GOLD_SIS2_bergs MOM6_GOLD_SIS2_generics MOM6_GOLD_SIS2_bergs_ens2 MOM6_GOLD_SIS2_generics_ens2"
 
-DEBUGLEVEL='_0'
-PLATFORM="ncrc3.intel16"
+DEBUGLEVEL='_c4'
+PLATFORM="ncrc4.intel16"
 TARGET="prod-openmp"
 REFERENCE_TAG='xanadu_mom6_ESM4_v1.0.2'
 FRE_VERSION='bronx-15'

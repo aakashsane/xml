@@ -10,9 +10,9 @@ GROUP="gfdl_f"
 #List of the experiments in the xml to run regression for
 EXPERIMENT_LIST="SPEAR_o1_CORE2_OM4"
 
-DEBUGLEVEL='_c3'
-PLATFORM="ncrc3.intel16"
-TARGET="prod-openmp"
+DEBUGLEVEL='_c4'
+PLATFORM="ncrc4.intel16"
+TARGET="prod"
 REFERENCE_TAG='xanadu_mom6_20190211'
 FRE_VERSION='bronx-15'
 
