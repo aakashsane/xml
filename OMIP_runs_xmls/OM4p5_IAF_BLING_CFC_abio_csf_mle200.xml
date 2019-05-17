@@ -33,7 +33,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
    <property name="FRE_VERSION"     value="bronx-12"/> <!-- fre version to be used -->
    <property name="ProjectID"       value="CMIP6"/>      <!-- database top level -->
    <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
-   <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
+   <property name="MDBIswitch"      value="off"/>       <!-- on/off switch for MDBI database -->
    <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
              and are not needed for the run or post-processing -->
    <property name="EXP_CPLD_START"   value="1708"/> <!--simulation start year-->
@@ -1089,7 +1089,12 @@ SIS_OVERRIDE_EOF
       <reference restart="$(REFERENCE)/archive/1x1m0d_1057x1o/restart/17080201.tar"/>
    </runtime>
 
-
+    <postProcess>
+      <xi:include href="awg_include/xml_building_blocks/om4_cmip6_postprocess.xml" xpointer="xpointer(//freInclude[@name='OM4_cmip6_postprocess']/postProcess/node())"/>
+      <xi:include href="awg_include/xml_building_blocks/bling_cmip6_postprocess.xml" xpointer="xpointer(//freInclude[@name='BLING_cmip6_postprocess']/postProcess/node())"/>
+      <xi:include href="awg_include/xml_building_blocks/abio_cmip6_postprocess.xml" xpointer="xpointer(//freInclude[@name='ABIO_cmip6_postprocess']/postProcess/node())"/>
+    </postProcess>
+<!--
     <postProcess>
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_postprocess']/postProcess/node())"/>
@@ -1102,6 +1107,7 @@ SIS_OVERRIDE_EOF
       <xi:include xpointer="xpointer(//freInclude[@name='inert_postprocess_1x1deg']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='inert_z_postprocess_1x1deg']/postProcess/node())"/>
     </postProcess>
+-->
    </experiment>
 
    <freInclude name="OM4p5grid_data">
