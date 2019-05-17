@@ -52,6 +52,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod OM4_SIS2_baseline -r basic
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
   <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
   <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)/mdt_xml/awg_include"/>
+<property name="CMIP6_PP_FIXER_SCRIPTS_DIR" value="/home/oar.gfdl.cmip6/CMIP6_publishing/pp_fixer_scripts"/>
     
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16'])"/>
@@ -1808,7 +1809,8 @@ biomass_p_valid_min = 0.0
 
       <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar" cmip="on">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/hfevapds.csh -c ocean_monthly"/>
+          <!--<analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>-->
         </timeSeries>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>
@@ -1817,6 +1819,7 @@ biomass_p_valid_min = 0.0
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
       </component>
       <component type="ocean_monthly_1x1deg" source="ocean_month" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+<!--
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
           <variables>
               evs                   ficeberg               friver                 heat_content_cond
@@ -1833,6 +1836,11 @@ biomass_p_valid_min = 0.0
               tossq                 ustar                  wfo                    zos
               zossq
           </variables>
+        </timeSeries>
+-->
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/hfevapds.csh -c ocean_monthly_1x1deg"/>
+          <!--<analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>-->
         </timeSeries>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
@@ -1857,7 +1865,9 @@ biomass_p_valid_min = 0.0
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
       </component>
       <component type="ocean_monthly_z_1x1deg" source="ocean_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
-        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
+           <analysis switch="on" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/zostoga.csh -t 1708"/>
+        </timeSeries>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
       </component>
@@ -1950,7 +1960,9 @@ biomass_p_valid_min = 0.0
       </component>
 
       <component type="ocean_month_z_refined"   source="ocean_month_z_refined" sourceGrid="ocean-tripolar" cmip="on">
-        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month_z_refined"/>
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month_z_refined">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/mfo.csh"/>
+        </timeSeries>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)" />
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
       </component>
@@ -2042,12 +2054,14 @@ biomass_p_valid_min = 0.0
       <!--ICE-->      
       <component type="ice"  start="$(PP_START_YEAR)"  source="ice_month"  sourceGrid="ocean-tripolar" cmip="on">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"  source="ice_month">
-	   <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
-           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/seaice_units.csh -c ice"/>
-           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/sivol.csh -c ice"/>
+	   <!--<analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>-->
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/seaice_units.csh -c ice"/>
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/sivol.csh -c ice"/>
 	</timeSeries>   
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)"  source="ice_month">
-           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+	   <!--<analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>-->
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/seaice_units.csh -c ice"/>
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/sivol.csh -c ice"/>
         </timeSeries>
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
 	  
@@ -2056,10 +2070,10 @@ biomass_p_valid_min = 0.0
 
       <component type="ice_1x1deg"  source="ice_month" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
-	<analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/seaice_units.csh -c ice"/>
-        <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/sivol.csh -c ice"/>
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/seaice_units.csh -c ice_1x1deg"/>
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/sivol.csh -c ice_1x1deg"/>
         </timeSeries>
-					
+
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
       </component>
 
