@@ -91,9 +91,9 @@ NOTES:
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for shared source code -->
   <property name="ATMOS_GIT_TAG"  value="$(RELEASE)"/>        <!-- git tag for atmos_shared and atmos_param source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>        <!-- git tag for atmos_cubed_sphere and atmos_driver source code -->
-  <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>        <!-- git tag for LAND source code -->
+  <property name="LAND_GIT_TAG"   value="xanadu_esm4_20190603_rc1"/>        <!-- git tag for LAND source code -->
   <property name="COUPLER_GIT_TAG" value="$(RELEASE)"/>       <!-- git tag for AWG source code -->
-  <property name="BUILD_DATE"     value="20190304"/>          <!-- name for source/exec directory -->
+  <property name="BUILD_DATE"     value="20190603"/>          <!-- name for source/exec directory -->
   <property name="MOM6_DATE"      value="ESM4_v1.0.3"/>       <!-- git tag date for MOM6 source code -->
   <property name="MOM6_GIT_TAG"   value="ESM4/v1.0.3"/>       <!-- git tag for MOM6 source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>  <!-- git tag for ocean_shared component -->
@@ -10732,9 +10732,9 @@ cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
 SIS_LAYOUT_EOF
 
 #timing runs show that nyblocks = 2 * atm_threads perform better than nyblocks = atm_threads
-set nxblock = 1
+set nxblock = $atm_threads
 set nyblock = $atm_threads
-@ nyblock = 2 * $atm_threads
+#@ nyblock = 2 * $atm_threads
 
 
 ###The following vars are set for the timing database ingestion tool only and are not necessary for a successful run
@@ -10753,6 +10753,10 @@ set land_io_layout = $lnd_io_layout
 set nxblocks = $nxblock
 #set dummy  = `awk '/nyblocks/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
 set nyblocks = $nyblock
+set use_hyperthread = $atm_hyperthread
+#set atm_hyperthread = $atm_hythr
+#set ocn_hyperthread = $ocn_hythr
+
 
 
 #f1p: note added ncap instructions 
@@ -11284,9 +11288,51 @@ endif
 	       <ice                            layout = "72,3"   io_layout = "1,3" />
 	     </resources>
    </freInclude>
+   <freInclude name="resourceparams_A216x8">
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="216" threads="8"    layout = "3,12"   io_layout = "1,4" hyperthread="off"/>
+	       <lnd                            layout = "3,12"   io_layout = "1,4" />
+	       <ice                            layout = "72,3"   io_layout = "1,3" />
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A216x8h">
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="216" threads="8"    layout = "3,12"   io_layout = "1,4" hyperthread="on"/>
+	       <lnd                            layout = "3,12"   io_layout = "1,4" />
+	       <ice                            layout = "72,3"   io_layout = "1,3" />
+	     </resources>
+   </freInclude>
    <freInclude name="resourceparams_A432x1">
              <resources jobWallclock="01:00:00">
                <atm ranks="432" threads="1"    layout = "3,24"   io_layout = "1,4" hyperthread="off"/>
+               <lnd                            layout = "3,24"   io_layout = "1,4" />
+               <ice                            layout = "144,3"  io_layout = "1,3" />
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A432x2">
+             <resources jobWallclock="01:00:00">
+               <atm ranks="432" threads="2"    layout = "3,24"   io_layout = "1,4" hyperthread="off"/>
+               <lnd                            layout = "3,24"   io_layout = "1,4" />
+               <ice                            layout = "144,3"  io_layout = "1,3" />
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A432x2h">
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="432" threads="2" hyperthread="on"	    layout = "3,24"   io_layout = "1,4" />
+	       <lnd                            layout = "3,24"   io_layout = "1,4" />
+               <ice                            layout = "144,3"   io_layout = "1,3" />               
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A432x4h">
+	     <resources jobWallclock="01:00:00">
+               <atm ranks="432" threads="4" hyperthread="on"	    layout = "3,24"   io_layout = "1,4" />
+	       <lnd                            layout = "3,24"   io_layout = "1,4" />
+               <ice                            layout = "144,3"   io_layout = "1,3" />               
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A432x4">
+             <resources jobWallclock="01:00:00">
+               <atm ranks="432" threads="4"    layout = "3,24"   io_layout = "1,4" hyperthread="off"/>
                <lnd                            layout = "3,24"   io_layout = "1,4" />
                <ice                            layout = "144,3"  io_layout = "1,3" />
 	     </resources>
@@ -16778,6 +16824,19 @@ set nyblock = $atm_threads
         <run days="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4h']/node())"/> </run>
         <run days="2" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4']/node())"/> </run>
       </regression>
+        <regression name="timings">
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2h']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4h']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x8h']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x8']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x1']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x2h']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x4']/node())"/> </run>
+          <run months="1" ><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A432x4h']/node())"/> </run>
+        </regression>
       <reference restart="$(REFERENCE)/archive/1x0m8d_216x2a/restart/00010109.tar"/>
       <reference restart="$(REFERENCE)/archive/1x0m2d_216x2a/restart/00010103.tar"/>
     </runtime>

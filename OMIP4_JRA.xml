@@ -10,20 +10,19 @@ frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r5_
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <property name="RELEASE"        value="xanadu"/>                  <!-- git tag for general component source code-->
-  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
-  <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="downsample_r4"/>              <!-- git tag date for MOM6 source code -->
-  <!--property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/-->   <!-- git tag for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl"/>   <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"       value="CMIP6/OMIP/$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="RELEASE"        value="xanadu_esm4_20190304"/>     <!-- git tag for general component source code-->
+  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>               <!-- git tag for shared source code -->
+  <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>         <!-- git tag for ocean_shared source code -->
+  <property name="MOM6_DATE"      value="ESM4_v1.0.3"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="ESM4/v1.0.3"/>              <!-- git tag for MOM6 source code -->
+  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
-  <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
+  <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-   <property name="PROD_SIMTIME"   value="60"/>
+   <property name="PROD_SIMTIME"   value="5"/>
    <!--Post-processing  chunk lengths -->
    <property name="CHUNK_LENGTH_A" value="5yr"/>
    <property name="CHUNK_LENGTH_B" value="20yr"/>
@@ -39,7 +38,7 @@ frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r5_
    <property name="EXP_CPLD_END"     value="2018"/> <!--simulation end   year-->
 
    <!--Users need not change the following properties -->
-   <property name="reference_tag"  value="warsaw_201803_mom6_2018.04.11_answers"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
+   <property name="reference_tag"  value="warsaw_201803_mom6_2018.04.11"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
    <property name="MODIFIER"     value=""/>  
@@ -74,6 +73,12 @@ frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r5_
            </resources>
   </freInclude>
 
+  <freInclude name="resourceparams_O1057p5_production">
+             <resources jobWallclock="16:00:00"  segRuntime="5:00:00">
+	       <ocn ranks="1057" layout = "36,36"   io_layout = "1,4" mask_table="mask_table.239.36x36" threads="1"/>
+	       <ice              layout = "36,36"   io_layout = "1,4" mask_table="mask_table.239.36x36"/>
+             </resources>
+   </freInclude>
   <freInclude name="resourceparams_O1300p5_production">
              <resources jobWallclock="16:00:00"  segRuntime="4:00:00">
                <ocn ranks="1300" layout = "36,45"   io_layout = "1,5" mask_table="mask_table.320.36x45" threads="1"/>
@@ -133,13 +138,6 @@ Make the executable for ocean-ice experiments.
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
 
-          #Checkout Downsampling work
-          if ("$(MOM6_DATE)" =~ "downsample_r4") then
-            (cd src/MOM6 && git fetch https://github.com/nikizadehgfdl/MOM6.git downsample_r4 && git checkout FETCH_HEAD)
-	  endif
-          popd
-
-          pushd mom6
           set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
           if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
             ln -s /scratch4/GFDL/gfdlscr/pdata/gfdl_O/datasets/ .datasets
@@ -159,30 +157,16 @@ Make the executable for ocean-ice experiments.
       </source>
       <compile>
         <cppDefs><![CDATA[ $(F2003_FLAGS) -DMAX_FIELDS_=100 -DNOT_SET_AFFINITY -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER  -DUSE_PRECISION=2 -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
-        <makeOverrides>OPENMP=""</makeOverrides> <!-- openmp switch for MOM6 may cause crash -->
       </compile>
     </component>
       
-      <component name="icebergs" paths="mom6/src/icebergs" requires="fms">
-       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="master"> ocean_null.git </codeBase>
-        <csh>\rm -rf ocean_null</csh>
-       </source>
-       <compile>
-            <cppDefs><![CDATA[-D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
-       </compile>
-       <description domainName="N/A" communityName="N/A" communityVersion="$(RELEASE)" communityGrid="N/A"/>
-      </component>
-
-
-      <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src ice_param" requires="fms mom6 icebergs" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
+      <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" >
          <description domainName="Sea Ice SIS2" communityName="GFDL-SIS2" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
 	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-<!--            <makeOverrides>OPENMP=""</makeOverrides> openmp switch for MOM6 may cause crash -->
          </compile>
       </component>
 
@@ -193,7 +177,7 @@ Make the executable for ocean-ice experiments.
          </source>
       </component>
 
-      <component name="atmos_null" paths="atmos_null" requires="fms">
+      <component name="atmos_null" paths="atmos_null fms" requires="fms">
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
            <codeBase version="$(RELEASE)"> atmos_null.git </codeBase>
          </source>
@@ -201,7 +185,7 @@ Make the executable for ocean-ice experiments.
             <cppDefs>$(F2003_FLAGS) </cppDefs>
         </compile>
       </component>
-      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6 icebergs">
+      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6">
         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
         <source versionControl="git" root="https://github.com/NOAA-GFDL">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
@@ -250,6 +234,8 @@ touch $work/INPUT/SIS_layout
 cat >> $HOME/frejobs_stdout <<EOF_frejobs
 $stdoutDir/$FRE_JOBID
 EOF_frejobs
+
+
 
 cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
 #override IO_LAYOUT = $ocn_io_layout
@@ -1625,6 +1611,10 @@ $baseDate
 "ocean_model_z", "opottemppmdiff", "opottemppmdiff", "ocean_annual_z", "all", "mean", "none",2
       </diagTable>
 
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/cmip6/datasets/OMIP/diagnostic/diag_rho2.nc</dataSource>
+      </dataFile>
+
      <!--data_tables and data files-->
      <!--JRA forcing-->
      <xi:include xpointer="xpointer(//freInclude[@name='JRA_data_table']/input/node())"/>
@@ -1657,10 +1647,6 @@ $baseDate
         <dataSource platform="$(platform)">$(KRASTING)/cwg/input/cfc/MOM_GENERICS_OM4p5.20170829.res.nc</dataSource>
       </dataFile>
 
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/cmip6/datasets/OMIP/diagnostic/diag_rho2.nc</dataSource>
-      </dataFile>
-
      <!--MOM_overrides-->
      <csh>
        <![CDATA[
@@ -1688,16 +1674,27 @@ SIS_OVERRIDE_EOF
    <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
-          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O2783p5_production']/node())"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5_production']/node())"/>
       </production>
 
+      <regression name="basic_prod_nomask">
+        <run months="1" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1620']/node())"/> </run>
+        <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1620']/node())"/> </run>
+      </regression>
+      <regression name="basic_prod">
+        <run months="1" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5']/node())"/> </run>
+        <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5']/node())"/> </run>
+      </regression>
+      <regression name="debug_prod">
+        <run days="1" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5']/node())"/> </run>
+      </regression>
       <regression name="basic">
         <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1057p5']/node())"/> </run>
       </regression>
       <regression name="rts">
         <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1057p5']/node())"/> </run>
         <!--the following should reproduce eachother but not the basic because basic uses mask_table-->
-        <run days="29" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1296']/node())"/> </run>
+        <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1296']/node())"/> </run>
         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O648']/node())"/> </run>
         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
       </regression>
@@ -1706,6 +1703,11 @@ SIS_OVERRIDE_EOF
         <run days="1 1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
       </regression>
 
+      <regression name="rts2">
+          <run days="8"  ><xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1728']/node())"/> </run>
+          <run days="4 4"><xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1728']/node())"/> </run>
+      </regression>
+ 
       <regression name="restart">
         <run months="1"   > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2783p5']/node())"/> </run>
         <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2783p5']/node())"/> </run>
@@ -1839,6 +1841,7 @@ SIS_OVERRIDE_EOF
       </dataFile>
     </input>
    </freInclude>
+
    <freInclude name="OM4p5_data">
     <input>
 <!--
@@ -2627,11 +2630,26 @@ biomass_p_valid_min = 0.0
       <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh  $(NB_ROOT)/mdt_xml/awg_include/refineDiag/refineDiag_data_stager_globalAve.csh"/>
 
       <!--PostProcessing component models-->
-      <component type="ocean_daily"   start="$(PP_START_YEAR)" source="ocean_daily" sourceGrid="ocean-tripolar">
+      <component type="ocean_daily"   start="$(PP_START_YEAR)" source="ocean_daily" sourceGrid="ocean-tripolar" cmip="off">
         <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_daily"/>
         <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_daily"/>
       </component>
-      <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar">
+      <component type="ocean_daily_cmip" source="ocean_daily" sourceGrid="ocean-tripolar" cmip="on">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)">
+          <variables>sos tos zos</variables>
+        </timeSeries>
+      </component>
+      <component type="ocean_daily_gfdl" source="ocean_daily" sourceGrid="ocean-tripolar" cmip="off">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)">
+          <variables>chlos sossq tossq ssu ssv omldamax</variables>
+        </timeSeries>
+      </component>
+
+      <component type="ocean_daily_1x1deg" source="ocean_daily" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar" cmip="off">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>
         </timeSeries>
@@ -2641,45 +2659,128 @@ biomass_p_valid_min = 0.0
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
       </component>
-      <component type="ocean_monthly_z" start="$(PP_START_YEAR)"  source="ocean_month_z" sourceGrid="ocean-tripolar">
+      <component type="ocean_monthly_1x1deg" source="ocean_month" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
+          <variables>
+              evs                   ficeberg               friver                 heat_content_cond
+              heat_content_fprec    heat_content_massin    heat_content_massout   heat_content_surfwater
+              Heat_PmE               hfds                   hfevapds
+              hfibthermds           hflso                  hfrainds               hfrunoffds
+              hfsifrazil            hfsnthermds            hfsso
+              LwLatSens             MLD_003                MLD_restrat            mlotstmax
+              mlotstmin             mlotst                 mlotstsq               MSTAR
+              net_heat_coupler      net_massin             net_massout            nonpenSW
+              pbo                   prlq                   prsn                   pso
+              rlntds                rsntds                 sfdsi                  sob
+              sos                   sossq                  tob                    tos
+              tossq                 ustar                  wfo                    zos
+              zossq
+          </variables>
+        </timeSeries>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
-        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_B)"/>
-      </component>
-
-      <component type="ocean_annual_z" start="$(PP_START_YEAR)" source="ocean_annual_z"  sourceGrid="ocean-tripolar">
-        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
-        </timeAverage>
-        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
-        </timeAverage>
-        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>	
-      </component>
-
-      <component type="ocean_annual" start="$(PP_START_YEAR)"  source="ocean_annual"  sourceGrid="ocean-tripolar"> 
-        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
-        </timeAverage>
-        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
-          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
-        </timeAverage>
-      </component>
-
-      <component type="ocean_annual_rho2"  start="$(PP_START_YEAR)" source="ocean_annual_rho2" sourceGrid="ocean-tripolar">
-        <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_rho2"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
-        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
       </component>
+
+<!-- added by h1g 20171002 -->
+      <component type="ocean_month_rho2" source="ocean_month_rho2" sourceGrid="ocean-tripolar" cmip="off">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
+        </timeSeries>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+      <component type="ocean_month_rho2_1x1deg" source="ocean_month_rho2" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="off">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
+        </timeSeries>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+<!-- 20171002 -->
+
+      <component type="ocean_monthly_z" start="$(PP_START_YEAR)"  source="ocean_month_z" sourceGrid="ocean-tripolar" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+      <component type="ocean_monthly_z_1x1deg" source="ocean_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_annual_z" start="$(PP_START_YEAR)" source="ocean_annual_z"  sourceGrid="ocean-tripolar" cmip="on">
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(AWG_INPUT_HOME)/analysis/stub/atw_ocean_av_annual_subsfc_ocean.csh -D ocean_annual_z.%04d-%04d."/>
+        </timeAverage>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
+        </timeAverage>
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_A)" source="ocean_annual_z"/>	
+      </component>
+
+      <component type="ocean_annual_z_1x1deg" source="ocean_annual_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_annual" start="$(PP_START_YEAR)"  source="ocean_annual"  sourceGrid="ocean-tripolar" cmip="on"> 
+        <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
+        </timeAverage>
+        <timeAverage source="annual" interval="10yr"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
+        </timeAverage>
+      </component>
+
+      <component type="ocean_annual_1x1deg" source="ocean_annual" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)">
+          <variables>
+             boundary_forcing_heat_tendency_2d  boundary_forcing_salt_tendency_2d  dispkexyfo evs  ficeberg  frazil_heat_tendency_2d
+             friver                             heat_content_cond                           heat_content_fprec        heat_content_massin
+             heat_content_massout               heat_content_surfwater                      Heat_PmE
+             hfds                               hfevapds                                    hfibthermds               hflso
+             hfrainds                           hfrunoffds                                  hfsifrazil                hfsnthermds
+             hfsso                              LwLatSens                 mass_wt
+             MEKE_KH                            MEKE_Le                                     MEKE_Ue                   MLD_003_max
+             MLD_003_min                        MLD_003                                     mlotstmax                 mlotstmin
+             mlotst                             mlotstsq                                    MSTAR                     net_heat_coupler
+             net_massin                         net_massout                                 nonpenSW                  opottempmint
+             opottemptend_2d                    osalttend_2d                                pbo                       prlq
+             prsn                               pso                                         rlntds                    rsntds
+             S_advection_xy_2d                  sfdsi                                       Sh_tendency_vert_remap_2d sob
+             somint                             sos                                         sossq                     speed
+             subML_N2                           T_advection_xy_2d                           Th_tendency_vert_remap_2d TKE_itidal
+             TKE_tidal                          tob                       tos_max
+             tos_min                            tos                                         tossq                     ustar
+             wfo                                zos                                         zossq
+          </variables>
+        </timeSeries>
+
+        <timeAverage source="annual" interval="10yr"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+<!-- added by h1g 20171002 -->
+      <component type="ocean_annual_rho2" source="ocean_annual_rho2" sourceGrid="ocean-tripolar" cmip="off">
+        <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)">
+        </timeSeries>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+      <component type="ocean_annual_rho2_1x1deg" source="ocean_annual_rho2" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="off">
+        <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)">
+        </timeSeries>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+<!-- 20171002 -->
 
       <!--Ocean scalars-->
-      <component type="ocean_scalar_monthly" start="$(PP_START_YEAR)" source="ocean_scalar_month" sourceGrid="ocean-tripolar">
-        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_scalar_month"/>
+      <component type="ocean_scalar_monthly" start="$(PP_START_YEAR)" source="ocean_scalar_month" sourceGrid="ocean-tripolar" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_scalar_month"/>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_B)"/>
       </component>
       
-      <component type="ocean_scalar_annual"  start="$(PP_START_YEAR)" source="ocean_scalar_annual" sourceGrid="ocean-tripolar">
-        <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_B)" source="ocean_scalar_annual"/>
+      <component type="ocean_scalar_annual"  start="$(PP_START_YEAR)" source="ocean_scalar_annual" sourceGrid="ocean-tripolar" cmip="on">
+        <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_A)" source="ocean_scalar_annual"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
       </component>
@@ -2703,20 +2804,236 @@ biomass_p_valid_min = 0.0
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
       </component>
 
+      <!--Ocean regions-->
+      <component type="ocean_Barents_opening" source="ocean_Barents_opening" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Bering_Strait" source="ocean_Bering_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Davis_Strait" source="ocean_Davis_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Windward_Passage" source="ocean_Windward_Passage" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Denmark_Strait" source="ocean_Denmark_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Drake_Passage" source="ocean_Drake_Passage" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_English_Channel" source="ocean_English_Channel" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Faroe_Scotland" source="ocean_Faroe_Scotland" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Florida_Bahamas" source="ocean_Florida_Bahamas" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Fram_Strait" source="ocean_Fram_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Iceland_Faroe_V" source="ocean_Iceland_Faroe_V" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Iceland_Faroe_U" source="ocean_Iceland_Faroe_U" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Indonesian_Throughflow" source="ocean_Indonesian_Throughflow" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Mozambique_Channel" source="ocean_Mozambique_Channel" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Pacific_undercurrent" source="ocean_Pacific_undercurrent" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Taiwan_Luzon" source="ocean_Taiwan_Luzon" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Agulhas_section" source="ocean_Agulhas_section" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Gibraltar_Strait" source="ocean_Gibraltar_Strait" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_Iceland_Norway" source="ocean_Iceland_Norway" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+
       <!--ICE-->      
-      <component type="ice"  start="$(PP_START_YEAR)"  source="ice_month"  sourceGrid="ocean-tripolar">
+      <component type="ice"  start="$(PP_START_YEAR)"  source="ice_month"  sourceGrid="ocean-tripolar" cmip="on">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"  source="ice_month">
 	   <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/seaice_units.csh -c ice"/>
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/sivol.csh -c ice"/>
 	</timeSeries>   
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)"  source="ice_month">
            <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/seaice_units.csh -c ice"/>
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/sivol.csh -c ice"/>
         </timeSeries>
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
 	  
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_B)"/>
       </component>
+
+      <component type="ice_1x1deg"  source="ice_month" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
+        <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/seaice_units.csh -c ice"/>
+        <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/sivol.csh -c ice"/>
+        </timeSeries>
+
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
      </postProcess>
    </freInclude>
+
+  <freInclude name="abiotic_postprocess">
+      <postProcess> 
+      <component type="ocean_abiotic_month" start="$(PP_START_YEAR)" source="ocean_abiotic" sourceGrid="ocean-tripolar" cmip="off">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+ 
+  <freInclude name="abiotic_postprocess_1x1deg">
+      <postProcess> 
+      <component type="ocean_abiotic_month_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_abiotic" sourceGrid="ocean-tripolar" cmip="on">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+ 
+  <freInclude name="abiotic_z_postprocess">
+      <postProcess> 
+      <component type="ocean_abiotic_z" start="$(PP_START_YEAR)" source="ocean_abiotic_z" sourceGrid="ocean-tripolar" cmip="off">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+
+  <freInclude name="abiotic_z_postprocess_1x1deg">
+      <postProcess> 
+      <component type="ocean_abiotic_z_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_abiotic_z" sourceGrid="ocean-tripolar" cmip="on">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+
+  <freInclude name="inert_postprocess">
+      <postProcess> 
+      <component type="ocean_inert_month" start="$(PP_START_YEAR)" source="ocean_inert" sourceGrid="ocean-tripolar" cmip="off">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+ 
+  <freInclude name="inert_postprocess_1x1deg">
+      <postProcess> 
+      <component type="ocean_inert_month_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_inert" sourceGrid="ocean-tripolar" cmip="on">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+ 
+
+  <freInclude name="inert_z_postprocess">
+      <postProcess> 
+      <component type="ocean_inert_z" start="$(PP_START_YEAR)" source="ocean_inert_z" sourceGrid="ocean-tripolar" cmip="off">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+
+  <freInclude name="inert_z_postprocess_1x1deg">
+      <postProcess> 
+      <component type="ocean_inert_z_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_inert_z" sourceGrid="ocean-tripolar" cmip="on">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+
+  <freInclude name="BLING_postprocess">
+      <postProcess> 
+      <component type="ocean_bling_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="off">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_sfc_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_sfc" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="off">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_2d_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_2d" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_tracers_month_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_tracers_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_tracers_year_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_tracers_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="off">
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_bling_cmip6_omip_rates_year_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_rates_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
+         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+     </postProcess>
+  </freInclude>
 
   <freInclude name="ocean_regions">
       <postProcess> 
@@ -2799,130 +3116,4 @@ biomass_p_valid_min = 0.0
       </component>
     </postProcess>
   </freInclude>
-
-  <freInclude name="abiotic_postprocess">
-      <postProcess> 
-      <component type="ocean_abiotic_month" start="$(PP_START_YEAR)" source="ocean_abiotic" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-     </postProcess>
-  </freInclude>
- 
-  <freInclude name="abiotic_postprocess_1x1deg">
-      <postProcess> 
-      <component type="ocean_abiotic_month_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_abiotic" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-     </postProcess>
-  </freInclude>
- 
-  <freInclude name="abiotic_z_postprocess">
-      <postProcess> 
-      <component type="ocean_abiotic_z" start="$(PP_START_YEAR)" source="ocean_abiotic_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-     </postProcess>
-  </freInclude>
-
-  <freInclude name="abiotic_z_postprocess_1x1deg">
-      <postProcess> 
-      <component type="ocean_abiotic_z_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_abiotic_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-     </postProcess>
-  </freInclude>
-
-  <freInclude name="inert_postprocess">
-      <postProcess> 
-      <component type="ocean_inert_month" start="$(PP_START_YEAR)" source="ocean_inert" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-     </postProcess>
-  </freInclude>
- 
-  <freInclude name="inert_postprocess_1x1deg">
-      <postProcess> 
-      <component type="ocean_inert_month_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_inert" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-     </postProcess>
-  </freInclude>
- 
-
-  <freInclude name="inert_z_postprocess">
-      <postProcess> 
-      <component type="ocean_inert_z" start="$(PP_START_YEAR)" source="ocean_inert_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-     </postProcess>
-  </freInclude>
-
-  <freInclude name="inert_z_postprocess_1x1deg">
-      <postProcess> 
-      <component type="ocean_inert_z_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_inert_z" sourceGrid="ocean-tripolar">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-     </postProcess>
-  </freInclude>
-
-  <freInclude name="BLING_postprocess">
-      <postProcess> 
-      <component type="ocean_bling_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling" sourceGrid="ocean-tripolar" xyInterp="180,360">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-
-      <component type="ocean_bling_cmip6_omip_sfc_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_sfc" sourceGrid="ocean-tripolar" xyInterp="180,360">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-
-      <component type="ocean_bling_cmip6_omip_2d_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_2d" sourceGrid="ocean-tripolar" xyInterp="180,360">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-
-      <component type="ocean_bling_cmip6_omip_tracers_month_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_tracers_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
-         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-
-      <component type="ocean_bling_cmip6_omip_tracers_year_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_tracers_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-
-      <component type="ocean_bling_cmip6_omip_rates_year_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling_cmip6_omip_rates_year_z" sourceGrid="ocean-tripolar" xyInterp="180,360">
-         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
-         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-      </component>
-
-     </postProcess>
-  </freInclude>
-
-
 </experimentSuite>
