@@ -14,8 +14,8 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod MOM6_GOLD_SIS2_bergs -r basic
   <property name="RELEASE"        value="xanadu"/>                 <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="ESM4_v1.0.2"/>                <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="ESM4/v1.0.2"/>              <!-- git tag for MOM6 source code -->
+  <property name="MOM6_DATE"      value="ESM4_v1.0.2"/>       <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="ESM4/v1.0.2"/>       <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -305,24 +305,12 @@ cat >> $HOME/frejobs_stdout <<EOF_frejobs
 $stdoutDir/$FRE_JOBID
 EOF_frejobs
 
-#Handle hyperthreaded cases
-set ocean_nthreads = $ocn_threads
-set use_hyper_thread = ".F."
-set use_hyper_thread = `awk '/use_hyper_thread/ {gsub(/=/," ");gsub(/,/," ");print $2}' $work/input.nml`
-
-if ( $use_hyper_thread == ".T." || $use_hyper_thread == ".true." ) then
-   @ ocean_nthreads *= 2
-   alias runCommand /usr/bin/time -p `which aprun` -n $ocn_ranks -j2 -d $ocean_nthreads ./$executable:t
-endif
-
-set ocn_hyperthread = $use_hyper_thread
-
 
 cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
 #override IO_LAYOUT = $ocn_io_layout
 #override LAYOUT    = $ocn_layout
 #override MASKTABLE = $ocn_mask_table
-#override OCEAN_OMP_THREADS = $ocean_nthreads
+#override OCEAN_OMP_THREADS = $ocn_threads
 MOM_LAYOUT_EOF
 
 cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
@@ -578,7 +566,7 @@ endif
        concurrent = .false.          
        use_lag_fluxes=.true.         
        atmos_nthreads = $atm_threads
-       ocean_nthreads = $ocean_nthreads
+       ocean_nthreads = $ocn_threads
 debug_affinity =.true.
 ncores_per_node = 36
 use_hyper_thread = .false.
@@ -674,7 +662,6 @@ OVERRIDE_EOF
       </regression>
       <reference restart="$(REFERENCE)/archive/1x1m0d_64x1o/restart/00010201.tar"/>
       <reference restart="$(REFERENCE)/archive/1x1m0d_128x1o/restart/00010201.tar"/>
-      <reference restart="$(archiveDir)/../../$(platform)-prod/archive/1x1m0d_128x1o/restart/00010201.tar"/>
    </runtime>
     <postProcess>
       <xi:include xpointer="xpointer(//freInclude[@name='OM4i_postprocess']/postProcess/node())"/>
@@ -754,7 +741,7 @@ SIS_OVERRIDE_EOF
        concurrent = .false.          
        use_lag_fluxes=.true.         
        atmos_nthreads = $atm_threads
-       ocean_nthreads = $ocean_nthreads
+       ocean_nthreads = $ocn_threads
 debug_affinity =.true.
 ncores_per_node = 36
 use_hyper_thread = .false.
@@ -805,7 +792,7 @@ use_hyper_thread = .false.
          #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
          #This causes problems for ferret and python tools for analysis.
          #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
-         cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+         #cp $work/INPUT/ocean_static_no_mask_table.nc $work/
 
          ]]></csh>
     </postProcess>
@@ -934,7 +921,6 @@ cd $work/INPUT
    <runtime>
       <reference restart="$(REFERENCE)/archive/1x1m0d_64x1o/restart/19700201.tar"/>
       <reference restart="$(REFERENCE)/archive/1x1m0d_128x1o/restart/19700201.tar"/>
-      <reference restart="$(archiveDir)/../../$(platform)-prod/archive/1x1m0d_128x1o/restart/19700201.tar"/>
    </runtime>
    </experiment>
 
@@ -1522,7 +1508,6 @@ cd $work/INPUT
 
    <runtime>
       <reference restart="$(REFERENCE)/archive/1x1m0d_128x1o/restart/19700201.tar"/>
-      <reference restart="$(archiveDir)/../../$(platform)-prod/archive/1x1m0d_128x1o/restart/00010201.tar"/>
    </runtime>
    </experiment>
 
@@ -1828,7 +1813,6 @@ SIS_OVERRIDE_EOF
       </regression>
 
       <reference restart="$(REFERENCE)/archive/1x1m0d_432x1o/restart/19000201.tar"/>
-      <reference restart="$(archiveDir)/../../$(platform)-prod/archive/1x1m0d_432x1o/restart/19000201.tar"/>
 
    </runtime>
 

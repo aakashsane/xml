@@ -946,16 +946,16 @@ NOTES:
 Experiment to build executable.
     </description>
 
-    <component name="fms" paths="shared">
+      <component name="fms" paths="FMS/amip_interp FMS/column_diagnostics FMS/diag_integral FMS/fft FMS/horiz_interp FMS/memutils FMS/oda_tools FMS/sat_vapor_pres FMS/topography FMS/astronomy FMS/constants  FMS/diag_manager FMS/field_manager FMS/include FMS/monin_obukhov FMS/platform FMS/station_data FMS/tracer_manager FMS/axis_utils FMS/coupler FMS/drifters FMS/fms FMS/interpolator FMS/mosaic FMS/random_numbers FMS/time_interp FMS/tridiagonal FMS/block_control  FMS/data_override FMS/exchange  FMS/mpp FMS/time_manager">
      <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid=""/>
-      <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-            <codeBase version="$(RELEASE)"> shared.git </codeBase>
+     <source versionControl="git" root="https://github.com/NOAA-GFDL">
+            <codeBase version="$(RELEASE)"> FMS.git </codeBase>
       	    <csh><![CDATA[
-              ( cd shared && git checkout $(SHARED_GIT_TAG) )
+              ( cd FMS && git checkout $(SHARED_GIT_TAG) )
               ]]>
             </csh>
-      </source>
-      <compile>
+     </source>
+     <compile>
         <cppDefs>$(F2003_FLAGS) -Duse_libMPI -Duse_netCDF -DMAXFIELDMETHODS_=500</cppDefs>
       </compile>
     </component>
@@ -994,9 +994,14 @@ Experiment to build executable.
       </compile>
     </component>
 
+    <component paths="ice_param" requires="fms mom6" name="ice_param">
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
+            <codeBase version="$(RELEASE)"> ice_param.git </codeBase>
+         </source>
+    </component>
     <component paths="ice_sis ice_param" requires="fms mom6" name="ice_sis">
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-            <codeBase version="$(RELEASE)"> ice_sis.git ice_param.git </codeBase>
+            <codeBase version="$(RELEASE)"> ice_sis.git </codeBase>
          </source>
          <compile>
             <cppDefs>$(F2003_FLAGS)</cppDefs>
@@ -1078,7 +1083,7 @@ Experiment to build executable.
   </experiment>
 
   <experiment name="cm4_sis2_compile" inherit="cm4_libs_compile">
-      <component paths="shared" name="fms" includeDir="$root/$(LIBS_ROOT)/src/shared/include">
+      <component paths="shared" name="fms" includeDir="$root/$(LIBS_ROOT)/src/FMS/include">
          <library path="$(MY_LIBS)/fms/libfms.a" headerDir="$(MY_LIBS)/fms"/>
       </component>
       <component name="land_lad2" paths="land_lad2" requires="fms">
@@ -1103,9 +1108,9 @@ Experiment to build executable.
       <component paths="sis2" requires="fms icebergs" name="sis2">
          <library path="$(MY_LIBS)/sis2/libsis2.a" headerDir="$(MY_LIBS)/sis2"/>
       </component> 
-      <component name="coupler" paths="coupler" requires="fms atmos_dyn atmos_phys land_lad2 sis2 mom6 icebergs">
+      <component name="coupler" paths="coupler/shared coupler/full" requires="fms atmos_dyn atmos_phys land_lad2 sis2 mom6 icebergs">
         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
-        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <source versionControl="git" root="https://github.com/NOAA-GFDL">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
         </source>
         <compile>
@@ -2198,9 +2203,9 @@ endif
       #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
       #This causes problems for ferret and python tools for analysis.
       #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
-      cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+#      cp $work/INPUT/ocean_static_no_mask_table.nc $work/
       #Basin codes are needed to calculate offline diagnostics for CMIP6 
-      cp $work/INPUT/basin_codes.nc $work/
+#      cp $work/INPUT/basin_codes.nc $work/
          ]]></csh>
       <!--REFINE DIAG SCRIPT -->
       <!--refineDiag_data_stager.csh calculates global averages of basic quantities and stores them in a sqlit database file-->

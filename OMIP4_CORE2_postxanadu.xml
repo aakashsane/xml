@@ -5,8 +5,8 @@ Quick start guide
 This xml consists of 1/4 degree and 1/2 degree Ocean-Ice experiments.
 
 module load fre/bronx-12
-fremake -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
-frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r5_cycle1 -r basic 
+fremake -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
+frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r basic 
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -27,15 +27,15 @@ frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r5_
    <property name="CHUNK_LENGTH_A" value="5yr"/>
    <property name="CHUNK_LENGTH_B" value="20yr"/>
    <!--Start year of PP -->
-   <property name="PP_START_YEAR"  value="1958"/>      <!--Use these values for CORE2 dynamic forcing runs -->
+   <property name="PP_START_YEAR"  value="1708"/>      <!--Use these values for CORE2 dynamic forcing runs -->
    <property name="FRE_VERSION"     value="bronx-15"/> <!-- fre version to be used -->
    <property name="ProjectID"       value="CMIP6"/>      <!-- database top level -->
    <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
    <property name="MDBIswitch"      value="off"/>       <!-- on/off switch for MDBI database -->
    <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
              and are not needed for the run or post-processing -->
-   <property name="EXP_CPLD_START"   value="1958"/> <!--simulation start year-->
-   <property name="EXP_CPLD_END"     value="2018"/> <!--simulation end   year-->
+   <property name="EXP_CPLD_START"   value="1708"/> <!--simulation start year-->
+   <property name="EXP_CPLD_END"     value="2007"/> <!--simulation end   year-->
 
    <!--Users need not change the following properties -->
    <property name="reference_tag"  value="warsaw_201803_mom6_2018.04.11"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
@@ -49,7 +49,7 @@ frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r5_
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
   <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
   <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)/mdt_xml/awg_include"/>
-  <property name="append_to_setup_csh"  value="set fyear=1958"/><!--The start year of forcing dataset-->
+  <property name="append_to_setup_csh"  value=""/>
   
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16'])"/>
@@ -103,7 +103,6 @@ frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r5_
    <property name="MOM6_EXAMPLES"  value="$root/$(LIBS_ROOT)/src/mom6"/>
    <property name="MY_LIBS"        value="$(EXEC_ROOT)/$(FMS_LIB_DIR)"/>
 
-  <property name="JRA_dataset"  value="$(ARCHIVE_NNZ)/gold/datasets/reanalysis/JRA55-do-1-3/v20180412/padded_dataset"/>
   <property name="gfdlO_pdata"  value="/lustre/f2/pdata/gfdl/gfdl_O"/>
 
    <experiment name="MOM6_SIS2_compile">
@@ -162,7 +161,7 @@ Make the executable for ocean-ice experiments.
       
       <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" >
          <description domainName="Sea Ice SIS2" communityName="GFDL-SIS2" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
 	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
          </source>
          <compile>
@@ -172,20 +171,20 @@ Make the executable for ocean-ice experiments.
 
       <component name="land_null" paths="land_null" requires="fms">
          <description domainName="NA" communityName="NA" communityVersion="NA" communityGrid="NA"/>
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
             <codeBase version="$(RELEASE)"> land_null.git </codeBase>
          </source>
       </component>
 
       <component name="atmos_null" paths="atmos_null fms" requires="fms">
-         <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
            <codeBase version="$(RELEASE)"> atmos_null.git </codeBase>
          </source>
          <compile>
             <cppDefs>$(F2003_FLAGS) </cppDefs>
         </compile>
       </component>
-      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6">
+      <component name="coupler" paths="coupler/shared coupler/full" requires="fms land_null atmos_null sis2 mom6">
         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
         <source versionControl="git" root="https://github.com/NOAA-GFDL">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
@@ -194,17 +193,6 @@ Make the executable for ocean-ice experiments.
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
         </compile>
       </component>
-<!-- post xanadu
-      <component name="coupler" paths="coupler/shared coupler/full" requires="fms land_null atmos_null sis2 mom6 icebergs">
-        <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
-        <source versionControl="git" root="https://github.com/NOAA-GFDL">
-          <codeBase version="$(RELEASE)"> coupler.git </codeBase>
-        </source>
-        <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-        </compile>
-      </component>
--->
    </experiment>
 
    <freInclude name="OM4_common">
@@ -250,9 +238,9 @@ cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
 #override MASKTABLE = $ice_mask_table
 SIS_LAYOUT_EOF
 
-#Note: No SIS_diurnal hence 
-#ADD_DIURNAL_SW = False 
-#since JRA forcings has a diurnal cycle
+cat > $work/INPUT/SIS_diurnal << SIS_diurnal_EOF
+ADD_DIURNAL_SW = True ! This must ONLY be used in the ice-ocean mode if forcing is not diurnal (e.g. CORE), NOT fully coupled mode.
+SIS_diurnal_EOF
 
 # Copy AWG and OWG ascii input files to GFDL (waiting for FRE to do this for us)
 if ( $?flagOutputXferOn && $?flagOutputPostProcessOn && $currentSeg == 1 ) then
@@ -275,38 +263,6 @@ if ( $?flagOutputXferOn && $?flagOutputPostProcessOn && $currentSeg == 1 ) then
     gcp -cd -r --sync mom6 gfdl:$(NB_ROOT)/
   endif
 endif
-
-#######IAF cycle mechanism
-echo "Model year = $fyear"
-#Current JRA dataset starts at 1958 and ends at 2018
-#These numbers should be adjusted when the datasets start or length changes.
-set JRA_START_YEAR = 1958
-set JRA_LEN = 60
-@ modulyr = ( $fyear - $JRA_START_YEAR ) % $JRA_LEN
-@ forceyr = $JRA_START_YEAR + $modulyr
-if ( $modulyr < 0 ) then
-   @ forceyr = $forceyr + $JRA_LEN
-endif
-echo "Forcings file year = $forceyr"
-@ forceyrp1 = $forceyr + 1
-
-cd $work/INPUT/
-#set fetch_cmd = 'ln -sf ' #This might be the cause of frequent crashes with HDF errors?!
-set fetch_cmd = 'cp ' 
-$fetch_cmd $(JRA_dataset)/huss_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_huss.nc 
-$fetch_cmd $(JRA_dataset)/prra_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010130-${forceyrp1}01010000.padded.nc JRA_prra.nc
-$fetch_cmd $(JRA_dataset)/prsn_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010130-${forceyrp1}01010000.padded.nc JRA_prsn.nc
-$fetch_cmd $(JRA_dataset)/psl_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_psl.nc
-$fetch_cmd $(JRA_dataset)/rlds_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010130-${forceyrp1}01010000.padded.nc JRA_rlds.nc
-$fetch_cmd $(JRA_dataset)/rsds_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010130-${forceyrp1}01010000.padded.nc JRA_rsds.nc
-$fetch_cmd $(JRA_dataset)/tas_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_tas.nc
-$fetch_cmd $(JRA_dataset)/uas_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_uas.nc
-$fetch_cmd $(JRA_dataset)/vas_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}01010000-${forceyr}12312230.padded.nc JRA_vas.nc
-$fetch_cmd $(JRA_dataset)/friver_regrid2880x2240/friver_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}0101-${forceyrp1}0101.nc.regrid2880x2240.v20181114.padded.nc JRA_friver_2880x2240.nc
-$fetch_cmd $(JRA_dataset)/friver_regrid1440x1080/friver_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}0101-${forceyrp1}0101.nc.regrid1440x1080.v20181114.padded.nc JRA_friver_1440x1080.nc
-$fetch_cmd $(JRA_dataset)/friver_regrid720x576/friver_input4MIPs_atmosphericState_OMIP_MRI-JRA55-do-1-3_gn_${forceyr}0101-${forceyrp1}0101.nc.regrid720x576.v20181114.padded.nc JRA_friver_720x576.nc
-
-cd $work
 
 #Add required BLING gas flux fields if they do not exist in the restarts 
 #to be able to start from older runs that did not have these gas fluxes
@@ -396,24 +352,24 @@ endif
     </input>
    </freInclude>
 
-   <freInclude name="JRA_data_table">
+   <freInclude name="CORE2_data_table">
     <input>
       <dataTable>
-"ATM" , "p_surf"        , "psl"     , "./INPUT/JRA_psl.nc"   , "bilinear" ,  1.0
-"ATM" , "p_bot"         , "psl"     , "./INPUT/JRA_psl.nc"   , "bilinear" ,  1.0
-"ATM" , "t_bot"         , "tas"     , "./INPUT/JRA_tas.nc"   , "bilinear" ,  1.0
-"ATM" , "sphum_bot"     , "huss"    , "./INPUT/JRA_huss.nc"  , "bilinear" ,  1.0
-"ATM" , "u_bot"         , "uas"     , "./INPUT/JRA_uas.nc"   , "bicubic",    1.0
-"ATM" , "v_bot"         , "vas"     , "./INPUT/JRA_vas.nc"   , "bicubic",    1.0
-"ATM" , "z_bot"         , ""            , ""             , "bilinear" ,  10.0
-"ATM" , "gust"          , ""            , ""             , "bilinear" ,  1.0e-4
-"ICE" , "lw_flux_dn"    , "rlds"    , "./INPUT/JRA_rlds.nc"  , "bilinear" ,  1.0
-"ICE" , "sw_flux_vis_dir_dn", "rsds", "./INPUT/JRA_rsds.nc"  , "bilinear" ,  0.285
-"ICE" , "sw_flux_vis_dif_dn", "rsds", "./INPUT/JRA_rsds.nc"  , "bilinear" ,  0.285
-"ICE" , "sw_flux_nir_dir_dn", "rsds", "./INPUT/JRA_rsds.nc"  , "bilinear" ,  0.215
-"ICE" , "sw_flux_nir_dif_dn", "rsds", "./INPUT/JRA_rsds.nc"  , "bilinear" ,  0.215
-"ICE" , "lprec"         , "prra"    , "./INPUT/JRA_prra.nc"  , "bilinear" ,  0.9933
-"ICE" , "fprec"         , "prsn"    , "./INPUT/JRA_prsn.nc"  , "bilinear" ,  0.9933
+"ATM" , "p_surf"        , "SLP"         , "./INPUT/slp.1948-2007.nomads.nc"          , "bilinear" ,  1.0
+"ATM" , "p_bot"         , "SLP"         , "./INPUT/slp.1948-2007.nomads.nc"          , "bilinear" ,  1.0
+"ATM" , "t_bot"         , "T_10_MOD"    , "./INPUT/t_10_mod.1948-2007.nomads.nc"     , "bilinear" ,  1.0
+"ATM" , "sphum_bot"     , "Q_10_MOD"    , "./INPUT/q_10_mod.1948-2007.nomads.nc"     , "bilinear" ,  1.0
+"ATM" , "u_bot"         , "U_10_MOD"    , "./INPUT/u_10_mod.1948-2007.nomads.nc"     , "bicubic",   1.0
+"ATM" , "v_bot"         , "V_10_MOD"    , "./INPUT/v_10_mod.1948-2007.nomads.nc"     , "bicubic",   1.0
+"ATM" , "z_bot"         , ""            , ""                                         , "bilinear" , 10.0
+"ATM" , "gust"          , ""            , ""                                         , "bilinear" ,  1.0e-4
+"ICE" , "lw_flux_dn"    , "LWDN_MOD"    , "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  1.0
+"ICE" , "sw_flux_vis_dir_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.285
+"ICE" , "sw_flux_vis_dif_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.285
+"ICE" , "sw_flux_nir_dir_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.215
+"ICE" , "sw_flux_nir_dif_dn", "SWDN_MOD", "./INPUT/ncar_rad.1948-2007.nomads.nc"     , "bilinear" ,  0.215
+"ICE" , "lprec"         , "RAIN"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
+"ICE" , "fprec"         , "SNOW"        , "./INPUT/ncar_precip.1948-2007.nomads.nc"  , "bilinear" ,  0.9933
 "ICE" , "calving"       , ""            , ""                             , "none"  ,  0.0
 "ICE" , "dhdt"          , ""            , ""                             , "none"  , 80.0
 "ICE" , "dedt"          , ""            , ""                             , "none"  ,  2.0e-6
@@ -449,12 +405,12 @@ endif
    <!--***************************** 1/8 degree experiments        ****************************-->
    <!--****************************************************************************************-->
 						
-   <experiment name="OM4p125_IAF_csf_JRA55do1-3_r5_cycle1" inherit="MOM6_SIS2_compile$(MODIFIER)">
+   <experiment name="OM4p125_IAF_csf_CORE2_r5" inherit="MOM6_SIS2_compile$(MODIFIER)">
     <description>
 global 1/8 degree z ocean_ice experiment 
 regridded runoff and salinity
-JRA55do1-3 dynamic inter_annual forcing data
-No additional diurnal cycle imposed
+CORE2 dynamic inter_annual forcing data
+Using the same MOM6/SIS2 timesteps as JRA runs
 Use downsampled diagnostics _d2
 ADJUST_NET_FRESH_WATER_TO_ZERO  = True
 READ_TIDEAMP = True
@@ -469,11 +425,11 @@ READ_TIDEAMP = True
       <mip_era>CMIP6</mip_era>
       <!-- model info -->
       <!-- the model names are subject to change after arriving at a new name and registering it in CV-->	
-      <source>GFDL-OM4_p125deg_JRA (2017)</source>
-      <source_id>GFDL-OM4_p125deg_JRA</source_id>
+      <source>GFDL-OM4_p125deg_CORE2 (2017)</source>
+      <source_id>GFDL-OM4_p125deg_CORE2</source_id>
       <source_type>OGCM</source_type>
       <!--experiment info-->
-      <experiment_name>OMIP experiment forced by JRA55-do-1-3/v20180412 Inter-Annual Forcing version 2.0 and initialized with observed physical and biogeochemical ocean data</experiment_name>
+      <experiment_name>OMIP experiment forced by CORE Inter-Annual Forcing (CIAF) version 2.0 and initialized with observed physical and biogeochemical ocean data</experiment_name>
       <experiment_id>omip2</experiment_id>
       <sub_experiment>none</sub_experiment>
       <sub_experiment_id>none</sub_experiment_id>
@@ -486,7 +442,7 @@ READ_TIDEAMP = True
       <!-- variant info-->
       <variant_info></variant_info>
       <!--parent info-->
-      <parent_time_units>days since 1958-1-1</parent_time_units>
+      <parent_time_units>days since 1708-1-1</parent_time_units>
       <parent_activity_id>CMIP</parent_activity_id>
       <parent_experiment_id></parent_experiment_id>
       <parent_mip_era>CMIP6</parent_mip_era>
@@ -503,11 +459,11 @@ READ_TIDEAMP = True
       <namelist name="coupler_nml">
        months = $months,
        days   = $days,
-       current_date = 1958,1,1,0,0,0,
+       current_date = 1708,1,1,0,0,0,
        hours = 0
        minutes = 0
        seconds = 0
-       calendar = 'julian',  !important
+       calendar = 'NOLEAP',
        dt_cpld  = 3600,
        dt_atmos = 3600,
        do_atmos = .false.,
@@ -583,24 +539,20 @@ $baseDate
      </diagTable>
 
      <!--A set of downsampled diagnotics-->
-<!--
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6.d2sample</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6.d2sample</dataSource>
      </dataFile>
--->
-      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table.MOM6.d2sample</dataSource>
-      </dataFile>
 
      <!--data_tables and data files-->
-     <!--JRA forcing-->
-     <xi:include xpointer="xpointer(//freInclude[@name='JRA_data_table']/input/node())"/>
+     <!--CORE2 forcing-->
+     <xi:include xpointer="xpointer(//freInclude[@name='CORE2_data_table']/input/node())"/>
      <!--append the resolution dependent runoff override-->
      <dataTable order="append"> 
-#JRA runoff    
-"ICE" , "runoff"        , "friver"      , "./INPUT/JRA_friver_2880x2240.nc", "none" ,  1.0
+#CORE2 runoff    
+"ICE" , "runoff"        , "runoff"      , "./INPUT/runoff.daitren.clim.2880x2240.v20180716.nc", "none" ,  1.0
      </dataTable>
+     <xi:include xpointer="xpointer(//freInclude[@name='CORE2_IAF_data']/input/node())"/>
 
       
      <!--field_tables-->
@@ -668,169 +620,6 @@ SIS_OVERRIDE_EOF
     </postProcess>
    </experiment>
 
-   <experiment name="OM4p125_IAF_csf_JRA55do1-3_r5_cycle2" inherit="OM4p125_IAF_csf_JRA55do1-3_r5_cycle1">
-    <input>
-     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">/lustre/f2/scratch/oar.gfdl.ogrp-account/CMIP6/OMIP/xanadu_mom6_20181101/OM4p125_IAF_csf_JRA55do1-3_r5_cycle1/ncrc4.intel16f2-prod/archive/restart/20180101.tar</dataSource>
-     </dataFile>
-     <!--There is  MOM6/SIS2 restart provided in initCond.-->
-     <namelist name="MOM_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
-     </namelist>
-     <namelist name="SIS_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
-     </namelist>
-     <csh>
-        <![CDATA[
-
-if ( $currentSeg == 1 ) then
-   #Take current date from coupler_nml
-   if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
-endif
-
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override NIGLOBAL = 2880
-#override NJGLOBAL = 2240
-#override TOPO_EDITS_FILE = ""
-#override TIDEAMP_FILE = "tidal_amplitude.v20181107.nc"
-#override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
-#override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20180716.nc"
-#override SALT_RESTORE_FILE = "salt_restore_PHC2.2880x2240.v20180716.nc"
-#override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
-#override DT_THERM = 3600.0               !   [s] !reduced from 7200.0 for OM4_025
-#override BAD_VAL_SST_MIN = -5.0  ! decreased from default of -3.0 to avoid extremes in 1/8 degree model
-#override U_TRUNC_FILE = "MOM_U_truncations"
-#override V_TRUNC_FILE = "MOM_V_truncations"
-MOM_OVERRIDE_EOF
-
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override NIGLOBAL = 2880
-#override NJGLOBAL = 2240
-#override DT_ICE_DYNAMICS = 450 !reduced from 1200.0 for OM4_025
-#override DT_RHEOLOGY = 25.0
-#override U_TRUNC_FILE = "SIS_U_truncations"
-#override V_TRUNC_FILE = "SIS_V_truncations"
-SIS_OVERRIDE_EOF
-     ]]></csh>
-    </input>
-   </experiment>
-   <experiment name="OM4p125_IAF_csf_JRA55do1-3_r5_cycle3" inherit="OM4p125_IAF_csf_JRA55do1-3_r5_cycle1">
-    <input>
-     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">/lustre/f2/scratch/oar.gfdl.ogrp-account/CMIP6/OMIP/xanadu_mom6_20181101/OM4p125_IAF_csf_JRA55do1-3_r5_cycle2/ncrc4.intel16f2-prod/archive/restart/20180101.tar</dataSource>
-     </dataFile>
-     <!--There is  MOM6/SIS2 restart provided in initCond.-->
-     <namelist name="MOM_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
-     </namelist>
-     <namelist name="SIS_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
-     </namelist>
-     <csh>
-        <![CDATA[
-
-if ( $currentSeg == 1 ) then
-   #Take current date from coupler_nml
-   if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
-endif
-
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override NIGLOBAL = 2880
-#override NJGLOBAL = 2240
-#override TOPO_EDITS_FILE = ""
-#override TIDEAMP_FILE = "tidal_amplitude.v20181107.nc"
-#override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
-#override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20180716.nc"
-#override SALT_RESTORE_FILE = "salt_restore_PHC2.2880x2240.v20180716.nc"
-#override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
-#override DT_THERM = 3600.0               !   [s] !reduced from 7200.0 for OM4_025
-#override BAD_VAL_SST_MIN = -5.0  ! decreased from default of -3.0 to avoid extremes in 1/8 degree model
-#override U_TRUNC_FILE = "MOM_U_truncations"
-#override V_TRUNC_FILE = "MOM_V_truncations"
-MOM_OVERRIDE_EOF
-
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override NIGLOBAL = 2880
-#override NJGLOBAL = 2240
-#override DT_ICE_DYNAMICS = 450 !reduced from 1200.0 for OM4_025
-#override DT_RHEOLOGY = 25.0
-#override U_TRUNC_FILE = "SIS_U_truncations"
-#override V_TRUNC_FILE = "SIS_V_truncations"
-SIS_OVERRIDE_EOF
-     ]]></csh>
-    </input>
-   </experiment>
-   <experiment name="OM4p125_IAF_csf_JRA55do1-3_r5_cycle4" inherit="OM4p125_IAF_csf_JRA55do1-3_r5_cycle1">
-    <input>
-     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">/lustre/f2/scratch/oar.gfdl.ogrp-account/CMIP6/OMIP/xanadu_mom6_20181101/OM4p125_IAF_csf_JRA55do1-3_r5_cycle3/ncrc4.intel16f2-prod/archive/restart/20180101.tar</dataSource>
-     </dataFile>
-     <!--There is  MOM6/SIS2 restart provided in initCond.-->
-     <namelist name="MOM_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
-     </namelist>
-     <namelist name="SIS_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
-     </namelist>
-     <csh>
-        <![CDATA[
-
-if ( $currentSeg == 1 ) then
-   #Take current date from coupler_nml
-   if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
-endif
-
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override NIGLOBAL = 2880
-#override NJGLOBAL = 2240
-#override TOPO_EDITS_FILE = ""
-#override TIDEAMP_FILE = "tidal_amplitude.v20181107.nc"
-#override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
-#override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20180716.nc"
-#override SALT_RESTORE_FILE = "salt_restore_PHC2.2880x2240.v20180716.nc"
-#override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
-#override DT_THERM = 3600.0               !   [s] !reduced from 7200.0 for OM4_025
-#override BAD_VAL_SST_MIN = -5.0  ! decreased from default of -3.0 to avoid extremes in 1/8 degree model
-#override ENERGYSAVEDAYS = 1.0    ! decreased from 0.25 to save compute time (the default is supposed to be 1. but its not
-#override U_TRUNC_FILE = "MOM_U_truncations"
-#override V_TRUNC_FILE = "MOM_V_truncations"
-MOM_OVERRIDE_EOF
-
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override NIGLOBAL = 2880
-#override NJGLOBAL = 2240
-#override DT_ICE_DYNAMICS = 450 !reduced from 1200.0 for OM4_025
-#override DT_RHEOLOGY = 25.0
-#override U_TRUNC_FILE = "SIS_U_truncations"
-#override V_TRUNC_FILE = "SIS_V_truncations"
-SIS_OVERRIDE_EOF
-     ]]></csh>
-    </input>
-   </experiment>
    <freInclude name="OM4p125_grid">
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
@@ -929,7 +718,7 @@ $(ARCHIVE_NNZ)/input/xanadu/OM4p125_grid/mask_table.6368.160x120
          input_filename = '$restart_flag'
          restart_input_dir = 'INPUT/',
          restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_diurnal','INPUT/SIS_override'
      </namelist>
      </input>
    </freInclude>
@@ -937,13 +726,143 @@ $(ARCHIVE_NNZ)/input/xanadu/OM4p125_grid/mask_table.6368.160x120
    <!--****************************************************************************************-->
    <!--***************************** 1/4 degree experiments        ****************************-->
    <!--****************************************************************************************-->
+											      
+   <experiment name="OM4p25_IAF_BLING_csf_rerun_hifreqdiag_2003-2008" inherit="OM4p25_IAF_BLING_csf_rerun">
+    <input>								      
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override','INPUT/SIS_diurnal'
+     </namelist>
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/warsaw/OM4p25_IAF_BLING_csf_rerun_restart_20030101_combined.tar</dataSource>
+     </dataFile>
 
-   <experiment name="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle1" inherit="MOM6_SIS2_compile">
+     <diagTable>
+$name
+$baseDate
+#
+"ice_5daily",    5, "days", 1, "days", "time"
+"ice_model", "siconc",  "siconc"    "ice_5daily", "all", "none", "none", 2
+"ice_model", "sisnconc","sisnconc", "ice_5daily", "all", "none", "none", 2
+"ice_model", "MIB"     ,"MIB",      "ice_5daily", "all", "none", "none", 2
+#
+"ocean_5daily",  5, "days", 1, "days", "time"
+"ocean_model",   "zos",              "zos",                "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "thetao",           "thetao",             "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "so",               "so",                 "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "vintage",          "vintage",            "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "uh",               "uh",                 "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "vh",               "vh",                 "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "e",                "e",                  "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "MLD_003",          "MLD_003",            "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "tauuo",            "tauuo",              "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "tauvo",            "tauvo",              "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "net_heat_coupler", "net_heat_coupler",   "ocean_5daily",         "all", "none", "none",2
+"ocean_model",   "Kd_interface",     "Kd_interface",       "ocean_5daily",         "all", "none", "none",2
+     </diagTable>
+    </input>
+   </experiment>
+   <experiment name="OM4p25_IAF_BLING_csf_rerun" inherit="OM4p25_IAF_BLING_CFC_csf">
+    <publicMetadata DBswitch="$(MDBIswitch)">
+      <!-- Realization tag -->
+      <realization r="1" i="1" p="1" f="1"/>
+      <!-- project info -->
+      <project>CMIP6</project>
+      <activity_id>OMIP</activity_id>
+      <mip_era>CMIP6</mip_era>
+      <!-- model info -->
+  <source>GFDL-CM4 (2018): \naerosol: interactive\natmos: GFDL-AM4.0.1 (Cubed-sphere (c96) - 1 degree nominal horizontal resolution; 360 x 180 longitude/latitude; 33 levels; top level 1 hPa)\natmosChem: fast chemistry, aerosol only\nland: GFDL-LM4.0.1 (1 degree nominal horizontal resolution; 360 x 180 longitude/latitude; 20 levels; bot level 10m); land:Veg:unnamed (dynamic vegetation, dynamic land use); land:Hydro:unnamed (soil water and ice, multi-layer snow, rivers and lakes)\nlandIce: GFDL-LM4.0.1\nocean: GFDL-OM4p25 (GFDL-MOM6, tripolar - nominal 0.25 deg; 1440 x 1080 longitude/latitude; 75 levels; top grid cell 0-2 m)\nocnBgchem: GFDL-BLINGv2\nseaIce: GFDL-SIM4p25 (GFDL-SIS2.0, tripolar - nominal 0.25 deg; 1440 x 1080 longitude/latitude; 5 layers; 5 thickness categories) 
+  </source>
+
+      <source_id>GFDL-CM4</source_id>
+      <source_type>OGCM</source_type>
+      <!--experiment info-->
+      <experiment_name>OMIP experiment forced by CORE Inter-Annual Forcing (CIAF) version 2.0 and initialized with observed physical and biogeochemical ocean data</experiment_name>
+      <experiment_id>omip1</experiment_id>
+      <sub_experiment>none</sub_experiment>
+      <sub_experiment_id>none</sub_experiment_id>
+      <start_time>$(EXP_CPLD_START)</start_time>
+      <end_time>$(EXP_CPLD_END)</end_time>
+      <!-- branch info -->
+      <branch_method>standard</branch_method>
+      <branch_time_in_child>0.0D0</branch_time_in_child>
+      <branch_time_in_parent></branch_time_in_parent>
+      <!-- variant info-->
+      <variant_info></variant_info>
+      <!--parent info-->
+      <parent_time_units>days since 1708-1-1</parent_time_units>
+      <parent_activity_id>CMIP</parent_activity_id>
+      <parent_experiment_id></parent_experiment_id>
+      <parent_mip_era>CMIP6</parent_mip_era>
+      <parent_source_id>GFDL-CM4</parent_source_id>
+      <parent_variant_label>r1i1p1f1</parent_variant_label>
+      <comment>
+       Experiment name = $(name)
+    For more information please refer to the
+    &lt;a href="https://github.com/NOAA-GFDL/MOM6-examples/wiki"&gt; MOM6 Wiki.  &lt;/a&gt;
+      </comment>
+
+    </publicMetadata>
+     <!--MOM_overrides-->
+     <input>
+     <namelist name="generic_tracer_nml">
+       do_generic_tracer=.true.
+       do_generic_BLING=.true.
+       do_generic_CFC=.false.
+       do_generic_SF6=.false.
+       do_generic_age=.false.
+       do_generic_argon=.false.
+       do_generic_COBALT=.false.
+       force_update_fluxes=.true.
+      </namelist>
+       <diagTable order="append">
+"ocean_Tropics_monthly",         1, "months",   1, "days", "time"
+"ocean_model_z2", "volcello", "volcello", "ocean_Tropics_monthly", "all", "mean", "-255. 19. -5. 5. -1 -1",2
+"ocean_model_z2", "thetao",   "thetao",   "ocean_Tropics_monthly", "all", "mean", "-255. 19. -5. 5. -1 -1",2
+"ocean_model_z2", "so",       "so",       "ocean_Tropics_monthly", "all", "mean", "-255. 19. -5. 5. -1 -1",2
+"ocean_model_z2", "umo",      "umo",      "ocean_Tropics_monthly", "all", "mean", "-255. 19. -5. 5. -1 -1",2
+"ocean_model_z2", "uo",       "uo",       "ocean_Tropics_monthly", "all", "mean", "-255. 19. -5. 5. -1 -1",2
+"ocean_model_z2", "vmo",      "vmo",      "ocean_Tropics_monthly", "all", "mean", "-255. 19. -5. 5. -1 -1",2
+"ocean_model_z2", "vo",       "vo",       "ocean_Tropics_monthly", "all", "mean", "-255. 19. -5. 5. -1 -1",2
+"ocean_model_rho2","vo",   "vo",     "ocean_annual_rho2",  "all", "mean", "none",2
+"ocean_model_rho2","vo",   "vo",     "ocean_month_rho2",   "all", "mean", "none",2
+       </diagTable>
+       <csh>
+         <![CDATA[
+# Get new diagnostic coordinate file
+cp /lustre/f2/pdata/gfdl/cmip6/datasets/OMIP/diagnostic/diag_rho2.nc $work/INPUT/
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = True
+# Fix sign error in adjustment of net fresh-water
+USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
+# Add a uniform 10m diagnostic coordinate between 0 and 350m
+#override NUM_DIAG_COORDS = 3
+#override DIAG_COORDS = "z Z ZSTAR", "rho2 RHO2 RHO", "z2 Z2 ZSTAR"
+DIAG_COORD_DEF_Z2 = "UNIFORM:35,350"
+# Use finer resolution rho2 diagnostic coordinate
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+MOM_OVERRIDE_EOF
+         ]]></csh>
+     </input>
+
+   </experiment>
+   <experiment name="OM4p25_IAF_BLING_CFC_csf" inherit="MOM6_SIS2_compile$(MODIFIER)">
     <description>
 global 1/4 degree z ocean_ice experiment 
 regridded runoff and salinity
-JRA55do1-3 dynamic inter_annual forcing data
-No additional diurnal cycle imposed
+CORE2 dynamic inter_annual forcing data
     </description>  
     <publicMetadata DBswitch="$(MDBIswitch)">
       <!-- Realization tag -->
@@ -954,11 +873,11 @@ No additional diurnal cycle imposed
       <mip_era>CMIP6</mip_era>
       <!-- model info -->
       <!-- the model names are subject to change after arriving at a new name and registering it in CV-->	
-      <source>GFDL-OM4_p25deg_JRA (2017)</source>
-      <source_id>GFDL-OM4_p25deg_JRA</source_id>
+      <source>GFDL-OM4_p25deg_CORE2 (2017)</source>
+      <source_id>GFDL-OM4_p25deg_CORE2</source_id>
       <source_type>OGCM</source_type>
       <!--experiment info-->
-      <experiment_name>OMIP experiment forced by JRA55-do-1-3/v20180412 Inter-Annual Forcing version 2.0 and initialized with observed physical and biogeochemical ocean data</experiment_name>
+      <experiment_name>OMIP experiment forced by CORE Inter-Annual Forcing (CIAF) version 2.0 and initialized with observed physical and biogeochemical ocean data</experiment_name>
       <experiment_id>omip2</experiment_id>
       <sub_experiment>none</sub_experiment>
       <sub_experiment_id>none</sub_experiment_id>
@@ -971,7 +890,7 @@ No additional diurnal cycle imposed
       <!-- variant info-->
       <variant_info></variant_info>
       <!--parent info-->
-      <parent_time_units>days since 1958-1-1</parent_time_units>
+      <parent_time_units>days since 1708-1-1</parent_time_units>
       <parent_activity_id>CMIP</parent_activity_id>
       <parent_experiment_id></parent_experiment_id>
       <parent_mip_era>CMIP6</parent_mip_era>
@@ -988,11 +907,11 @@ No additional diurnal cycle imposed
       <namelist name="coupler_nml">
        months = $months,
        days   = $days,
-       current_date = 1958,1,1,0,0,0,
+       current_date = 1708,1,1,0,0,0,
        hours = 0
        minutes = 0
        seconds = 0
-       calendar = 'julian',
+       calendar = 'NOLEAP',
        dt_cpld  = 3600,
        dt_atmos = 3600,
        do_atmos = .false.,
@@ -1079,20 +998,17 @@ No additional diurnal cycle imposed
 $name
 $baseDate
      </diagTable>
-
      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_GENERICS']/input/node())"/>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_BLING</dataSource>
       </dataFile>
 
      <!--data_tables and data files-->
-     <!--JRA forcing-->
-     <xi:include xpointer="xpointer(//freInclude[@name='JRA_data_table']/input/node())"/>
-     <!--append the resolution dependent runoff override-->
-      <dataTable order="append">
-#JRA runoff
-"ICE" , "runoff"        , "friver"      , "./INPUT/JRA_friver_1440x1080.nc", "none" ,  1.0
-      </dataTable>  
+     <!--CORE2 forcing-->
+     <xi:include xpointer="xpointer(//freInclude[@name='CORE2_IAF_data']/input/node())"/>
+      <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/data_table_iaf</dataSource>
+      </dataFile>
 
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_data_table']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='CFC_data_table']/input/node())"/>
@@ -1182,97 +1098,6 @@ endif
       <xi:include xpointer="xpointer(//freInclude[@name='inert_postprocess_1x1deg']/postProcess/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='inert_z_postprocess_1x1deg']/postProcess/node())"/>    </postProcess>
    </experiment>
-
-   <experiment name="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle2" inherit="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle1">
-    <input>
-     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">/lustre/f2/scratch/oar.gfdl.ogrp-account/CMIP6/OMIP/xanadu_mom6_20181101/OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle1/ncrc4.intel16f2-prod/archive/restart/20180101.tar</dataSource>
-     </dataFile>
-     <!--There is  MOM6/SIS2 restart provided in initCond.-->
-     <namelist name="MOM_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
-     </namelist>
-     <namelist name="SIS_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
-     </namelist>
-     <csh>
-        <![CDATA[
-
-if ( $currentSeg == 1 ) then
-   #Take current date from coupler_nml
-   if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
-endif
-
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-# Turn on generic tracers
-USE_generic_tracer = True
-#override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
-MOM_OVERRIDE_EOF
-     ]]></csh>
-    </input>
-   </experiment>
-   <experiment name="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle3" inherit="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle1">
-    <input>
-     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">/lustre/f2/scratch/oar.gfdl.ogrp-account/CMIP6/OMIP/xanadu_mom6_20181101/OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle2/ncrc4.intel16f2-prod/archive/restart/20180101.tar</dataSource>
-     </dataFile>
-     <!--There is  MOM6/SIS2 restart provided in initCond.-->
-     <namelist name="MOM_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
-     </namelist>
-     <namelist name="SIS_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
-     </namelist>
-     <csh>
-        <![CDATA[
-
-if ( $currentSeg == 1 ) then
-   #Take current date from coupler_nml
-   if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
-endif
-
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-# Turn on generic tracers
-USE_generic_tracer = True
-#override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
-MOM_OVERRIDE_EOF
-     ]]></csh>
-    </input>
-   </experiment>
-
-   <experiment name="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle1_d2test" inherit="OM4p25_IAF_BLING_CFC_csf_JRA55do1-3_r4r_cycle1">
-    <input>
-     <diagTable order="append">
-# _d2 sample
- "ocean_daily_d2",               1, "days",   1, "days", "time"
- "ocean_model_d2",   "zos",          "zos",              "ocean_daily_d2", "all", "mean", "none",2
- "ocean_model_d2",   "mlotst",       "mlotst",           "ocean_daily_d2", "all", "mean", "none",2
- "ocean_model_d2",   "tos",          "tos",              "ocean_daily_d2", "all", "mean", "none",2
- "ocean_model_d2",   "sos",          "sos",              "ocean_daily_d2", "all", "mean", "none",2
- "ocean_model_d2",   "SSU",          "ssu",              "ocean_daily_d2", "all", "mean", "none",2
- "ocean_model_d2",   "SSV",          "ssv",              "ocean_daily_d2", "all", "mean", "none",2
- "ocean_model_d2",   "thetao",       "thetao",           "ocean_daily_d2", "all", "mean", "none",2
- "ocean_model_d2", "ePBL_h_ML",    "omldamax",         "ocean_daily_d2", "all", "max",  "none",2
-     </diagTable>
-    </input>
-   </experiment>
-
    <freInclude name="OM4p25_grid">
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
@@ -1310,14 +1135,12 @@ MOM_OVERRIDE_EOF
    
    <freInclude name="OM4p25_data">
     <input>
-<!--Not used
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/runoff.daitren.clim.1440x1080.v20180328.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/runoff.daitren.iaf.1440x1080.v20180328.nc</dataSource>
       </dataFile>
--->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/seawifs-clim-1997-2010.1440x1080.v20180328.nc</dataSource>
       </dataFile>
@@ -1385,7 +1208,7 @@ MOM_OVERRIDE_EOF
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.3785.90x144
       </dataFile>
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
-          <dataSource site="ncrc">$(gfdlO_pdata)/datasets/OM4_025/mosaic.v20170622.unpacked/ocean_static.nc</dataSource>
+          <dataSource site="ncrc">$(gfdlO_pdata)/datasets/OM4_025/mosaic.v20140610.unpacked/ocean_static.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/geothermal_davies2013_v1.nc</dataSource>
@@ -1442,25 +1265,255 @@ MOM_OVERRIDE_EOF
          input_filename = '$restart_flag'
          restart_input_dir = 'INPUT/',
          restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_diurnal','INPUT/SIS_override'
      </namelist>
 
      </input>
    </freInclude>
 
+   <experiment name="OM4p25_zstar" inherit="OM4p25_IAF_BLING_CFC_csf">
+    <input>
+     <csh>
+        <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = True
+#override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
+#override REGRIDDING_COORDINATE_MODE = "Z*"
+#override ALE_COORDINATE_CONFIG = "FNC1:2,6500,6,.01"
+MOM_OVERRIDE_EOF
+     ]]></csh>
+    </input>
+   </experiment>
    
+   <experiment name="OM4p25_IAF_BLING_CFC_csf_diagd2$(MODIFIER)" inherit="OM4p25_IAF_BLING_CFC_csf">
+    <input>
+     <diagTable>
+$name
+$baseDate
+     </diagTable>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6.d2</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6.d2</dataSource>
+      </dataFile>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+     </dataFile>
+    </input>
+   </experiment>
 
    <!--****************************************************************************************-->
    <!--***************************** 1/2 degree experiments        ****************************-->
    <!--****************************************************************************************-->
+											      
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998_uncombined" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
+    <input>								      
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override','INPUT/SIS_diurnal'
+     </namelist>
+<!--
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.20080101.tar</dataSource>
+      </dataFile>
 
-   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_JRA55do1-3_r4r_cycle1" inherit="MOM6_SIS2_compile">
-    <description>
-global 1/2 degree z ocean_ice experiment 
-regridded runoff and salinity
-JRA55do1-3 dynamic inter_annual forcing data
-No additional diurnal cycle imposed
-    </description>  
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/OM4p5_IAF_BLING_CFC_abio_csf_mle200.20080101_combined.tar</dataSource>
+      </dataFile>
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/gfdl/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.19980101.combined.tar</dataSource>
+      </dataFile>
+-->
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.19980101.tar</dataSource>
+      </dataFile>
+     <!--MOM_overrides-->
+     <csh>
+       <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = True
+GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+#override DEBUG  = True
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+#override ADD_DIURNAL_SW = True 
+#override ICE_STATS_INTERVAL = 30
+
+#override DEBUG  = True
+SIS_OVERRIDE_EOF
+
+####################################################################################################
+##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
+##
+if ( $currentSeg == 1 ) then
+  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+      ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kd_turb,Kd_shear || exit 1
+      endif
+
+      ncdump -h $resfile | grep 'double Kv_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kv_turb,Kv_shear || exit 1
+      endif
+  end
+
+endif
+     ]]></csh>
+    </input>
+   <runtime>
+      <production simTime="$(PROD_SIMTIME)" units="years">
+          <segment simTime="12" units="months"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5_production']/node())"/>
+      </production>
+
+      <regression name="basic">
+        <run months="1" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5']/node())"/> </run>
+        <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5']/node())"/> </run>
+      </regression>
+      <reference restart="$(REFERENCE)/archive/1x1m0d_1300x1o/restart/17080201.tar"/>
+   </runtime>
+   </experiment>
+
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998_combined" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
+    <input>
+      <namelist name="frecheck_nml">
+        start_date =  1998,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
+      </namelist>
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override','INPUT/SIS_diurnal'
+     </namelist>
+<!--
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.20080101.tar</dataSource>
+      </dataFile>
+
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/OM4p5_IAF_BLING_CFC_abio_csf_mle200.20080101_combined.tar</dataSource>
+      </dataFile>
+-->
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/gfdl/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.19980101.combined.tar</dataSource>
+      </dataFile>
+<!--
+      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/John.Krasting/cwg/IC/OM4p5_IAF_BLING_CFC_abio_csf_mle200.19980101.tar</dataSource>
+      </dataFile>
+-->
+     <!--MOM_overrides-->
+     <csh>
+       <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = True
+GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+#override ADD_DIURNAL_SW = True 
+#override ICE_STATS_INTERVAL = 30
+SIS_OVERRIDE_EOF
+
+####################################################################################################
+##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
+##
+if ( $currentSeg == 1 ) then
+  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+      ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kd_turb,Kd_shear || exit 1
+      endif
+
+      ncdump -h $resfile | grep 'double Kv_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kv_turb,Kv_shear || exit 1
+      endif
+  end
+
+endif
+####################################################################################################
+##The following is to avoid model crash with a layout other than the one that produced the initCond.
+##The problem could occur if the generating model run used a mask_table that was different from the
+##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical 
+##values on land on the masked pes (9.96E36) that should have been set as "missing values". 
+##I am pretty sure that there is a bug in SIS2 that tickles this, but I do not have a smoking gun.
+##
+if ( $currentSeg == 1 ) then
+  cd $work/INPUT
+  cp ice_model.res.nc ice_model.res1.nc
+
+  #All ice restart variables should be 0 where they have a "missing value" (9.96E36)
+  foreach var ( T_skin coszen rough_moist rough_heat rough_mom sym_str_s str_t str_d sym_v_ice_C sym_u_ice_C sal_ice enth_ice H_to_kg_m2 h_ice enth_snow h_snow h_pond flux_sw_nir_dif flux_sw_nir_dir flux_sw_vis_dif flux_sw_vis_dir p_surf calving_hflx runoff_hflx calving runoff fprec lprec flux_lw flux_salt flux_q flux_t flux_v flux_u )
+     ncap2 -s "where( $var > 1e36) $var =0.0" ice_model.res1.nc ice_model.res2.nc
+     mv -f ice_model.res2.nc ice_model.res1.nc
+  end
+
+  #except part_size that should be 1 for category 1 and 0 otherwise. But I don't know how to do that!
+  #The next best guess would be 1/6 for all categories so that they add up to 1:
+  ncap2 -s 'where( (part_size>1e36) ) part_size =1.0/6.0' ice_model.res1.nc ice_model.res2.nc
+
+  cp -f ice_model.res2.nc  ice_model.res.nc
+
+  #Same story with calving.res.nc
+  cp -f calving.res.nc calving.res1.nc
+  ncap2 -s 'where( stored_ice>1e36 ) stored_ice =0.0' calving.res1.nc calving.res2.nc
+  mv -f calving.res2.nc calving.res1.nc
+  ncap2 -s 'where( stored_heat>1e36 ) stored_heat =0.0' calving.res1.nc calving.res2.nc
+  mv -f calving.res2.nc calving.res.nc
+
+  cd $work
+endif
+     ]]></csh>
+    </input>
+   </experiment>
+
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200" inherit="MOM6_SIS2_compile$(MODIFIER)">
    <publicMetadata DBswitch="$(MDBIswitch)">
       <!-- Realization tag -->
       <realization r="1" i="1" p="1" f="1"/>
@@ -1470,12 +1523,13 @@ No additional diurnal cycle imposed
       <mip_era>CMIP6</mip_era>
       <!-- model info --> 
       <!-- the model names are subject to change after arriving at a new name and registering it in CV-->	
-      <source>GFDL-OM4_p5deg_JRA (2017)</source>
-      <source_id>GFDL-OM4_p5deg_JRA</source_id>
+  <source>GFDL-OM4p5B (2018): \naerosol: none\natmos: none\natmosChem: none\nland: none\nlandIce: none\nocean: GFDL-OM4p5 (GFDL-MOM6, tripolar - nominal 0.5 deg; 720 x 576 longitude/latitude; 75 levels; top grid cell 0-2 m)\nocnBgchem: GFDL-BLINGv2\nseaIce: GFDL-SIM4p5 (GFDL-SIS2.0, tripolar - nominal 0.5 deg; 720 x 576 longitude/latitude; 5 layers; 5 thickness categories) 
+  </source>
+      <source_id>GFDL-OM4p5B</source_id>
       <source_type>OGCM</source_type>
       <!--experiment info-->
-      <experiment_name>OMIP experiment forced by JRA55-do-1-3/v20180412 Inter-Annual Forcing and initialized with observed physical and biogeochemical ocean data</experiment_name>
-      <experiment_id>omip2</experiment_id>
+      <experiment_name>OMIP experiment forced by CORE Inter-Annual Forcing (CIAF) version 2.0 and initialized with observed physical and biogeochemical ocean data</experiment_name>
+      <experiment_id>omip1</experiment_id>
       <sub_experiment>none</sub_experiment>
       <sub_experiment_id>none</sub_experiment_id>
       <start_time>$(EXP_CPLD_START)</start_time>
@@ -1487,7 +1541,7 @@ No additional diurnal cycle imposed
       <!-- variant info-->
       <variant_info></variant_info>
       <!--parent info-->
-      <parent_time_units>days since 1958-1-1</parent_time_units>
+      <parent_time_units>days since 1708-1-1</parent_time_units>
       <parent_activity_id>no parent</parent_activity_id>
       <parent_experiment_id></parent_experiment_id>
       <parent_mip_era>CMIP6</parent_mip_era>
@@ -1501,16 +1555,15 @@ No additional diurnal cycle imposed
 
     </publicMetadata>
 
-
     <input> 
       <namelist name="coupler_nml">
        months = $months,
        days   = $days,
-       current_date = 1958,1,1,0,0,0,
+       current_date = 1708,1,1,0,0,0,
        hours = 0
        minutes = 0
        seconds = 0
-       calendar = 'julian',
+       calendar = 'NOLEAP',
        dt_cpld  = 3600, 
        dt_atmos = 3600, 
        do_atmos = .false.,
@@ -1605,9 +1658,10 @@ $baseDate
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_BLING</dataSource>
      </dataFile>
+
       <diagTable order="append">
-"ocean_model_rho2","vo",   "vo",     "ocean_annual_rho2",  "all", "mean", "none",2                               
-"ocean_model_rho2","vo",   "vo",     "ocean_month_rho2",   "all", "mean", "none",2                               
+"ocean_model_rho2","vo",   "vo",     "ocean_annual_rho2",  "all", "mean", "none",2
+"ocean_model_rho2","vo",   "vo",     "ocean_month_rho2",   "all", "mean", "none",2
 "ocean_model_z", "opottemppmdiff", "opottemppmdiff", "ocean_annual_z", "all", "mean", "none",2
       </diagTable>
 
@@ -1616,13 +1670,11 @@ $baseDate
       </dataFile>
 
      <!--data_tables and data files-->
-     <!--JRA forcing-->
-     <xi:include xpointer="xpointer(//freInclude[@name='JRA_data_table']/input/node())"/>
-     <!--append the resolution dependent runoff override-->
-     <dataTable order="append">
-#JRA runoff    
-"ICE" , "runoff"        , "friver"      , "./INPUT/JRA_friver_720x576.nc", "none" ,  1.0
-      </dataTable>  
+     <!--CORE2 forcing-->
+     <xi:include xpointer="xpointer(//freInclude[@name='CORE2_IAF_data']/input/node())"/>
+     <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/data_table_iaf</dataSource>
+     </dataFile>
 
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_data_table']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='CFC_data_table']/input/node())"/>
@@ -1635,6 +1687,25 @@ $baseDate
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/field_table</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_05/field_table</dataSource>
      </dataFile>
+
+      <fieldTable order="append">
+###.................................................
+### INERT TRACERS field table   (2018/07/06)
+### jgj 2018/07/06 - need sf6 and cfc field table entries due to 2 changes in generic_tracer_utils.F90
+###                  these code changes set require_src_info and requires_restart to true for each tracer
+##
+"namelists","ocean_mod","generic_sf6"
+sf6_requires_src_info = f
+sf6_requires_restart = f
+/
+"namelists","ocean_mod","generic_cfc"
+cfc11_requires_src_info = f
+cfc11_requires_restart = f
+
+cfc12_requires_src_info = f
+cfc12_requires_restart = f
+/
+     </fieldTable>
 
       <!--BLING specific datasets and tables-->
       <!--COBALT IC datasets used in BLING field_table-->
@@ -1655,6 +1726,7 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 USE_generic_tracer = True
 GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
 #override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
@@ -1664,6 +1736,7 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
 
+#override ADD_DIURNAL_SW = True 
 #override ICE_STATS_INTERVAL = 30
 SIS_OVERRIDE_EOF
 
@@ -1674,7 +1747,7 @@ SIS_OVERRIDE_EOF
    <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
-          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1300p5_production']/node())"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O1057p5_production']/node())"/>
       </production>
 
       <regression name="basic_prod_nomask">
@@ -1734,40 +1807,29 @@ SIS_OVERRIDE_EOF
     </postProcess>
    </experiment>
 
-   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_JRA55do1-3_r4r_cycle2" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200_JRA55do1-3_r4r_cycle1">
-    <input>
-     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-      <!--dataSource platform="$(platform)">/lustre/f2/scratch/oar.gfdl.ogrp-account/CMIP6/OMIP/xanadu_mom6_20181101/OM4p5_IAF_BLING_CFC_abio_csf_mle200_JRA55do1-3_r4r_cycle1/ncrc4.intel16f2-prod/archive/restart/20180101.tar</dataSource-->
-      <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/OM4p5_IAF_BLING_CFC_abio_csf_mle200_JRA55do1-3_r4r_cycle2.20180101.tar</dataSource>
-     </dataFile>
-     <!--There is  MOM6/SIS2 restart provided in initCond.-->
-     <namelist name="MOM_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
-     </namelist>
-     <namelist name="SIS_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
-     </namelist>
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_p25config" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
+     <input>
+     <!--MOM_overrides-->
      <csh>
         <![CDATA[
-
-if ( $currentSeg == 1 ) then
-   #Take current date from coupler_nml
-   #if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
-endif
-
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 # Turn on generic tracers
 USE_generic_tracer = True
 GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
-#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+#override MLE_FRONT_LENGTH = 500.0
+#override KHTH_USE_EBT_STRUCT = False 
+#override KHTH_USE_FGNV_STREAMFUNCTION = False
+#override KHTR = 0.0
+#override KH_RES_FN_POWER = 2
+#override KH_SIN_LAT = 0.0
+#override KH_VEL_SCALE = 0.0
+#override MEKE_KHTH_FAC = 0.0
+#override MEKE_KHTR_FAC = 0.0
+#override MEKE_VISCOSITY_COEFF = 0.0
+#override SMAGORINSKY_KH = False
+#override USE_NEUTRAL_DIFFUSION = False
+#override VISC_RES_FN_POWER = 2
+#override MAX_TR_DIFFUSION_CFL = -1.0
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
@@ -1777,59 +1839,31 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
 
+#override ADD_DIURNAL_SW = True 
 #override ICE_STATS_INTERVAL = 30
 SIS_OVERRIDE_EOF
+
      ]]></csh>
-    </input>
+
+     </input>
    </experiment>
-   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_JRA55do1-3_r4r_cycle3" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200_JRA55do1-3_r4r_cycle1">
+
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_p25config_diagd2$(MODIFIER)" inherit="OM4p5_IAF_BLING_CFC_abio_csf_p25config">
     <input>
-     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/OM4p5_IAF_BLING_CFC_abio_csf_mle200_JRA55do1-3_r4r_cycle3.19660101.tar</dataSource>
+     <diagTable>
+$name
+$baseDate
+     </diagTable>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6.d2</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6.d2</dataSource>
+      </dataFile>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
      </dataFile>
-     <!--There is  MOM6/SIS2 restart provided in initCond.-->
-     <namelist name="MOM_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
-     </namelist>
-     <namelist name="SIS_input_nml" >
-         output_directory = './',
-         input_filename = 'r'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
-     </namelist>
-     <csh>
-        <![CDATA[
-
-if ( $currentSeg == 1 ) then
-   #Take current date from coupler_nml
-#   if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
-endif
-
-cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-# Turn on generic tracers
-USE_generic_tracer = True
-GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
-#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
-MOM_OVERRIDE_EOF
-
-cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override NIGLOBAL = 720
-#override NJGLOBAL = 576
-#override U_TRUNC_FILE = "SIS_U_truncations"
-#override V_TRUNC_FILE = "SIS_V_truncations"
-#override MIN_OCN_INTERTIAL_H = 2.
-
-#override ICE_STATS_INTERVAL = 30
-SIS_OVERRIDE_EOF
-     ]]></csh>
     </input>
    </experiment>
-
    <freInclude name="OM4p5grid_data">
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
@@ -1844,14 +1878,12 @@ SIS_OVERRIDE_EOF
 
    <freInclude name="OM4p5_data">
     <input>
-<!--
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/runoff.daitren.iaf.720x576.v20180328.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/runoff.daitren.clim.720x576.v20180328.nc</dataSource>
       </dataFile>
--->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/seawifs-clim-1997-2010.720x576.v20180328.nc</dataSource>
       </dataFile>
@@ -2459,6 +2491,36 @@ biomass_p_valid_min = 0.0
     </input>
   </freInclude>
 
+   <!--OM4 CORE2 dynamic forcing datasets-->
+   <freInclude name="CORE2_IAF_data">
+    <input>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/gfdl_O/datasets/CORE/IAF_v2.0/ncar_precip.1948-2007.nomads.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/gfdl_O/datasets/CORE/IAF_v2.0/ncar_rad.1948-2007.nomads.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/gfdl_O/datasets/CORE/IAF_v2.0/q_10_mod.1948-2007.nomads.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/gfdl_O/datasets/CORE/IAF_v2.0/slp.1948-2007.nomads.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/gfdl_O/datasets/CORE/IAF_v2.0/t_10_mod.1948-2007.nomads.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/gfdl_O/datasets/CORE/IAF_v2.0/u_10_mod.1948-2007.nomads.nc</dataSource>
+      </dataFile>      
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/gfdl_O/datasets/CORE/IAF_v2.0/v_10_mod.1948-2007.nomads.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/SIS2/INPUT/cfc.bc.nc</dataSource>
+      </dataFile>
+    </input>
+   </freInclude>
+
    <!-- OCEAN  and ICE post-processing-->
    <freInclude name="OM4p125_postprocess">
       <postProcess> 
@@ -2619,9 +2681,6 @@ biomass_p_valid_min = 0.0
          #This causes problems for ferret and python tools for analysis.
          #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
          #cp $work/INPUT/ocean_static_no_mask_table.nc $work/
-#bronx-15 does not let us do this copy! outputstager.HS jobs fail with
-#*ERROR*: An ocean mask file was specified, so the output.stager was configured to swap in unmasked grid info into the ocean_static.nc history file. Unfortunately, there were multiple *.ocean_static.nc targets for unmasked lat/lon swap, but there should be just one. This shouldn't happen, so please open a help desk ticket. Alternatively, to temporarily disable this feature, change argFile actionFillGridOn = 0, or in the runscript, delete the variable flagOutputFillGridOn.
-
 
          ]]></csh>
 
