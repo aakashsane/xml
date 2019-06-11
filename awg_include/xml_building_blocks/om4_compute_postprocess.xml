@@ -1,0 +1,54 @@
+<freInclude name="compute_postprocess">
+  <postProcess> 
+         <csh><![CDATA[
+	 #Take care of iceberg restarts and trajectories
+         cd $work/RESTART
+         #Treat icebergs restarts and trajectories
+         #Find non-empty iceberg restarts and combine them AND then remove uncombined restarts
+         #This should be handled properly by FRE
+         #ncrcat icebergs.res.nc.* icebergs.res.nc
+      ls icebergs.res.nc.*
+      if( ! $status ) then
+         which ncdump
+         if( $status ) then
+           echo ncdump not available! We need to stop the run or the model restarts incorrectly!
+           exit 1
+         endif
+
+         set non_empty_restarts = ""
+         foreach file ( `ls icebergs.res.nc.????` )
+            if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
+         end
+         if( "$non_empty_restarts" != "" ) then
+          ncrcat $non_empty_restarts icebergs.res.nc
+          if( ! -e icebergs.res.nc ) then
+            echo ERROR: ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
+            exit 1
+          endif
+         endif
+
+         mkdir hide_from_fre
+         mv icebergs.res.nc.* hide_from_fre/
+         cd $work
+         mkdir hide_from_fre
+         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
+         mv iceberg_trajectories.nc.* hide_from_fre/
+      endif
+
+         cd $work
+         #Make a directory to trick FRE to pick up and archive in ascii
+         mkdir extra.results
+         mv *velocity_truncations MOM_parameter_doc* SIS_parameter_doc* seaice.stats* ocean.stats* extra.results/
+
+         #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
+         #This causes problems for ferret and python tools for analysis.
+         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
+         #cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+#bronx-15 does not let us do this copy! outputstager.HS jobs fail with
+#*ERROR*: An ocean mask file was specified, so the output.stager was configured to swap in unmasked grid info into the ocean_static.nc history file. Unfortunately, there were multiple *.ocean_static.nc targets for unmasked lat/lon swap, but there should be just one. This shouldn't happen, so please open a help desk ticket. Alternatively, to temporarily disable this feature, change argFile actionFillGridOn = 0, or in the runscript, delete the variable flagOutputFillGridOn.
+
+
+         ]]></csh>
+
+  </postProcess>
+</freInclude>
