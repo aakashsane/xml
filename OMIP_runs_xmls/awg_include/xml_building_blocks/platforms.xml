@@ -656,125 +656,10 @@ module use -a /usw/eslogin/modulefiles-c3
       </csh>
     </platform>
 
-    <platform name="olcf.eos_intel14">
-      <freVersion>$(FRE_VERSION)</freVersion>
-      <compiler type="intel" version="" />
-      <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(stem)</root>
-        <exec>$CPERM/$USER/$(stem)/$(name)/$(platform)-$(target)/exec</exec>
-        <state>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <scripts>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CPERM/$USER/work/$(stem)/$FRE_JOBID</work>
-      </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_NESCC)"/>
-      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/CM4/input"/>
-      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_M"/>
-      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/CM4/input"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)/$(name)"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/atlas/proj-shared/cli061/pdata/fms"/>
-      <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20160517"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="FMS_ESM_ARCHIVE_ROOT" value="/lustre/atlas/proj-shared/cli061/pdata/fms/esm"/>
-      <property name="OBGC_ARCHIVE_ROOT"    value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/retrospective"/> 
-      <property name="OBGC_MODEL_UPDATES"   value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/retrospective"/>
-      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
-      <property name="CMIP6_ESM4_ARCHIVE_ROOT"    value="$CDATA/gfdl_B/CMIP6/ESM4"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
-      <property name="FMS_ARCHIVE_ROOT" value="/lustre/atlas/proj-shared/cli061/pdata/fms" />
-      
-      <project>cli061</project>
-      <csh><![CDATA[
-        module use -a /ccs/proj/cli061/local/modulefiles
-#        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray #if unload and reload PrgEnv-intel it cannot find some modules
-        module unload netcdf fre
-#        module load PrgEnv-intel
-#        module swap intel intel/13.1.3.192 #does not find some system libraries
-        module load $(FRE_VERSION)
-#        module load netcdf/4.3.0
-module load cray-netcdf/4.3.3.1
-        module load gcp
-
-#        module use /lustre/atlas/proj-shared/cli061/underwoo/hsm/modulefiles
-        module load hsm
-        setenv NC_BLKSZ 1M
-        setenv KMP_STACKSIZE 512m
-        setenv F_UFMTENDIAN big
-setenv MPICH_ENV_DISPLAY
-setenv MPICH_UNEX_BUFFER_SIZE 256m
-limit stacksize unlimited
-limit coredumpsize unlimited
-        ]]>
-      </csh>
-    </platform>
-    <platform name="olcf.eos_intel15">
-      <freVersion>$(FRE_VERSION)</freVersion>
-      <compiler type="intel" version="15.0.2.164" />
-      <directory stem="$(FRE_STEM)">
-        <!--unswept locations--><!-- CPERM=/lustre/f1/unswept -->
-        <root>$CPERM/$USER/$(stem)</root>
-        <exec>$CPERM/$USER/$(stem)/$(name)/$(platform)-$(target)/exec</exec>
-        <state>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/state</state>
-        <scripts>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/scripts</scripts>
-        <!--swept locations (including the staged archive location)-->
-        <archive>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/archive</archive>
-        <stdout>$CPERM/$USER/$(stem)$(DEBUGLEVEL)/$(name)/$(platform)-$(target)/stdout</stdout>
-        <work>$CPERM/$USER/work/$(stem)/$FRE_JOBID</work>
-      </directory>
-      <property name="EXEC_ROOT"         value="$CPERM/$USER/$(stem)"/>
-      <property name="F2003_FLAGS"       value=" -DINTERNAL_FILE_NML -g -traceback"/>
-      <property name="AWG_INPUT_HOME"    value="$(AWG_INPUT_HOME_NESCC)"/>
-      <property name="AWG_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/CM4/input"/>
-      <property name="LWH_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_M"/>
-      <property name="MIZ_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/CM4/input"/>
-      <property name="NB_ROOT"           value="/nbhome/$USER/$(FRE_STEM)/$(name)"/>
-      <property name="REFERENCE"         value="/lustre/f1/unswept/Niki.Zadeh/answers/$(reference_tag)/$(name)/$(platform)-$(target)"/>
-
-      <property name="FMS_ARCHIVE_ROOT"  value="/lustre/atlas/proj-shared/cli061/pdata/fms" />
-      <property name="ARCHIVE_INPUT_NZ"  value="/lustre/atlas/proj-shared/cli061/pdata/fms"/>
-      <property name="OM4_05_ARCHIVE"    value="$(ARCHIVE_INPUT_NZ)/verona/John.Dunne_OM4_05_20160517"/>
-      <property name="FMS_ARCHIVE_ROOT"     value="$CDATA/fms"/>
-      <property name="FMS_ESM_ARCHIVE_ROOT" value="/lustre/atlas/proj-shared/cli061/pdata/fms/esm"/>
-      <property name="OBGC_ARCHIVE_ROOT"    value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/retrospective"/> 
-      <property name="OBGC_MODEL_UPDATES"   value="/lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/retrospective"/>
-      <property name="ESM4_ARCHIVE_ROOT"    value="$CPERM/Jasmin.John/datasets/ESM4"/>
-      <property name="CMIP6_ESM4_ARCHIVE_ROOT"    value="$CDATA/gfdl_B/CMIP6/ESM4"/>
-      <property name="CMIP6_ARCHIVE_ROOT"   value="$CDATA/cmip6/datasets"/>
-      
-      <project>cli061</project>
-      <csh><![CDATA[
-        module use -a /ccs/proj/cli061/local/modulefiles
-#        module unload PrgEnv-pgi PrgEnv-pathscale PrgEnv-intel PrgEnv-gnu PrgEnv-cray #if unload and reload PrgEnv-intel it cannot find some modules
-        module unload netcdf fre
-#        module load PrgEnv-intel
-        module swap intel intel/15.0.2.164 #does not find some system libraries
-        module load $(FRE_VERSION)
-#        module load netcdf/4.3.0
-        module load cray-netcdf/4.3.3.1
-        module load gcp
-#        module use /lustre/atlas/proj-shared/cli061/underwoo/hsm/modulefiles
-        module load hsm
-        setenv NC_BLKSZ 1M
-        setenv KMP_STACKSIZE 512m
-        setenv F_UFMTENDIAN big
-setenv MPICH_ENV_DISPLAY
-setenv MPICH_UNEX_BUFFER_SIZE 256m
-limit stacksize unlimited
-limit coredumpsize unlimited
-       ]]>
-      </csh>
-    </platform>
     <platform name="gfdl.default">
       <freVersion>$(FRE_VERSION)</freVersion>
       <property name="NB_ROOT"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)"/><!--Do not change this! Other platforms use  the same value. -->
       <directory stem="$(FRE_STEM)">
-        <root>$HOME/$(FRE_STEM)</root>
         <archive>$ARCHIVE/$(stem)/$(name)/$(platform)-$(target)</archive>
         <postProcess>$(archiveDir)/pp</postProcess>
         <ptmp>/ptmp/$USER</ptmp>
@@ -819,9 +704,6 @@ limit coredumpsize unlimited
       <xi:include xpointer="xpointer(//freInclude/platform[@name='gfdl.default']/node())" />
     </platform>
     <platform name="gfdl.ncrc4-intel17">
-      <xi:include xpointer="xpointer(//freInclude/platform[@name='gfdl.default']/node())" />
-    </platform>
-    <platform name="gfdl.olcf-eos_intel15">
       <xi:include xpointer="xpointer(//freInclude/platform[@name='gfdl.default']/node())" />
     </platform>
     <platform name="gfdl.theia-intel">
