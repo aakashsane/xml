@@ -43,13 +43,16 @@
       </component>
 
       <component type="ocean_monthly_z" start="$(PP_START_YEAR)"  source="ocean_month_z" sourceGrid="ocean-tripolar" cmip="on">
-        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
+             <analysis switch="$(CMIP6_PP_FIXER_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/thkcello.csh ocean_monthly_z monthly"/>
+        </timeSeries>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
       </component>
       <component type="ocean_monthly_z_1x1deg" source="ocean_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
-           <analysis switch="on" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/zostoga.csh -t 1708"/>
+           <analysis switch="$(CMIP6_PP_FIXER_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/OMIP_zostoga.csh -c 60 -s 1708 -n 5 -t 1708"/>
+           <analysis switch="$(CMIP6_PP_FIXER_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/thkcello.csh ocean_monthly_z_1x1deg monthly"/>
         </timeSeries>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
