@@ -5,12 +5,12 @@ XML_FILE=CM4_piControl_A.xml               #The xml to test
 RELEASE='xanadu'                 #The FMS release to test
 MOM6_DATE='om4_v1.0.5'                     #The MOM6 tag date to test
 MOM6_GIT_TAG="om4\\\/v1.0.5"               #The MOM6 tag to test
-FRESTEM="${RELEASE}_${MOM6_DATE}_c4slurm"       #The FRESTEM to use
+FRESTEM="${RELEASE}_${MOM6_DATE}"       #The FRESTEM to use
 GROUP="gfdl_f"
 #List of the experiments in the xml to run regression for
 EXPERIMENT_LIST="CM4_piControl"
 
-DEBUGLEVEL='_c4Slurm'
+DEBUGLEVEL='_0'
 PLATFORM="ncrc4.intel16"
 TARGET="prod-openmp"
 REFERENCE_TAG='warsaw_201710_mom6_2017.10.19_answers'

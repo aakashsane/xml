@@ -50,6 +50,8 @@ frerun  -x OMIP4_JRA.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_JRA55do1-3_r5_
   <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
   <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)/mdt_xml/awg_include"/>
   <property name="append_to_setup_csh"  value="set fyear=1958"/><!--The start year of forcing dataset-->
+  <property name="CMIP6_PP_FIXER_SCRIPTS_DIR" value="/home/oar.gfdl.cmip6/CMIP6_publishing/pp_fixer_scripts"/>
+  <property name="CMIP6_PP_FIXER_SWITCH" value="on"/>
   
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16'])"/>
@@ -185,12 +187,12 @@ Make the executable for ocean-ice experiments.
             <cppDefs>$(F2003_FLAGS) </cppDefs>
         </compile>
       </component>
-      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6">
-        <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
-        <source versionControl="git" root="https://github.com/NOAA-GFDL">
-          <codeBase version="$(RELEASE)"> coupler.git </codeBase>
-        </source>
-        <compile>
+      <component name="FMScoupler" paths="FMScoupler" requires="fms land_null atmos_null sis2 mom6">
+         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
+            <codeBase version="$(RELEASE)"> FMScoupler.git </codeBase>
+         </source>
+         <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
         </compile>
       </component>

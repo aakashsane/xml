@@ -11,11 +11,11 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod MOM6_GOLD_SIS2_bergs -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <property name="RELEASE"        value="xanadu"/>                 <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="xanadu_esm4_20190304"/>    <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>        <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="ESM4_v1.0.2"/>       <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="ESM4/v1.0.2"/>       <!-- git tag for MOM6 source code -->
+  <property name="MOM6_DATE"      value="ESM4_v1.0.3"/>       <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="ESM4/v1.0.3"/>       <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -29,7 +29,7 @@ frerun  -x OM4.xml -p ncrc4.intel16 -t prod MOM6_GOLD_SIS2_bergs -r basic
    <property name="CHUNK_LENGTH_B" value="20yr"/>
    <!--Start year of PP -->
    <property name="PP_START_YEAR"  value="1948"/>      <!--Use these values for CORE2 dynamic forcing runs -->
-   <property name="FRE_VERSION"     value="bronx-13"/> <!-- fre version to be used -->
+   <property name="FRE_VERSION"     value="bronx-15"/> <!-- fre version to be used -->
    <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
    <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
    <property name="MDBIswitch"      value="on"/>       <!-- on/off switch for MDBI database -->
@@ -169,10 +169,10 @@ Make the executable for ocean-ice experiments.
             <cppDefs>$(F2003_FLAGS) </cppDefs>
         </compile>
       </component>
-      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6 icebergs">
+      <component name="FMScoupler" paths="FMScoupler" requires="fms land_null atmos_null sis2 mom6 icebergs">
          <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
          <source versionControl="git" root="https://github.com/NOAA-GFDL">
-            <codeBase version="$(RELEASE)"> coupler.git </codeBase>
+            <codeBase version="$(RELEASE)"> FMScoupler.git </codeBase>
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
@@ -220,10 +220,10 @@ Make the executable for ocean-ice experiments.
          </compile>
       </component>
 
-      <component name="coupler" paths="coupler/shared coupler/full" requires="fms land_null atmos_null sis2 mom6_symmetric icebergs">
+      <component name="FMScoupler" paths="FMScoupler/shared FMScoupler/full" requires="fms land_null atmos_null sis2 mom6_symmetric icebergs">
          <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
          <source versionControl="git" root="https://github.com/NOAA-GFDL">
-            <codeBase version="$(RELEASE)"> coupler.git </codeBase>
+            <codeBase version="$(RELEASE)"> FMScoupler.git </codeBase>
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
@@ -266,10 +266,10 @@ Make the executable for ocean-ice experiments.
       </component>
 
       
-      <component name="coupler" paths="coupler/shared coupler/full" requires="fms land_null atmos_null sis2 mom6_static_90x45 icebergs">
+      <component name="FMScoupler" paths="FMScoupler/shared FMScoupler/full" requires="fms land_null atmos_null sis2 mom6_static_90x45 icebergs">
          <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
          <source versionControl="git" root="https://github.com/NOAA-GFDL">
-            <codeBase version="$(RELEASE)"> coupler.git </codeBase>
+            <codeBase version="$(RELEASE)"> FMScoupler.git </codeBase>
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>

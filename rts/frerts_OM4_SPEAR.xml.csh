@@ -5,12 +5,12 @@ XML_FILE=OM4_SPEAR.xml                     #The xml to test
 RELEASE='xanadu_esm4_20190304'                 #The FMS release to test
 MOM6_DATE='ESM4_v1.0.3'                     #The MOM6 tag date to test
 MOM6_GIT_TAG="ESM4\\\/v1.0.3" #\\\/$MOM6_DATE" #The MOM6 tag to test
-FRESTEM="${RELEASE}_mom6_${MOM6_DATE}"         #The FRESTEM to use
+FRESTEM="${RELEASE}_mom6_${MOM6_DATE}_0708"         #The FRESTEM to use
 GROUP="gfdl_f"
 #List of the experiments in the xml to run regression for
 EXPERIMENT_LIST="SPEAR_o1_CORE2_OM4"
 
-DEBUGLEVEL='_c4'
+DEBUGLEVEL='_0'
 PLATFORM="ncrc4.intel16"
 TARGET="prod"
 REFERENCE_TAG='xanadu_mom6_20190211'
