@@ -71,21 +71,24 @@ NOTES:
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2003/XInclude">
 
   <!--User should set the following properties according to the plan for the production run-->	
-  <property name="RELEASE"        value="xanadu"/>           <!-- git tag for general component source code-->
+  <property name="RELEASE"        value="xanadu_esm4_20190304"/>     <!-- git tag for general component source code-->
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>              <!-- git tag for shared source code -->
-  <property name="MOM6_DATE"      value="om4_v1.0.5"/>              <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="om4/v1.0.5"/>              <!-- git tag for MOM6 source code -->
+  <property name="MOM6_DATE"      value="devgfdl_20190718"/>              <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="dev/gfdl"/>              <!-- git tag for MOM6 source code -->
   <property name="AWG_GIT_TAG"    value="$(RELEASE)"/>              <!-- git tag for AWG source code -->
   <property name="LAND_GIT_TAG"   value="$(RELEASE)"/>              <!-- git tag for LAND_LAD2 source code -->  
-  <property name="FRE_STEM"       value="$(RELEASE)_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="FRE_STEM"       value="nnz/$(RELEASE)_$(MOM6_DATE)"/> <!-- customize as needed -->
+
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"   value="gfdl_o"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
   <property name="PROD_SIMTIME"     value="100"/>  <!--simulation length in years-->
   <property name="PP_CPLD_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CPLD_CHUNK_B"  value="20yr"/> <!--bigger  chunk length for pp/analysis-->
+  <property name="CHUNK_LENGTH_A" value="5yr"/>
+  <property name="CHUNK_LENGTH_B" value="20yr"/>
   <property name="PP_START_YEAR"    value="0001" />
   <property name="PP_CPLD_START"    value="0001" />
   <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
@@ -118,6 +121,8 @@ NOTES:
   <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
   <property name="AWG_INPUT_HOME_NESCC" value="awg_include"/>
   <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)/mdt_xml/awg_include"/>
+  <property name="CMIP6_PP_FIXER_SCRIPTS_DIR" value="/home/oar.gfdl.cmip6/CMIP6_publishing/pp_fixer_scripts"/>
+  <property name="CMIP6_PP_FIXER_SWITCH" value="on"/>
 
 
    <!--AMIP configurations-->
@@ -404,6 +409,30 @@ NOTES:
 	       <lnd                            layout = "3,24"   io_layout = "1,4" />
 	       <ice                            layout = "144,3"   io_layout = "1,3" />
 	       <ocn ranks="1296" threads="1"   layout = "36,36"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A768x1_O768">
+             <resources jobWallclock="02:00:00">              
+               <atm ranks="768" threads="1"   layout = "8,16"   io_layout = "1,4" />
+               <lnd                            layout = "8,16"   io_layout = "1,4" />
+               <ice                            layout = "48,16"   io_layout = "1,4" />
+	       <ocn ranks="768" threads="1"   layout = "24,32"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A1536x1_O1536">
+             <resources jobWallclock="02:00:00">              
+               <atm ranks="1536" threads="1"   layout = "16,16"   io_layout = "1,4" />
+               <lnd                            layout = "16,16"   io_layout = "1,4" />
+               <ice                            layout = "96,16"   io_layout = "1,4" />
+	       <ocn ranks="1536" threads="1"   layout = "48,32"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A576x2_O1600">
+	     <resources jobWallclock="02:30:00">
+               <atm ranks="576" threads="2"    layout = "6,16"   io_layout = "1,4" hyperthread="off"/>
+               <lnd                            layout = "6,16"   io_layout = "1,4" />
+               <ice                            layout = "72,8"   io_layout = "1,4"/>
+	       <ocn ranks="1600" threads="1"  layout = "40,40"   io_layout = "1,4" mask_table="MOM_mask_table"/>
 	     </resources>
    </freInclude>
    <freInclude name="resourceparams_A576x2_O1296">
@@ -820,6 +849,22 @@ NOTES:
              </resources>
    </freInclude>
 
+   <freInclude name="resourceparams_A288x2_O9126">
+             <resources jobWallclock="01:00:00">
+               <atm ranks="288" threads="2"    layout = "4,12"   io_layout = "1,4" />
+               <lnd                            layout = "4,12"   io_layout = "1,4" />
+               <ice                            layout = "72,4"   io_layout = "1,4" />
+               <ocn ranks="9126" threads="1"   layout = "120,112"   io_layout = "4,4" mask_table="mask_table.4314.120x112"/>
+	     </resources>
+   </freInclude>
+   <freInclude name="resourceparams_A288x2_O9126_production">
+             <resources jobWallclock="16:00:00" segRuntime="16:00:00">
+               <atm ranks="288" threads="2"    layout = "4,12"   io_layout = "1,4" />
+               <lnd                            layout = "4,12"   io_layout = "1,4" />
+               <ice                            layout = "72,4"   io_layout = "1,4" />
+               <ocn ranks="9126" threads="1"   layout = "120,112"   io_layout = "4,4" mask_table="mask_table.4314.120x112"/>
+	     </resources>
+   </freInclude>
 
   <setup>
     <platform name="ncrc4.intel16">
@@ -1267,9 +1312,11 @@ Experiment to build executable.
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/OM4p125_grid/OM4_0125_c96_20190614.tar</dataSource>
       </dataFile>
+<!--including this file causes a weird crash in xgrid
       <dataFile label="input" target="INPUT/land_domain.nc" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/common/c96_grid/land_domain.nc</dataSource>
       </dataFile>
+-->
     </input>
   </freInclude>
 
@@ -2177,39 +2224,6 @@ endif
   <freInclude name="OM4_postprocess">
     <postProcess>
         <csh><![CDATA[
-	 #Take care of iceberg restarts and trajectories
-         cd $work/RESTART
-         #Treat icebergs restarts and trajectories
-         #Find non-empty iceberg restarts and combine them AND then remove uncombined restarts
-         #This should be handled properly by FRE
-         #ncrcat icebergs.res.nc.* icebergs.res.nc
-      ls icebergs.res.nc.*
-      if( ! $status ) then
-         which ncdump
-         if( $status ) then
-           echo ncdump not available! We need to stop the run or the model restarts incorrectly!
-           exit 1
-         endif
-
-         set non_empty_restarts = ""
-         foreach file ( `ls icebergs.res.nc.????` )
-            if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
-         end
-         if( "$non_empty_restarts" != "" ) then
-          ncrcat $non_empty_restarts icebergs.res.nc
-          if( ! -e icebergs.res.nc ) then
-            echo ERROR: ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
-            exit 1
-          endif
-         endif
-
-         mkdir hide_from_fre
-         mv icebergs.res.nc.* hide_from_fre/
-         cd $work
-         mkdir hide_from_fre
-         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
-         mv iceberg_trajectories.nc.* hide_from_fre/
-      endif
         #Save the last line of timestats without the first (step number) column as a signature of MOM6 answers
          tail -1 timestats | cut -c8- > RESTART/$enddate.timestats.res
          #Save the whole timestats under ascii/
@@ -2218,12 +2232,6 @@ endif
          #Make a directory to trick FRE to pick up and archive in ascii
          mkdir extra.results
          mv *velocity_truncations MOM_parameter_doc* SIS_parameter_doc* seaice.stats timestats ocean.stats *.ocean.stats* extra.results/
-      #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
-      #This causes problems for ferret and python tools for analysis.
-      #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
-      cp $work/INPUT/ocean_static_no_mask_table.nc $work/
-      #Basin codes are needed to calculate offline diagnostics for CMIP6 
-      cp $work/INPUT/basin_codes.nc $work/
          ]]></csh>
       <!--REFINE DIAG SCRIPT -->
       <!--refineDiag_data_stager.csh calculates global averages of basic quantities and stores them in a sqlit database file-->
@@ -3205,7 +3213,7 @@ biomass_p_valid_min = 0.0
 <!--===============================-->
  
 
-  <experiment name="CM4_piControl_C_c96_OM4p125" inherit="cm4_sis2_compile">
+  <experiment name="CM4_piControl_C_noBLING_c96_OM4p125" inherit="cm4_sis2_compile">
 
 <description>
 change from A
@@ -3294,11 +3302,11 @@ removeatmos_tracer co2
       </namelist>
 
       <namelist name="generic_tracer_nml">
-       do_generic_tracer=.true.
+       do_generic_tracer=.false.
        do_generic_CFC=.false.
        do_generic_COBALT=.false.
        do_generic_TOPAZ=.false.
-       do_generic_BLING=.true.
+       do_generic_BLING=.false.
        force_update_fluxes=.true. !This has to be set for THERMO_SPANS_COUPLING to work
       </namelist>
       <namelist name="generic_bling_nml">
@@ -3550,40 +3558,17 @@ removeatmos_tracer co2
       <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20170518']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_grid']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/>
+      <!--xi:include xpointer="xpointer(//freInclude[@name='diag_table_lm3p2_fullaero_cmip6']/input/node())"/-->
 
-      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_land_byTile</dataSource>
-      </dataFile>
-      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_LUmip</dataSource>
-      </dataFile>
-
-      <diagTable order="append">
-        "vegn",           "SAI",           "SAI",          "land_month",          "all",  .true.,  "none", 2
-        "cmor_land",      "sai",           "sai",          "land_month_cmip",     "all",  .true.,  "none", 2
-        "vegn",           "qco2_phot",     "qco2_phot",    "land_month",          "all",  .true.,  "none", 2
-
-# Daily sea-ice for CFMIP per Levi
-        "ice_daily_CFMIP",              1, "days",   1, "days", "time"
-
-        "ice_model",      "siconc",        "siconc",       "ice_daily_CFMIP",     "all", "mean", "none", 2
-        "ice_model",      "sithick",       "sithick",      "ice_daily_CFMIP",     "all", "mean", "none", 2
-        "ice_model",      "siu",           "siu",          "ice_daily_CFMIP",     "all", "mean", "none", 2
-        "ice_model",      "siv",           "siv",          "ice_daily_CFMIP",     "all", "mean", "none", 2
-
-#  Table 6hrPlevPt, we need the following for tropical cyclone study 
-        "atmos_4xdaily_cmip",       6, "hours",    1,  "days",  "time",
-
-        "atmos",          "p850",          "p850",         "atmos_4xdaily_cmip",  "all", .false.,  "none", 1
-        "atmos",          "ps",            "ps",           "atmos_4xdaily_cmip",  "all", .false.,  "none", 2
-##. Relative Vorticity at 850 hPa, s-1 (longitude,latitude,time1,p850)
-        "atmos",          "rv850",         "rv850",        "atmos_4xdaily_cmip",  "all", .false.,  "none", 2
-
-##. Sea Level Pressure, Pa (longitude,latitude,time1)
-        "flux",           "psl",           "psl",          "atmos_4xdaily_cmip",  "all", .false.,  "none", 2
+      <diagTable>
+$name
+$baseDate
       </diagTable>
-
+<!--
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/CM4_reduced_diag_test</dataSource>
+      </dataFile>
+-->
       <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11_cmip6']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_init_csh_blocks']/input/node())"/>
 
@@ -3593,12 +3578,13 @@ removeatmos_tracer co2
       <xi:include xpointer="xpointer(//freInclude[@name='SIS2_data']/input/node())"/>
       <!--BLING specific datasets and tables-->
       <!--COBALT IC datasets used in BLING field_table-->
+<!--
       <xi:include xpointer="xpointer(//freInclude[@name='OBGC_data_set']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_field_table']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_data_table_fixCO2_20170809']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_diag_table']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='extra_diag_table']/input/node())"/>
-
+-->
       <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
         <!--dataSource site="ncrc">/lustre/f2/pdata/gfdl/cmip6/datasets/CM4/IC/Run814_Restart701_Run759_RestartIcebergsAndCalving50.tar</dataSource-->
         <dataSource site="ncrc">/lustre/f2/pdata/gfdl/cmip6/datasets/CM4/IC/awg_C96L33_LM3_OM4_025_grid_lm4p1_topo_no_ice_res_v20170407.tar</dataSource>
@@ -3613,6 +3599,7 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override TIDEAMP_FILE = "tidal_amplitude.nc"
 #override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
 #override CHL_FILE = "seawifs-clim-1997-2010.nc"
+#override CHL_VARNAME = "CHL_A"
 #override SALT_RESTORE_FILE = "salt_restore.nc"
 #override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
 #override DT_THERM = 3600.0               !   [s] !reduced from 7200.0 for OM4_025
@@ -3620,10 +3607,16 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override U_TRUNC_FILE = "MOM_U_truncations"
 #override V_TRUNC_FILE = "MOM_V_truncations"
 ! BLING parameters
-#override USE_generic_tracer = True
+#override USE_generic_tracer = False
 #override USE_RIVER_HEAT_CONTENT = False
 #override USE_CALVING_HEAT_CONTENT = False
 #override ENERGYSAVEDAYS = 1
+! new parameters
+#override TEMP_SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override TEMP_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override SALT_Z_INIT_FILE = "WOA05_pottemp_salt.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "PTEMP"
+#override Z_INIT_FILE_SALT_VAR = "SALT"
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
@@ -3650,16 +3643,19 @@ SIS_OVERRIDE_EOF
         <run days="2"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O1152']/node())"/> </run>
       </regression>
       <regression name="debug">
-        <run days="2"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x2_O648']/node())"/> </run>
-        <run days="2"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4h_O648']/node())"/> </run>
-        <run days="1 1"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A216x4h_O648']/node())"/> </run>
+        <run days="2">  <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O9126']/node())"/> </run>
+        <run days="1 1"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O9126']/node())"/> </run>
+      </regression>
+      <regression name="debug_equal">
+        <run days="2"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1536x1_O1536']/node())"/> </run>
+        <run days="2"><xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A768x1_O768']/node())"/> </run>
       </regression>
       <regression name="timing">
         <run months="1"> <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A576x2_O2997']/node())"/> </run>
       </regression>
       <production simTime="100" units="years">
           <segment simTime="12" units="months"/>
-          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A1152x2_O5791_production']/node())"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_A288x2_O9126_production']/node())"/>
       </production>
 
       <reference restart="$(REFERENCE)/archive/1x1m0d_432x2a_2997x1o/restart/00010201.tar"/>
@@ -3668,9 +3664,10 @@ SIS_OVERRIDE_EOF
     </runtime>
 
     <postProcess>
+      <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh  $(NB_ROOT)/mdt_xml/awg_include/refineDiag/refineDiag_data_stager_globalAve.csh"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c96_climo_cmip6_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='OM4_postprocess']/postProcess/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='BLING_postprocess']/postProcess/node())"/>
+      <xi:include href="awg_include/xml_building_blocks/om4_cmip6_postprocess.xml" xpointer="xpointer(//freInclude[@name='OM4_cmip6_postprocess']/postProcess/node())"/>
+      <!--xi:include href="awg_include/xml_building_blocks/bling_cmip6_postprocess.xml" xpointer="xpointer(//freInclude[@name='BLING_cmip6_postprocess']/postProcess/node())"/-->
     </postProcess>
   </experiment>
 

@@ -2154,39 +2154,6 @@ endif
   <freInclude name="OM4_postprocess">
     <postProcess>
         <csh><![CDATA[
-	 #Take care of iceberg restarts and trajectories
-         cd $work/RESTART
-         #Treat icebergs restarts and trajectories
-         #Find non-empty iceberg restarts and combine them AND then remove uncombined restarts
-         #This should be handled properly by FRE
-         #ncrcat icebergs.res.nc.* icebergs.res.nc
-      ls icebergs.res.nc.*
-      if( ! $status ) then
-         which ncdump
-         if( $status ) then
-           echo ncdump not available! We need to stop the run or the model restarts incorrectly!
-           exit 1
-         endif
-
-         set non_empty_restarts = ""
-         foreach file ( `ls icebergs.res.nc.????` )
-            if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
-         end
-         if( "$non_empty_restarts" != "" ) then
-          ncrcat $non_empty_restarts icebergs.res.nc
-          if( ! -e icebergs.res.nc ) then
-            echo ERROR: ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
-            exit 1
-          endif
-         endif
-
-         mkdir hide_from_fre
-         mv icebergs.res.nc.* hide_from_fre/
-         cd $work
-         mkdir hide_from_fre
-         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
-         mv iceberg_trajectories.nc.* hide_from_fre/
-      endif
         #Save the last line of timestats without the first (step number) column as a signature of MOM6 answers
          tail -1 timestats | cut -c8- > RESTART/$enddate.timestats.res
          #Save the whole timestats under ascii/

@@ -186,17 +186,7 @@ Make the executable for ocean-ice experiments.
             <cppDefs>$(F2003_FLAGS) </cppDefs>
         </compile>
       </component>
-      <component name="FMScoupler" paths="FMScoupler" requires="fms land_null atmos_null sis2 mom6">
-         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
-         <source versionControl="git" root="https://github.com/NOAA-GFDL">
-            <codeBase version="$(RELEASE)"> FMScoupler.git </codeBase>
-         </source>
-         <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-        </compile>
-      </component>
-<!-- post xanadu
-      <component name="coupler" paths="coupler/shared coupler/full" requires="fms land_null atmos_null sis2 mom6 icebergs">
+      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6">
         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
         <source versionControl="git" root="https://github.com/NOAA-GFDL">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
@@ -205,7 +195,6 @@ Make the executable for ocean-ice experiments.
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
         </compile>
       </component>
--->
    </experiment>
 
    <freInclude name="OM4_common">
@@ -744,7 +733,215 @@ $(ARCHIVE_NNZ)/input/xanadu/OM4p125_grid/mask_table.6368.160x120
    <!--****************************************************************************************-->
    <!--***************************** 1/4 degree experiments        ****************************-->
    <!--****************************************************************************************-->
+   <experiment name="OM4p25_IAF_BLING_csf_rerun_initCond2003_noBLING" inherit="OM4p25_IAF_BLING_csf_rerun_initCond2003">
+    <input>								      
+     <namelist name="generic_tracer_nml">
+       do_generic_tracer=.false.
+       do_generic_BLING=.false.
+       do_generic_CFC=.false.
+       do_generic_SF6=.false.
+       do_generic_age=.false.
+       do_generic_argon=.false.
+       do_generic_COBALT=.false.
+       force_update_fluxes=.true.
+      </namelist>
+       <csh>
+         <![CDATA[
+# Get new diagnostic coordinate file
+cp /lustre/f2/pdata/gfdl/cmip6/datasets/OMIP/diagnostic/diag_rho2.nc $work/INPUT/
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = False
+# Fix sign error in adjustment of net fresh-water
+USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
+# Add a uniform 10m diagnostic coordinate between 0 and 350m
+#override NUM_DIAG_COORDS = 3
+#override DIAG_COORDS = "z Z ZSTAR", "rho2 RHO2 RHO", "z2 Z2 ZSTAR"
+DIAG_COORD_DEF_Z2 = "UNIFORM:35,350"
+# Use finer resolution rho2 diagnostic coordinate
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+MOM_OVERRIDE_EOF
+
+####################################################################################################
+##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
+##
+if ( $currentSeg == 1 ) then
+  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+      ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kd_turb,Kd_shear || exit 1
+      endif
+
+      ncdump -h $resfile | grep 'double Kv_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kv_turb,Kv_shear || exit 1
+      endif
+  end
+
+endif
+####################################################################################################
+##The following is to avoid model crash with a layout other than the one that produced the initCond.
+##The problem could occur if the generating model run used a mask_table that was different from the
+##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical 
+##values on land on the masked pes (9.96E36) that should have been set as "missing values". 
+##I am pretty sure that there is a bug in SIS2 that tickles this, but I do not have a smoking gun.
+##
+if ( $currentSeg == 1 ) then
+  cd $work/INPUT
+  cp ice_model.res.nc ice_model.res1.nc
+
+  #All ice restart variables should be 0 where they have a "missing value" (9.96E36)
+  foreach var ( T_skin coszen rough_moist rough_heat rough_mom sym_str_s str_t str_d sym_v_ice_C sym_u_ice_C sal_ice enth_ice H_to_kg_m2 h_ice enth_snow h_snow h_pond flux_sw_nir_dif flux_sw_nir_dir flux_sw_vis_dif flux_sw_vis_dir p_surf calving_hflx runoff_hflx calving runoff fprec lprec flux_lw flux_salt flux_q flux_t flux_v flux_u )
+     ncap2 -s "where( $var > 1e36) $var =0.0" ice_model.res1.nc ice_model.res2.nc
+     mv -f ice_model.res2.nc ice_model.res1.nc
+  end
+
+  #except part_size that should be 1 for category 1 and 0 otherwise. But I don't know how to do that!
+  #The next best guess would be 1/6 for all categories so that they add up to 1:
+  ncap2 -s 'where( (part_size>1e36) ) part_size =1.0/6.0' ice_model.res1.nc ice_model.res2.nc
+
+  cp -f ice_model.res2.nc  ice_model.res.nc
+
+  #Same story with calving.res.nc
+  cp -f calving.res.nc calving.res1.nc
+  ncap2 -s 'where( stored_ice>1e36 ) stored_ice =0.0' calving.res1.nc calving.res2.nc
+  mv -f calving.res2.nc calving.res1.nc
+  ncap2 -s 'where( stored_heat>1e36 ) stored_heat =0.0' calving.res1.nc calving.res2.nc
+  mv -f calving.res2.nc calving.res.nc
+
+  cd $work
+endif
+         ]]></csh>
+    </input>
+   </experiment>
 											      
+   <experiment name="OM4p25_IAF_BLING_csf_rerun_noBLING" inherit="OM4p25_IAF_BLING_csf_rerun">
+    <input>
+     <namelist name="generic_tracer_nml">
+       do_generic_tracer=.false.
+       do_generic_BLING=.false.
+       do_generic_CFC=.false.
+       do_generic_SF6=.false.
+       do_generic_age=.false.
+       do_generic_argon=.false.
+       do_generic_COBALT=.false.
+       force_update_fluxes=.true.
+      </namelist>
+       <csh>
+         <![CDATA[
+# Get new diagnostic coordinate file
+cp /lustre/f2/pdata/gfdl/cmip6/datasets/OMIP/diagnostic/diag_rho2.nc $work/INPUT/
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = False
+# Fix sign error in adjustment of net fresh-water
+USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
+# Add a uniform 10m diagnostic coordinate between 0 and 350m
+#override NUM_DIAG_COORDS = 3
+#override DIAG_COORDS = "z Z ZSTAR", "rho2 RHO2 RHO", "z2 Z2 ZSTAR"
+DIAG_COORD_DEF_Z2 = "UNIFORM:35,350"
+# Use finer resolution rho2 diagnostic coordinate
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+MOM_OVERRIDE_EOF
+         ]]></csh>
+    </input>
+   </experiment>
+ 
+   <experiment name="OM4p25_IAF_BLING_csf_rerun_initCond2003" inherit="OM4p25_IAF_BLING_csf_rerun">
+    <input>								      
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override','INPUT/SIS_diurnal'
+     </namelist>
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/warsaw/OM4p25_IAF_BLING_csf_rerun_restart_20030101_combined.tar</dataSource>
+     </dataFile>
+
+       <csh>
+         <![CDATA[
+# Get new diagnostic coordinate file
+cp /lustre/f2/pdata/gfdl/cmip6/datasets/OMIP/diagnostic/diag_rho2.nc $work/INPUT/
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = True
+# Fix sign error in adjustment of net fresh-water
+USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
+# Add a uniform 10m diagnostic coordinate between 0 and 350m
+#override NUM_DIAG_COORDS = 3
+#override DIAG_COORDS = "z Z ZSTAR", "rho2 RHO2 RHO", "z2 Z2 ZSTAR"
+DIAG_COORD_DEF_Z2 = "UNIFORM:35,350"
+# Use finer resolution rho2 diagnostic coordinate
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+MOM_OVERRIDE_EOF
+
+####################################################################################################
+##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
+##
+if ( $currentSeg == 1 ) then
+  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+      ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kd_turb,Kd_shear || exit 1
+      endif
+
+      ncdump -h $resfile | grep 'double Kv_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kv_turb,Kv_shear || exit 1
+      endif
+  end
+
+endif
+####################################################################################################
+##The following is to avoid model crash with a layout other than the one that produced the initCond.
+##The problem could occur if the generating model run used a mask_table that was different from the
+##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical 
+##values on land on the masked pes (9.96E36) that should have been set as "missing values". 
+##I am pretty sure that there is a bug in SIS2 that tickles this, but I do not have a smoking gun.
+##
+if ( $currentSeg == 1 ) then
+  cd $work/INPUT
+  cp ice_model.res.nc ice_model.res1.nc
+
+  #All ice restart variables should be 0 where they have a "missing value" (9.96E36)
+  foreach var ( T_skin coszen rough_moist rough_heat rough_mom sym_str_s str_t str_d sym_v_ice_C sym_u_ice_C sal_ice enth_ice H_to_kg_m2 h_ice enth_snow h_snow h_pond flux_sw_nir_dif flux_sw_nir_dir flux_sw_vis_dif flux_sw_vis_dir p_surf calving_hflx runoff_hflx calving runoff fprec lprec flux_lw flux_salt flux_q flux_t flux_v flux_u )
+     ncap2 -s "where( $var > 1e36) $var =0.0" ice_model.res1.nc ice_model.res2.nc
+     mv -f ice_model.res2.nc ice_model.res1.nc
+  end
+
+  #except part_size that should be 1 for category 1 and 0 otherwise. But I don't know how to do that!
+  #The next best guess would be 1/6 for all categories so that they add up to 1:
+  ncap2 -s 'where( (part_size>1e36) ) part_size =1.0/6.0' ice_model.res1.nc ice_model.res2.nc
+
+  cp -f ice_model.res2.nc  ice_model.res.nc
+
+  #Same story with calving.res.nc
+  cp -f calving.res.nc calving.res1.nc
+  ncap2 -s 'where( stored_ice>1e36 ) stored_ice =0.0' calving.res1.nc calving.res2.nc
+  mv -f calving.res2.nc calving.res1.nc
+  ncap2 -s 'where( stored_heat>1e36 ) stored_heat =0.0' calving.res1.nc calving.res2.nc
+  mv -f calving.res2.nc calving.res.nc
+
+  cd $work
+endif
+         ]]></csh>
+    </input>
+   </experiment>
+
    <experiment name="OM4p25_IAF_BLING_csf_rerun_hifreqdiag_2003-2008" inherit="OM4p25_IAF_BLING_csf_rerun">
     <input>								      
      <!--There is  MOM6/SIS2 restart provided in initCond.-->
@@ -1325,6 +1522,127 @@ $baseDate
    <!--***************************** 1/2 degree experiments        ****************************-->
    <!--****************************************************************************************-->
 											      
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_noBLING" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
+    <input>
+     <namelist name="generic_tracer_nml">
+       do_generic_tracer=.false.
+       do_generic_BLING=.false.
+       do_generic_CFC=.false.
+       do_generic_SF6=.false.
+       do_generic_age=.false.
+       do_generic_argon=.false.
+       do_generic_COBALT=.false.
+       force_update_fluxes=.true.
+      </namelist>
+       <csh>
+         <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = False
+GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+#override ADD_DIURNAL_SW = True 
+#override ICE_STATS_INTERVAL = 30
+SIS_OVERRIDE_EOF
+         ]]></csh>
+    </input>
+   </experiment>
+   <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998_noBLING" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998_combined">
+    <input>
+     <namelist name="generic_tracer_nml">
+       do_generic_tracer=.false.
+       do_generic_BLING=.false.
+       do_generic_abiotic=.false.
+       do_generic_CFC=.false.
+       do_generic_SF6=.false.
+       do_generic_age=.false.
+       do_generic_argon=.false.
+       do_generic_COBALT=.false.
+       force_update_fluxes=.true.
+      </namelist>
+       <csh>
+         <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = False
+GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 720
+#override NJGLOBAL = 576
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override MIN_OCN_INTERTIAL_H = 2.
+
+#override ADD_DIURNAL_SW = True 
+#override ICE_STATS_INTERVAL = 30
+SIS_OVERRIDE_EOF
+
+####################################################################################################
+##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
+##
+if ( $currentSeg == 1 ) then
+  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+      ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kd_turb,Kd_shear || exit 1
+      endif
+
+      ncdump -h $resfile | grep 'double Kv_turb' > /dev/null
+      if ($status == 0) then
+        chmod +w $resfile
+        ncrename -O $resfile -v Kv_turb,Kv_shear || exit 1
+      endif
+  end
+
+endif
+####################################################################################################
+##The following is to avoid model crash with a layout other than the one that produced the initCond.
+##The problem could occur if the generating model run used a mask_table that was different from the
+##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical 
+##values on land on the masked pes (9.96E36) that should have been set as "missing values". 
+##I am pretty sure that there is a bug in SIS2 that tickles this, but I do not have a smoking gun.
+##
+if ( $currentSeg == 1 ) then
+  cd $work/INPUT
+  cp ice_model.res.nc ice_model.res1.nc
+
+  #All ice restart variables should be 0 where they have a "missing value" (9.96E36)
+  foreach var ( T_skin coszen rough_moist rough_heat rough_mom sym_str_s str_t str_d sym_v_ice_C sym_u_ice_C sal_ice enth_ice H_to_kg_m2 h_ice enth_snow h_snow h_pond flux_sw_nir_dif flux_sw_nir_dir flux_sw_vis_dif flux_sw_vis_dir p_surf calving_hflx runoff_hflx calving runoff fprec lprec flux_lw flux_salt flux_q flux_t flux_v flux_u )
+     ncap2 -s "where( $var > 1e36) $var =0.0" ice_model.res1.nc ice_model.res2.nc
+     mv -f ice_model.res2.nc ice_model.res1.nc
+  end
+
+  #except part_size that should be 1 for category 1 and 0 otherwise. But I don't know how to do that!
+  #The next best guess would be 1/6 for all categories so that they add up to 1:
+  ncap2 -s 'where( (part_size>1e36) ) part_size =1.0/6.0' ice_model.res1.nc ice_model.res2.nc
+
+  cp -f ice_model.res2.nc  ice_model.res.nc
+
+  #Same story with calving.res.nc
+  cp -f calving.res.nc calving.res1.nc
+  ncap2 -s 'where( stored_ice>1e36 ) stored_ice =0.0' calving.res1.nc calving.res2.nc
+  mv -f calving.res2.nc calving.res1.nc
+  ncap2 -s 'where( stored_heat>1e36 ) stored_heat =0.0' calving.res1.nc calving.res2.nc
+  mv -f calving.res2.nc calving.res.nc
+
+  cd $work
+endif
+         ]]></csh>
+    </input>
+   </experiment>
    <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998_uncombined" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
     <input>								      
       <namelist name="frecheck_nml">
@@ -2546,40 +2864,6 @@ biomass_p_valid_min = 0.0
    <freInclude name="OM4p125_postprocess">
       <postProcess> 
          <csh><![CDATA[
-	 #Take care of iceberg restarts and trajectories
-         cd $work/RESTART
-         #Treat icebergs restarts and trajectories
-         #Find non-empty iceberg restarts and combine them AND then remove uncombined restarts
-         #This should be handled properly by FRE
-         #ncrcat icebergs.res.nc.* icebergs.res.nc
-      ls icebergs.res.nc.*
-      if( ! $status ) then
-         which ncdump
-         if( $status ) then
-           echo ncdump not available! We need to stop the run or the model restarts incorrectly!
-           exit 1
-         endif
-
-         set non_empty_restarts = ""
-         foreach file ( `ls icebergs.res.nc.????` )
-            if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
-         end
-         if( "$non_empty_restarts" != "" ) then
-          ncrcat $non_empty_restarts icebergs.res.nc
-          if( ! -e icebergs.res.nc ) then
-            echo ERROR: ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
-            exit 1
-          endif
-         endif
-
-         mkdir hide_from_fre
-         mv icebergs.res.nc.* hide_from_fre/
-         cd $work
-         mkdir hide_from_fre
-         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
-         mv iceberg_trajectories.nc.* hide_from_fre/
-      endif
-
          cd $work
          #Make a directory to trick FRE to pick up and archive in ascii
          mkdir extra.results
@@ -2659,40 +2943,6 @@ biomass_p_valid_min = 0.0
    <freInclude name="OM4_postprocess">
       <postProcess> 
          <csh><![CDATA[
-	 #Take care of iceberg restarts and trajectories
-         cd $work/RESTART
-         #Treat icebergs restarts and trajectories
-         #Find non-empty iceberg restarts and combine them AND then remove uncombined restarts
-         #This should be handled properly by FRE
-         #ncrcat icebergs.res.nc.* icebergs.res.nc
-      ls icebergs.res.nc.*
-      if( ! $status ) then
-         which ncdump
-         if( $status ) then
-           echo ncdump not available! We need to stop the run or the model restarts incorrectly!
-           exit 1
-         endif
-
-         set non_empty_restarts = ""
-         foreach file ( `ls icebergs.res.nc.????` )
-            if ( `ncdump -h $file | grep UNLIMITED | awk '{gsub(/\(/," ");print $6}'` ) set non_empty_restarts = "$non_empty_restarts $file"
-         end
-         if( "$non_empty_restarts" != "" ) then
-          ncrcat $non_empty_restarts icebergs.res.nc
-          if( ! -e icebergs.res.nc ) then
-            echo ERROR: ncrcat did not produce icebergs restart file! We need to stop the run or the model restarts incorrectly!
-            exit 1
-          endif
-         endif
-
-         mkdir hide_from_fre
-         mv icebergs.res.nc.* hide_from_fre/
-         cd $work
-         mkdir hide_from_fre
-         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
-         mv iceberg_trajectories.nc.* hide_from_fre/
-      endif
-
          cd $work
          #Make a directory to trick FRE to pick up and archive in ascii
          mkdir extra.results

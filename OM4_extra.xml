@@ -131,26 +131,13 @@ Make the executable for ocean-ice experiments.
       </compile>
     </component>
       
-      <component name="icebergs" paths="mom6/src/icebergs" requires="fms">
-       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="master"> ocean_null.git </codeBase>
-        <csh>\rm -rf ocean_null</csh>
-       </source>
-       <compile>
-            <cppDefs><![CDATA[-D_FILE_VERSION="'"`git-version-string $<`"'"]]> </cppDefs>
-       </compile>
-       <description domainName="N/A" communityName="N/A" communityVersion="$(RELEASE)" communityGrid="N/A"/>
-      </component>
-
-
-      <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src ice_param" requires="fms mom6 icebergs" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
+      <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" >
          <description domainName="Sea Ice SIS2" communityName="GFDL-SIS2" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
 	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-<!--            <makeOverrides>OPENMP=""</makeOverrides> openmp switch for MOM6 may cause crash -->
          </compile>
       </component>
 
@@ -169,17 +156,7 @@ Make the executable for ocean-ice experiments.
             <cppDefs>$(F2003_FLAGS) </cppDefs>
         </compile>
       </component>
-      <component name="FMScoupler" paths="FMScoupler" requires="fms land_null atmos_null sis2 mom6 icebergs">
-         <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
-         <source versionControl="git" root="https://github.com/NOAA-GFDL">
-            <codeBase version="$(RELEASE)"> FMScoupler.git </codeBase>
-         </source>
-         <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-         </compile>
-      </component>
-<!-- post xanadu
-      <component name="coupler" paths="coupler/shared coupler/full" requires="fms land_null atmos_null sis2 mom6 icebergs">
+      <component name="coupler" paths="coupler/shared coupler/full" requires="fms land_null atmos_null sis2 mom6">
          <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid="NA"/> 
          <source versionControl="git" root="https://github.com/NOAA-GFDL">
             <codeBase version="$(RELEASE)"> coupler.git </codeBase>
@@ -188,7 +165,6 @@ Make the executable for ocean-ice experiments.
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
          </compile>
       </component>
--->
    </experiment>
 
    <experiment name="MOM6_SIS2_compile_symmetric" inherit="MOM6_SIS2_compile">
@@ -1898,12 +1874,6 @@ SIS_LAYOUT_EOF
       </runtime>
       <postProcess> 
          <csh><![CDATA[
-         cd $work/RESTART
-         ncrcat icebergs.res.nc.* icebergs.res.nc
-         rm -f icebergs.res.nc.*
-         cd $work
-         ncrcat iceberg_trajectories.nc.* iceberg_trajectories.nc
-         rm -f iceberg_trajectories.nc.* 
          #Save the last line of ocean.stats without the first (step number) column as a signature of MOM6 answers
          tail -1 ocean.stats | cut -c8- > RESTART/$enddate.ocean.stats.res
          #Save the whole ocean.stats under ascii/
