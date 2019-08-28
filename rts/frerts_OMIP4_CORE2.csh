@@ -2,10 +2,10 @@
 set -v
 # Automatic Build and Run on Gaea using fre
 XML_FILE=OMIP4_CORE2.xml  #The xml to test
-RELEASE='xanadu_esm4_20190304'                 #The FMS release to test
+RELEASE='dev\\\/master'                 #The FMS release to test
 MOM6_DATE='ESM4_v1.0.3'                     #The MOM6 tag date to test
 MOM6_GIT_TAG="ESM4\\\/v1.0.3" #\\\/$MOM6_DATE" #The MOM6 tag to test
-FRESTEM="${RELEASE}_mom6_${MOM6_DATE}_0708"         #The FRESTEM to use
+FRESTEM="testing_20190705_mom6_${MOM6_DATE}"         #The FRESTEM to use
 GROUP="gfdl_f"
 #List of the experiments in the xml to run regression for
 EXPERIMENT_LIST="OM4p25_IAF_BLING_csf_rerun OM4p5_IAF_BLING_CFC_abio_csf_mle200 OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998_combined"
@@ -31,7 +31,7 @@ FRERTS_BATCH_ARGS="-p ${PLATFORM} -t ${TARGET} --release ${RELEASE} --fre_stem $
 
 FRERTS_ARGS="--compile,--res_num,6,--fre_ops,-r;basic;-u;--no-transfer,--do_frecheck,--reference_tag,${REFERENCE_TAG}" 
 #If you do not want to recompile
-#FRERTS_ARGS="--res_num,6,--fre_ops,--cluster=t4;-r;basic;-u;--no-transfer,--do_frecheck,--reference_tag,${REFERENCE_TAG}" 
+#FRERTS_ARGS="--res_num,6,--fre_ops,-r;basic;-u;--no-transfer,--do_frecheck,--reference_tag,${REFERENCE_TAG}" 
 #If you want only a "basic" regression to run
 #FRERTS_ARGS="--compile,--no_rts,--fre_ops,-r;basic;-u;--no-transfer,--do_frecheck,--reference_tag,${REFERENCE_TAG}" 
 
