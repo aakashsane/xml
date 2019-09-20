@@ -17,12 +17,12 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
   <property name="MOM6_GIT_TAG"   value="dev/gfdl/$(MOM6_DATE)"/>    <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
 
    <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-   <property name="PROD_SIMTIME"   value="5"/>
+   <property name="PROD_SIMTIME"   value="10"/>
    <!--Post-processing  chunk lengths -->
    <property name="CHUNK_LENGTH_A" value="5yr"/>
    <property name="CHUNK_LENGTH_B" value="20yr"/>
@@ -448,6 +448,11 @@ MOM_OVERRIDE_EOF
          #Make a directory to trick FRE to pick up and archive in ascii
          mkdir extra.results
          mv *velocity_truncations MOM_parameter_doc* SIS_parameter_doc* seaice.stats* ocean.stats* extra.results/
+
+         #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
+         #This causes problems for ferret and python tools for analysis.
+         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
+         cp $work/INPUT/ocean_static_no_mask_table.nc $work/
       ]]></csh>
       <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh  $(NB_ROOT)/mdt_xml/awg_include/refineDiag/refineDiag_data_stager_globalAve.csh"/>
       <xi:include href="awg_include/xml_building_blocks/om4_cmip6_postprocess.xml" xpointer="xpointer(//freInclude[@name='OM4_cmip6_postprocess']/postProcess/node())"/>
@@ -459,6 +464,14 @@ MOM_OVERRIDE_EOF
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/OM4p25_grid/OM4p25_gridgen_20190903.tar</dataSource>
         <dataSource site="gfdl">/work/Niki.Zadeh/MOM6-examples_myfork/ice_ocean_SIS2/OM4_025/preprocessing.new/mosaic_ocean/OM4p25_gridgen_20190903.tar</dataSource> 
+      </dataFile>
+      <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
+          <!--dataSource site="ncrc">$(gfdlO_pdata)/datasets/OM4_025/mosaic.v20170622.unpacked/ocean_static.nc</dataSource-->
+          <dataSource site="ncrc">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/OM4p25_grid/OM4p25_gridgen_20190903_unpacked/ocean_static_from_no_masktable_run_add_basin.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/ocean_basin_codes.nc" chksum="" size="" timestamp="">
+          <dataSource site="ncrc">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/OM4p25_grid/OM4p25_gridgen_20190903_unpacked/basin_codes.nc</dataSource>
+          <dataSource site="gfdl">/work/Niki.Zadeh/MOM6-examples_myfork/ice_ocean_SIS2/OM4_025/preprocessing/mosaic_ocean/basin_codes.nc</dataSource>
       </dataFile>
     </input>
    </freInclude>
