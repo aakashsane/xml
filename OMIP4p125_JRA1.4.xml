@@ -163,21 +163,6 @@ READ_TIDEAMP = True
 $name
 $baseDate
 #
-#A short subset od seaice diagnotics for 1/8 degree models
-#
-"ice_month",              1, "months", 1, "days", "time"
-"ice_model", "EXT",        "EXT",          "ice_month", "all", "mean", "none", 2
-"ice_model", "siu",        "siu",          "ice_month", "all", "mean", "none", 2
-"ice_model", "siv",        "siv",          "ice_month", "all", "mean", "none", 2
-"ice_model", "siconc",     "siconc",       "ice_month", "all", "mean", "none", 2
-"ice_model", "sisnconc",   "sisnconc",     "ice_month", "all", "mean", "none", 2
-"ice_model", "simass",     "simass",       "ice_month", "all", "mean", "none", 2
-"ice_model", "sisnmass",   "sisnmass",     "ice_month", "all", "mean", "none", 2
-"ice_model", "sisnthick",  "sisnthick",    "ice_month", "all", "mean", "none", 2
-"ice_model", "sithick",    "sithick",      "ice_month", "all", "mean", "none", 2
-"ice_model", "sivol",      "sivol",        "ice_month", "all", "mean", "none", 2
-"ice_model", "MIB",        "MIB",          "ice_month", "all", "mean", "none", 2
-#
 #TKE_tidal diagnostics needed for tuning KAPPA_H2_FACTOR
 #
 "ocean_annual",               12, "months",   1, "days", "time"
@@ -251,6 +236,7 @@ SIS_OVERRIDE_EOF
         <run days="2" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1600']/node())"/> </run>
         <run days="1 1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1600']/node())"/> </run>
       </regression>
+      <reference restart="$(REFERENCE)/archive/1x0m2d_1600x1o/restart/19580103.tar"/>
     </runtime>
 
     <postProcess>
@@ -321,6 +307,7 @@ SIS_OVERRIDE_EOF
       </dataFile>
     </input>
    </freInclude>
+   
    <freInclude name="OM4p125_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -380,17 +367,38 @@ SIS_OVERRIDE_EOF
          restart_output_dir = 'RESTART/',
          parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_saltrestore','INPUT/MOM_override'
      </namelist>
-
      </input>
-
    </freInclude>
 
    <freInclude name="SIS2p125_data">
     <input>
+<!--Due to high resolution of this experiment do not use the full SIS2 diag_table
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/diag_table.SIS</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025.JRA/diag_table.SIS</dataSource>
+     </dataFile>
+-->
+     <diagTable order="append">
+#
+#A short subset od seaice diagnotics for 1/8 degree models
+#
+"ice_month",              1, "months", 1, "days", "time"
+"ice_model", "EXT",        "EXT",          "ice_month", "all", "mean", "none", 2
+"ice_model", "siu",        "siu",          "ice_month", "all", "mean", "none", 2
+"ice_model", "siv",        "siv",          "ice_month", "all", "mean", "none", 2
+"ice_model", "siconc",     "siconc",       "ice_month", "all", "mean", "none", 2
+"ice_model", "sisnconc",   "sisnconc",     "ice_month", "all", "mean", "none", 2
+"ice_model", "simass",     "simass",       "ice_month", "all", "mean", "none", 2
+"ice_model", "sisnmass",   "sisnmass",     "ice_month", "all", "mean", "none", 2
+"ice_model", "sisnthick",  "sisnthick",    "ice_month", "all", "mean", "none", 2
+"ice_model", "sithick",    "sithick",      "ice_month", "all", "mean", "none", 2
+"ice_model", "sivol",      "sivol",        "ice_month", "all", "mean", "none", 2
+"ice_model", "MIB",        "MIB",          "ice_month", "all", "mean", "none", 2
+     </diagTable>
+
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/SIS_input</dataSource>
      </dataFile>
-
      <namelist name="SIS_input_nml" >
          output_directory = './',
          input_filename = '$restart_flag'
@@ -400,5 +408,4 @@ SIS_OVERRIDE_EOF
      </namelist>
      </input>
    </freInclude>
-   
 </experimentSuite>

@@ -1,0 +1,95 @@
+<freInclude xmlns:xi="http://www.w3.org/2003/XInclude">
+   <experiment name="MOM6_SIS2_compile">
+      <description>
+Make the executable for ocean-ice experiments.
+      </description>
+    <component name="fms" paths="FMS/affinity FMS/amip_interp FMS/column_diagnostics FMS/diag_integral FMS/fft FMS/horiz_interp FMS/memutils FMS/oda_tools FMS/sat_vapor_pres FMS/topography FMS/astronomy FMS/constants  FMS/diag_manager FMS/field_manager FMS/include FMS/monin_obukhov FMS/platform FMS/station_data FMS/tracer_manager FMS/axis_utils FMS/coupler FMS/drifters FMS/fms FMS/interpolator FMS/mosaic FMS/random_numbers FMS/time_interp FMS/tridiagonal FMS/block_control  FMS/data_override       FMS/exchange  FMS/fv3gfs  FMS/mpp FMS/time_manager">
+     <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid=""/>
+      <source versionControl="git" root="https://github.com/NOAA-GFDL">
+            <codeBase version="$(RELEASE)"> FMS.git </codeBase>
+      	    <csh><![CDATA[
+              ( cd FMS && git checkout $(SHARED_GIT_TAG) )
+              ]]>
+            </csh>
+      </source>
+      <compile>
+            <cppDefs>-Duse_libMPI -Duse_netCDF $(F2003_FLAGS) -DMAXFIELDMETHODS_=400</cppDefs>
+      </compile>
+    </component>
+
+    <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared/generic_tracers ocean_shared/mocsy/src">
+      <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
+       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
+        <codeBase version="$(OCEAN_SHARED_GIT_TAG)"> ocean_shared.git </codeBase>
+        <csh><![CDATA[
+          git clone -b $(MOM6_GIT_TAG) https://github.com/NOAA-GFDL/MOM6-examples.git mom6
+          pushd mom6
+          git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
+          git submodule init src/MOM6 src/SIS2 src/icebergs tools/python/MIDAS
+          git clone --recursive https://github.com/NOAA-GFDL/MOM6.git src/MOM6 
+          git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
+          git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
+          git submodule update #This gets the right version of submodules
+          popd
+
+          pushd mom6
+          set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
+          if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
+            ln -s /scratch4/GFDL/gfdlscr/pdata/gfdl_O/datasets/ .datasets
+          else if ("${platform_domain}" =~ *"ccs.ornl.gov"* ) then
+            ln -s /lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/ .datasets
+          else
+            ln -s /lustre/f2/pdata/gfdl/gfdl_O/datasets/ .datasets
+          endif
+          popd	  
+
+          test -e mom6/.datasets
+          if ($status != 0) then
+            echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
+          endif
+ 
+        ]]></csh>
+      </source>
+      <compile>
+        <cppDefs><![CDATA[ $(F2003_FLAGS) -DMAX_FIELDS_=100 -DNOT_SET_AFFINITY -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER  -DUSE_PRECISION=2 -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
+        <!--makeOverrides>OPENMP=""</makeOverrides>  openmp switch for MOM6 may cause crash -->
+      </compile>
+    </component>
+      
+      <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" >
+         <description domainName="Sea Ice SIS2" communityName="GFDL-SIS2" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
+	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
+         </source>
+         <compile>
+            <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+         </compile>
+      </component>
+
+      <component name="land_null" paths="land_null" requires="fms">
+         <description domainName="NA" communityName="NA" communityVersion="NA" communityGrid="NA"/>
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
+            <codeBase version="$(RELEASE)"> land_null.git </codeBase>
+         </source>
+      </component>
+
+      <component name="atmos_null" paths="atmos_null" requires="fms">
+         <source versionControl="git" root="https://github.com/NOAA-GFDL">
+           <codeBase version="$(RELEASE)"> atmos_null.git </codeBase>
+         </source>
+         <compile>
+            <cppDefs>$(F2003_FLAGS) </cppDefs>
+        </compile>
+      </component>
+      <component name="coupler" paths="coupler/full coupler/shared" requires="fms land_null atmos_null sis2 mom6">
+        <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
+        <source versionControl="git" root="https://github.com/NOAA-GFDL">
+          <codeBase version="$(RELEASE)"> coupler.git </codeBase>
+        </source>
+        <compile>
+            <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
+        </compile>
+      </component>
+   </experiment>
+
+</freInclude>
