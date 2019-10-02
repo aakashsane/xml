@@ -1,0 +1,404 @@
+<?xml version="1.0"?>
+<!-- FRE Usage documentation: http://www.gfdl.noaa.gov/fms/fre -->
+<!--
+Quick start guide
+This xml consists of 1/4 degree Ocean-Ice experiments with JRA version1.4 interannual forcings.
+
+module load fre/bronx-15
+fremake -x OMIP_JRA.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
+frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_r6_cycle1 -r basic 
+-->
+
+<experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <property name="RELEASE"        value="xanadu_esm4_20190304"/>     <!-- git tag for general component source code-->
+  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>               <!-- git tag for shared source code -->
+  <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>         <!-- git tag for ocean_shared source code -->
+  <property name="MOM6_DATE"      value="2019.08.08"/>               <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="dev/gfdl/2019.08.08"/>              <!-- git tag for MOM6 source code -->
+  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
+  <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="OM4_ANALYSIS"   value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
+  <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
+  <property name="PROD_SIMTIME"   value="60"/>
+  <!--Post-processing  chunk lengths -->
+  <property name="CHUNK_LENGTH_A" value="5yr"/>
+  <property name="CHUNK_LENGTH_B" value="20yr"/>
+  <!--Start year of PP -->
+  <property name="PP_START_YEAR"   value="1958"/>      <!--Use these values for CORE2 dynamic forcing runs -->
+  <property name="FRE_VERSION"     value="bronx-15"/> <!-- fre version to be used -->
+  <property name="ProjectID"       value="CMIP6"/>      <!-- database top level -->
+  <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
+  <!--pp fixer scripts for CMIP6-->
+  <property name="CMIP6_PP_FIXER_SCRIPTS_DIR" value="/home/oar.gfdl.cmip6/CMIP6_publishing/pp_fixer_scripts"/>
+  <property name="CMIP6_PP_FIXER_SWITCH" value="off"/>
+
+  <!--Users need not change the following properties -->
+  <property name="reference_tag"  value="xanadu_esm4_20190304_mom6_2019.08.08"/> <!-- Reference answers for frecheck -->
+  <!-- The following properties are for testing/debugging purposes and should normally be empty-->
+  <property name="DEBUGLEVEL" value=""/>
+  <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
+
+  <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
+  <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)/mdt_xml/awg_include"/>
+  <property name="gfdlO_pdata"     value="/lustre/f2/pdata/gfdl/gfdl_O"/>
+
+  <!--JRA dataset location. There are used in awg_include/xml_building_blocks/om4_common.xml-->
+  <property name="append_to_setup_csh"  value="set fyear=1958"/><!--The start year of forcing dataseti. FRE hack to set fyear.-->
+  <property name="JRA_dataset"     value="/lustre/f2/pdata/gfdl/gfdl_O/datasets/reanalysis/JRA55-do/v1.4.0/"/>
+  <property name="JRA_dataset_8th" value="/lustre/f2/dev/Raphael.Dussin/input/xanadu/OM4p125_grid/rivers_JRAv1.4/OM4_025_runoff_aja.git"/>
+  
+  <setup>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc3.intel16'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc4-intel16'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc3-intel16'])"/>
+  </setup>
+
+  <freInclude name="resourceparams_O9084p125_production">
+	     <resources jobWallclock="14:00:00"  segRuntime="7:00:00">
+               <ocn ranks="9084" layout = "120,112"   io_layout = "4,4" mask_table="mask_table.4356.120x112" threads="1"/>
+               <ice              layout = "120,112"   io_layout = "4,4" mask_table="mask_table.4356.120x112"/>
+             </resources>
+  </freInclude>
+
+   <!--= COMPILE =-->
+   <property name="PROG_MAIN"   value="coupler/coupler_main.o"/>
+   <property name="LIBS_ROOT"   value="MOM6_SIS2_compile"/>
+   <property name="FMS_LIB_DIR" value="./$(LIBS_ROOT)/$(platform)-$(target)/exec"/>
+   <property name="MY_LIBS"     value="$(EXEC_ROOT)/$(FMS_LIB_DIR)"/>
+   <!--The compile expriment is xincluded here so it could be used in all OMIP xmls-->
+   <xi:include href="awg_include/xml_building_blocks/OMIP_compile.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_SIS2_compile'])"/>
+
+   <!--The property MOM6_EXAMPLES should point to the mom6 directory that is checked out. It is needed by MOM6 to access its input data files-->
+   <property name="MOM6_EXAMPLES"  value="$root/$(LIBS_ROOT)/src/mom6"/>
+
+   <!--****************************************************************************************-->
+   <!--***************************** 1/8 degree experiments        ****************************-->
+   <!--****************************************************************************************-->
+						
+   <experiment name="OM4p125_JRA55do1.4_r6_cycle1" inherit="MOM6_SIS2_compile">
+    <description>
+global 1/8 degree z ocean_ice experiment 
+regridded runoff and salinity
+JRA55do1-4 dynamic inter_annual forcing data
+No additional diurnal cycle imposed
+Use downsampled diagnostics _d2
+ADJUST_NET_FRESH_WATER_TO_ZERO  = True
+READ_TIDEAMP = True
+#override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
+    </description>  
+    <input>
+      <namelist name="coupler_nml">
+       months = $months,
+       days   = $days,
+       current_date = 1958,1,1,0,0,0,
+       hours = 0
+       minutes = 0
+       seconds = 0
+       calendar = 'julian',  !important
+       dt_cpld  = 3600,
+       dt_atmos = 3600,
+       do_atmos = .false.,
+       do_land = .false.,
+       do_ice = .true.,
+       do_ocean = .true.,
+       atmos_npes = 0,
+       ocean_npes = 0,
+       concurrent = .false.
+       use_lag_fluxes=.false. 
+       atmos_nthreads = $atm_threads
+       ocean_nthreads = $ocn_threads
+     </namelist>
+     <namelist name="xgrid_nml">
+       make_exchange_reproduce = .true.
+       interp_method = 'second_order'
+     </namelist>
+     <namelist name="fms_nml">
+       clock_grain='ROUTINE'
+       clock_flags='NONE'
+       domains_stack_size = 8000000
+       stack_size =0
+     </namelist>
+     <namelist name="fms_io_nml" >
+       fms_netcdf_restart=.true.
+       threading_read='multi'
+       max_files_r = 800
+       max_files_w = 800
+     </namelist>
+     <namelist name="atmos_model_nml" >
+       layout= 0, 0
+     </namelist>
+     <!--verona-->
+     <namelist name="sat_vapor_pres_nml">
+      construct_table_wrt_liq = .true.,
+      construct_table_wrt_liq_and_ice = .true.,
+     </namelist>
+   
+     <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
+     </dataFile>
+
+     <!--common setup for JRA forcing dataset and data_table-->
+     <xi:include href="awg_include/xml_building_blocks/om4_common.xml" xpointer="xpointer(//freInclude[@name='OM4_JRA_always_csh']/input/node())"/>
+     <xi:include href="awg_include/xml_building_blocks/om4_common.xml" xpointer="xpointer(//freInclude[@name='JRA_data_table']/input/node())"/>
+     <!--append the resolution dependent runoff override-->
+     <dataTable order="append"> 
+#JRA runoff    
+"ICE" , "runoff"        , "friver"      , "./INPUT/JRA_friver_2880x2240.nc", "none" ,  1.0
+"ICE" , "calving"       , "licalvf"     , "./INPUT/JRA_licalvf_2880x2240.nc", "none" ,  1.0
+     </dataTable>
+
+     <!--OM4 gridSpec mosaic datasets-->
+     <xi:include xpointer="xpointer(//freInclude[@name='OM4p125_grid']/input/node())"/>
+     <!--MOM6 Input datasets-->
+     <xi:include xpointer="xpointer(//freInclude[@name='OM4p125_data']/input/node())"/>
+     <!--SIS2 Input datasets-->
+     <xi:include xpointer="xpointer(//freInclude[@name='SIS2p125_data']/input/node())"/>
+
+     <!--diag_tables-->
+     <!--Due to high resolution of this experiment it is not recommended to run with the full SIS2 diag_table-->
+     <diagTable>
+$name
+$baseDate
+#
+#A short subset od seaice diagnotics for 1/8 degree models
+#
+"ice_month",              1, "months", 1, "days", "time"
+"ice_model", "EXT",        "EXT",          "ice_month", "all", "mean", "none", 2
+"ice_model", "siu",        "siu",          "ice_month", "all", "mean", "none", 2
+"ice_model", "siv",        "siv",          "ice_month", "all", "mean", "none", 2
+"ice_model", "siconc",     "siconc",       "ice_month", "all", "mean", "none", 2
+"ice_model", "sisnconc",   "sisnconc",     "ice_month", "all", "mean", "none", 2
+"ice_model", "simass",     "simass",       "ice_month", "all", "mean", "none", 2
+"ice_model", "sisnmass",   "sisnmass",     "ice_month", "all", "mean", "none", 2
+"ice_model", "sisnthick",  "sisnthick",    "ice_month", "all", "mean", "none", 2
+"ice_model", "sithick",    "sithick",      "ice_month", "all", "mean", "none", 2
+"ice_model", "sivol",      "sivol",        "ice_month", "all", "mean", "none", 2
+"ice_model", "MIB",        "MIB",          "ice_month", "all", "mean", "none", 2
+#
+#TKE_tidal diagnostics needed for tuning KAPPA_H2_FACTOR
+#
+"ocean_annual",               12, "months",   1, "days", "time"
+"ocean_model",   "TKE_tidal",        "TKE_tidal",          "ocean_annual",   "mean", "none", "none",2
+"ocean_model",   "TKE_itidal",       "TKE_itidal",         "ocean_annual",   "mean", "none", "none",2
+     </diagTable>
+ 
+     <!--Due to high resolution of this experiment it is not recommended to run with the full MOM6 diag_table-->
+     <!--A set of downsampled diagnotics-->
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table.MOM6.d2sample</dataSource>
+     </dataFile>
+
+     <!--field_tables-->
+     <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/field_table</dataSource>
+     </dataFile>
+
+     <!--MOM_overrides-->
+     <csh>
+        <![CDATA[
+if ( $currentSeg == 1 ) then
+   #Take current date from coupler_nml
+   if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
+endif
+
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override TOPO_EDITS_FILE = ""
+#override TIDEAMP_FILE = "tidal_amplitude.v20181107.nc"
+#override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
+#override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20190815.nc"
+#override SALT_RESTORE_FILE = "salt_restore_PHC2.2880x2240.v20190815.nc"
+#override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
+#override DT_THERM = 3600.0               !   [s] !reduced from 7200.0 for OM4_025
+#override BAD_VAL_SST_MIN = -5.0  ! decreased from default of -3.0 to avoid extremes in 1/8 degree model
+#override U_TRUNC_FILE = "MOM_U_truncations"
+#override V_TRUNC_FILE = "MOM_V_truncations"
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override DT_ICE_DYNAMICS = 450 !reduced from 1200.0 for OM4_025
+#override DT_RHEOLOGY = 25.0
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
+
+   </input>
+
+    <runtime>   
+      <production simTime="$(PROD_SIMTIME)" units="years">
+          <segment simTime="12" units="months"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O9084p125_production']/node())"/>
+      </production>
+      <regression name="basic">
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2085p125']/node())"/> </run>
+      </regression>
+      <regression name="rts">
+        <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2085p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2880']/node())"/> </run>
+         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2240']/node())"/> </run>
+         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1600']/node())"/> </run>
+      </regression>
+      <regression name="debug">
+        <run days="2" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1600']/node())"/> </run>
+        <run days="1 1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1600']/node())"/> </run>
+      </regression>
+    </runtime>
+
+    <postProcess>
+      <csh><![CDATA[
+         cd $work
+         #Make a directory to trick FRE to pick up and archive in ascii
+         mkdir extra.results
+         mv *velocity_truncations MOM_parameter_doc* SIS_parameter_doc* seaice.stats* ocean.stats* extra.results/
+         #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
+         #This causes problems for ferret and python tools for analysis.
+         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
+         cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+      ]]></csh>
+      <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh  $(NB_ROOT)/mdt_xml/awg_include/refineDiag/refineDiag_data_stager_globalAve.csh"/>
+      <xi:include href="awg_include/xml_building_blocks/om4_cmip6_postprocess.xml" xpointer="xpointer(//freInclude[@name='OM4_cmip6_postprocess']/postProcess/node())"/>
+      <xi:include href="awg_include/xml_building_blocks/om4_regions_postprocess.xml" xpointer="xpointer(//freInclude[@name='OM4_regions_postprocess']/postProcess/node())"/>
+      <!--d2 pp-->
+      <component type="ocean_monthly_z_d2" start="$(PP_START_YEAR)"  source="ocean_month_z_d2" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_month_z_d2"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+      <component type="ocean_annual_rho2_d2"  start="$(PP_START_YEAR)" source="ocean_annual_rho2_d2" sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_rho2_d2"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_annual_z_d2" start="$(PP_START_YEAR)" source="ocean_annual_z_d2"  sourceGrid="ocean-tripolar">
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
+        </timeAverage>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
+        </timeAverage>
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z_d2"/>	
+      </component>
+    </postProcess>
+   </experiment>
+
+   <!--This is how to run the next cycles of an experiment. Replace the initCond with the actual last year restart of the previous cycle-->
+   <experiment name="OM4p125_JRA55do1.4_r6_cycle2" inherit="OM4p125_JRA55do1.4_r6_cycle1">
+    <input>
+     <!--Replace the initCond dataSource with the actual last year restart of the previous cycle-->
+     <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
+      <dataSource platform="$(platform)">lustre/f2/scratch/oar.gfdl.ogrp-account/CMIP6/OMIP/xanadu_mom6_20181101/OM4p125_IAF_csf_JRA55do1-4_r5_cycle1/ncrc4.intel16f2-prod/archive/restart/20180101.tar</dataSource>
+     </dataFile>
+     <!--There is  MOM6/SIS2 restart provided in initCond.-->
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override','INPUT/MOM_saltrestore'
+     </namelist>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
+     </namelist>
+    </input>
+   </experiment>
+
+   <freInclude name="OM4p125_grid">
+    <input>
+      <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f2/dev/Raphael.Dussin/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy.tar</dataSource>
+      </dataFile>
+    </input>
+   </freInclude>
+   <freInclude name="OM4p125_data">
+    <input>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <!--The following is a copy of /lustre/f1/unswept/Matthew.Harrison/MOM6_datasets/GIS_0125/tikal/tidal_amplitude.nc -->
+       <dataSource platform="$(platform)">$(ARCHIVE_NNZ)/input/xanadu/OM4p125_grid/tidal_amplitude.v20181107.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_input</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/layer_coord.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_saltrestore</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/MOM_channels_global_025</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m_575m.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/analysis_vgrid_lev35.v1.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_edits.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_GS_edits.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/All_edits.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/woa13_decav_ptemp_monthly_fulldepth_01.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/woa13_decav_s_monthly_fulldepth_01.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/geothermal_davies2013_v1.nc</dataSource>
+      </dataFile>
+
+      <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = '$restart_flag'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_saltrestore','INPUT/MOM_override'
+     </namelist>
+
+     </input>
+
+   </freInclude>
+
+   <freInclude name="SIS2p125_data">
+    <input>
+     <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/SIS_input</dataSource>
+     </dataFile>
+
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = '$restart_flag'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
+     </namelist>
+     </input>
+   </freInclude>
+   
+</experimentSuite>
