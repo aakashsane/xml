@@ -6,12 +6,12 @@ RELEASE='xanadu_esm4_20190304'                 #The FMS release to test
 MOM6_DATE='2019.08.08'                     #The MOM6 tag date to test
 MOM6_GIT_TAG="dev\\\/gfdl\\\/$MOM6_DATE" #The MOM6 tag to test
 FRESTEM="${RELEASE}_mom6_${MOM6_DATE}"         #The FRESTEM to use
-GROUP="gfdl_o"
+GROUP="gfdl_f"
 #List of the experiments in the xml to run regression for
 EXPERIMENT_LIST="OM4p125_JRA55do1.4_r6_cycle1"
 
 
-DEBUGLEVEL='_1002'
+DEBUGLEVEL='_1008'
 PLATFORM="ncrc4.intel16"
 TARGET="prod"
 REFERENCE_TAG='xanadu_esm4_20190304_mom6_2019.08.08'
