@@ -158,7 +158,7 @@ No additional diurnal cycle imposed
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
      </dataFile>
-      
+
      <!--common setup for JRA forcing dataset and data_table-->
      <xi:include href="awg_include/xml_building_blocks/om4_common.xml" xpointer="xpointer(//freInclude[@name='OM4_JRA_always_csh']/input/node())"/>
      <xi:include href="awg_include/xml_building_blocks/om4_common.xml" xpointer="xpointer(//freInclude[@name='JRA_data_table']/input/node())"/>
@@ -195,6 +195,7 @@ if ( $currentSeg == 1 ) then
    #Take current date from coupler_nml
    if(-e $work/INPUT/coupler.res ) \rm -rf $work/INPUT/coupler.res
 endif
+
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 # Turn off generic tracers
 USE_generic_tracer = False
@@ -229,6 +230,20 @@ MOM_OVERRIDE_EOF
       <regression name="debug">
         <run days="2"  > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O864']/node())"/> </run>
         <run days="1 1"> <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O864']/node())"/> </run>
+      </regression>
+      <regression name="timing">
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1756']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O910']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1970']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2432']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2997']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O3551']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O3782']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O4671']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O5791']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O6430']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O9175']/node())"/> </run>
       </regression>
       <reference restart="$(REFERENCE)/archive/1x0m2d_864x1o/restart/19580103.tar"/>
     </runtime>
@@ -316,6 +331,31 @@ MOM_OVERRIDE_EOF
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/woa13_decav_s_monthly_fulldepth_01.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/geothermal_davies2013_v1.nc</dataSource>
+      </dataFile>
+
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/diag_table.MOM6</dataSource>
+        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025.JRA/diag_table.MOM6</dataSource>
+      </dataFile>
+      <diagTable order="append">
+# MOM6 ocean diagnostics only used in a CORE/OMIP (no interactive atmos). 
+# These terms provide diagnostics for the surface salinity / fresh water restoring. 
+ "ocean_model", "vprec",              "vprec",              "ocean_annual", "all", "mean", "none",2
+ "ocean_model", "salt_flux_added",    "salt_flux_added",    "ocean_annual", "all", "mean", "none",2
+ "ocean_model", "vprec",              "vprec",              "ocean_month", "all", "mean", "none",2
+ "ocean_model", "salt_flux_added",    "salt_flux_added",    "ocean_month", "all", "mean", "none",2
+      </diagTable>
+
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = '$restart_flag'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_saltrestore','INPUT/MOM_override'
+     </namelist>
+
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/mask_table.33.16x18.255
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/mask_table.96.32x18.480
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/mask_table.242.32x36.910
@@ -328,36 +368,15 @@ MOM_OVERRIDE_EOF
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/mask_table.1809.90x72.4671
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/mask_table.1309.90x54.3551
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/mask_table.1402.72x72.3782
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/mask_table.2309.90x90.5791
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/mask_table.2570.90x100.6430
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/mask_table.3785.90x144.9175
       </dataFile>
+
       <dataFile label="input" target="INPUT/ocean_static_no_mask_table.nc" chksum="" size="" timestamp="">
           <dataSource site="ncrc">$(gfdlO_pdata)/datasets/OM4_025/mosaic.v20170622.unpacked/ocean_static.nc</dataSource>
       </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/geothermal_davies2013_v1.nc</dataSource>
-      </dataFile>
-      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/diag_table.MOM6</dataSource>
-        <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/diag_table.MOM6</dataSource>
-        <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025.JRA/diag_table.MOM6</dataSource>
-      </dataFile>
-      <diagTable order="append">
-# MOM6 ocean diagnostics only used in a CORE/OMIP (no interactive atmos). 
-# These terms provide diagnostics for the surface salinity / fresh water restoring. 
- "ocean_model", "vprec",              "vprec",              "ocean_annual", "all", "mean", "none",2
- "ocean_model", "salt_flux_added",    "salt_flux_added",    "ocean_annual", "all", "mean", "none",2
 
- "ocean_model", "vprec",              "vprec",              "ocean_month", "all", "mean", "none",2
- "ocean_model", "salt_flux_added",    "salt_flux_added",    "ocean_month", "all", "mean", "none",2
-      </diagTable>
-
-     <namelist name="MOM_input_nml" >
-         output_directory = './',
-         input_filename = '$restart_flag'
-         restart_input_dir = 'INPUT/',
-         restart_output_dir = 'RESTART/',
-         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_saltrestore','INPUT/MOM_override'
-     </namelist>
      </input>
    </freInclude>
 

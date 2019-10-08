@@ -96,7 +96,7 @@ READ_TIDEAMP = True
        hours = 0
        minutes = 0
        seconds = 0
-       calendar = 'julian',  !important
+       calendar = 'julian',
        dt_cpld  = 3600,
        dt_atmos = 3600,
        do_atmos = .false.,
@@ -134,7 +134,7 @@ READ_TIDEAMP = True
       construct_table_wrt_liq = .true.,
       construct_table_wrt_liq_and_ice = .true.,
      </namelist>
-   
+
      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
@@ -158,23 +158,10 @@ READ_TIDEAMP = True
      <xi:include xpointer="xpointer(//freInclude[@name='SIS2p125_data']/input/node())"/>
 
      <!--diag_tables-->
-     <!--Due to high resolution of this experiment it is not recommended to run with the full SIS2 diag_table-->
      <diagTable>
 $name
 $baseDate
-#
-#TKE_tidal diagnostics needed for tuning KAPPA_H2_FACTOR
-#
-"ocean_annual",               12, "months",   1, "days", "time"
-"ocean_model",   "TKE_tidal",        "TKE_tidal",          "ocean_annual",   "mean", "none", "none",2
-"ocean_model",   "TKE_itidal",       "TKE_itidal",         "ocean_annual",   "mean", "none", "none",2
      </diagTable>
- 
-     <!--Due to high resolution of this experiment it is not recommended to run with the full MOM6 diag_table-->
-     <!--A set of downsampled diagnotics-->
-     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table.MOM6.d2sample</dataSource>
-     </dataFile>
 
      <!--field_tables-->
      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
@@ -198,6 +185,7 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
 #override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20190815.nc"
 #override SALT_RESTORE_FILE = "salt_restore_PHC2.2880x2240.v20190815.nc"
+#override SALT_RESTORE_VARIABLE = "SALT"  ! default = "sos"
 #override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
 #override DT_THERM = 3600.0               !   [s] !reduced from 7200.0 for OM4_025
 #override BAD_VAL_SST_MIN = -5.0  ! decreased from default of -3.0 to avoid extremes in 1/8 degree model
@@ -235,6 +223,14 @@ SIS_OVERRIDE_EOF
       <regression name="debug">
         <run days="2" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1600']/node())"/> </run>
         <run days="1 1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1600']/node())"/> </run>
+      </regression>
+      <regression name="timing">
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2085p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2902p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O3649p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O4509p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O9084p125']/node())"/> </run>
+        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O11270p125']/node())"/> </run>
       </regression>
       <reference restart="$(REFERENCE)/archive/1x0m2d_1600x1o/restart/19580103.tar"/>
     </runtime>
@@ -311,54 +307,45 @@ SIS_OVERRIDE_EOF
    <freInclude name="OM4p125_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/MOM_input</dataSource>
+      </dataFile>
+      <!--salt restore data file is included in the grid tar-->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/MOM_saltrestore</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <!--The following is a copy of /lustre/f1/unswept/Matthew.Harrison/MOM6_datasets/GIS_0125/tikal/tidal_amplitude.nc -->
        <dataSource platform="$(platform)">$(ARCHIVE_NNZ)/input/xanadu/OM4p125_grid/tidal_amplitude.v20181107.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_input</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/MOM_channels_global_025</dataSource>
+      </dataFile>
+      <!--seawif data file is included in the grid tar-->
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/hycom1_75_800m.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/layer_coord.nc</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/All_edits.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/MOM_saltrestore</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/woa13_decav_ptemp_monthly_fulldepth_01.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/MOM_channels_global_025</dataSource>
+       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/INPUT/woa13_decav_s_monthly_fulldepth_01.nc</dataSource>
       </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/vgrid_75_2m_575m.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/analysis_vgrid_lev35.v1.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_edits.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/Faroe_GS_edits.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/All_edits.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/woa13_decav_ptemp_monthly_fulldepth_01.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/woa13_decav_s_monthly_fulldepth_01.nc</dataSource>
-      </dataFile>
-      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/geothermal_davies2013_v1.nc</dataSource>
-      </dataFile>
+      <!--geothermal data file is included in the grid tar-->
+
+     <!--Due to high resolution of this experiment it is not recommended to run with the full MOM6 diag_table-->
+     <!--A set of downsampled diagnotics-->
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table.MOM6.d2sample</dataSource>
+     </dataFile>
+     <diagTable order="append">
+#TKE_tidal diagnostics needed for tuning KAPPA_H2_FACTOR
+"ocean_annual",               12, "months",   1, "days", "time"
+"ocean_model",   "TKE_tidal",        "TKE_tidal",          "ocean_annual",   "mean", "none", "none",2
+"ocean_model",   "TKE_itidal",       "TKE_itidal",         "ocean_annual",   "mean", "none", "none",2
+    </diagTable>
 
       <namelist name="MOM_input_nml" >
          output_directory = './',
@@ -367,6 +354,9 @@ SIS_OVERRIDE_EOF
          restart_output_dir = 'RESTART/',
          parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_saltrestore','INPUT/MOM_override'
      </namelist>
+
+     <!--mask_table files are included in the grid tar-->
+
      </input>
    </freInclude>
 
