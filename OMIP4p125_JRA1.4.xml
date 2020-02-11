@@ -6,7 +6,7 @@ This xml consists of 1/4 degree Ocean-Ice experiments with JRA version1.4 intera
 
 module load fre/bronx-15
 fremake -x OMIP_JRA.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
-frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_r6_cycle1 -r basic
+frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_cycle1 -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -14,19 +14,21 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_r6_cycle1 -r
   <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>               <!-- git tag for shared source code -->
   <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>         <!-- git tag for ocean_shared source code -->
   <property name="MOM6_DATE"      value="2019.08.08"/>               <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl/2019.08.08"/>              <!-- git tag for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="ba839be"/>              <!-- git tag for MOM6 source code, actually MOM6-examples -->
   <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
   <property name="OM4_ANALYSIS"   value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
   <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-  <property name="PROD_SIMTIME"   value="60"/>
+  <property name="PROD_SIMTIME"   value="61"/>
   <!--Post-processing  chunk lengths -->
+  <property name="CHUNK_LENGTH_1" value="1yr"/>
   <property name="CHUNK_LENGTH_A" value="5yr"/>
   <property name="CHUNK_LENGTH_B" value="20yr"/>
   <!--Start year of PP -->
   <property name="PP_START_YEAR"   value="1958"/>      <!--Use these values for CORE2 dynamic forcing runs -->
-  <property name="FRE_VERSION"     value="bronx-15"/> <!-- fre version to be used -->
+  <property name="PP_FINAL_YEAR"   value="2018"/>      <!--JRA 1958-2018 needs 1yr pp for last year -->
+  <property name="FRE_VERSION"     value="bronx-16"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="CMIP6"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
   <!--pp fixer scripts for CMIP6-->
@@ -40,13 +42,13 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_r6_cycle1 -r
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
 
   <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
-  <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)/mdt_xml/awg_include"/>
+  <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/xml_odiv/awg_include"/>
   <property name="gfdlO_pdata"     value="/lustre/f2/pdata/gfdl/gfdl_O"/>
 
   <!--JRA dataset location. There are used in awg_include/xml_building_blocks/om4_common.xml-->
   <property name="append_to_setup_csh"  value="set fyear=1958"/><!--The start year of forcing dataseti. FRE hack to set fyear.-->
   <property name="JRA_dataset"     value="/lustre/f2/pdata/gfdl/gfdl_O/datasets/reanalysis/JRA55-do/v1.4.0/"/>
-  <property name="JRA_dataset_8th" value="/lustre/f2/dev/Raphael.Dussin/input/xanadu/OM4p125_grid/rivers_JRAv1.4/OM4_025_runoff_aja.git"/>
+  <property name="JRA_dataset_8th" value="/lustre/f2/dev/Raphael.Dussin/forcings/OM4_125_runoff/"/>
 
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16'])"/>
@@ -56,7 +58,7 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_r6_cycle1 -r
   </setup>
 
   <freInclude name="resourceparams_O9084p125_production">
-	     <resources jobWallclock="14:00:00"  segRuntime="7:00:00">
+	     <resources jobWallclock="15:59:00"  segRuntime="7:58:00">
                <ocn ranks="9084" layout = "120,112"   io_layout = "4,4" mask_table="mask_table.4356.120x112" threads="1"/>
                <ice              layout = "120,112"   io_layout = "4,4" mask_table="mask_table.4356.120x112"/>
              </resources>
@@ -90,7 +92,7 @@ Make the executable for ocean-ice experiments.
        <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
         <codeBase version="$(OCEAN_SHARED_GIT_TAG)"> ocean_shared.git </codeBase>
         <csh><![CDATA[
-          git clone -b $(MOM6_GIT_TAG) https://github.com/NOAA-GFDL/MOM6-examples.git mom6
+          git clone https://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
           git submodule init src/MOM6 src/SIS2 src/icebergs tools/python/MIDAS
