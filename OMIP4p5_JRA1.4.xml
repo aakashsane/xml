@@ -6,7 +6,7 @@ This xml consists of 1/4 degree Ocean-Ice experiments with JRA version1.4 intera
 
 module load fre/bronx-15
 fremake -x OMIP_JRA.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
-frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p5_JRA55do1.4_r6_cycle1 -r basic 
+frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p5_JRA55do1.4_r6_cycle1 -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -47,7 +47,7 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p5_JRA55do1.4_r6_cycle1 -r b
   <property name="append_to_setup_csh"  value="set fyear=1958"/><!--The start year of forcing dataseti. FRE hack to set fyear.-->
   <property name="JRA_dataset"     value="/lustre/f2/pdata/gfdl/gfdl_O/datasets/reanalysis/JRA55-do/v1.4.0/"/>
   <property name="JRA_dataset_8th" value="/lustre/f2/dev/Raphael.Dussin/input/xanadu/OM4p125_grid/rivers_JRAv1.4/OM4_025_runoff_aja.git"/>
-  
+
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc3.intel16'])"/>
@@ -100,7 +100,7 @@ Make the executable for ocean-ice experiments.
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
           git submodule init src/MOM6 src/SIS2 src/icebergs tools/python/MIDAS
-          git clone --recursive https://github.com/NOAA-GFDL/MOM6.git src/MOM6 
+          git clone --recursive https://github.com/NOAA-GFDL/MOM6.git src/MOM6
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
@@ -115,13 +115,13 @@ Make the executable for ocean-ice experiments.
           else
             ln -s /lustre/f2/pdata/gfdl/gfdl_O/datasets/ .datasets
           endif
-          popd	  
+          popd
 
           test -e mom6/.datasets
           if ($status != 0) then
             echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
           endif
- 
+
         ]]></csh>
       </source>
       <compile>
@@ -129,11 +129,11 @@ Make the executable for ocean-ice experiments.
         <!--makeOverrides>OPENMP=""</makeOverrides>  openmp switch for MOM6 may cause crash -->
       </compile>
     </component>
-      
+
       <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" >
          <description domainName="Sea Ice SIS2" communityName="GFDL-SIS2" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
          <source versionControl="git" root="https://github.com/NOAA-GFDL">
-	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
+	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase>
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
@@ -156,7 +156,7 @@ Make the executable for ocean-ice experiments.
         </compile>
       </component>
       <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6">
-        <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
+        <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>
         <source versionControl="git" root="https://github.com/NOAA-GFDL">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
         </source>
@@ -175,11 +175,11 @@ Make the executable for ocean-ice experiments.
 
    <experiment name="OM4p5_JRA55do1.4_r6_cycle1" inherit="MOM6_SIS2_compile">
     <description>
-global 1/2 degree z ocean_ice experiment 
+global 1/2 degree z ocean_ice experiment
 regridded runoff and salinity
 JRA55do1-4 dynamic inter_annual forcing data
 No additional diurnal cycle imposed
-    </description>  
+    </description>
     <input>
       <namelist name="coupler_nml">
        months = $months,
@@ -236,8 +236,8 @@ No additional diurnal cycle imposed
      <xi:include href="awg_include/xml_building_blocks/om4_common.xml" xpointer="xpointer(//freInclude[@name='OM4_JRA_always_csh']/input/node())"/>
      <xi:include href="awg_include/xml_building_blocks/om4_common.xml" xpointer="xpointer(//freInclude[@name='JRA_data_table']/input/node())"/>
      <!--append the resolution dependent runoff override-->
-     <dataTable order="append"> 
-#JRA runoff    
+     <dataTable order="append">
+#JRA runoff
 "ICE" , "runoff"        , "friver"      , "./INPUT/JRA_friver_720x576.nc", "none" ,  1.0
      </dataTable>
 
@@ -317,7 +317,7 @@ SIS_OVERRIDE_EOF
          mv *velocity_truncations MOM_parameter_doc* SIS_parameter_doc* seaice.stats* ocean.stats* extra.results/
          #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
          #This causes problems for ferret and python tools for analysis.
-         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
+         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts .
          cp $work/INPUT/ocean_static_no_mask_table.nc $work/
       ]]></csh>
       <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh  $(NB_ROOT)/mdt_xml/awg_include/refineDiag/refineDiag_data_stager_globalAve.csh"/>
@@ -411,8 +411,8 @@ SIS_OVERRIDE_EOF
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_05/diag_table.MOM6</dataSource>
       </dataFile>
       <diagTable order="append">
-# MOM6 ocean diagnostics only used in a CORE/OMIP (no interactive atmos). 
-# These terms provide diagnostics for the surface salinity / fresh water restoring. 
+# MOM6 ocean diagnostics only used in a CORE/OMIP (no interactive atmos).
+# These terms provide diagnostics for the surface salinity / fresh water restoring.
  "ocean_model", "vprec",              "vprec",              "ocean_annual", "all", "mean", "none",2
  "ocean_model", "salt_flux_added",    "salt_flux_added",    "ocean_annual", "all", "mean", "none",2
 
