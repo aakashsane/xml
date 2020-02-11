@@ -6,7 +6,7 @@ This xml consists of 1/4 degree Ocean-Ice experiments with JRA version1.4 intera
 
 module load fre/bronx-15
 fremake -x OMIP_JRA.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
-frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_r6_cycle1 -r basic 
+frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_r6_cycle1 -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -47,7 +47,7 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_r6_cycle1 -r
   <property name="append_to_setup_csh"  value="set fyear=1958"/><!--The start year of forcing dataseti. FRE hack to set fyear.-->
   <property name="JRA_dataset"     value="/lustre/f2/pdata/gfdl/gfdl_O/datasets/reanalysis/JRA55-do/v1.4.0/"/>
   <property name="JRA_dataset_8th" value="/lustre/f2/dev/Raphael.Dussin/input/xanadu/OM4p125_grid/rivers_JRAv1.4/OM4_025_runoff_aja.git"/>
-  
+
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc3.intel16'])"/>
@@ -94,7 +94,7 @@ Make the executable for ocean-ice experiments.
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
           git submodule init src/MOM6 src/SIS2 src/icebergs tools/python/MIDAS
-          git clone --recursive https://github.com/NOAA-GFDL/MOM6.git src/MOM6 
+          git clone --recursive https://github.com/NOAA-GFDL/MOM6.git src/MOM6
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
@@ -109,13 +109,13 @@ Make the executable for ocean-ice experiments.
           else
             ln -s /lustre/f2/pdata/gfdl/gfdl_O/datasets/ .datasets
           endif
-          popd	  
+          popd
 
           test -e mom6/.datasets
           if ($status != 0) then
             echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
           endif
- 
+
         ]]></csh>
       </source>
       <compile>
@@ -123,11 +123,11 @@ Make the executable for ocean-ice experiments.
         <!--makeOverrides>OPENMP=""</makeOverrides>  openmp switch for MOM6 may cause crash -->
       </compile>
     </component>
-      
+
       <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" >
          <description domainName="Sea Ice SIS2" communityName="GFDL-SIS2" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
          <source versionControl="git" root="https://github.com/NOAA-GFDL">
-	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
+	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase>
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
@@ -150,7 +150,7 @@ Make the executable for ocean-ice experiments.
         </compile>
       </component>
       <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6">
-        <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
+        <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>
         <source versionControl="git" root="https://github.com/NOAA-GFDL">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
         </source>
@@ -166,10 +166,10 @@ Make the executable for ocean-ice experiments.
    <!--****************************************************************************************-->
    <!--***************************** 1/8 degree experiments        ****************************-->
    <!--****************************************************************************************-->
-						
+
    <experiment name="OM4p125_JRA55do1.4_r6_cycle1" inherit="MOM6_SIS2_compile">
     <description>
-global 1/8 degree z ocean_ice experiment 
+global 1/8 degree z ocean_ice experiment
 regridded runoff and salinity
 JRA55do1-4 dynamic inter_annual forcing data
 No additional diurnal cycle imposed
@@ -177,7 +177,7 @@ Use downsampled diagnostics _d2
 ADJUST_NET_FRESH_WATER_TO_ZERO  = True
 READ_TIDEAMP = True
 #override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
-    </description>  
+    </description>
     <input>
       <namelist name="coupler_nml">
        months = $months,
@@ -196,7 +196,7 @@ READ_TIDEAMP = True
        atmos_npes = 0,
        ocean_npes = 0,
        concurrent = .false.
-       use_lag_fluxes=.false. 
+       use_lag_fluxes=.false.
        atmos_nthreads = $atm_threads
        ocean_nthreads = $ocn_threads
      </namelist>
@@ -234,8 +234,8 @@ READ_TIDEAMP = True
      <xi:include href="awg_include/xml_building_blocks/om4_common.xml" xpointer="xpointer(//freInclude[@name='OM4_JRA_always_csh']/input/node())"/>
      <xi:include href="awg_include/xml_building_blocks/om4_common.xml" xpointer="xpointer(//freInclude[@name='JRA_data_table']/input/node())"/>
      <!--append the resolution dependent runoff override-->
-     <dataTable order="append"> 
-#JRA runoff    
+     <dataTable order="append">
+#JRA runoff
 "ICE" , "runoff"        , "friver"      , "./INPUT/JRA_friver_2880x2240.nc", "none" ,  1.0
 "ICE" , "calving"       , "licalvf"     , "./INPUT/JRA_licalvf_2880x2240.nc", "none" ,  1.0
      </dataTable>
@@ -296,7 +296,7 @@ SIS_OVERRIDE_EOF
 
    </input>
 
-    <runtime>   
+    <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O9084p125_production']/node())"/>
@@ -333,7 +333,7 @@ SIS_OVERRIDE_EOF
          mv *velocity_truncations MOM_parameter_doc* SIS_parameter_doc* seaice.stats* ocean.stats* extra.results/
          #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
          #This causes problems for ferret and python tools for analysis.
-         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
+         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts .
          cp $work/INPUT/ocean_static_no_mask_table.nc $work/
       ]]></csh>
       <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh  $(NB_ROOT)/mdt_xml/awg_include/refineDiag/refineDiag_data_stager_globalAve.csh"/>
@@ -374,7 +374,7 @@ SIS_OVERRIDE_EOF
       </dataFile>
     </input>
    </freInclude>
-   
+
    <freInclude name="OM4p125_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -471,7 +471,7 @@ SIS_OVERRIDE_EOF
    </freInclude>
 
    <freInclude name="OM4_cmip6_postprocess_p125">
-   <postProcess> 
+   <postProcess>
       <!--PostProcessing component models-->
       <component type="ocean_daily_cmip" source="ocean_daily" sourceGrid="ocean-tripolar" cmip="on">
         <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)">
@@ -487,7 +487,7 @@ SIS_OVERRIDE_EOF
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
-        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_A)" source="ocean_annual_z"/>	
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_A)" source="ocean_annual_z"/>
       </component>
 
       <!--Ocean scalars-->
@@ -496,20 +496,20 @@ SIS_OVERRIDE_EOF
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_B)"/>
       </component>
-      
+
       <component type="ocean_scalar_annual"  start="$(PP_START_YEAR)" source="ocean_scalar_annual" sourceGrid="ocean-tripolar" cmip="on">
         <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_A)" source="ocean_scalar_annual"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
       </component>
 
-      <!--ICE-->      
+      <!--ICE-->
       <component type="ice"  start="$(PP_START_YEAR)"  source="ice_month"  sourceGrid="ocean-tripolar" cmip="on">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"  source="ice_month">
 	   <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
            <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/seaice_units.csh -c ice"/>
            <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/sivol.csh -c ice"/>
-	</timeSeries>   
+	</timeSeries>
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_B)"/>
       </component>
@@ -517,14 +517,14 @@ SIS_OVERRIDE_EOF
     In the components we provide this remap file via a label="xyInterpRegridFile"-->
       <component type="ocean_annual_z_1x1deg" source="ocean_annual_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
         <dataFile label="xyInterpRegridFile">
-/archive/Niki.Zadeh/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_remap_file_5760x4480_to_360x180.nc      
+/archive/Niki.Zadeh/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_remap_file_5760x4480_to_360x180.nc
         </dataFile>
         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
       </component>
       <component type="ice_1x1deg"  source="ice_month" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
         <dataFile label="xyInterpRegridFile">
-/archive/Niki.Zadeh/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_remap_file_5760x4480_to_360x180.nc      
+/archive/Niki.Zadeh/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_remap_file_5760x4480_to_360x180.nc
         </dataFile>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
            <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/seaice_units.csh -c ice_1x1deg"/>
@@ -550,12 +550,12 @@ SIS_OVERRIDE_EOF
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
-        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z_d2"/>	
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z_d2"/>
       </component>
       <!-- currenlty no ocean_daily diags
       <component type="ocean_daily_1x1deg" source="ocean_daily" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
         <dataFile label="xyInterpRegridFile">
-/archive/Niki.Zadeh/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_remap_file_5760x4480_to_360x180.nc      
+/archive/Niki.Zadeh/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_remap_file_5760x4480_to_360x180.nc
         </dataFile>
         <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)"/>
       </component>
@@ -563,7 +563,7 @@ SIS_OVERRIDE_EOF
       <!-- currenlty no ocean_monthly diags
       <component type="ocean_monthly_1x1deg" start="$(PP_START_YEAR)" source="ocean_month" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
         <dataFile label="xyInterpRegridFile">
-/archive/Niki.Zadeh/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_remap_file_5760x4480_to_360x180.nc      
+/archive/Niki.Zadeh/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_remap_file_5760x4480_to_360x180.nc
         </dataFile>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/hfevapds.csh -c ocean_monthly_1x1deg"/>
@@ -572,7 +572,7 @@ SIS_OVERRIDE_EOF
       </component>
       <component type="ocean_monthly_z_1x1deg" source="ocean_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
         <dataFile label="xyInterpRegridFile">
-/archive/Niki.Zadeh/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_remap_file_5760x4480_to_360x180.nc      
+/archive/Niki.Zadeh/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_remap_file_5760x4480_to_360x180.nc
         </dataFile>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
            <analysis switch="on" cumulative="no" script="$(CMIP6_PP_FIXER_SCRIPTS_DIR)/zostoga.csh -t 1708"/>
@@ -582,7 +582,7 @@ SIS_OVERRIDE_EOF
       </component>
       <component type="ocean_annual_1x1deg" source="ocean_annual" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
         <dataFile label="xyInterpRegridFile">
-/archive/Niki.Zadeh/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_remap_file_5760x4480_to_360x180.nc      
+/archive/Niki.Zadeh/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_remap_file_5760x4480_to_360x180.nc
         </dataFile>
         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)">
           <variables>

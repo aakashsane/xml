@@ -6,7 +6,7 @@ This xml consists of 1/4 degree and 1/2 degree Ocean-Ice experiments.
 
 module load fre/bronx-12
 fremake -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
-frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r basic 
+frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -41,9 +41,9 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
    <property name="reference_tag"  value="warsaw_201803_mom6_2018.04.11"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
-   <property name="MODIFIER"     value=""/>  
+   <property name="MODIFIER"     value=""/>
    <property name="DEBUGLEVEL"   value=""/>
-   <property name="STATIC"       value=""/>  
+   <property name="STATIC"       value=""/>
    <property name="KRASTING"   value="/lustre/f2/pdata/gfdl/cmip6/datasets/OMIP"/>
 
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
@@ -52,7 +52,7 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
   <property name="append_to_setup_csh"  value=""/>
   <property name="CMIP6_PP_FIXER_SCRIPTS_DIR" value="/home/oar.gfdl.cmip6/CMIP6_publishing/pp_fixer_scripts"/>
   <property name="CMIP6_PP_FIXER_SWITCH" value="on"/>
-  
+
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc3.intel16'])"/>
@@ -101,7 +101,7 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel16 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
    <property name="PROG_MAIN"   value="coupler/coupler_main.o"/>
    <property name="LIBS_ROOT"   value="MOM6_SIS2_compile"/>
    <property name="FMS_LIB_DIR" value="./$(LIBS_ROOT)/$(platform)-$(target)/exec"/>
-   
+
    <property name="MOM6_EXAMPLES"  value="$root/$(LIBS_ROOT)/src/mom6"/>
    <property name="MY_LIBS"        value="$(EXEC_ROOT)/$(FMS_LIB_DIR)"/>
 
@@ -134,7 +134,7 @@ Make the executable for ocean-ice experiments.
           pushd mom6
           git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
           git submodule init src/MOM6 src/SIS2 src/icebergs tools/python/MIDAS
-          git clone --recursive https://github.com/NOAA-GFDL/MOM6.git src/MOM6 
+          git clone --recursive https://github.com/NOAA-GFDL/MOM6.git src/MOM6
           git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
           git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
           git submodule update #This gets the right version of submodules
@@ -147,24 +147,24 @@ Make the executable for ocean-ice experiments.
           else
             ln -s /lustre/f2/pdata/gfdl/gfdl_O/datasets/ .datasets
           endif
-          popd	  
+          popd
 
           test -e mom6/.datasets
           if ($status != 0) then
             echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
           endif
- 
+
         ]]></csh>
       </source>
       <compile>
         <cppDefs><![CDATA[ $(F2003_FLAGS) -DMAX_FIELDS_=100 -DNOT_SET_AFFINITY -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER  -DUSE_PRECISION=2 -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
       </compile>
     </component>
-      
+
       <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" >
          <description domainName="Sea Ice SIS2" communityName="GFDL-SIS2" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
          <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase> 
+	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase>
          </source>
          <compile>
             <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
@@ -187,7 +187,7 @@ Make the executable for ocean-ice experiments.
         </compile>
       </component>
       <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6">
-        <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>  
+        <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>
         <source versionControl="git" root="https://github.com/NOAA-GFDL">
           <codeBase version="$(RELEASE)"> coupler.git </codeBase>
         </source>
@@ -213,7 +213,7 @@ else
    if(-e $work/INPUT/MOM.res.nc.0000 ) \rm -rf $work/INPUT/MOM.res*.nc
 endif
 
-ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc 
+ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc
 
 touch $work/INPUT/MOM_override
 touch $work/INPUT/SIS_override
@@ -266,13 +266,13 @@ if ( $?flagOutputXferOn && $?flagOutputPostProcessOn && $currentSeg == 1 ) then
   endif
 endif
 
-#Add required BLING gas flux fields if they do not exist in the restarts 
+#Add required BLING gas flux fields if they do not exist in the restarts
 #to be able to start from older runs that did not have these gas fluxes
-if ( $currentSeg == 1 ) then 
+if ( $currentSeg == 1 ) then
    #The following values for kw and deltap fields are arbitrary and do not matter, the fields just need to exist!
-   #These kw and deltap fields do not need to be restarted as they are calculated from alpha and csurf values!    
+   #These kw and deltap fields do not need to be restarted as they are calculated from alpha and csurf values!
    #This has to be fixed in the source code in future with a new coupler flux design.
-   foreach resfile ( `ls $work/INPUT/ice_bling.res.nc*` ) 
+   foreach resfile ( `ls $work/INPUT/ice_bling.res.nc*` )
       ncdump -h $resfile | grep o2_flux_deltap_ice > /dev/null
       if ($status != 0) then
         ncap -O -s 'o2_flux_deltap_ice=co2_flux_flux_ice*0.0+1000.0' $resfile $resfile
@@ -303,13 +303,13 @@ if ( $currentSeg == 1 ) then
         ncap -O -s 'nh4_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
       endif
    end
-   foreach resfile ( `ls $work/INPUT/ice_ocmip_sf6.res.nc*` ) 
+   foreach resfile ( `ls $work/INPUT/ice_ocmip_sf6.res.nc*` )
       ncdump -h $resfile | grep sf6_flux_flux0_ice > /dev/null
       if ($status != 0) then
         ncap -O -s 'sf6_flux_flux0_ice=sf6_flux_flux_ice*0.0+0.001' $resfile $resfile
       endif
    end
-   foreach resfile ( `ls $work/INPUT/ice_ocmip2_cfc.res.nc*` ) 
+   foreach resfile ( `ls $work/INPUT/ice_ocmip2_cfc.res.nc*` )
       ncdump -h $resfile | grep cfc11_flux_flux0_ice > /dev/null
       if ($status != 0) then
         ncap -O -s 'cfc11_flux_flux0_ice=cfc11_flux_flux_ice*0.0+0.001' $resfile $resfile
@@ -319,7 +319,7 @@ if ( $currentSeg == 1 ) then
         ncap -O -s 'cfc12_flux_flux0_ice=cfc12_flux_flux_ice*0.0+0.001' $resfile $resfile
       endif
    end
-   foreach resfile ( `ls $work/INPUT/ice_ocmip_abiotic.res.nc*` ) 
+   foreach resfile ( `ls $work/INPUT/ice_ocmip_abiotic.res.nc*` )
       ncdump -h $resfile | grep ab14co2_flux_flux0_ice > /dev/null
       if ($status != 0) then
         ncap -O -s 'ab14co2_flux_flux0_ice=ab14co2_flux_flux_ice*0.0+0.001' $resfile $resfile
@@ -330,7 +330,7 @@ if ( $currentSeg == 1 ) then
       endif
    end
    #
-   #Add Schmidt number to restart if it does not exist so that the model can use old restart files. 
+   #Add Schmidt number to restart if it does not exist so that the model can use old restart files.
    #A value of 660 make it consistent with the old ( "non-generic") formulation that did not have a separate sc_no
    foreach resfile ( `ls $work/INPUT/ocean_bling_airsea_flux.res.nc*` )
       ncdump -h $resfile | grep o2_flux_sc_no_ocn > /dev/null
@@ -343,7 +343,7 @@ if ( $currentSeg == 1 ) then
       endif
    end
 
-  
+
    #Xanadu has a bug fix for airsea flux restart checksums and they don't match the old checksums in the files
    chmod +w $work/INPUT/ocean_bling_airsea_flux.res.nc
    ncatted -O -a checksum,,d,, $work/INPUT/ocean_bling_airsea_flux.res.nc
@@ -401,15 +401,15 @@ endif
       </dataTable>
     </input>
    </freInclude>
-   
+
 
    <!--****************************************************************************************-->
    <!--***************************** 1/8 degree experiments        ****************************-->
    <!--****************************************************************************************-->
-						
+
    <experiment name="OM4p125_IAF_csf_CORE2_r5" inherit="MOM6_SIS2_compile$(MODIFIER)">
     <description>
-global 1/8 degree z ocean_ice experiment 
+global 1/8 degree z ocean_ice experiment
 regridded runoff and salinity
 CORE2 dynamic inter_annual forcing data
 Using the same MOM6/SIS2 timesteps as JRA runs
@@ -417,7 +417,7 @@ Use downsampled diagnostics _d2
 ADJUST_NET_FRESH_WATER_TO_ZERO  = True
 READ_TIDEAMP = True
 #override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
-    </description>  
+    </description>
     <publicMetadata DBswitch="$(MDBIswitch)">
       <!-- Realization tag -->
       <realization r="1" i="1" p="1" f="1"/>
@@ -426,7 +426,7 @@ READ_TIDEAMP = True
       <activity_id>OMIP</activity_id>
       <mip_era>CMIP6</mip_era>
       <!-- model info -->
-      <!-- the model names are subject to change after arriving at a new name and registering it in CV-->	
+      <!-- the model names are subject to change after arriving at a new name and registering it in CV-->
       <source>GFDL-OM4_p125deg_CORE2 (2017)</source>
       <source_id>GFDL-OM4_p125deg_CORE2</source_id>
       <source_type>OGCM</source_type>
@@ -475,7 +475,7 @@ READ_TIDEAMP = True
        atmos_npes = 0,
        ocean_npes = 0,
        concurrent = .false.
-       use_lag_fluxes=.false. 
+       use_lag_fluxes=.false.
        atmos_nthreads = $atm_threads
        ocean_nthreads = $ocn_threads
      </namelist>
@@ -503,7 +503,7 @@ READ_TIDEAMP = True
       construct_table_wrt_liq = .true.,
       construct_table_wrt_liq_and_ice = .true.,
      </namelist>
-   
+
      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
@@ -555,13 +555,13 @@ $baseDate
      <!--CORE2 forcing-->
      <xi:include xpointer="xpointer(//freInclude[@name='CORE2_data_table']/input/node())"/>
      <!--append the resolution dependent runoff override-->
-     <dataTable order="append"> 
-#CORE2 runoff    
+     <dataTable order="append">
+#CORE2 runoff
 "ICE" , "runoff"        , "runoff"      , "./INPUT/runoff.daitren.clim.2880x2240.v20180716.nc", "none" ,  1.0
      </dataTable>
      <xi:include xpointer="xpointer(//freInclude[@name='CORE2_IAF_data']/input/node())"/>
 
-      
+
      <!--field_tables-->
      <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/field_table</dataSource>
@@ -599,7 +599,7 @@ SIS_OVERRIDE_EOF
 
    </input>
 
-    <runtime>   
+    <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O9084p125_production']/node())"/>
@@ -729,12 +729,12 @@ $(ARCHIVE_NNZ)/input/xanadu/OM4p125_grid/mask_table.6368.160x120
      </namelist>
      </input>
    </freInclude>
-   
+
    <!--****************************************************************************************-->
    <!--***************************** 1/4 degree experiments        ****************************-->
    <!--****************************************************************************************-->
    <experiment name="OM4p25_IAF_BLING_csf_rerun_initCond2003_noBLING" inherit="OM4p25_IAF_BLING_csf_rerun_initCond2003">
-    <input>								      
+    <input>
      <namelist name="generic_tracer_nml">
        do_generic_tracer=.false.
        do_generic_BLING=.false.
@@ -766,7 +766,7 @@ MOM_OVERRIDE_EOF
 ##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
 ##
 if ( $currentSeg == 1 ) then
-  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+  foreach resfile ( `ls $work/INPUT/MOM.res*` )
       ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
       if ($status == 0) then
         chmod +w $resfile
@@ -784,8 +784,8 @@ endif
 ####################################################################################################
 ##The following is to avoid model crash with a layout other than the one that produced the initCond.
 ##The problem could occur if the generating model run used a mask_table that was different from the
-##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical 
-##values on land on the masked pes (9.96E36) that should have been set as "missing values". 
+##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical
+##values on land on the masked pes (9.96E36) that should have been set as "missing values".
 ##I am pretty sure that there is a bug in SIS2 that tickles this, but I do not have a smoking gun.
 ##
 if ( $currentSeg == 1 ) then
@@ -816,7 +816,7 @@ endif
          ]]></csh>
     </input>
    </experiment>
-											      
+
    <experiment name="OM4p25_IAF_BLING_csf_rerun_noBLING" inherit="OM4p25_IAF_BLING_csf_rerun">
     <input>
      <namelist name="generic_tracer_nml">
@@ -848,9 +848,9 @@ MOM_OVERRIDE_EOF
          ]]></csh>
     </input>
    </experiment>
- 
+
    <experiment name="OM4p25_IAF_BLING_csf_rerun_initCond2003" inherit="OM4p25_IAF_BLING_csf_rerun">
-    <input>								      
+    <input>
      <!--There is  MOM6/SIS2 restart provided in initCond.-->
      <namelist name="MOM_input_nml" >
          output_directory = './',
@@ -891,7 +891,7 @@ MOM_OVERRIDE_EOF
 ##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
 ##
 if ( $currentSeg == 1 ) then
-  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+  foreach resfile ( `ls $work/INPUT/MOM.res*` )
       ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
       if ($status == 0) then
         chmod +w $resfile
@@ -909,8 +909,8 @@ endif
 ####################################################################################################
 ##The following is to avoid model crash with a layout other than the one that produced the initCond.
 ##The problem could occur if the generating model run used a mask_table that was different from the
-##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical 
-##values on land on the masked pes (9.96E36) that should have been set as "missing values". 
+##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical
+##values on land on the masked pes (9.96E36) that should have been set as "missing values".
 ##I am pretty sure that there is a bug in SIS2 that tickles this, but I do not have a smoking gun.
 ##
 if ( $currentSeg == 1 ) then
@@ -943,7 +943,7 @@ endif
    </experiment>
 
    <experiment name="OM4p25_IAF_BLING_csf_rerun_hifreqdiag_2003-2008" inherit="OM4p25_IAF_BLING_csf_rerun">
-    <input>								      
+    <input>
      <!--There is  MOM6/SIS2 restart provided in initCond.-->
      <namelist name="MOM_input_nml" >
          output_directory = './',
@@ -997,7 +997,7 @@ $baseDate
       <activity_id>OMIP</activity_id>
       <mip_era>CMIP6</mip_era>
       <!-- model info -->
-  <source>GFDL-CM4 (2018): \naerosol: interactive\natmos: GFDL-AM4.0.1 (Cubed-sphere (c96) - 1 degree nominal horizontal resolution; 360 x 180 longitude/latitude; 33 levels; top level 1 hPa)\natmosChem: fast chemistry, aerosol only\nland: GFDL-LM4.0.1 (1 degree nominal horizontal resolution; 360 x 180 longitude/latitude; 20 levels; bot level 10m); land:Veg:unnamed (dynamic vegetation, dynamic land use); land:Hydro:unnamed (soil water and ice, multi-layer snow, rivers and lakes)\nlandIce: GFDL-LM4.0.1\nocean: GFDL-OM4p25 (GFDL-MOM6, tripolar - nominal 0.25 deg; 1440 x 1080 longitude/latitude; 75 levels; top grid cell 0-2 m)\nocnBgchem: GFDL-BLINGv2\nseaIce: GFDL-SIM4p25 (GFDL-SIS2.0, tripolar - nominal 0.25 deg; 1440 x 1080 longitude/latitude; 5 layers; 5 thickness categories) 
+  <source>GFDL-CM4 (2018): \naerosol: interactive\natmos: GFDL-AM4.0.1 (Cubed-sphere (c96) - 1 degree nominal horizontal resolution; 360 x 180 longitude/latitude; 33 levels; top level 1 hPa)\natmosChem: fast chemistry, aerosol only\nland: GFDL-LM4.0.1 (1 degree nominal horizontal resolution; 360 x 180 longitude/latitude; 20 levels; bot level 10m); land:Veg:unnamed (dynamic vegetation, dynamic land use); land:Hydro:unnamed (soil water and ice, multi-layer snow, rivers and lakes)\nlandIce: GFDL-LM4.0.1\nocean: GFDL-OM4p25 (GFDL-MOM6, tripolar - nominal 0.25 deg; 1440 x 1080 longitude/latitude; 75 levels; top grid cell 0-2 m)\nocnBgchem: GFDL-BLINGv2\nseaIce: GFDL-SIM4p25 (GFDL-SIS2.0, tripolar - nominal 0.25 deg; 1440 x 1080 longitude/latitude; 5 layers; 5 thickness categories)
   </source>
 
       <source_id>GFDL-CM4</source_id>
@@ -1075,10 +1075,10 @@ MOM_OVERRIDE_EOF
    </experiment>
    <experiment name="OM4p25_IAF_BLING_CFC_csf" inherit="MOM6_SIS2_compile$(MODIFIER)">
     <description>
-global 1/4 degree z ocean_ice experiment 
+global 1/4 degree z ocean_ice experiment
 regridded runoff and salinity
 CORE2 dynamic inter_annual forcing data
-    </description>  
+    </description>
     <publicMetadata DBswitch="$(MDBIswitch)">
       <!-- Realization tag -->
       <realization r="1" i="1" p="1" f="1"/>
@@ -1087,7 +1087,7 @@ CORE2 dynamic inter_annual forcing data
       <activity_id>OMIP</activity_id>
       <mip_era>CMIP6</mip_era>
       <!-- model info -->
-      <!-- the model names are subject to change after arriving at a new name and registering it in CV-->	
+      <!-- the model names are subject to change after arriving at a new name and registering it in CV-->
       <source>GFDL-OM4_p25deg_CORE2 (2017)</source>
       <source_id>GFDL-OM4_p25deg_CORE2</source_id>
       <source_type>OGCM</source_type>
@@ -1136,7 +1136,7 @@ CORE2 dynamic inter_annual forcing data
        atmos_npes = 0,
        ocean_npes = 0,
        concurrent = .false.
-       use_lag_fluxes=.false. 
+       use_lag_fluxes=.false.
        atmos_nthreads = $atm_threads
        ocean_nthreads = $ocn_threads
      </namelist>
@@ -1197,7 +1197,7 @@ CORE2 dynamic inter_annual forcing data
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/input.nml</dataSource>
      </dataFile>
-      
+
       <!--common setup-->
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_common']/input/node())"/>
       <!--OM4 gridSpec mosaic datasets-->
@@ -1280,7 +1280,7 @@ endif
 
    </input>
 
-    <runtime>   
+    <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
           <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_O4671_production']/node())"/>
@@ -1328,7 +1328,7 @@ endif
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/grid_spec.nc</dataSource>
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/grid_spec.nc</dataSource>
-        <dataSource site="gfdl">/archive/gold/datasets/OM4_025/mosaic.v20170622.tar</dataSource> 
+        <dataSource site="gfdl">/archive/gold/datasets/OM4_025/mosaic.v20170622.tar</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/atmos_mosaic_tile1Xland_mosaic_tile1.nc</dataSource>
@@ -1357,7 +1357,7 @@ endif
       </dataFile>
     </input>
    </freInclude>
-   
+
    <freInclude name="OM4p25_data">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -1418,17 +1418,17 @@ endif
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/woa13_decav_s_monthly_fulldepth_01.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.33.16x18     
-       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.96.32x18     
-       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.242.32x36     
-       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.274.36x36     
-       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.315.32x45    
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.33.16x18
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.96.32x18
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.242.32x36
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.274.36x36
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.315.32x45
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.548.32x72
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.622.36x72
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.808.45x72
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1053.90x45
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1809.90x72
-       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1309.90x54     
+       $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1309.90x54
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.1402.72x72
        $(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/INPUT/mask_table.3785.90x144
       </dataFile>
@@ -1451,8 +1451,8 @@ endif
       </dataFile>
 -->
       <diagTable order="append">
-# MOM6 ocean diagnostics only used in a CORE/OMIP (no interactive atmos). 
-# These terms provide diagnostics for the surface salinity / fresh water restoring. 
+# MOM6 ocean diagnostics only used in a CORE/OMIP (no interactive atmos).
+# These terms provide diagnostics for the surface salinity / fresh water restoring.
  "ocean_model", "vprec",              "vprec",              "ocean_annual", "all", "mean", "none",2
  "ocean_model", "salt_flux_added",    "salt_flux_added",    "ocean_annual", "all", "mean", "none",2
 
@@ -1510,7 +1510,7 @@ MOM_OVERRIDE_EOF
      ]]></csh>
     </input>
    </experiment>
-   
+
    <experiment name="OM4p25_IAF_BLING_CFC_csf_diagd2$(MODIFIER)" inherit="OM4p25_IAF_BLING_CFC_csf">
     <input>
      <diagTable>
@@ -1531,7 +1531,7 @@ $baseDate
    <!--****************************************************************************************-->
    <!--***************************** 1/2 degree experiments        ****************************-->
    <!--****************************************************************************************-->
-											      
+
    <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_noBLING" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
     <input>
      <namelist name="generic_tracer_nml">
@@ -1560,7 +1560,7 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
 
-#override ADD_DIURNAL_SW = True 
+#override ADD_DIURNAL_SW = True
 #override ICE_STATS_INTERVAL = 30
 SIS_OVERRIDE_EOF
          ]]></csh>
@@ -1595,7 +1595,7 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
 
-#override ADD_DIURNAL_SW = True 
+#override ADD_DIURNAL_SW = True
 #override ICE_STATS_INTERVAL = 30
 SIS_OVERRIDE_EOF
 
@@ -1603,7 +1603,7 @@ SIS_OVERRIDE_EOF
 ##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
 ##
 if ( $currentSeg == 1 ) then
-  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+  foreach resfile ( `ls $work/INPUT/MOM.res*` )
       ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
       if ($status == 0) then
         chmod +w $resfile
@@ -1621,8 +1621,8 @@ endif
 ####################################################################################################
 ##The following is to avoid model crash with a layout other than the one that produced the initCond.
 ##The problem could occur if the generating model run used a mask_table that was different from the
-##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical 
-##values on land on the masked pes (9.96E36) that should have been set as "missing values". 
+##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical
+##values on land on the masked pes (9.96E36) that should have been set as "missing values".
 ##I am pretty sure that there is a bug in SIS2 that tickles this, but I do not have a smoking gun.
 ##
 if ( $currentSeg == 1 ) then
@@ -1654,7 +1654,7 @@ endif
     </input>
    </experiment>
    <experiment name="OM4p5_IAF_BLING_CFC_abio_csf_mle200_initCond1998_uncombined" inherit="OM4p5_IAF_BLING_CFC_abio_csf_mle200">
-    <input>								      
+    <input>
       <namelist name="frecheck_nml">
         start_date =  1998,01,01,0,0,0, !This is Current Model Time from coupler.res in the initCond, frecheck needs it, but it does not open coupler.res
       </namelist>
@@ -1706,7 +1706,7 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
 
-#override ADD_DIURNAL_SW = True 
+#override ADD_DIURNAL_SW = True
 #override ICE_STATS_INTERVAL = 30
 
 SIS_OVERRIDE_EOF
@@ -1715,7 +1715,7 @@ SIS_OVERRIDE_EOF
 ##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
 ##
 if ( $currentSeg == 1 ) then
-  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+  foreach resfile ( `ls $work/INPUT/MOM.res*` )
       ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
       if ($status == 0) then
         chmod +w $resfile
@@ -1801,7 +1801,7 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
 
-#override ADD_DIURNAL_SW = True 
+#override ADD_DIURNAL_SW = True
 #override ICE_STATS_INTERVAL = 30
 SIS_OVERRIDE_EOF
 
@@ -1809,7 +1809,7 @@ SIS_OVERRIDE_EOF
 ##The following is to rename two variables in the old restart file Kd_turb,Kv_turb to their newer names Kd_shear,Kv_shear.
 ##
 if ( $currentSeg == 1 ) then
-  foreach resfile ( `ls $work/INPUT/MOM.res*` ) 
+  foreach resfile ( `ls $work/INPUT/MOM.res*` )
       ncdump -h $resfile | grep 'double Kd_turb' > /dev/null
       if ($status == 0) then
         chmod +w $resfile
@@ -1827,8 +1827,8 @@ endif
 ####################################################################################################
 ##The following is to avoid model crash with a layout other than the one that produced the initCond.
 ##The problem could occur if the generating model run used a mask_table that was different from the
-##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical 
-##values on land on the masked pes (9.96E36) that should have been set as "missing values". 
+##current model run. Specifically, when SIS2 reads the ice_model.res.nc it chokes on the unphysical
+##values on land on the masked pes (9.96E36) that should have been set as "missing values".
 ##I am pretty sure that there is a bug in SIS2 that tickles this, but I do not have a smoking gun.
 ##
 if ( $currentSeg == 1 ) then
@@ -1871,9 +1871,9 @@ endif
       <project>"$(ProjectID)"</project>
       <activity_id>OMIP</activity_id>
       <mip_era>CMIP6</mip_era>
-      <!-- model info --> 
-      <!-- the model names are subject to change after arriving at a new name and registering it in CV-->	
-  <source>GFDL-OM4p5B (2018): \naerosol: none\natmos: none\natmosChem: none\nland: none\nlandIce: none\nocean: GFDL-OM4p5 (GFDL-MOM6, tripolar - nominal 0.5 deg; 720 x 576 longitude/latitude; 75 levels; top grid cell 0-2 m)\nocnBgchem: GFDL-BLINGv2\nseaIce: GFDL-SIM4p5 (GFDL-SIS2.0, tripolar - nominal 0.5 deg; 720 x 576 longitude/latitude; 5 layers; 5 thickness categories) 
+      <!-- model info -->
+      <!-- the model names are subject to change after arriving at a new name and registering it in CV-->
+  <source>GFDL-OM4p5B (2018): \naerosol: none\natmos: none\natmosChem: none\nland: none\nlandIce: none\nocean: GFDL-OM4p5 (GFDL-MOM6, tripolar - nominal 0.5 deg; 720 x 576 longitude/latitude; 75 levels; top grid cell 0-2 m)\nocnBgchem: GFDL-BLINGv2\nseaIce: GFDL-SIM4p5 (GFDL-SIS2.0, tripolar - nominal 0.5 deg; 720 x 576 longitude/latitude; 5 layers; 5 thickness categories)
   </source>
       <source_id>GFDL-OM4p5B</source_id>
       <source_type>OGCM</source_type>
@@ -1905,7 +1905,7 @@ endif
 
     </publicMetadata>
 
-    <input> 
+    <input>
       <namelist name="coupler_nml">
        months = $months,
        days   = $days,
@@ -1914,8 +1914,8 @@ endif
        minutes = 0
        seconds = 0
        calendar = 'NOLEAP',
-       dt_cpld  = 3600, 
-       dt_atmos = 3600, 
+       dt_cpld  = 3600,
+       dt_atmos = 3600,
        do_atmos = .false.,
        do_land = .false.,
        do_ice = .true.,
@@ -2085,13 +2085,13 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
 
-#override ADD_DIURNAL_SW = True 
+#override ADD_DIURNAL_SW = True
 #override ICE_STATS_INTERVAL = 30
 SIS_OVERRIDE_EOF
 
      ]]></csh>
 
-    </input> 
+    </input>
 
    <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
@@ -2129,7 +2129,7 @@ SIS_OVERRIDE_EOF
           <run days="8"  ><xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1728']/node())"/> </run>
           <run days="4 4"><xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1728']/node())"/> </run>
       </regression>
- 
+
       <regression name="restart">
         <run months="1"   > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2783p5']/node())"/> </run>
         <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2783p5']/node())"/> </run>
@@ -2166,7 +2166,7 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 USE_generic_tracer = True
 GENERIC_TRACER_IC_FILE = "MOM_GENERICS.res.nc"
 #override MLE_FRONT_LENGTH = 500.0
-#override KHTH_USE_EBT_STRUCT = False 
+#override KHTH_USE_EBT_STRUCT = False
 #override KHTH_USE_FGNV_STREAMFUNCTION = False
 #override KHTR = 0.0
 #override KH_RES_FN_POWER = 2
@@ -2188,7 +2188,7 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override V_TRUNC_FILE = "SIS_V_truncations"
 #override MIN_OCN_INTERTIAL_H = 2.
 
-#override ADD_DIURNAL_SW = True 
+#override ADD_DIURNAL_SW = True
 #override ICE_STATS_INTERVAL = 30
 SIS_OVERRIDE_EOF
 
@@ -2259,7 +2259,7 @@ $baseDate
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/INPUT/MOM_channels_global_025</dataSource>
-      </dataFile>      
+      </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/MOM_input</dataSource>
       </dataFile>
@@ -2278,7 +2278,7 @@ $baseDate
         <dataSource site="theia">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.MOM6</dataSource>
       </dataFile>
-<!-- "heat_content_vprec" are repeated in diag_table.MOM6 
+<!-- "heat_content_vprec" are repeated in diag_table.MOM6
       When this is fixed in mom6_examples we can replace the following "append" block by this dataFile
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.OM4</dataSource>
@@ -2287,8 +2287,8 @@ $baseDate
       </dataFile>
 -->
       <diagTable order="append">
-# MOM6 ocean diagnostics only used in a CORE/OMIP (no interactive atmos). 
-# These terms provide diagnostics for the surface salinity / fresh water restoring. 
+# MOM6 ocean diagnostics only used in a CORE/OMIP (no interactive atmos).
+# These terms provide diagnostics for the surface salinity / fresh water restoring.
  "ocean_model", "vprec",              "vprec",              "ocean_annual", "all", "mean", "none",2
  "ocean_model", "salt_flux_added",    "salt_flux_added",    "ocean_annual", "all", "mean", "none",2
 
@@ -2353,7 +2353,7 @@ $baseDate
 "ATM", "cfc11_flux_pcair_atm","CFC11","INPUT/cfc.bc.nc","bilinear", 1.0e-12
 "ATM", "cfc12_flux_pcair_atm","CFC12","INPUT/cfc.bc.nc","bilinear", 1.0e-12
 "ATM", "sf6_flux_pcair_atm",   "SF6",  "INPUT/cfc.bc.nc","bilinear", 1.0e-12
-      </dataTable>  
+      </dataTable>
     </input>
     </freInclude>
 
@@ -2368,7 +2368,7 @@ $baseDate
 "OCN", "delta_14catm", "D14C", "./INPUT/atm_delta_13C_14C.nc",  "bilinear", 1.0
 "ATM", "abco2_flux_pcair_atm", "" , "", "none" ,284.262e-6
 "ATM", "ab14co2_flux_pcair_atm", "", "", "none" ,284.262e-6
-      </dataTable>  
+      </dataTable>
     </input>
     </freInclude>
 
@@ -2436,7 +2436,7 @@ dissi14cabio_valid_min = 0.0
 "OCN", "runoff_dic_flux_ice_ocn",      "",      "",                                "none",    0.96e-3
 "OCN", "runoff_po4_flux_ice_ocn",      "",      "",                                "none",    0.006792e-3
 "OCN", "dry_dep_fed_flux_ice_ocn",     "FLUX",  "./INPUT/Soluble_Fe_Flux_PI.nc",   "bilinear",   -1.0
-      </dataTable>  
+      </dataTable>
     </input>
   </freInclude>
 
@@ -2457,10 +2457,10 @@ dissi14cabio_valid_min = 0.0
 ##       WTMAIR = 2.896440E+01 WTMCO2   =  44.00995
 ##       CMIP6 Jan 1 1850 co2 = 284.262e-6
 #
- 
+
 
 ###.................................................
-### BLING field table 
+### BLING field table
 ## jgj 2013/01/23 updated for BLING
 
 "namelists","ocean_mod","generic_bling/*global*"
@@ -2485,7 +2485,7 @@ ca_2_p = 1.06
 # valid src_var_record : 0-12, where 0 is Annual, 1-12 for Jan-Dec
 # 2015/10/05: Use annual data for WOA13 N, P, Si, O2 since monthly data does not extend to depth
 # airsea and ice_ocean fluxes are handled by coupler, so are initialized in COBALT/BLING.
-# 
+#
 # 2015/09/28 jgj updated to provide valid_min, valid_max for tracers to ensure
 # tracers remain positive after interpolation
 # note that values of valid_min and valid_max are in model units not src_units
@@ -2499,7 +2499,7 @@ ca_2_p = 1.06
 # BLING needs: dic, alk, po4, o2, dop, fed, htotal, co3_ion, irr_mem, biomass_p, chl
 # optional needs: po4_pre, alk_pre, dic_pre, dic_sat, htotal_sat, di14c, do14c
 # dop = srdop in cobalt
-# biomass = phytoplankton biomass = (nlg+nsm+ndi in COBALT) 
+# biomass = phytoplankton biomass = (nlg+nsm+ndi in COBALT)
 #------------------------------------------------------------------------------------------------
 #
 # O2 from WOA2013  (/archive/mdteam/obs/NOAA-NODC/WOA13/v1.00a/woa13_all_o_annual_01.nc)
@@ -2568,7 +2568,7 @@ alk_pre_valid_min = 0.0
 dic_src_file = INPUT/Preind_DIC.nc
 dic_src_var_name = Preind_DIC
 dic_src_var_unit = micromoles_per_kg
-dic_dest_var_name =  dic 
+dic_dest_var_name =  dic
 dic_dest_var_unit = mol kg-1
 dic_src_var_record = 1
 dic_src_var_gridspec = NONE
@@ -2580,7 +2580,7 @@ dic_valid_min = 0.0
 dic_pre_src_file = INPUT/Preind_DIC.nc
 dic_pre_src_var_name = Preind_DIC
 dic_pre_src_var_unit = micromoles_per_kg
-dic_pre_dest_var_name =  dic_pre 
+dic_pre_dest_var_name =  dic_pre
 dic_pre_dest_var_unit = mol kg-1
 dic_pre_src_var_record = 1
 dic_pre_src_var_gridspec = NONE
@@ -2592,7 +2592,7 @@ dic_pre_valid_min = 0.0
 dic_sat_src_file = INPUT/Preind_DIC.nc
 dic_sat_src_var_name = Preind_DIC
 dic_sat_src_var_unit = micromoles_per_kg
-dic_sat_dest_var_name =  dic_sat 
+dic_sat_dest_var_name =  dic_sat
 dic_sat_dest_var_unit = mol kg-1
 dic_sat_src_var_record = 1
 dic_sat_src_var_gridspec = NONE
@@ -2718,7 +2718,7 @@ biomass_p_valid_min = 0.0
 #
 /
 ###........................................
-      </fieldTable>  
+      </fieldTable>
     </input>
   </freInclude>
 
@@ -2860,7 +2860,7 @@ biomass_p_valid_min = 0.0
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/gfdl_O/datasets/CORE/IAF_v2.0/u_10_mod.1948-2007.nomads.nc</dataSource>
-      </dataFile>      
+      </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/gfdl_O/datasets/CORE/IAF_v2.0/v_10_mod.1948-2007.nomads.nc</dataSource>
       </dataFile>
@@ -2872,7 +2872,7 @@ biomass_p_valid_min = 0.0
 
    <!-- OCEAN  and ICE post-processing-->
    <freInclude name="OM4p125_postprocess">
-      <postProcess> 
+      <postProcess>
          <csh><![CDATA[
          cd $work
          #Make a directory to trick FRE to pick up and archive in ascii
@@ -2881,7 +2881,7 @@ biomass_p_valid_min = 0.0
 
          #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
          #This causes problems for ferret and python tools for analysis.
-         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
+         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts .
          cp $work/INPUT/ocean_static_no_mask_table.nc $work/
          ]]></csh>
 
@@ -2910,7 +2910,7 @@ biomass_p_valid_min = 0.0
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
-        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>	
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>
       </component>
       <component type="ocean_annual_z_d2" start="$(PP_START_YEAR)" source="ocean_annual_z_d2"  sourceGrid="ocean-tripolar">
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
@@ -2919,11 +2919,11 @@ biomass_p_valid_min = 0.0
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
-        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z_d2"/>	
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z_d2"/>
       </component>
 
       <!--Ocean scalars-->
-      
+
       <component type="ocean_scalar_annual"  start="$(PP_START_YEAR)" source="ocean_scalar_annual" sourceGrid="ocean-tripolar">
         <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_B)" source="ocean_scalar_annual"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
@@ -2931,23 +2931,23 @@ biomass_p_valid_min = 0.0
       </component>
 
 
-      <!--ICE-->      
+      <!--ICE-->
       <component type="ice"  start="$(PP_START_YEAR)"  source="ice_month"  sourceGrid="ocean-tripolar">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"  source="ice_month">
 	   <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
-	</timeSeries>   
+	</timeSeries>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)"  source="ice_month">
            <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
         </timeSeries>
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-	  
+
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_B)"/>
       </component>
      </postProcess>
    </freInclude>
 
    <freInclude name="OM4_postprocess">
-      <postProcess> 
+      <postProcess>
          <csh><![CDATA[
          cd $work
          #Make a directory to trick FRE to pick up and archive in ascii
@@ -2956,7 +2956,7 @@ biomass_p_valid_min = 0.0
 
          #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
          #This causes problems for ferret and python tools for analysis.
-         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts . 
+         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts .
          cp $work/INPUT/ocean_static_no_mask_table.nc $work/
          ]]></csh>
 
@@ -2990,7 +2990,7 @@ biomass_p_valid_min = 0.0
         </timeSeries>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)" source="ocean_month">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_monthly.frepp"/>
-        </timeSeries> 
+        </timeSeries>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
       </component>
@@ -3048,7 +3048,7 @@ biomass_p_valid_min = 0.0
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual_z.frepp"/>
         </timeAverage>
-        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_A)" source="ocean_annual_z"/>	
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_A)" source="ocean_annual_z"/>
       </component>
 
       <component type="ocean_annual_z_1x1deg" source="ocean_annual_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
@@ -3056,7 +3056,7 @@ biomass_p_valid_min = 0.0
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
       </component>
 
-      <component type="ocean_annual" start="$(PP_START_YEAR)"  source="ocean_annual"  sourceGrid="ocean-tripolar" cmip="on"> 
+      <component type="ocean_annual" start="$(PP_START_YEAR)"  source="ocean_annual"  sourceGrid="ocean-tripolar" cmip="on">
         <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/$(OM4_ANALYSIS)/ocn_annual.frepp"/>
@@ -3113,7 +3113,7 @@ biomass_p_valid_min = 0.0
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
         <timeAverage source="monthly" interval="$(CHUNK_LENGTH_B)"/>
       </component>
-      
+
       <component type="ocean_scalar_annual"  start="$(PP_START_YEAR)" source="ocean_scalar_annual" sourceGrid="ocean-tripolar" cmip="on">
         <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_A)" source="ocean_scalar_annual"/>
         <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
@@ -3217,20 +3217,20 @@ biomass_p_valid_min = 0.0
         <timeSeries freq="monthly" averageOf="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
       </component>
 
-      <!--ICE-->      
+      <!--ICE-->
       <component type="ice"  start="$(PP_START_YEAR)"  source="ice_month"  sourceGrid="ocean-tripolar" cmip="on">
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"  source="ice_month">
 	   <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
            <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/seaice_units.csh -c ice"/>
            <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/sivol.csh -c ice"/>
-	</timeSeries>   
+	</timeSeries>
         <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)"  source="ice_month">
            <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
            <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/seaice_units.csh -c ice"/>
            <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/sivol.csh -c ice"/>
         </timeSeries>
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
-	  
+
         <timeAverage source="annual"  interval="$(CHUNK_LENGTH_B)"/>
       </component>
 
@@ -3247,7 +3247,7 @@ biomass_p_valid_min = 0.0
    </freInclude>
 
   <freInclude name="abiotic_postprocess">
-      <postProcess> 
+      <postProcess>
       <component type="ocean_abiotic_month" start="$(PP_START_YEAR)" source="ocean_abiotic" sourceGrid="ocean-tripolar" cmip="off">
          <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
          <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
@@ -3256,9 +3256,9 @@ biomass_p_valid_min = 0.0
       </component>
      </postProcess>
   </freInclude>
- 
+
   <freInclude name="abiotic_postprocess_1x1deg">
-      <postProcess> 
+      <postProcess>
       <component type="ocean_abiotic_month_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_abiotic" sourceGrid="ocean-tripolar" cmip="on">
          <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
          <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
@@ -3267,9 +3267,9 @@ biomass_p_valid_min = 0.0
       </component>
      </postProcess>
   </freInclude>
- 
+
   <freInclude name="abiotic_z_postprocess">
-      <postProcess> 
+      <postProcess>
       <component type="ocean_abiotic_z" start="$(PP_START_YEAR)" source="ocean_abiotic_z" sourceGrid="ocean-tripolar" cmip="off">
          <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
          <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
@@ -3280,7 +3280,7 @@ biomass_p_valid_min = 0.0
   </freInclude>
 
   <freInclude name="abiotic_z_postprocess_1x1deg">
-      <postProcess> 
+      <postProcess>
       <component type="ocean_abiotic_z_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_abiotic_z" sourceGrid="ocean-tripolar" cmip="on">
          <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
          <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
@@ -3291,7 +3291,7 @@ biomass_p_valid_min = 0.0
   </freInclude>
 
   <freInclude name="inert_postprocess">
-      <postProcess> 
+      <postProcess>
       <component type="ocean_inert_month" start="$(PP_START_YEAR)" source="ocean_inert" sourceGrid="ocean-tripolar" cmip="off">
          <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
          <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
@@ -3300,9 +3300,9 @@ biomass_p_valid_min = 0.0
       </component>
      </postProcess>
   </freInclude>
- 
+
   <freInclude name="inert_postprocess_1x1deg">
-      <postProcess> 
+      <postProcess>
       <component type="ocean_inert_month_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_inert" sourceGrid="ocean-tripolar" cmip="on">
          <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
          <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
@@ -3311,10 +3311,10 @@ biomass_p_valid_min = 0.0
       </component>
      </postProcess>
   </freInclude>
- 
+
 
   <freInclude name="inert_z_postprocess">
-      <postProcess> 
+      <postProcess>
       <component type="ocean_inert_z" start="$(PP_START_YEAR)" source="ocean_inert_z" sourceGrid="ocean-tripolar" cmip="off">
          <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
          <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
@@ -3325,7 +3325,7 @@ biomass_p_valid_min = 0.0
   </freInclude>
 
   <freInclude name="inert_z_postprocess_1x1deg">
-      <postProcess> 
+      <postProcess>
       <component type="ocean_inert_z_1x1deg" xyInterp="180,360" start="$(PP_START_YEAR)" source="ocean_inert_z" sourceGrid="ocean-tripolar" cmip="on">
          <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
          <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" />
@@ -3336,7 +3336,7 @@ biomass_p_valid_min = 0.0
   </freInclude>
 
   <freInclude name="BLING_postprocess">
-      <postProcess> 
+      <postProcess>
       <component type="ocean_bling_1x1deg" start="$(PP_START_YEAR)" source="ocean_bling" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="off">
          <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
          <timeAverage source="monthly"  interval="$(CHUNK_LENGTH_A)"/>
@@ -3371,7 +3371,7 @@ biomass_p_valid_min = 0.0
   </freInclude>
 
   <freInclude name="ocean_regions">
-      <postProcess> 
+      <postProcess>
       <!--Ocean regions-->
       <component type="ocean_Barents_opening" source="ocean_Barents_opening" sourceGrid="ocean-tripolar">
         <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_B)"/>
