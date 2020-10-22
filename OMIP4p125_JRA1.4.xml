@@ -4,18 +4,21 @@
 Quick start guide
 This xml consists of 1/4 degree Ocean-Ice experiments with JRA version1.4 interannual forcings.
 
-module load fre/bronx-15
-fremake -x OMIP_JRA.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
-frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_cycle1 -r basic
+module load fre/bronx-18
+fremake -x OMIP_JRA.xml -p ncrc4.intel18 -t prod MOM6_SIS2_compile
+frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p125_JRA55do1.4_r6_cycle1 -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <property name="RELEASE"        value="xanadu_esm4_20190304"/>     <!-- git tag for general component source code-->
-  <property name="SHARED_GIT_TAG" value="$(RELEASE)"/>               <!-- git tag for shared source code -->
-  <property name="OCEAN_SHARED_GIT_TAG" value="$(RELEASE)"/>         <!-- git tag for ocean_shared source code -->
+  <property name="RELEASE"      value="2019.01.03"/> <!-- git tag for general component source code-->
+  <property name="FMS_GIT_TAG"  value="$(RELEASE)"/>    <!-- git tag for shared source code -->
+  <property name="CPL_GIT_TAG"  value="2020.03"/>       <!-- git tag for shared source code -->
+  <property name="NULL_TAG"     value="master"/>        <!-- git tag for shared source code -->
+  <property name="OCEAN_BGC_GIT_TAG" value="199f2f24"/> <!-- git tag for ocean_shared source code -->
   <property name="MOM6_DATE"      value="2019.08.08"/>               <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="ba839be"/>              <!-- git tag for MOM6 source code, actually MOM6-examples -->
-  <property name="FRE_STEM"       value="$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="MOM6_GIT_TAG"   value="dev/gfdl/2019.08.08"/>              <!-- git tag for MOM6 source code -->
+  <property name="MOM6_GIT_FIX" value=""/>   <!-- git tag for MOM6 source code -->
+  <property name="FRE_STEM"     value="FMS$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
   <property name="OM4_ANALYSIS"   value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
@@ -28,7 +31,7 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_cycle1 -r ba
   <!--Start year of PP -->
   <property name="PP_START_YEAR"   value="1958"/>      <!--Use these values for CORE2 dynamic forcing runs -->
   <property name="PP_FINAL_YEAR"   value="2018"/>      <!--JRA 1958-2018 needs 1yr pp for last year -->
-  <property name="FRE_VERSION"     value="bronx-16"/> <!-- fre version to be used -->
+  <property name="FRE_VERSION"     value="bronx-18"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="CMIP6"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
   <!--pp fixer scripts for CMIP6-->
@@ -40,25 +43,27 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_cycle1 -r ba
   <!-- The following properties are for testing/debugging purposes and should normally be empty-->
   <property name="DEBUGLEVEL" value=""/>
   <property name="PLATINFO"   value=""/>  <!--This is necessary only if you want to run exact same experiment on multiple platforms-->
+  <property name="BUILD_DATE" value=""/>  <!--Not used-->
 
   <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
   <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)/mdt_xml/awg_include"/>
-  <property name="gfdlO_pdata"     value="/lustre/f2/pdata/gfdl/gfdl_O"/>
-
-  <!--JRA dataset location. There are used in awg_include/xml_building_blocks/om4_common.xml-->
   <property name="append_to_setup_csh"  value="set fyear=1958"/><!--The start year of forcing dataseti. FRE hack to set fyear.-->
-  <property name="JRA_dataset"     value="/lustre/f2/pdata/gfdl/gfdl_O/datasets/reanalysis/JRA55-do/v1.4.0/"/>
-  <property name="JRA_dataset_8th" value="/lustre/f2/dev/Raphael.Dussin/forcings/OM4_125_runoff/"/>
-
   <setup>
-    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel16'])"/>
-    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc3.intel16'])"/>
-    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc4-intel16'])"/>
-    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc3-intel16'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel18'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc3.intel18'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc4-intel18'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='orion.intel18'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='orion.intel19'])"/>
   </setup>
+  <property name="gfdlO_pdata"      value="$(CMIP6_ARCHIVE_ROOT)/../../gfdl_O"/>
+  <!--JRA dataset location. There are used in awg_include/xml_building_blocks/om4_common.xml-->
+  <property name="JRA_dataset"      value="$(gfdlO_pdata)/datasets/reanalysis/JRA55-do/v1.4.0"/>
+  <property name="JRA_dataset_p5"   value="/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/Runoff_JRAv1.4_OM4p5"/>
+  <property name="JRA_dataset_p25"  value="$(gfdlO_pdata)/datasets/OM4_025/INPUT.JRA.v2019.07.04"/>
+  <property name="JRA_dataset_p125" value="/lustre/f2/dev/Raphael.Dussin/forcings/OM4_125_runoff/"/>
 
   <freInclude name="resourceparams_O9084p125_production">
-	     <resources jobWallclock="15:59:00"  segRuntime="7:58:00">
+	     <resources jobWallclock="14:00:00"  segRuntime="7:00:00">
                <ocn ranks="9084" layout = "120,112"   io_layout = "4,4" mask_table="mask_table.4356.120x112" threads="1"/>
                <ice              layout = "120,112"   io_layout = "4,4" mask_table="mask_table.4356.120x112"/>
              </resources>
@@ -69,98 +74,10 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel16 -t prod OM4p125_JRA55do1.4_cycle1 -r ba
    <property name="LIBS_ROOT"   value="MOM6_SIS2_compile"/>
    <property name="FMS_LIB_DIR" value="./$(LIBS_ROOT)/$(platform)-$(target)/exec"/>
    <property name="MY_LIBS"     value="$(EXEC_ROOT)/$(FMS_LIB_DIR)"/>
-   <experiment name="MOM6_SIS2_compile">
-      <description>
-Make the executable for ocean-ice experiments.
-      </description>
-    <component name="fms" paths="FMS/amip_interp FMS/column_diagnostics FMS/diag_integral FMS/fft FMS/horiz_interp FMS/memutils FMS/oda_tools FMS/sat_vapor_pres FMS/topography FMS/astronomy FMS/constants  FMS/diag_manager FMS/field_manager FMS/include FMS/monin_obukhov FMS/platform FMS/station_data FMS/tracer_manager FMS/axis_utils FMS/coupler FMS/drifters FMS/fms FMS/interpolator FMS/mosaic FMS/random_numbers FMS/time_interp FMS/tridiagonal FMS/block_control  FMS/data_override       FMS/exchange  FMS/fv3gfs  FMS/mpp FMS/time_manager">
-     <description domainName="infrastructure" communityName="FMS" communityVersion="$(RELEASE)" communityGrid=""/>
-      <source versionControl="git" root="https://github.com/NOAA-GFDL">
-            <codeBase version="$(RELEASE)"> FMS.git </codeBase>
-      	    <csh><![CDATA[
-              ( cd FMS && git checkout $(SHARED_GIT_TAG) )
-              ]]>
-            </csh>
-      </source>
-      <compile>
-            <cppDefs>-Duse_libMPI -Duse_netCDF $(F2003_FLAGS) -DMAXFIELDMETHODS_=400</cppDefs>
-      </compile>
-    </component>
 
-    <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ ocean_shared/generic_tracers ocean_shared/mocsy/src">
-      <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
-       <source versionControl="git" root="http://gitlab.gfdl.noaa.gov/fms">
-        <codeBase version="$(OCEAN_SHARED_GIT_TAG)"> ocean_shared.git </codeBase>
-        <csh><![CDATA[
-          git clone https://github.com/NOAA-GFDL/MOM6-examples.git mom6
-          pushd mom6
-          git checkout $(MOM6_GIT_TAG)  #needed for older git on zeus
-          git submodule init src/MOM6 src/SIS2 src/icebergs tools/python/MIDAS
-          git clone --recursive https://github.com/NOAA-GFDL/MOM6.git src/MOM6
-          git clone             https://github.com/NOAA-GFDL/SIS2.git src/SIS2
-          git clone             https://github.com/NOAA-GFDL/icebergs.git src/icebergs
-          git submodule update #This gets the right version of submodules
-          popd
-
-          pushd mom6
-          set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
-          if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
-            ln -s /scratch4/GFDL/gfdlscr/pdata/gfdl_O/datasets/ .datasets
-          else if ("${platform_domain}" =~ *"ccs.ornl.gov"* ) then
-            ln -s /lustre/atlas/proj-shared/cli061/pdata/gfdl_O/datasets/ .datasets
-          else
-            ln -s /lustre/f2/pdata/gfdl/gfdl_O/datasets/ .datasets
-          endif
-          popd
-
-          test -e mom6/.datasets
-          if ($status != 0) then
-            echo ""; echo "" ; echo "   WARNING:  .datasets link in MOM6 examples directory is invalid"; echo ""; echo ""
-          endif
-
-        ]]></csh>
-      </source>
-      <compile>
-        <cppDefs><![CDATA[ $(F2003_FLAGS) -DMAX_FIELDS_=100 -DNOT_SET_AFFINITY -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER  -DUSE_PRECISION=2 -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
-        <!--makeOverrides>OPENMP=""</makeOverrides>  openmp switch for MOM6 may cause crash -->
-      </compile>
-    </component>
-
-      <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" >
-         <description domainName="Sea Ice SIS2" communityName="GFDL-SIS2" communityVersion="$(RELEASE)" communityGrid="Tripolar"/>
-         <source versionControl="git" root="https://github.com/NOAA-GFDL">
-	   <codeBase version="$(RELEASE)"> ice_param.git </codeBase>
-         </source>
-         <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-         </compile>
-      </component>
-
-      <component name="land_null" paths="land_null" requires="fms">
-         <description domainName="NA" communityName="NA" communityVersion="NA" communityGrid="NA"/>
-         <source versionControl="git" root="https://github.com/NOAA-GFDL">
-            <codeBase version="$(RELEASE)"> land_null.git </codeBase>
-         </source>
-      </component>
-
-      <component name="atmos_null" paths="atmos_null" requires="fms">
-         <source versionControl="git" root="https://github.com/NOAA-GFDL">
-           <codeBase version="$(RELEASE)"> atmos_null.git </codeBase>
-         </source>
-         <compile>
-            <cppDefs>$(F2003_FLAGS) </cppDefs>
-        </compile>
-      </component>
-      <component name="coupler" paths="coupler" requires="fms land_null atmos_null sis2 mom6">
-        <description domainName="FMS Coupler" communityName="coupler" communityVersion="$(RELEASE)" communityGrid=""/>
-        <source versionControl="git" root="https://github.com/NOAA-GFDL">
-          <codeBase version="$(RELEASE)"> coupler.git </codeBase>
-        </source>
-        <compile>
-            <cppDefs><![CDATA[$(F2003_FLAGS) -D_USE_LEGACY_LAND_ -Duse_AM3_physics -D_FILE_VERSION="'"`git-version-string $<`"'"]]></cppDefs>
-        </compile>
-      </component>
-   </experiment>
+   <!--experiment name="MOM6_SIS2_compile"-->
+   <xi:include href="awg_include/xml_building_blocks/om4_compile_postxanadu.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_SIS2_compile'])"/>
+   <!--/experiment-->
 
    <!--The property MOM6_EXAMPLES should point to the mom6 directory that is checked out. It is needed by MOM6 to access its input data files-->
    <property name="MOM6_EXAMPLES"  value="$root/$(LIBS_ROOT)/src/mom6"/>
@@ -205,6 +122,23 @@ READ_TIDEAMP = True
      <namelist name="xgrid_nml">
        make_exchange_reproduce = .true.
        interp_method = 'second_order'
+     </namelist>
+     <namelist name="icebergs_nml">
+       verbose=.false.
+       verbose_hrs=24
+       traj_sample_hrs=0
+       debug=.false.
+       really_debug=.false.
+       use_slow_find=.true.
+       add_weight_to_ocean=.false.
+       passive_mode=.false.
+       generate_test_icebergs=.false.
+       speed_limit=0.
+       use_roundoff_fix=.true.
+       make_calving_reproduce=.true.
+       old_bug_bilin=.false.
+       tidal_drift=0.005
+       use_updated_rolling_scheme=.true.
      </namelist>
      <namelist name="fms_nml">
        clock_grain='ROUTINE'
@@ -272,6 +206,8 @@ endif
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 #override NIGLOBAL = 2880
 #override NJGLOBAL = 2240
+#override USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
+#override ADJUST_NET_FRESH_WATER_TO_ZERO = True
 #override TOPO_EDITS_FILE = ""
 #override TIDEAMP_FILE = "tidal_amplitude.v20181107.nc"
 #override KAPPA_H2_FACTOR = 2.8  ! increase from 0.84 recommended by Matt
@@ -308,21 +244,64 @@ SIS_OVERRIDE_EOF
       </regression>
       <regression name="rts">
         <run days="15 16" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2085p125']/node())"/> </run>
-        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2880']/node())"/> </run>
-         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2240']/node())"/> </run>
-         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1600']/node())"/> </run>
+        <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2880']/node())"/> </run>
+        <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2240']/node())"/> </run>
+        <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1600']/node())"/> </run>
       </regression>
       <regression name="debug">
         <run days="2" >   <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1600']/node())"/> </run>
         <run days="1 1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O1600']/node())"/> </run>
       </regression>
       <regression name="timing">
-        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2085p125']/node())"/> </run>
-        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O2902p125']/node())"/> </run>
-        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O3649p125']/node())"/> </run>
-        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O4509p125']/node())"/> </run>
-        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O9084p125']/node())"/> </run>
-        <run months="1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O11270p125']/node())"/> </run>
+        <run months="1" >
+	     <resources jobWallclock="03:00:00">
+	       <ocn ranks="1652" layout = "40,56"   io_layout = "1,8" mask_table="mask_table.40x56.1652" threads="1"/>
+	       <ice              layout = "40,56"   io_layout = "1,8" mask_table="mask_table.40x56.1652"/>
+	     </resources>
+        </run>
+        <run months="1" >
+	     <resources jobWallclock="02:30:00">
+	       <ocn ranks="2415" layout = "60,56"   io_layout = "1,8" mask_table="mask_table.60x56.2415" threads="1"/>
+	       <ice              layout = "60,56"   io_layout = "1,8" mask_table="mask_table.60x56.2415"/>
+	     </resources>
+        </run>
+        <run months="1" >
+	     <resources jobWallclock="02:00:00">
+	       <ocn ranks="4384" layout = "90,70"   io_layout = "1,5" mask_table="mask_table.90x70.4384" threads="1"/>
+	       <ice              layout = "90,70"   io_layout = "1,5" mask_table="mask_table.90x70.4384"/>
+	     </resources>
+        </run>
+        <run months="1" >
+	     <resources jobWallclock="02:00:00">
+	       <ocn ranks="6590" layout = "120,80"   io_layout = "1,5" mask_table="mask_table.120x80.6590" threads="1"/>
+	       <ice              layout = "120,80"   io_layout = "1,5" mask_table="mask_table.120x80.6590"/>
+	     </resources>
+        </run>
+
+        <run months="1" >
+	     <resources jobWallclock="02:00:00">
+	       <ocn ranks="3547" layout = "90,56"   io_layout = "1,8" mask_table="mask_table.90x56.3547" threads="1"/>
+	       <ice              layout = "90,56"   io_layout = "1,8" mask_table="mask_table.90x56.3547"/>
+	     </resources>
+        </run>
+        <run months="1" >
+	     <resources jobWallclock="02:00:00">
+	       <ocn ranks="5791" layout = "120,70"   io_layout = "1,5" mask_table="mask_table.120x70.5791" threads="1"/>
+	       <ice              layout = "120,70"   io_layout = "1,5" mask_table="mask_table.120x70.5791"/>
+	     </resources>
+        </run>
+        <run months="1" >
+	     <resources jobWallclock="02:00:00">
+	       <ocn ranks="8563" layout = "90,140"   io_layout = "1,5" mask_table="mask_table.90x140.8563" threads="1"/>
+	       <ice              layout = "90,140"   io_layout = "1,5" mask_table="mask_table.90x140.8563"/>
+	     </resources>
+        </run>
+        <run months="1" >
+	     <resources jobWallclock="02:00:00">
+	       <ocn ranks="9755" layout = "90,160"   io_layout = "1,5" mask_table="mask_table.90x160.9755" threads="1"/>
+	       <ice              layout = "90,160"   io_layout = "1,5" mask_table="mask_table.90x160.9755"/>
+	     </resources>
+        </run>
       </regression>
       <reference restart="$(REFERENCE)/archive/1x0m2d_1600x1o/restart/19580103.tar"/>
     </runtime>
@@ -338,7 +317,7 @@ SIS_OVERRIDE_EOF
          #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts .
          cp $work/INPUT/ocean_static_no_mask_table.nc $work/
       ]]></csh>
-      <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh  $(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_data_stager_globalAve.csh"/>
+      <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh  $(NB_ROOT)/mdt_xml/awg_include/refineDiag/refineDiag_data_stager_globalAve.csh"/>
       <xi:include xpointer="xpointer(//freInclude[@name='OM4_cmip6_postprocess_p125']/postProcess/node())"/>
     </postProcess>
    </experiment>
@@ -372,7 +351,11 @@ SIS_OVERRIDE_EOF
     <input>
       <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">/lustre/f2/dev/Raphael.Dussin/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy.tar</dataSource>
+        <dataSource site="orion">$(ARCHIVE_NNZ)/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy.tar</dataSource>
         <dataSource site="gfdl">/archive/Raphael.Dussin/datasets/OM4p125/OM4p125_grid_20190822_merged_bathy.tar</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource site="ncrc">$(ARCHIVE_NNZ)/input/xanadu/OM4p125_grid/OM4p125_grid_20190822_merged_bathy_mask_tables.tar</dataSource>
       </dataFile>
     </input>
    </freInclude>
