@@ -2,7 +2,7 @@
 set -v
 # Automatic Build and Run on Gaea using fre
 XML_FILE=OMIP4p125_JRA1.4.xml  #The xml to test
-RELEASE='2020.03-beta4'   #The FMS release to test
+RELEASE='2019.01.03'   #The FMS release to test
 MOM6_DATE='2019.08.08'                     #The MOM6 tag date to test
 MOM6_GIT_TAG="dev\/gfdl\/2019.08.08" #The MOM6 tag to test
 FRESTEM="FMS${RELEASE}_mom6_${MOM6_DATE}_min"         #The FRESTEM to use
