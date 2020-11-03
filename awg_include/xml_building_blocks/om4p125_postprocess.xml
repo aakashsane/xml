@@ -1,0 +1,166 @@
+<!-- OCEAN  and ICE post-processing for cmip6 publishing-->
+<freInclude name="OM4p125_postprocess">
+   <postProcess>
+      <!-- DAILY -->
+      <component type="ocean_daily"   start="$(PP_START_YEAR)" source="ocean_daily" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_daily"/>
+      </component>
+
+      <component type="ocean_daily_d2"   start="$(PP_START_YEAR)" source="ocean_daily_d2" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_daily_d2"/>
+      </component>
+      <!-- 1x1 deg: is it really useful?? -->
+      <!--The 1/8 degree grid needs a remap file different from the one that frepp uses by default.
+          In the components we provide this remap file via a label="xyInterpRegridFile"-->
+      <component type="ocean_daily_1x1deg"   start="$(PP_START_YEAR)" source="ocean_daily" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on" >
+        <dataFile label="xyInterpRegridFile">
+          /archive/Raphael.Dussin/datasets/OM4p125/OM4p125_grid_20200921_noiceshelves_unpacked/remap_file_native_to_1x1.nc
+        </dataFile>
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)" />
+      </component>
+      <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_monthly" sourceGrid="ocean-tripolar" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/om4p125_monthly.frepp"/>
+        </timeSeries>
+      </component>
+      <!-- d2: downsampled to 1/4 degree -->
+      <component type="ocean_monthly_d2" start="$(PP_START_YEAR)"  source="ocean_month_d2" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month_d2"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+      <component type="ocean_monthly_z_d2" start="$(PP_START_YEAR)"  source="ocean_month_z_d2" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month_z_d2"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+      <!-- d2 to 1x1 deg -->
+      <component type="ocean_monthly_z_d2_1x1deg" start="$(PP_START_YEAR)"  source="ocean_month_z_d2" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on" xyInterpOptions="--input_mosaic /archive/Raphael.Dussin/datasets/OM4p125/OM4p125_grid_20200921_noiceshelves_unpacked/ocean_mosaic_d2.nc">
+        <dataFile label="xyInterpRegridFile">
+	 /archive/Raphael.Dussin/datasets/OM4p125/OM4p125_grid_20200921_noiceshelves_unpacked/remap_file_d2_to_1x1.nc	
+        </dataFile>
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <!-- ocean scalars -->
+
+      <component type="ocean_scalar_monthly" start="$(PP_START_YEAR)" source="ocean_scalar_month" sourceGrid="ocean-tripolar" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_scalar_month"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <!-- ANNUAL -->
+
+      <component type="ocean_annual_rho2_d2"  start="$(PP_START_YEAR)" source="ocean_annual_rho2_d2" sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_rho2_d2"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <!-- 1x1 deg -->
+      <component type="ocean_annual_rho2_d2_1x1deg"  start="$(PP_START_YEAR)" source="ocean_annual_rho2_d2" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on" xyInterpOptions="--input_mosaic /archive/Raphael.Dussin/datasets/OM4p125/OM4p125_grid_20200921_noiceshelves_unpacked/ocean_mosaic_d2.nc">
+        <dataFile label="xyInterpRegridFile">
+	 /archive/Raphael.Dussin/datasets/OM4p125/OM4p125_grid_20200921_noiceshelves_unpacked/remap_file_d2_to_1x1.nc	
+        </dataFile>
+        <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_annual" start="$(PP_START_YEAR)" source="ocean_annual"  sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_A)" source="ocean_annual"/>
+      </component>
+      <component type="ocean_annual_z" start="$(PP_START_YEAR)" source="ocean_annual_z"  sourceGrid="ocean-tripolar">
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/om4p125_annual_z.frepp"/>
+        </timeAverage>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/om4p125_annual_z.frepp"/>
+        </timeAverage>
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>
+      </component>
+      <!-- 1x1 deg -->
+      <component type="ocean_annual_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_annual_z"  sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <dataFile label="xyInterpRegridFile">
+          /archive/Raphael.Dussin/datasets/OM4p125/OM4p125_grid_20200921_noiceshelves_unpacked/remap_file_native_to_1x1.nc
+        </dataFile>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
+        </timeAverage>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
+        </timeAverage>
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_annual_z_d2" start="$(PP_START_YEAR)" source="ocean_annual_z_d2"  sourceGrid="ocean-tripolar">
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z_d2"/>
+      </component>
+      <!-- d2 to 1x1 deg -->
+      <component type="ocean_annual_z_d2_1x1deg" start="$(PP_START_YEAR)" source="ocean_annual_z_d2"  sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on" xyInterpOptions="--input_mosaic /archive/Raphael.Dussin/datasets/OM4p125/OM4p125_grid_20200921_noiceshelves_unpacked/ocean_mosaic_d2.nc">
+        <dataFile label="xyInterpRegridFile">
+	 /archive/Raphael.Dussin/datasets/OM4p125/OM4p125_grid_20200921_noiceshelves_unpacked/remap_file_d2_to_1x1.nc	
+        </dataFile>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
+        </timeAverage>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
+        </timeAverage>
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+
+      <!-- _z3: 3-layer diagnostics -->
+
+      <component type="ocean_monthly_z3" start="$(PP_START_YEAR)"  source="ocean_month_z3" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month_z3"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+
+      <component type="ocean_annual_z3" start="$(PP_START_YEAR)"  source="ocean_annual_z3" sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_annual_z3"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+
+      <!--Ocean scalars-->
+
+      <component type="ocean_scalar_annual"  start="$(PP_START_YEAR)" source="ocean_scalar_annual" sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_B)" source="ocean_scalar_annual"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+
+      <!--ICE-->
+
+      <component type="ice"  start="$(PP_START_YEAR)"  source="ice_month"  sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"  source="ice_month">
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+        </timeSeries>
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)"  source="ice_month">
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+        </timeSeries>
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ice_1x1deg"  start="$(PP_START_YEAR)" source="ice_month" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <dataFile label="xyInterpRegridFile">
+          /archive/Raphael.Dussin/datasets/OM4p125/OM4p125_grid_20200921_noiceshelves_unpacked/remap_file_native_to_1x1.nc
+        </dataFile>
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+      <component type="ice_daily"  start="$(PP_START_YEAR)"  source="ice_daily"  sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)"  source="ice_daily"/>
+      </component>
+      <component type="extraice_daily"  start="$(PP_START_YEAR)"  source="extraice_daily"  sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)"  source="extraice_daily"/>
+      </component>
+
+      <component type="ocean_month_z_d2_refined"   source="ocean_month_z_d2_refined" sourceGrid="ocean-tripolar" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month_z_d2_refined"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)" />
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+      <component type="ocean_month_rho2_d2_refined"   source="ocean_month_rho2_d2_refined" sourceGrid="ocean-tripolar" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month_rho2_d2_refined"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)" />
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+  </postProcess>
+</freInclude>
