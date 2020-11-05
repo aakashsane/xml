@@ -23,7 +23,7 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p5_JRA55do1.4_cycle1 -r basi
   <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
   <property name="OM4_ANALYSIS"   value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
   <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
-  <property name="PROD_SIMTIME"   value="1"/>
+  <property name="PROD_SIMTIME"   value="60"/>
   <!--Post-processing  chunk lengths -->
   <property name="CHUNK_LENGTH_A" value="5yr"/>
   <property name="CHUNK_LENGTH_B" value="20yr"/>
@@ -45,7 +45,7 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p5_JRA55do1.4_cycle1 -r basi
 
   <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
   <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)/mdt_xml/awg_include"/>
-  <property name="KRASTING"   value="/lustre/f2/pdata/gfdl/cmip6/datasets/OMIP"/>
+  <property name="OBGCdataset"   value="/lustre/f2/pdata/gfdl/cmip6/datasets/OMIP"/>
   <property name="append_to_setup_csh"  value="set fyear=1958"/><!--The start year of forcing dataseti. FRE hack to set fyear.-->
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel18'])"/>
@@ -245,7 +245,7 @@ $baseDate
       <xi:include xpointer="xpointer(//freInclude[@name='BLING_field_table']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='ABIO_field_table']/input/node())"/>
       <dataFile label="input" target="INPUT/MOM_GENERICS.res.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(KRASTING)/cfc/MOM_GENERICS_OM4p5.20170829.res.nc</dataSource>
+        <dataSource platform="$(platform)">$(OBGCdataset)/cfc/MOM_GENERICS_OM4p5.20170829.res.nc</dataSource>
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_BLING</dataSource>
@@ -468,7 +468,7 @@ SIS_OVERRIDE_EOF
 
       <!-- Generic Abiotic Input Files -->
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(KRASTING)/abiotic/GLODAPv1.abiotic.filled.20180316.nc</dataSource>
+        <dataSource platform="$(platform)">$(OBGCdataset)/abiotic/GLODAPv1.abiotic.filled.20180316.nc</dataSource>
       </dataFile>
 
     </input>
@@ -478,7 +478,7 @@ SIS_OVERRIDE_EOF
     <input>
       <!--CFCs/SF6 Boundary Conditions -->
       <dataFile label="input" target="INPUT/cfc.bc.nc" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(KRASTING)/cfc/CFC_histories_revised_2015_20x20deg.20171208.nc</dataSource>
+        <dataSource platform="$(platform)">$(OBGCdataset)/cfc/CFC_histories_revised_2015_20x20deg.20171208.nc</dataSource>
       </dataFile>
 
       <dataTable order="append">
@@ -493,7 +493,7 @@ SIS_OVERRIDE_EOF
     <freInclude name="ABIO_data_table">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(KRASTING)/abiotic/atm_delta_13C_14C.nc</dataSource>
+        <dataSource platform="$(platform)">$(OBGCdataset)/abiotic/atm_delta_13C_14C.nc</dataSource>
       </dataFile>
 
       <dataTable order="append">
