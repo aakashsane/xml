@@ -1,0 +1,242 @@
+<outer xmlns:xi="http://www.w3.org/2003/XInclude">
+  <!--ATMOS-->      
+  <freInclude name="c96_postprocess_ATMOS">
+    <postProcess>
+      <component type="atmos"  start="$(PP_START_YEAR)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+<!--Note: If we break this huge components to pieces, some of the analysis scripts ( atw_ scripts and cjs_precip_intensity2.csh) won't work since "atmos" as component is hard-coded inside them.
+          This prevents runing the components in parallel
+-->
+
+<!--
+      <component type="atmos_8xdaily"  start="$(PP_START_YEAR)" source="atmos_8xdaily" sourceGrid="atmos-cubedsphere" xyInterp="360,576" cmip="on">\
+-->
+        <timeSeries freq="3hr" source="atmos_8xdaily" chunkLength="$(PP_CMIP_CHUNK_A)">
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(AWG_INPUT_HOME)/analysis/stub/bw_diurnal_precip.csh"/><!--8xdaily precip,prec_ls,prec_conv-->
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$FRE_ANALYSIS_HOME/cjs/stub/cjs_precip_intensity2.csh"/><!--8xdaily pr or precip if component name is atmos , takes 16hrs to run-->
+        </timeSeries>
+<!--
+      </component>
+
+      <component type="atmos_4xdaily"  start="$(PP_START_YEAR)" source="atmos_4xdaily" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
+-->
+        <timeSeries freq="6hr" source="atmos_4xdaily" chunkLength="$(PP_CMIP_CHUNK_A)">
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$FRE_ANALYSIS_HOME/jwd/tropical_storms/frepp.jwd_tropical_storms_wsfc.csh"/>
+        </timeSeries>
+<!--
+      </component>
+
+      <component type="atmos_daily"  start="$(PP_START_YEAR)" source="atmos_daily" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
+-->
+        <timeSeries freq="daily" source="atmos_daily" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$FRE_ANALYSIS_HOME/cjs/stub/wheeler_kiladis.csh"/><!--daily olr-->
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(AWG_INPUT_HOME)/analysis/stub/bw_atmos_eddies.csh"/><!--daily ta,ua,va,hus,zg,wap-->
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/ESMValTools/ESMValTool-driver-1.0.2.csh -d samonsoon-daily"/>
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/ESMValTools/ESMValTool-driver-1.0.2.csh -d wamonsoon-daily"/>
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/ESMValTools/ESMValTool-driver-1.0.2.csh -d mjo-daily"/>
+        </timeSeries>
+<!--
+      </component>
+
+      <component type="atmos_monthly"  start="$(PP_START_YEAR)" source="atmos_month" sourceGrid="atmos-cubedsphere" xyInterp="360,576">
+-->
+        <timeSeries freq="monthly" source="atmos_month" chunkLength="$(PP_CMIP_CHUNK_A)">
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(AWG_INPUT_HOME)/analysis/stub/bw_atmos_monthly_cru_ts.csh"/><!--monthly precip,tot_cld_amt,t_ref,tas,tasmax,t_ref_max,tasmin,t_ref_min-->
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(AWG_INPUT_HOME)/analysis/stub/bw_atmos_timeseries.csh"/>
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(AWG_INPUT_HOME)/analysis/stub/bw_atmos_regress.csh"/>
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(AWG_INPUT_HOME)/analysis/stub/bw_atmos_zmstream.csh"/><!--monthly ps,vcomp-->
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$FRE_ANALYSIS_HOME/cjs/stub/cjg_atmos_ts_mon.csh"/><!--monthly enth_ls_col,wat_ls_col,enth_conv_col,enth_uw_col,wat_uw_col-->
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/code/pcmdi_metrics/frepp.pcmdi_metrics_v1p1p2.atmos.csh"/><!-- Did not work-->
+          <!-- New Analysis scripts from Andrew Wittenberg, 2017-03-15 -->
+          <!--annual and seasonal climatology-->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$(AWG_INPUT_HOME)/analysis/stub/atw_atmos_ts_monthly_sfc_ocean.csh"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$(AWG_INPUT_HOME)/analysis/stub/atw_atmos_ts_monthly_sfc.csh"/>
+          <!--wavelet plots of climate indices-->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$(AWG_INPUT_HOME)/analysis/stub/atw_atmos_ts_monthly_index.csh"/>
+          <!--Koppen climate types-->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$(AWG_INPUT_HOME)/analysis/stub/atw_atmos_ts_monthly_koppen.csh"/>
+          <!--annual and seasonal mean comparisons of atmospheric fields against existing Obs4MIPs and Ana4MIPs datasets:  - TRMM - GPCP - CERES-EBAF - ERA-Interim - MERRA -->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/jpk/Obs4MIPs/Krasting-Obs4MIPs.csh"/>
+          <!--NCAR's CVDP analysis -->
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/cvdp/frepp.cvdp.csh -s $(CVDP_startyear)"/>
+          <!-- ESMValTool Diagnostics -->
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/ESMValTools/ESMValTool-driver-1.0.2.csh -d samonsoon"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/ESMValTools/ESMValTool-driver-1.0.2.csh -d wamonsoon"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/ESMValTools/ESMValTool-driver-1.0.2.csh -d flatoipcc"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/ESMValTools/ESMValTool-driver-1.0.2.csh -d mjo-mean-state"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/ESMValTools/ESMValTool-driver-1.0.2.csh -d spi"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/ESMValTools/ESMValTool-driver-1.0.2.csh -d southern-hemisphere"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/ESMValTools/ESMValTool-driver-1.0.2.csh -d cloud-bias"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/ESMValTools/ESMValTool-driver-1.0.2.csh -d lauer13jclim"/>
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$FRE_ANALYSIS_HOME/oar.gfdl.mdteam/stub/ESMValTools/ESMValTool-driver-1.0.2.csh -d krasting13jclim"/>
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="/home/a1r/analysis/agu/Krasting/pywavelet_jpk_a1r.py -varname t_surf -comp atmos"/>
+        </timeSeries>
+
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$(AWG_INPUT_HOME)/analysis/stub/bw_atmos_av_mon.csh"/><!--monthly ucomp,temp,hght,omega,precip-->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$(AWG_INPUT_HOME)/analysis/stub/bw_atmos_atl_pac.csh"/><!--monthly tau_x,tau_y-->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$(AWG_INPUT_HOME)/analysis/stub/lwh_atmos_av_mon.csh"/><!--monthly sphum-->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$(AWG_INPUT_HOME)/analysis/stub/pjk_atmos_av_mon.csh"/><!--monthly ucomp,vcomp,temp,hght,rh,ps,precip,slp,t_ref,tau_x,tau_y,land_mask -->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$(AWG_INPUT_HOME)/analysis/stub/tk_atmos_av_mon.csh"/><!--monthly snow_conv,snow_ls,evap,shflx,lwdn_sfc,lwup_sfc,swdn_sfc,swup_sfc,-->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$(AWG_INPUT_HOME)/analysis/stub/bw_box_whisker.csh"/><!--monthly psl or slp, ps,t_ref,precip,olr,olr_clr,swup_toa,swup_toa_clr,-->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/radiation_atmos_av_mon.csh"/><!--monthly olr,olr_clr,swdn_toa,swup_toa,swup_toa_clr,lwdn_sfc,lwdn_sfc_clr,lwup_sfc,lwup_sfc_clr,swdn_sfc,swdn_sfc_clr,swup_sfc,swup_sfc_clr-->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/sak_atmos_av_mon.csh"/><!--monthly -->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/sak_lwp_atmos_av_mon.csh"/><!--monthly -->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/sak_precip_atmos_av_mon.csh"/><!--monthly -->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/precip_water_atmos_av_mon.csh"/><!--monthly -->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/liquid_cloud_atmos_av_mon.csh"/><!--monthly -->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/ice_cloud_atmos_av_mon.csh"/><!--monthly -->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/surface_atmos_av_mon.csh"/><!--monthly -->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/wind_atmos_av_mon.csh"/><!--monthly -->
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjs/stub/temp_atmos_av_mon.csh"/><!--monthly -->
+	  <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/cjg/stub/cjg_atmos_level_mon_av.csh"/><!--monthly -->
+        </timeAverage>
+
+        <timeAverage source="annual" interval="$(PP_CMIP_CHUNK_A)">
+	  <analysis switch="$(ANALYSIS_SWITCH)" cumulative="yes" script="$(AWG_INPUT_HOME)/analysis/stub/atw_atmos_av_annual_column.csh"/>
+        </timeAverage>
+      </component>
+
+      <component type="atmos_month_aer" start="$(PP_START_YEAR)" source="atmos_month_aer" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="off">
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/pag/stub/aerosol_monthly.csh"/>
+        </timeAverage>
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_diurnal" start="$(PP_START_YEAR)"  source="atmos_diurnal" sourceGrid="atmos-cubedsphere" xyInterp="180,288">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="atmos_scalar" start="$(PP_START_YEAR)" source="atmos_scalar" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeSeries freq="monthly" source="atmos_global_cmip" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+    </postProcess>
+  </freInclude> 
+
+<!-- LAND -->
+  <freInclude name="c96_postprocess_LAND">
+    <postProcess>
+      <!--refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/LUMIP_refineDiag.csh"/-->
+      <component type="land" start="$(PP_START_YEAR)" source="land_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CMIP_CHUNK_A)"/> -->
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
+	  <analysis switch="$(TS_ANALYSIS_SWITCH)" cumulative="yes" script="$FRE_ANALYSIS_HOME/kap/stub/kap_land_ts_reg_rad.csh"/>
+	  <analysis switch="$(TS_ANALYSIS_SWITCH)" cumulative="yes" script="$FRE_ANALYSIS_HOME/kap/stub/kap_land_ts_reg_web.csh"/>
+        </timeSeries>
+        <!-- changed to CHUNK_A only -->
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)">
+	  <analysis switch="$(ANALYSIS_SWITCH)" script="$FRE_ANALYSIS_HOME/kap/stub/kap_land_av.csh"/>
+        </timeAverage>
+      </component>
+
+      <component type="land_cubic" start="$(PP_START_YEAR)" source="land_month" sourceGrid="land-cubedsphere">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" >
+	  <analysis switch="$(TS_ANALYSIS_SWITCH)" cumulative="yes" script="$FRE_ANALYSIS_HOME/kap/stub/kap_dsch_ratio.csh"/>
+	  <analysis switch="$(TS_ANALYSIS_SWITCH)" cumulative="yes" script="$FRE_ANALYSIS_HOME/kap/stub/kap_land_ts_bas_rad.csh"/>
+	  <analysis switch="$(TS_ANALYSIS_SWITCH)" cumulative="yes" script="$FRE_ANALYSIS_HOME/kap/stub/kap_land_ts_bas_web.csh"/>
+        </timeSeries>
+<!--    <timeSeries freq="daily" source="land_daily" chunkLength="$(PP_CMIP_CHUNK_A)"/> -->
+      </component>
+      
+      <component type="land_instant_cubic" start="$(PP_START_YEAR)" source="land_month_inst" sourceGrid="land-cubedsphere">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
+      </component>
+      <component type="land_cmip" start="$(PP_START_YEAR)" source="land_month_cmip" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="yes">
+        <timeSeries freq="daily" source="land_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)">
+           <analysis switch="$(ANALYSIS_SWITCH_CMIP)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/snc_norm.csh daily"/>
+        </timeSeries>
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
+           <analysis switch="$(ANALYSIS_SWITCH_CMIP)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/snc_norm.csh monthly"/>
+        </timeSeries>
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
+        <timeSeries freq="3hr" source="land_8xdaily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeSeries freq="3hr" source="land_8xdaily_inst" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+      <component type="land_dust" start="$(PP_START_YEAR)" source="land_dust" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="annual" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+<!-- RIVER -->
+      <component type="river" start="$(PP_START_YEAR)" source="river_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="daily" source="river_daily" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+ 
+      <component type="river_cubic" start="$(PP_START_YEAR)" source="river_month" sourceGrid="land-cubedsphere">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" >
+	  <analysis switch="$(TS_ANALYSIS_SWITCH)" cumulative="yes" script="$FRE_ANALYSIS_HOME/kap/stub/kap_land_basin_map.csh"/>
+        </timeSeries>
+      </component>
+
+      <component type="river_instant_cubic" start="$(PP_START_YEAR)" source="river_month_inst" sourceGrid="land-cubedsphere">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)" />
+      </component>
+
+    </postProcess>
+  </freInclude>
+
+  <freInclude name="LUmip_postprocess">
+    <postProcess>
+      <component type="LUmip_month_psl" start="$(PP_START_YEAR)" source="lumip_Lmon_psl" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="off">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+      <component type="LUmip_month_crp" start="$(PP_START_YEAR)" source="lumip_Lmon_crp" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="off">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+      <component type="LUmip_month_pst" start="$(PP_START_YEAR)" source="lumip_Lmon_pst" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="off">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+      <component type="LUmip_refined" start="$(PP_START_YEAR)" source="lumip_refined" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <component type="LUmip_year_psl" start="$(PP_START_YEAR)" source="lumip_Lyr_psl" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="off">
+        <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeSeries freq="annual" source="lumip_Lyr"  chunkLength="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+      <component type="LUmip_year_crp" start="$(PP_START_YEAR)" source="lumip_Lyr_crp" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="off">
+        <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+      <component type="LUmip_year_pst" start="$(PP_START_YEAR)" source="lumip_Lyr_pst" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="off">
+        <timeSeries freq="annual" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+    </postProcess>
+  </freInclude>
+
+  <!-- By-species land post-processing -->
+  <freInclude name="land_by_species_postprocess">
+    <postProcess>
+      <component type="land_by_species" start="$(PP_START_YEAR)" source="land_month_by_species" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+    </postProcess>
+  </freInclude>
+
+  <freInclude name="fire_postprocess">
+    <postProcess>
+      <component type="fire" start="$(PP_START_YEAR)" source="fire_month" sourceGrid="land-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+    </postProcess>
+  </freInclude>
+
+
+  <!-- Atmos co2 post-processing: note atmos_level, atmos_month and atmos_scalar already in c96_climo_postprocess -->
+  <freInclude name="atmos_co2_postprocess">
+      <postProcess> 
+      <component type="atmos_co2_level" start="$(PP_START_YEAR)" source="atmos_co2_month" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeSeries freq="annual"  chunkLength="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)"/>
+        <timeAverage source="annual" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+     </postProcess>
+  </freInclude>
+</outer>
+

@@ -53,7 +53,7 @@ endif
 # clone the source code from the repository
 
 set GIT_REPOSITORY = $FRE_ANALYSIS_GIT_URL/bw
-set FRE_CODE_TAG = testing
+set FRE_CODE_TAG = testing_20180103
 set PACKAGE_NAME = bw_atmos_monthly_av
 set FRE_CODE_BASE = $TMPDIR/fre-analysis
 
