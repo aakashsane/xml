@@ -2,11 +2,11 @@
 <!-- FRE Usage documentation: http://www.gfdl.noaa.gov/fms/fre -->
 <!--
 Quick start guide
-This xml consists of 1/4 degree Ocean-Ice experiments with JRA version1.4 interannual forcings.
+This xml consists of 1/4 degree Ocean-Ice experiments with JRA version1.5 interannual forcings.
 
 module load fre/bronx-18
-fremake -x OMIP_JRA.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
-frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p25_JRA55do1.4_r6_cycle1 -r basic
+fremake -x OMIP_JRA.xml -p ncrc4.intel18 -t prod MOM6_SIS2_compile
+frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p25_JRA55do1.5_r6_cycle1 -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -57,11 +57,12 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p25_JRA55do1.4_r6_cycle1 -r 
   </setup>
   <property name="gfdlO_pdata"      value="$(CMIP6_ARCHIVE_ROOT)/../../gfdl_O"/>
   <!--JRA dataset location. There are used in awg_include/xml_building_blocks/om4_common.xml-->
-  <property name="JRA_dataset"      value="$(gfdlO_pdata)/datasets/reanalysis/JRA55-do/v1.4.0"/>
+  <!--property name="JRA_dataset"      value="$(gfdlO_pdata)/datasets/reanalysis/JRA55-do/v1.5.0"/-->
+  <property name="JRA_dataset"      value="/lustre/f2/dev/Raphael.Dussin/forcings/JRA55v1.5.0/pad_JRA"/>
   <property name="JRA_dataset_p5"   value="/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/Runoff_JRAv1.4_OM4p5"/>
-  <property name="JRA_dataset_p25"  value="$(gfdlO_pdata)/datasets/OM4_025/INPUT.JRA.v2019.07.04"/>
+  <property name="JRA_dataset_p25"  value="/lustre/f2/dev/Raphael.Dussin/input/OM4_025/INPUT.JRA.v2020.11.09"/>
   <property name="JRA_dataset_p125" value="/lustre/f2/dev/Raphael.Dussin/forcings/OM4_125_runoff/"/>
-  <property name="JRA_version" value="1-4-0"/>
+  <property name="JRA_version" value="1-5-0"/>
 
   <freInclude name="resourceparams_O4671_production">
            <resources jobWallclock="16:00:00"  segRuntime="3:00:00">
@@ -93,11 +94,11 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p25_JRA55do1.4_r6_cycle1 -r 
    <!--***************************** 1/4 degree experiments        ****************************-->
    <!--****************************************************************************************-->
 
-   <experiment name="OM4p25_JRA55do1.4_r6_cycle1" inherit="MOM6_SIS2_compile">
+   <experiment name="OM4p25_JRA55do1.5_r6_cycle1" inherit="MOM6_SIS2_compile">
     <description>
 global 1/4 degree ocean_ice experiment
 regridded runoff and salinity
-JRA55do1-4 dynamic inter_annual forcing data
+JRA55do1-5 dynamic inter_annual forcing data
 No additional diurnal cycle imposed
     </description>
     <input>
@@ -292,7 +293,7 @@ MOM_OVERRIDE_EOF
    </experiment>
 
    <!--This is how to run the next cycles of an experiment. Replace the initCond with the actual last year restart of the previous cycle-->
-   <experiment name="OM4p25_JRA55do1.4_r6_cycle2" inherit="OM4p25_JRA55do1.4_r6_cycle1">
+   <experiment name="OM4p25_JRA55do1.5_r6_cycle2" inherit="OM4p25_JRA55do1.5_r6_cycle1">
     <input>
      <dataFile label="initCond" target="INPUT/" chksum="" size="" timestamp="">
       <dataSource platform="$(platform)">lustre/f2/scratch/oar.gfdl.ogrp-account/CMIP6/OMIP/xanadu_mom6_20181101/OM4p25_IAF_BLING_CFC_csf_JRA55do1-4_r4r_cycle1/ncrc4.intel16f2-prod/archive/restart/20180101.tar</dataSource>
