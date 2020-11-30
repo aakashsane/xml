@@ -912,6 +912,41 @@ $baseDate
      </diagTable>
     </input>
    </experiment>
+   <experiment name="OM4p25_IAF_BLING_csf_rerun_VERTEX_SHEAR_SPEARgrid" inherit="OM4p25_IAF_BLING_csf_rerun">
+   <input>
+      <dataFile label="gridSpec" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/SPEARgridOM4_025.tar</dataSource>
+      </dataFile>
+       <csh>
+         <![CDATA[
+# Get new diagnostic coordinate file
+cp /lustre/f2/pdata/gfdl/cmip6/datasets/OMIP/diagnostic/diag_rho2.nc $work/INPUT/
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+# Turn on generic tracers
+USE_generic_tracer = True
+# Fix sign error in adjustment of net fresh-water
+USE_NET_FW_ADJUSTMENT_SIGN_BUG = False
+# Add a uniform 10m diagnostic coordinate between 0 and 350m
+#override NUM_DIAG_COORDS = 3
+#override DIAG_COORDS = "z Z ZSTAR", "rho2 RHO2 RHO", "z2 Z2 ZSTAR"
+DIAG_COORD_DEF_Z2 = "UNIFORM:35,350"
+# Use finer resolution rho2 diagnostic coordinate
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+#override VERTEX_SHEAR=True
+MOM_OVERRIDE_EOF
+     ]]></csh>
+   </input>
+    <runtime>
+      <regression name="basic">
+        <run months="1" >
+	     <resources jobWallclock="01:30:00">
+	       <ice                           layout = "32,72"   io_layout = "1,4" mask_table="mask_table.32x72.1756"/>
+	       <ocn ranks="1756" threads="1"  layout = "32,72"   io_layout = "1,4" mask_table="mask_table.32x72.1756"/>
+	     </resources>
+        </run>     
+      </regression>
+    </runtime>
+   </experiment>
    <experiment name="OM4p25_IAF_BLING_csf_rerun_VERTEX_SHEAR" inherit="OM4p25_IAF_BLING_csf_rerun">
    <input>
        <csh>
