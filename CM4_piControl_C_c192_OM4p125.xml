@@ -362,22 +362,22 @@ Experiment to build executable.
     </input>
   </freInclude>
 
-  <freInclude name="Volcano_Solar_2010_cmip6_v2">
+  <freInclude name="Volcano_Solar_1850_cmip6_v2">
     <input>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_2010_cmip6_v2/extsw_data.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_1850_cmip6_v2/extsw_data.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_2010_cmip6_v2/omgsw_data.nc</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_1850_cmip6_v2/omgsw_data.nc</dataSource>
       </dataFile>
         <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_2010_cmip6_v2/asmsw_data.nc</dataSource>
+      <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_1850_cmip6_v2/asmsw_data.nc</dataSource>
       </dataFile>
         <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-      <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_2010_cmip6_v2/extlw_data.nc</dataSource>
+      <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_1850_cmip6_v2/extlw_data.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_2010_cmip6_v2/lean_solar_spectral_data.dat</dataSource>
+        <dataSource platform="$(platform)">$(CMIP6_ARCHIVE_ROOT)/CM4/forcings/Volcano_Solar_1850_cmip6_v2/lean_solar_spectral_data.dat</dataSource>
       </dataFile>
     </input>
   </freInclude>
@@ -612,7 +612,7 @@ set nyblocks = $nyblock
      </input>
   </freInclude>
 
-  <experiment name="CM4_2010Control_C_noBLING_c192_OM4p125" inherit="cm4_sis2_compile">
+  <experiment name="CM4_piControl_C_noBLING_c192_OM4p125" inherit="cm4_sis2_compile">
 <description>
 </description>
     <input>
@@ -788,7 +788,7 @@ SIS_OVERRIDE_EOF
       <namelist name="photosynthesis_nml">
        photosynthesis_to_use = 'leuning'	   
        co2_to_use_for_photosynthesis ='prescribed'    ! slm/jgj 2016/12/16 ok to set to interactive 
-       co2_for_photosynthesis = 387.5e-6             ! jgj  to match CMIP6 Jan 1 1850 co2 value	     
+       co2_for_photosynthesis = 284.262e-6             ! jgj  to match CMIP6 Jan 1 1850 co2 value	     
        respiration_to_use = 'LM3'
        Kok_effect = .False.
        lai_eps=1.e-5
@@ -835,17 +835,76 @@ SIS_OVERRIDE_EOF
         f_vol_warm_on_glacier = 0.06, 0.08
         f_geo_warm_on_glacier = 0.00, 0.00
       </namelist>
+      <namelist name="vegn_data_nml">
+       vegn_to_use = 'uniform'
+       K1=10,
+       K2=0.1,
+       fsc_liv=0.9,
+       fsc_wood=0.45,
+       c1(4) = 0.3
+       c2(4) = 0.3
+       Vmax = 2.0E-5, 2.0E-5, 2.0E-5, 2.0E-5, 1.50E-5,
+       m_cond = 4., 9., 9., 7., 7.,
+       alpha_phot = 0.05, 0.06, 0.06, 0.06, 0.06,
+       gamma_resp = 0.03, 0.02, 0.02, 0.02, 0.02,
+       tc_crit(0:2) = 3*273.16
+       fact_crit_phen(0:4) = 0., 0., 0., 0., 0.
+       fact_crit_fire(0:4) = 0., 0., 0., 0., 0.
+       cnst_crit_phen(0:4) = 0.30, 0.15, 0.15, 0.30, 0.30
+       cnst_crit_fire(0:4) = 0.15,  0.40, 0.15, 0.15, 0.15
+       wet_leaf_dreg(0:4)  = .3, .3, .3, .3, .3
+       ksi =  0, 0, 0, 0, 0,
+       leaf_refl(0:4,1) = 0.11, 0.11, 0.10, 0.10, 0.10
+       leaf_refl(0:4,2) = 0.58, 0.58, 0.45, 0.45, 0.39,
+       dat_root_zeta(0:4) =   0.35212, 0.17039, 0.28909, 0.25813, 0.17039
+       critical_root_density = 0.0,
+       tau_drip_s     = 259200.0
+       cmc_lai(0:4) = 0.02, 0.02, 0.02, 0.02, 0.02
+       csc_lai(0:4) = 0.30, 0.30, 0.30, 0.30, 0.2
+       dat_snow_crit = 2*1.e7, .1, 1.e7, .1
+       t_transp_min = 268.
+       srl(0:1) = 112.0e3, 150.0e3
+       root_perm = 14*5e-7
+       alpha(1,3) = 4
+       leaf_age_tau(2) = 150
+       smoke_fraction = 0.9, 0.9, 0.6, 0.6, 0.6
+       tg_c3_thresh = 1
+       phen_ev1 = 0.2
+       phen_ev2 = 0.7
+       cmc_eps = 0.01
+       alpha(0:4,6) = 0.0, 0.0, 0.012, 0.012, 0.012
+       treefall_disturbance_rate = 0.175, 0.185, 0.025, 0.0275, 0.027
+       use_light_saber = .true.
+       sai_cover = .true.
+       sai_rad = .true.
+
+       min_lai = 1.e-5   ! h1g, prevent numerical instability, 2017-08-24
+      </namelist>
+      <namelist name="radiation_driver_nml">
+      rad_time_step= 10800,
+      rad_package = 'sea_esf',
+      do_clear_sky_pass=.true.,
+      !calc_hemi_integrals = .false.,
+      renormalize_sw_fluxes=.true.,
+      zenith_spec = 'diurnally_varying',
+      using_restart_file = .false.
+      do_conserve_energy = .true.
+      sw_rad_time_step = 3600,
+      use_single_lw_sw_ts = .false.,
+      use_co2_tracer_field = .false.                 ! jgj added
+      treat_sfc_refl_dir_as_dif = .true.           ! jgj added
+      </namelist>
       <!-- Namelist -->
       <namelist file="$(AWG_INPUT_HOME)/nml/cmip6_am4p0_physics.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c192L33.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
-      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_2010climo.nml"/>
+      <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_1850climo.nml"/>
        <!-- Input datasets -->
       <xi:include xpointer="xpointer(//freInclude[@name='common_LM4']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c192_LM4']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_AM4_v20170208']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='common_cmip6']/input/node())"/>
-      <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_2010_cmip6_v2']/input/node())"/>
+      <xi:include xpointer="xpointer(//freInclude[@name='Volcano_Solar_1850_cmip6_v2']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='emissions_cmip6_v20170518']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='L32_gas_conc']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='field_table_am4p11_cmip6']/input/node())"/>
