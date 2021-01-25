@@ -1,5 +1,140 @@
 <!-- OCEAN  and ICE post-processing for cmip6 publishing-->
 <outer xmlns:xi="http://www.w3.org/2003/XInclude">
+<freInclude name="OM4p25_postprocess">
+   <postProcess>
+      <!-- DAILY -->
+      <component type="ocean_daily"   start="$(PP_START_YEAR)" source="ocean_daily" sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_daily"/>
+      </component>
+      <component type="ocean_daily_1x1deg"   start="$(PP_START_YEAR)" source="ocean_daily" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on" >
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)" />
+      </component>
+      <component type="ocean_monthly"   start="$(PP_START_YEAR)" source="ocean_monthly" sourceGrid="ocean-tripolar" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/om4p125_monthly.frepp"/>
+        </timeSeries>
+      </component>
+      <component type="ocean_monthly_z" start="$(PP_START_YEAR)"  source="ocean_month_z" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month_z"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+      <!-- to 1x1 deg -->
+      <component type="ocean_monthly_z_1x1deg" start="$(PP_START_YEAR)"  source="ocean_month_z" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" />
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <component type="ocean_month_z_refined"   source="ocean_month_z_refined" sourceGrid="ocean-tripolar" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month_z_refined"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)" />
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+      <component type="ocean_month_rho2_refined"   source="ocean_month_rho2_refined" sourceGrid="ocean-tripolar" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month_rho2_refined"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)" />
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+
+      <!-- ocean scalars -->
+
+      <component type="ocean_scalar_monthly" start="$(PP_START_YEAR)" source="ocean_scalar_month" sourceGrid="ocean-tripolar" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_scalar_month"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <!-- ANNUAL -->
+
+      <component type="ocean_annual_rho2"  start="$(PP_START_YEAR)" source="ocean_annual_rho2" sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_rho2"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <!-- 1x1 deg -->
+      <component type="ocean_annual_rho2_1x1deg"  start="$(PP_START_YEAR)" source="ocean_annual_rho2" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_B)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_annual" start="$(PP_START_YEAR)" source="ocean_annual"  sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_A)" source="ocean_annual"/>
+      </component>
+      <component type="ocean_annual_z" start="$(PP_START_YEAR)" source="ocean_annual_z"  sourceGrid="ocean-tripolar">
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/om4p125_annual_z.frepp"/>
+        </timeAverage>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
+          <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(AWG_INPUT_HOME)/analysis/stub/om4p125_annual_z.frepp"/>
+        </timeAverage>
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>
+      </component>
+      <!-- 1x1 deg -->
+      <component type="ocean_annual_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_annual_z"  sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
+        </timeAverage>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
+        </timeAverage>
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ocean_annual_z" start="$(PP_START_YEAR)" source="ocean_annual_z"  sourceGrid="ocean-tripolar">
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)" source="ocean_annual_z"/>
+      </component>
+      <!-- d2 to 1x1 deg -->
+      <component type="ocean_annual_z_1x1deg" start="$(PP_START_YEAR)" source="ocean_annual_z"  sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)">
+        </timeAverage>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)">
+        </timeAverage>
+        <timeSeries freq="annual"  chunkLength="$(CHUNK_LENGTH_B)"/>
+      </component>
+
+      <!-- _z3: 3-layer diagnostics -->
+
+      <component type="ocean_monthly_z3" start="$(PP_START_YEAR)"  source="ocean_month_z3" sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_month_z3"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="monthly" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+
+      <component type="ocean_annual_z3" start="$(PP_START_YEAR)"  source="ocean_annual_z3" sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual" chunkLength="$(CHUNK_LENGTH_A)" source="ocean_annual_z3"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+
+      <!--Ocean scalars-->
+
+      <component type="ocean_scalar_annual"  start="$(PP_START_YEAR)" source="ocean_scalar_annual" sourceGrid="ocean-tripolar">
+        <timeSeries freq="annual"   chunkLength="$(CHUNK_LENGTH_B)" source="ocean_scalar_annual"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual" interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+
+      <!--ICE-->
+
+      <component type="ice"  start="$(PP_START_YEAR)"  source="ice_month"  sourceGrid="ocean-tripolar">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"  source="ice_month">
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+        </timeSeries>
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_B)"  source="ice_month">
+           <analysis switch="$(ANALYSIS_SWITCH)" cumulative="no" script="$(NB_ROOT)/mom6/tools/analysis/Krasting-SeaIce.csh"/>
+        </timeSeries>
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_B)"/>
+      </component>
+      <component type="ice_1x1deg"  start="$(PP_START_YEAR)" source="ice_month" sourceGrid="ocean-tripolar" xyInterp="180,360" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(CHUNK_LENGTH_A)"/>
+        <timeAverage source="annual"  interval="$(CHUNK_LENGTH_A)"/>
+      </component>
+      <component type="ice_daily"  start="$(PP_START_YEAR)"  source="ice_daily"  sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)"  source="ice_daily"/>
+      </component>
+      <component type="ice_daily_extra"  start="$(PP_START_YEAR)"  source="ice_daily_extra"  sourceGrid="ocean-tripolar">
+        <timeSeries freq="daily" chunkLength="$(CHUNK_LENGTH_A)"  source="ice_daily_extra"/>
+      </component>
+  </postProcess>
+</freInclude>
 <freInclude name="OM4_postprocess">
    <postProcess>
       <!-- DAILY -->
