@@ -1,0 +1,76 @@
+<outer xmlns:xi="http://www.w3.org/2003/XInclude">
+  <!--ATMOS-->      
+  <freInclude name="postprocess_ATMOS_cmip6">
+    <postProcess>
+      <!-- <refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_atmos_cmip6.csh"/> -->
+      <!--refineDiag script="$(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_CFsite.csh"/-->
+      <!--
+           <component type="atmos_month_cfmip" start="$(PP_CPLD_START)" source="atmos_month_cfmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" interpMethod="conserve_order1" cmip="on">
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+      -->
+      <component type="atmos_cmip"  start="$(PP_CPLD_START)" source="atmos_month_cmip" sourceGrid="atmos-cubedsphere" xyInterp="180,288" cmip="on">
+      <!--
+          <timeSeries freq="3hr" source="atmos_8xdaily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmos8xDailyTScmip/*)">
+          <xi:fallback/>
+          </xi:include>
+        </timeSeries>
+        <timeSeries freq="3hr" source="atmos_8xdaily_inst" chunkLength="$(PP_CMIP_CHUNK_A)">
+        </timeSeries>
+       -->
+             <!-- 6hrLevPt, at plev3 -->
+        <!-- <timeSeries freq="6hr" source="atmos_4xdaily_refined" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <variables>
+             ta ua va
+          </variables>
+        </timeSeries> -->
+            <!-- 6hrLevPt, 2D -->
+        <!-- <timeSeries freq="6hr" source="atmos_4xdaily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <variables>
+             rv850 zg500 psl
+          </variables>
+        </timeSeries> -->
+            <!-- diag_table_day, 2D field at both 2-deg and 1-deg resolution-->
+        <!-- <timeSeries freq="daily" source="atmos_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <variables> 
+             huss tasmin tasmax tas pr psl sfcWind hurs hursmin hursmax clt tslsi prc prsn uas vas sfcWindmax hfls hfss rlds rlus rsds rsus rlut  
+          </variables>
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosDailyTScmip/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeSeries> -->
+
+        <timeSeries freq="monthly" source="atmos_month_refined" chunkLength="$(PP_CMIP_CHUNK_A)">
+        </timeSeries>
+        <timeSeries freq="monthly" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <xi:include href="../analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthTScmip/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeSeries>
+        <timeAverage source="monthly" interval="$(PP_CMIP_CHUNK_A)">
+          <xi:include href="../analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosMonthAvecmip/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeAverage>
+        <timeAverage source="annual" interval="$(PP_CMIP_CHUNK_A)"/>
+      </component>
+
+      <!-- diag_table_day, 2D field at both 2-deg and 1-deg resolution-->
+      <!--
+      <component type="atmos_cmip_2deg_daily_2D"  start="$(PP_CPLD_START)" source="atmos_daily_cmip" sourceGrid="atmos-cubedsphere" xyInterp="90,144" cmip="on">
+        <timeSeries freq="daily" source="atmos_daily_cmip" chunkLength="$(PP_CMIP_CHUNK_A)">
+          <variables> 
+             huss tasmin tasmax tas pr psl sfcWind hurs hursmin hursmax clt tslsi prc prsn uas vas sfcWindmax hfls hfss rlds rlus rsds rsus rlut  
+          </variables>
+          <xi:include href="./awg_include/analysis/analysis_cpld.xml" xpointer="xpointer(*/atmosDailyTScmip/*)">
+            <xi:fallback/>
+          </xi:include>
+        </timeSeries>
+      </component>
+      -->
+
+    </postProcess>
+  </freInclude>
+</outer>
+
