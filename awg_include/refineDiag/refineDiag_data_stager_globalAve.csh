@@ -6,7 +6,7 @@ echo "  ---------- begin refineDiag_data_stager.csh ----------  "
 date
 
 #-- Source the refineDiag version of the vitals script
-source /home/mdteam/DET/analysis/vitals/gfdlvitals_refineDiag.csh
+source /home/mdteam/DET/analysis/vitals/gfdlvitals_refineDiag.latest.csh
 
 date
 echo "  ---------- end refineDiag_data_stager.csh ----------  "
