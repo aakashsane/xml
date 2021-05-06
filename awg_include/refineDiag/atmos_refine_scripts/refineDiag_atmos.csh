@@ -46,8 +46,9 @@ if ($#daily_files == 6) then
       if ($?) @ refineAtmosErrors++
       if (-e $OUTFILE) then
         # perform append in working directory to avoid long filenames
-        cp $OUTFILE $OUTFILE:t
+        ncks -3 $OUTFILE -o $OUTFILE:t
         echo "ncks -h -A $TMPFILE $OUTFILE:t"
+        ncks -3 -O $TMPFILE -o $TMPFILE
         ncks -h -A $TMPFILE $OUTFILE:t
         if (! $?) then
           echo "cp -f $OUTFILE:t $OUTFILE"
@@ -105,8 +106,9 @@ foreach FILENAME ( $files_with_albedo )
         if (-e $TMPFILE) then
           if (-e $OUTFILE) then
             # perform append in working directory to avoid long filenames
-            cp $OUTFILE $OUTFILE:t
+            ncks -3 $OUTFILE -o $OUTFILE:t
             echo "ncks -h -A $TMPFILE $OUTFILE:t"
+            ncks -3 -O $TMPFILE -o $TMPFILE
             ncks -h -A $TMPFILE $OUTFILE:t
             if (! $?) then
               echo "cp -f $OUTFILE:t $OUTFILE"
