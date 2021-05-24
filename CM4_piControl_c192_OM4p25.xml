@@ -76,17 +76,19 @@ NOTES:
   <property name="ATM_PHYS_GIT_TAG"  value="8a30ff9a"/>      <!-- gitlab tag for atmos_phys source code -->  
   <property name="LAND_GIT_TAG"      value="xanadu"/>        <!-- git tag for LAND_LAD2 source code -->  
   <property name="OCEAN_BGC_GIT_TAG" value="8dda39f"/>       <!-- git tag for ocean_BGC component -->
-  <property name="MOM6_DATE"         value="devgfdl_20201120"/> <!-- arbitrary date string for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"      value="dea81c82"/>      <!-- git tag for MOM6 source code -->
+  <property name="MOM6_DATE"         value="devgfdl_20210308"/> <!-- arbitrary date string for MOM6 source code -->
+  <property name="MOM6EX_GIT_TAG"    value="b3321c68"/>      <!-- git tag for MOM6-examples source code -->
+  <property name="MOM6_GIT_TAG"      value="e7a80bcf"/>      <!-- git tag for MOM6 source code -->
   <property name="MOM6_GIT_FIX"      value=""/>       <!-- git tag for MOM6 source code -->
+  <property name="BERGS_GIT_TAG"     value="0908ff0f"/>       <!-- git tag for icebergs source code -->
   <property name="FRE_STEM"  value="FMS$(RELEASE)_$(MOM6_DATE)"/>     <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"   value="gfdl_f"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"   value="gfdl_o"/>    <!-- Replace YOURGROUPLETTER with GFDL group letter -->
   <property name="BUILD_DATE"     value=""/>          <!-- name for source/exec directory -->
 
   <property name="OM4_ANALYSIS" value="ice_ocean_SIS2/OM4_025"/>  <!--example containing .frepp scripts for analysis-->
                                                                  <!--Please set the value to ice_ocean_SIS2/OM4_05 for 1/2 degree ocean model runs--> 
-  <property name="PROD_SIMTIME"     value="100"/>  <!--simulation length in years-->
+  <property name="PROD_SIMTIME"     value="200"/>  <!--simulation length in years-->
   <property name="PP_CMIP_CHUNK_A"  value="5yr"/>  <!--smaller chunk length for pp/analysis-->
   <property name="PP_CMIP_CHUNK_B"  value="10yr"/> <!--bigger  chunk length for pp/analysis-->
   <property name="CHUNK_LENGTH_A"   value="5yr"/>
@@ -210,16 +212,17 @@ Experiment to build executable.
     </component>
 
     <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic_symmetric mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ mom6/src/MOM6/config_src/external/ODA_hooks ocean_BGC/generic_tracers ocean_BGC/mocsy/src">
-      <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
+      <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6EX_GIT_TAG)" communityGrid="Tripolar"/>
        <source versionControl="git" root="https://github.com/NOAA-GFDL">
         <codeBase version="master"> ocean_BGC.git </codeBase>
         <csh><![CDATA[
           ( cd ocean_BGC && git checkout $(OCEAN_BGC_GIT_TAG) )
           git clone -b dev/gfdl https://github.com/NOAA-GFDL/MOM6-examples.git mom6
           pushd mom6
-          git checkout $(MOM6_GIT_TAG)
+          git checkout $(MOM6EX_GIT_TAG)
           git submodule update --recursive --init src/MOM6 src/SIS2 src/icebergs
-	  (cd src/icebergs ; git checkout dev/gfdl)
+	  (cd src/MOM6 ; git checkout $(MOM6_GIT_TAG))
+	  (cd src/icebergs ; git checkout $(BERGS_GIT_TAG))
           #Revert a Fix to m6plot.py for frepp plots to work on PAN
           git revert --no-edit 9fb4ab2
 	  #Fixes for refineDiag analysis scripts to work with symmetric build
@@ -454,7 +457,7 @@ touch $work/INPUT/MOM_override
 touch $work/INPUT/MOM_layout
 touch $work/INPUT/SIS_override
 touch $work/INPUT/SIS_layout
-ln -s $work/INPUT/topog.nc $work/INPUT/ocean_topog.nc 
+ln -s $work/INPUT/topog.nc $work/INPUT/ocean_topog.nc
 
 # Record the job stdout location for later use timings database
 cat >> $HOME/frejobs_stdout <<EOF_frejobs
@@ -565,10 +568,16 @@ set nyblocks = $nyblock
        <dataSource platform="$(platform)">$(JRA_dataset_p25)/tidal_amplitude.v20140616.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/input/OM4_025/TPXO9_tideamp/tidal_amplitude_TPXO9_OM4p25.v20210125.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(JRA_dataset_p25)/seawifs-clim-1997-2010.1440x1080.v20180328.nc</dataSource>
       </dataFile>
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
        <dataSource platform="$(platform)">$(JRA_dataset_p25)/geothermal_davies2013_v1.nc</dataSource>
+      </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/input/OM4_025/static/ocean_static_no_mask_table_sym.nc</dataSource>
       </dataFile>
 
       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -640,17 +649,32 @@ set nyblocks = $nyblock
 	<!--recycle ATM/LAND (not Ice and Ocean) restarts from the end of previous 10 year run dora 1556
          This initCond crashes with FATAL from PE   798: land_tile_mod: tile container was not initialized before use 
        /lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/CM4_2010Control_C_noBLING_c192_OM4p125_bedMachineMLE2000_combined_res_00110101.tar -->
-        <dataSource platform="$(platform)">$(MING_HIRES_DIR)/ic/c192L33/awg_C192L33_OM4_025_grid_lm4p1_v20170325.tar</dataSource>
+        <!--dataSource platform="$(platform)">$(MING_HIRES_DIR)/ic/c192L33/awg_C192L33_OM4_025_grid_lm4p1_v20170325.tar</dataSource-->
+        <!--dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/input/CM4_2010Control_C_noBLING_c192_OM4p125_bedMachineMLE2000_combined_res_00110101.tar</dataSource-->
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/archive/warsaw_201710_om4_v1.0.1/CM4_c192L33_am4p0_piControl_A01/gfdl.ncrc4-intel16-prod-openmp/restart/02060101_recomb_script_noMOM_withSIS.tar</dataSource>
      </dataFile>
+     <namelist name="SIS_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
+     </namelist>
       <csh><![CDATA[
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 ! 1/4 degree parameter changes
 #override DT_THERM = 7200.0
+#override TIDEAMP_FILE = "tidal_amplitude_TPXO9_OM4p25.v20210125.nc"
+#override KAPPA_H2_FACTOR = 0.93
+#override CHL_FILE = "seawifs-clim-1997-2010.1440x1080.v20180328.nc"
+#override CHL_VARNAME = "chlor_a"
+#override U_TRUNC_FILE = "MOM_U_truncations"
+#override V_TRUNC_FILE = "MOM_V_truncations"
 #override USE_generic_tracer = False
 #override USE_RIVER_HEAT_CONTENT = False
 #override USE_CALVING_HEAT_CONTENT = False
 #override ENERGYSAVEDAYS = 1
-#override TOPO_FILE = "ocean_topog.nc"
+#override TOPO_FILE = "topog.nc"
 !parameters for using /ncrc/home2/John.Krasting/diag_z3.nc
 #override NUM_DIAG_COORDS = 3
 #override DIAG_COORDS = "z Z ZSTAR", "rho2 RHO2 RHO", "z3 Z3 ZSTAR"
@@ -700,14 +724,19 @@ MIN_THICKNESS = 1.0E-10
 # Coriolis
 #override CORIOLIS_SCHEME = "SADOURNY75_ENSTRO"
 #override CORIOLIS_EN_DIS = True
+!changes in diffusivity
+#override KD_MIN = 0.0
+#override KD_ADD = 2.0e-6
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override TOPO_FILE = "ocean_topog.nc"
+#override TOPO_FILE = "topog.nc"
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
 !Ice albedo variation
-#override ICE_DELTA_EDD_R_ICE  = 1.0  
-#override ICE_DELTA_EDD_R_SNOW = 1.0  
-#override ICE_DELTA_EDD_R_POND = 1.0  
+#override ICE_DELTA_EDD_R_ICE  = 0.0
+#override ICE_DELTA_EDD_R_SNOW = 0.0
+#override ICE_DELTA_EDD_R_POND = 0.0
 SIS_OVERRIDE_EOF
 
      ]]></csh>
@@ -895,6 +924,27 @@ SIS_OVERRIDE_EOF
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_c192L33.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_common.nml"/>
       <namelist file="$(AWG_INPUT_HOME)/nml/am4p0_1850climo.nml"/>
+      <!-- add "inspired by Ming Zhao's" tuning -->
+      <namelist name="rotstayn_klein_mp_nml">
+        rk_act_only_if_ql_gt_qmin = .true.
+        include_homogeneous_for_wetdep = .false.
+        include_adjustment_for_wetdep = .true.
+        num_mass_ratio1 = 1.0
+        num_mass_ratio2 = 0.
+        rthresh = 8.5,
+        U_evap_snow = 1.0
+        vfact = 0.875
+      </namelist>
+      <namelist name="tiedtke_macro_nml">
+        diff_thresh = 0.1,
+        eros_scale = 1.e-6,
+        eros_choice = .true.,
+        eros_scale_c = 5.e-5,
+        eros_scale_t = 5.75e-5,
+        U00 = 0.80,
+        mc_thresh = 0.001,
+        U00_profile = .true.,
+      </namelist>
        <!-- Input datasets -->
       <xi:include xpointer="xpointer(//freInclude[@name='common_LM4']/input/node())"/>
       <xi:include xpointer="xpointer(//freInclude[@name='c192_LM4']/input/node())"/>
@@ -920,6 +970,14 @@ $baseDate
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_OM4p25</dataSource>
       </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_sections_OM4p25</dataSource>
+      </dataFile>
+
+      <!-- CMIP6 atmos monthly fields -->
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/cmip6/diag_table_Amon</dataSource>
+      </dataFile>
 
      <!--MOM6 Input datasets-->
      <xi:include xpointer="xpointer(//freInclude[@name='OM4p25_data']/input/node())"/>
@@ -934,24 +992,29 @@ $baseDate
          mv *velocity_truncations MOM_parameter_doc* SIS_parameter_doc* seaice.stats* ocean.stats* extra.results/
          cp diag_table extra.results/.
          cp $scriptName extra.results/runscript.csh
-         #When the ocean uses a mask_table the ocean_static.nc file produced by the model run has holes in coordinates (geolon,geolat)
+         #When the ocean uses a mask_table the ocean_static.nc file produced by the model run
+         # has holes in coordinates (geolon,geolat)
          #This causes problems for ferret and python tools for analysis.
-         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used by the analysis scipts .
-	 cp $work/INPUT/ocean_static_no_mask_table.nc $work/
+         #Copy a non-masked version of ocean_static.nc to be saved as a history file to be used
+         # by the analysis scipts .
+	 cp $work/INPUT/ocean_static_no_mask_table_sym.nc $work/ocean_static_no_mask_table.nc
          #fix suggested by Raph for downsampled to 1x1
          foreach file ( `ls -1 | grep D2ocean` )
             ncatted -O -a associated_files,global,a,c,"areacello: ocean_static_d2.nc" $file
          end
 	 #drop D2ocean_static.nc that was produced with the grid. The model cannot produce the correct file.
-         cp $work/INPUT/ocean_static_d2.nc $work/D2ocean_static.nc
  
 ]]>   </csh>
 
-      <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh  $(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_data_stager_globalAve.csh"/>
+      <refineDiag script="$(NB_ROOT)/mom6/tools/analysis/MOM6_refineDiag.csh  $(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_data_stager_globalAve.csh $(AWG_INPUT_HOME_GFDL)/refineDiag/refineDiag_atmos_cmip6.csh"/>
       <xi:include href="awg_include/xml_building_blocks/om4p25_postprocess.xml" xpointer="xpointer(//freInclude[@name='OM4p25_postprocess']/postProcess/node())"/>
+      <xi:include href="awg_include/xml_building_blocks/om4_regions_postprocess.xml" xpointer="xpointer(//freInclude[@name='OM4_regions_postprocess']/postProcess/node())"/>
 
       <xi:include href="awg_include/xml_building_blocks/am4c192_postprocess.xml" xpointer="xpointer(//freInclude[@name='c192_postprocess_ATMOS']/postProcess/node())"/>
       <xi:include href="awg_include/xml_building_blocks/am4c192_postprocess.xml" xpointer="xpointer(//freInclude[@name='c192_postprocess_LAND']/postProcess/node())"/>
+
+      <xi:include href="awg_include/xml_building_blocks/atmos_cmip6_postprocess.xml" xpointer="xpointer(//freInclude[@name='postprocess_ATMOS_cmip6']/postProcess/node())"/>
+
     </postProcess>
     <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
