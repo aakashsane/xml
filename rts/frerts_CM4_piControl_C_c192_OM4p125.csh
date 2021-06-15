@@ -8,7 +8,7 @@ MOM6_GIT_TAG='b3321c68'      #'dev\/gfdl'      #The MOM6 tag to test
 FRESTEM="FMS${RELEASE}_${MOM6_DATE}"  #The FRESTEM to use
 GROUP="gfdl_o"
 #List of the experiments in the xml to run regression for
-EXPERIMENT_LIST="CM4_piControl_c192_OM4p125_v4_proto1"
+EXPERIMENT_LIST="CM4_piControl_c192_OM4p125_v4_hydrography20210614 CM4_piControl_c192_OM4p125_v4_hydrography20210614_recycleICE"
 
 DEBUGLEVEL='_0'
 PLATFORM="ncrc4.intel18"
