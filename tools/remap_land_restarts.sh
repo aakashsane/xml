@@ -5,14 +5,14 @@ set -u # stop on undefined variables
 
 source $MODULESHOME/init/bash
 module load fre/test
-  today="20210524"
+  today="20210614"
 srcgrid="/lustre/f2/pdata/gfdl/gfdl_W/Ming.Zhao/hiresmip/gridSpec/c192_OM4_025_grid_No_mg_drag_v20160808.tar"
     src="/lustre/f2/pdata/gfdl/gfdl_W/Ming.Zhao/hiresmip/ic/c192L33_new/CM4_c192L33_OM4_025_initCond_1950cntl_new.tar"
 #
 dstgrid="/lustre/f2/dev/Raphael.Dussin/input/mosaic_c192_bedmachine_v20210310.tar"
 #dstcold="/lustre/f2/dev/Raphael.Dussin/archive/FMS2019.01.03_devgfdl_20201120/CM4_piControl_c192_OM4p125/gfdl.ncrc4-intel18-prod-openmp/restart/01010101.tar"
 dstcold="/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/CM4_piControl_c192_OM4p125_res01010101.combined.tar" #above recombined, _v3 initCond,100 year run dora 1586
-    dst="/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/CM4_c192L33_OM4_025_initCond_1950cntl_new.remapLND.recycleIceLake.v${today}.tar"
+    dst="/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/CM4_c192L33_OM4_025_initCond_1950cntl_new.remapLND.recycleIce.v${today}.tar"
 
 # create temporary directory and structure in it
 tmp=`mktemp -d  -p $FRE_SYSTEM_TMP`
@@ -61,7 +61,7 @@ done
 cp dst_restart/*  src_restart/
 # replace SIS2/icebergs/lake restarts from the dst_cold
 \rm src_restart/{calving.res.nc,icebergs.res.nc,ice_model.res.nc,MOM.res*}
-cp dst_cold_restart/{calving.res.nc,icebergs.res.nc,ice_model.res.nc,lake.res.*} src_restart/
+cp dst_cold_restart/{calving.res.nc,icebergs.res.nc,ice_model.res.nc} src_restart/
 
 cd src_restart
 echo `date` >>README
