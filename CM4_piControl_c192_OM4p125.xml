@@ -76,9 +76,12 @@ NOTES:
   <property name="ATM_PHYS_GIT_TAG"  value="8a30ff9a"/>      <!-- gitlab tag for atmos_phys source code -->  
   <property name="LAND_GIT_TAG"      value="xanadu"/>        <!-- git tag for LAND_LAD2 source code -->  
   <property name="OCEAN_BGC_GIT_TAG" value="8dda39f"/>       <!-- git tag for ocean_BGC component -->
-  <property name="MOM6_DATE"         value="devgfdl_20210308"/> <!-- arbitrary date string for MOM6 source code -->
-  <property name="MOM6EX_GIT_TAG"    value="b3321c68"/>      <!-- git tag for MOM6-examples source code -->
-  <property name="MOM6_GIT_TAG"      value="e7a80bcf"/>      <!-- git tag for MOM6 source code -->
+  <!--property name="MOM6_DATE"         value="devgfdl_20210308"/--> <!-- arbitrary date string for MOM6 source code -->
+  <property name="MOM6_DATE"         value="devgfdl_20210706"/> <!-- arbitrary date string for MOM6 source code -->
+  <!--property name="MOM6EX_GIT_TAG"    value="b3321c68"/-->      <!-- git tag for MOM6-examples source code -->
+  <property name="MOM6EX_GIT_TAG"    value="be1b331"/>      <!-- git tag for MOM6-examples source code -->
+  <!--property name="MOM6_GIT_TAG"      value="e7a80bcf"/-->      <!-- git tag for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"      value="52fe576"/>      <!-- git tag for MOM6 source code -->
   <property name="MOM6_GIT_FIX"      value=""/>       <!-- git tag for MOM6 source code -->
   <property name="BERGS_GIT_TAG"     value="0908ff0f"/>       <!-- git tag for icebergs source code -->
   <property name="FRE_STEM"  value="FMS$(RELEASE)_$(MOM6_DATE)"/>     <!-- customize as needed -->
@@ -209,7 +212,8 @@ Experiment to build executable.
       </compile>
     </component>
 
-    <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic_symmetric mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ mom6/src/MOM6/config_src/external/ODA_hooks ocean_BGC/generic_tracers ocean_BGC/mocsy/src">
+    <!--component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic_symmetric mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ mom6/src/MOM6/config_src/external/ODA_hooks ocean_BGC/generic_tracers ocean_BGC/mocsy/src"-->
+    <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/{infra/FMS1,memory/dynamic_symmetric,drivers/FMS_cap,external} mom6/src/MOM6/src/{*,*/*}/ mom6/src/MOM6/pkg/GSW-Fortran/{modules,toolbox}/ mom6/src/MOM6/pkg/CVMix-src/{src,src/drivers,src/shared}/">
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6EX_GIT_TAG)" communityGrid="Tripolar"/>
        <source versionControl="git" root="https://github.com/NOAA-GFDL">
         <codeBase version="master"> ocean_BGC.git </codeBase>
@@ -255,7 +259,8 @@ Experiment to build executable.
       </compile>
     </component>
 
-    <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
+    <!--component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" -->
+    <component name="sis2" paths="mom6/src/SIS2/config_src/{dynamic_symmetric,external}/ mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" >
        <source versionControl="git" root="https://github.com/NOAA-GFDL">
            <codeBase version="$(ICE_PARAM_GIT_TAG)"> ice_param.git </codeBase>
        </source>
@@ -621,8 +626,9 @@ set nyblocks = $nyblock
      </input>
   </freInclude>
 
-  <experiment name="CM4_piControl_c192_OM4p125_v4_hydrography20210614_recycleICE" inherit="CM4_piControl_c192_OM4p125_v5_proto1"/>
-  <experiment name="CM4_piControl_c192_OM4p125_v5_proto1" inherit="CM4_piControl_c192_OM4p125_v3">
+  <experiment name="CM4_piControl_c192_OM4p125_v5" inherit="CM4_piControl_c192_OM4p125_v3"/>
+  <!--experiment name="CM4_piControl_c192_OM4p125_v4_hydrography20210614_recycleICE" inherit="CM4_piControl_c192_OM4p125_v5_proto1"/-->
+  <!--experiment name="CM4_piControl_c192_OM4p125_v5_proto1" inherit="CM4_piControl_c192_OM4p125_v3"-->
 <description>
 	Updated initCond with spun-up land from CM4_c192L33_OM4_025_initCond_1950cntl_new remapped to the new 1/8 degree grid
 	Updated static_vegetation climatology files consistent with the new 1/8 degree grid
@@ -1064,6 +1070,15 @@ $baseDate
       </dataFile>
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_sections_OM4p125</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_OM4_swmt</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_OM4p125_wmt3d_d2</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_vortbudget</dataSource>
       </dataFile>
 
       <!-- CMIP6 atmos monthly fields -->
