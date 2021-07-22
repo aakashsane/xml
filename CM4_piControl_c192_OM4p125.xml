@@ -665,8 +665,105 @@ set nyblocks = $nyblock
          parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
      </namelist>
      <namelist name="frecheck_nml"> start_date = 0001,01,01,0,0,0, </namelist><!--Ignore this. Used only be frecheck-->
+
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+! 1/8 degree parameter changes
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override TOPO_EDITS_FILE = ""
+#override TIDEAMP_FILE = "tidal_amplitude_TPXO9_OM4p125.v20200922.nc"
+#override KAPPA_H2_FACTOR = 6.4 ! increase from 2.8 recommended by Raph ! increase from 0.84 recommended by Matt
+#override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20200921.nc"
+#override CHL_VARNAME = "chlor_a"
+#override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
+#override DT_THERM = 3600.0               !   [s] !reduced from 7200.0 for OM4_025
+#override BAD_VAL_SST_MIN = -5.0  ! decreased from default of -3.0 to avoid extremes in 1/8 degree model
+#override U_TRUNC_FILE = "MOM_U_truncations"
+#override V_TRUNC_FILE = "MOM_V_truncations"
+#override USE_generic_tracer = False
+#override USE_RIVER_HEAT_CONTENT = False
+#override USE_CALVING_HEAT_CONTENT = False
+#override ENERGYSAVEDAYS = 1
+#override TOPO_FILE = "ocean_topog.nc"
+!parameters for using /ncrc/home2/John.Krasting/diag_z3.nc
+#override NUM_DIAG_COORDS = 3
+#override DIAG_COORDS = "z Z ZSTAR", "rho2 RHO2 RHO", "z3 Z3 ZSTAR"
+DIAG_COORD_DEF_Z3 = "FILE:diag_z3.nc,interfaces=z_i"
+! New tuning parameters
+#override CHANNEL_LIST_FILE = "MOM_channels_global_125"
+! Kappa Shear
+#override VERTEX_SHEAR = True
+#override USE_RESTRICTIVE_TOLERANCE_CHECK = True
+! ePBL
+#override ENERGETICS_SFC_PBL = True
+#override EPBL_IS_ADDITIVE = False
+#override TKE_DECAY = 0.001
+#override EPBL_MSTAR_SCHEME = "REICHL_H18"
+#override MSTAR = 0.0
+#override RH18_MSTAR_CN3 = -6.0
+#override NSTAR = 0.06
+#override MSTAR_CONV_ADJ = 0.66
+#override USE_MLD_ITERATION = True
+#override EPBL_VEL_SCALE_SCHEME = "REICHL_H18"
+#override WSTAR_USTAR_COEF = 15.
+#override EPBL_VEL_SCALE_FACTOR = 0.5477
+#override VSTAR_SURF_FAC = 1.8258
+#override EPBL_TRANSITION_SCALE = 0.01
+#override EPBL_LT = True
+#override EPBL_LANGMUIR_SCHEME = "ADDITIVE"
+#override LT_MOD_LAC1 = 0.0
+#override LT_MOD_LAC2 = 0.0
+#override LT_MOD_LAC3 = 0.0
+#override LT_MOD_LAC4 = 0.8
+#override LT_MOD_LAC5 = 0.8
+#override LT_ENHANCE_COEF = 0.1056
+#override LT_ENHANCE_EXP = -1.
+#override LA_DEPTH_RATIO = 0.2
+! Alistar MLE tuning
+#override DEFAULT_2018_ANSWERS = False
+#override KAPPA_SHEAR_ITER_BUG=False
+! BBL
+#override BBL_EFFIC=0.01
+! Tiny minimum thickness
+MIN_THICKNESS = 1.0E-10
+! MLE (this is the big unknown)
+#override MLE_FRONT_LENGTH=500.0
+#override MLE_MLD_DECAY_TIME=8.64E5
+! Higher order interpolation
+#override INTERPOLATION_SCHEME="PPM_H4"
+! Tiny minimum thickness
+MIN_THICKNESS = 1.0E-10
+# Coriolis
+#override CORIOLIS_SCHEME = "SADOURNY75_ENSTRO"
+#override CORIOLIS_EN_DIS = True
+!changes in diffusivity
+#override KD_MIN = 0.0
+#override KD_ADD = 2.0e-6
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override DT_ICE_DYNAMICS = 450 !reduced from 1200.0 for OM4_025
+#override DT_RHEOLOGY = 25.0
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override TOPO_FILE = "ocean_topog.nc"
+!Ice albedo variation
+#override ICE_DELTA_EDD_R_ICE  = 0.0
+#override ICE_DELTA_EDD_R_SNOW = 0.0
+#override ICE_DELTA_EDD_R_POND = 0.0
+
+#override PARALLEL_RESTARTFILES = True
+#override RESTART_CHECKSUMS_REQUIRED = False
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
      </input>
   </experiment>   
+
+
   <experiment name="CM4_piControl_c192_OM4p125_v4_hydrography20210614" inherit="CM4_piControl_c192_OM4p125_v3">
 <description>
 	Updated initCond with spun-up land from CM4_c192L33_OM4_025_initCond_1950cntl_new remapped to the new 1/8 degree grid
