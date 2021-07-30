@@ -5,19 +5,19 @@ Quick start guide
 This xml consists of 1/4 degree Ocean-Ice experiments with JRA version1.4 interannual forcings.
 
 module load fre/bronx-18
-fremake -x OMIP_JRA.xml -p ncrc4.intel16 -t prod MOM6_SIS2_compile
+fremake -x OMIP_JRA.xml -p ncrc4.intel18 -t prod MOM6_SIS2_compile
 frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p25_JRA55do1.4_r6_cycle1 -r basic
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <property name="RELEASE"      value="2019.01.03"/> <!-- git tag for general component source code-->
+  <property name="RELEASE"      value="2021.02"/> <!-- git tag for general component source code-->
   <property name="FMS_GIT_TAG"  value="$(RELEASE)"/>    <!-- git tag for shared source code -->
-  <property name="CPL_GIT_TAG"  value="2020.03"/>       <!-- git tag for shared source code -->
-  <property name="NULL_TAG"     value="master"/>        <!-- git tag for shared source code -->
-  <property name="OCEAN_BGC_GIT_TAG" value="199f2f24"/> <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"    value="20201020"/>               <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG" value="dev/gfdl"/>              <!-- git tag for MOM6 source code -->
-  <property name="MOM6_GIT_FIX" value=""/>       <!-- git tag for MOM6 source code -->
+  <property name="CPL_GIT_TAG"  value="$(RELEASE)"/>       <!-- git tag for shared source code -->
+  <property name="NULL_TAG"     value="$(RELEASE)"/>        <!-- git tag for shared source code -->
+  <property name="OCEAN_BGC_GIT_TAG" value="$(RELEASE)"/> <!-- git tag for ocean_shared source code -->
+  <property name="MOM6_DATE"      value="20210630"/>               <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="be1b331"/>              <!-- git tag for MOM6 source code -->
+  <property name="MOM6_GIT_FIX" value=""/>   <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"     value="FMS$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -29,7 +29,8 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p25_JRA55do1.4_r6_cycle1 -r 
   <property name="CHUNK_LENGTH_B" value="20yr"/>
   <!--Start year of PP -->
   <property name="PP_START_YEAR"   value="1958"/>      <!--Use these values for CORE2 dynamic forcing runs -->
-  <property name="FRE_VERSION"     value="bronx-18"/> <!-- fre version to be used -->
+  <property name="FRE_VERSION"     value="bronx-19"/> <!-- fre version to be used -->
+  <property name="JRA_version"     value="1-4-0"/>    
   <property name="ProjectID"       value="CMIP6"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
   <!--pp fixer scripts for CMIP6-->
@@ -45,13 +46,16 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p25_JRA55do1.4_r6_cycle1 -r 
 
   <property name="AWG_INPUT_HOME_GAEA"  value="awg_include"/>
   <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)/mdt_xml/awg_include"/>
+  <property name="OBGCdataset"   value="/lustre/f2/pdata/gfdl/cmip6/datasets/OMIP"/>
   <property name="append_to_setup_csh"  value="set fyear=1958"/><!--The start year of forcing dataseti. FRE hack to set fyear.-->
-  
+  <property name="PROG_MAIN"   value="coupler/coupler_main.o"/>
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel18'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc3.intel18'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.gnu7'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.pgi19'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc4-intel18'])"/>
-    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.orion-intel18'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc3-intel18'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='orion.intel18'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='orion.intel19'])"/>
   </setup>
@@ -61,7 +65,6 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p25_JRA55do1.4_r6_cycle1 -r 
   <property name="JRA_dataset_p5"   value="/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/Runoff_JRAv1.4_OM4p5"/>
   <property name="JRA_dataset_p25"  value="$(gfdlO_pdata)/datasets/OM4_025/INPUT.JRA.v2019.07.04"/>
   <property name="JRA_dataset_p125" value="/lustre/f2/dev/Raphael.Dussin/forcings/OM4_125_runoff/"/>
-  <property name="JRA_version" value="1-4-0"/>
 
   <freInclude name="resourceparams_O4671_production">
            <resources jobWallclock="16:00:00"  segRuntime="3:00:00">
@@ -77,13 +80,12 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p25_JRA55do1.4_r6_cycle1 -r 
   </freInclude>
 
    <!--= COMPILE =-->
-   <property name="PROG_MAIN"   value="coupler/coupler_main.o"/>
    <property name="LIBS_ROOT"   value="MOM6_SIS2_compile"/>
    <property name="FMS_LIB_DIR" value="./$(LIBS_ROOT)/$(platform)-$(target)/exec"/>
    <property name="MY_LIBS"     value="$(EXEC_ROOT)/$(FMS_LIB_DIR)"/>
 
-   <!--experiment name="MOM6_SIS2_compile"-->   
-   <xi:include href="awg_include/xml_building_blocks/om4_compile_postxanadu.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_SIS2_compile'])"/>  
+   <!--experiment name="MOM6_SIS2_compile"-->
+   <xi:include href="awg_include/xml_building_blocks/om4_compile_2021.02.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_SIS2_compile'])"/>
    <!--/experiment-->
 
    <!--The property MOM6_EXAMPLES should point to the mom6 directory that is checked out. It is needed by MOM6 to access its input data files-->
@@ -164,15 +166,17 @@ No additional diurnal cycle imposed
       construct_table_wrt_liq_and_ice = .true.,
      </namelist>
      <namelist name="diag_manager_nml">
-        mix_snapshot_average_fields = .false.,
-        max_input_fields = 1200,
-        max_output_fields = 1800
-        max_axes = 150
-        max_num_axis_sets = 100
-        max_files = 75
-        issue_oor_warnings = .false.
-        max_axis_attributes=6
-        max_field_attributes=4
+       max_files = 400
+       flush_nc_files=.false.
+       max_axes = 400,
+       max_num_axis_sets = 400,
+       max_input_fields = 1200
+       max_output_fields = 1800
+       mix_snapshot_average_fields=.false.
+     </namelist>
+     
+     <namelist name="data_override_nml">
+       reproduce_null_char_bug = .true. !this is needed to reproduce old (wrong) answers with FMS2020.04
      </namelist>
 
      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
@@ -399,6 +403,10 @@ MOM_OVERRIDE_EOF
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/diag_table.SIS</dataSource>
         <dataSource site="orion">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/diag_table.SIS</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025.JRA/diag_table.SIS</dataSource>
+     </dataFile>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
+	<dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/SIS_input</dataSource>
