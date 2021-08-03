@@ -98,8 +98,8 @@ NOTES:
   <property name="CHUNK_LENGTH_B"   value="10yr"/>
   <property name="PP_START_YEAR"    value="0001" />
   <property name="PP_CPLD_START"    value="0001" />
-  <property name="PROD_RUNTIME"     value="10:00:00"/><!--Maximum wall clock per simulation-->
-  <property name="PROD_SEGTIME"     value="10:00:00"/><!--Wall clock per segment (usually 1 year)-->
+  <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
+  <property name="PROD_SEGTIME"     value="16:00:00"/><!--Wall clock per segment (usually 1 year)-->
 
   <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->   
@@ -655,8 +655,16 @@ set nyblocks = $nyblock
       <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/CM4_c192L33_OM4_025_initCond_1950cntl_new.remapLND.recycleIce.v20210614.tar</dataSource>
       continuing the run with restart year 51 from v5_proto1
       -->
-      <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/archive/FMS2019.01.03_devgfdl_20210308/CM4_piControl_c192_OM4p125_v5_proto1/ncrc4.intel18-prod-openmp/archive/restart/00510101.tar</dataSource>
+      <!--dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/archive/FMS2019.01.03_devgfdl_20210308/CM4_piControl_c192_OM4p125_v5_proto1/ncrc4.intel18-prod-openmp/archive/restart/00510101.tar</dataSource-->
+      <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/archive/FMS2019.01.03_devgfdl_20210308/CM4_piControl_c192_OM4p125_v5_proto1/ncrc4.intel18-prod-openmp/archive/restart/00510101_combined_ice.tar</dataSource>
      </dataFile>
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override'
+     </namelist>
      <namelist name="SIS_input_nml" >
          output_directory = './',
          input_filename = 'r'
@@ -740,6 +748,8 @@ MIN_THICKNESS = 1.0E-10
 !changes in diffusivity
 #override KD_MIN = 0.0
 #override KD_ADD = 2.0e-6
+
+#override RESTART_CHECKSUMS_REQUIRED = False
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
@@ -755,7 +765,6 @@ cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
 #override ICE_DELTA_EDD_R_SNOW = 0.0
 #override ICE_DELTA_EDD_R_POND = 0.0
 
-#override PARALLEL_RESTARTFILES = True
 #override RESTART_CHECKSUMS_REQUIRED = False
 SIS_OVERRIDE_EOF
 
@@ -1230,7 +1239,7 @@ $baseDate
     <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
-             <resources jobWallclock="10:00:00" segRuntime="10:00:00">
+             <resources jobWallclock="16:00:00" segRuntime="16:00:00">
                <atm ranks="864" threads="2"    layout = "6,24"   io_layout = "1,8" />
                <lnd                            layout = "6,24"   io_layout = "1,8" />
                <ice                            layout = "36,24"  io_layout = "1,8" />
