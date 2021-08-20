@@ -107,7 +107,7 @@ NOTES:
   <property name="EXP_CPLD_END"     value="0100"/> <!--simulation end   year--> 
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
-  <property name="FRE_VERSION"     value="bronx-18"/> <!-- fre version to be used -->
+  <property name="FRE_VERSION"     value="bronx-19"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
   <property name="TS_ANALYSIS_SWITCH" value="off"/>   <!-- on/off switch for ATM/LND time series analysis -->
@@ -569,6 +569,9 @@ set nyblocks = $nyblock
        <!--The following is a copy of /ncrc/home2/John.Krasting/diag_z3.nc -->
        <dataSource platform="$(platform)">$(ARCHIVE_NNZ)/input/xanadu/diag_z3.nc</dataSource>
       </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/cmip6/datasets/OMIP/diagnostic/diag_rho2.nc</dataSource>
+      </dataFile>
 
       <namelist name="MOM_input_nml" >
          output_directory = './',
@@ -697,6 +700,7 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 !parameters for using /ncrc/home2/John.Krasting/diag_z3.nc
 #override NUM_DIAG_COORDS = 3
 #override DIAG_COORDS = "z Z ZSTAR", "rho2 RHO2 RHO", "z3 Z3 ZSTAR"
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
 DIAG_COORD_DEF_Z3 = "FILE:diag_z3.nc,interfaces=z_i"
 ! New tuning parameters
 #override CHANNEL_LIST_FILE = "MOM_channels_global_125"
