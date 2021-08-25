@@ -10,15 +10,15 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel18 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <property name="RELEASE"      value="2019.01.03"/>       <!-- git tag for general component source code-->
+  <property name="RELEASE"      value="2021.02"/> <!-- git tag for general component source code-->
   <property name="FMS_GIT_TAG"  value="$(RELEASE)"/>    <!-- git tag for shared source code -->
-  <property name="CPL_GIT_TAG"  value="2020.03"/>    <!-- git tag for shared source code -->
-  <property name="NULL_TAG"     value="master"/>        <!-- git tag for shared source code -->
-  <property name="OCEAN_BGC_GIT_TAG" value="199f2f24"/> <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"    value="ESM4_v1.0.3"/>   <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG" value="ESM4/v1.0.3"/>   <!-- git tag for MOM6 source code -->
+  <property name="CPL_GIT_TAG"  value="$(RELEASE)"/>       <!-- git tag for shared source code -->
+  <property name="NULL_TAG"     value="$(RELEASE)"/>        <!-- git tag for shared source code -->
+  <property name="OCEAN_BGC_GIT_TAG" value="$(RELEASE)"/> <!-- git tag for ocean_shared source code -->
+  <property name="MOM6_DATE"    value="20210630"/>               <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG" value="be1b331"/>              <!-- git tag for MOM6 source code -->
   <property name="MOM6_GIT_FIX" value=""/>   <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"     value="FMS$(RELEASE)_mom6_ESM4_v1.0.3"/> <!-- customize as needed -->
+  <property name="FRE_STEM"     value="FMS$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
 
@@ -31,7 +31,7 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel18 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
    <property name="CHUNK_LENGTH_B" value="20yr"/>
    <!--Start year of PP -->
    <property name="PP_START_YEAR"  value="1708"/>      <!--Use these values for CORE2 dynamic forcing runs -->
-   <property name="FRE_VERSION"     value="test"/> <!-- fre version to be used -->
+   <property name="FRE_VERSION"     value="bronx-19"/> <!-- fre version to be used -->
    <property name="ProjectID"       value="CMIP6"/>      <!-- database top level -->
    <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
    <property name="MDBIswitch"      value="off"/>       <!-- on/off switch for MDBI database -->
@@ -44,7 +44,7 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel18 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
    <property name="reference_tag"  value="xanadu_esm4_20190304_mom6_2019.08.08"/> <!-- Reference release tag for existing files in the archives for answer comparison. Used in "REFERENCE" property. -->
 
    <!-- The following properties are for testing/debugging purposes and should normally be empty-->
-   <property name="MODIFIER"     value="_symmetric"/>
+   <property name="MODIFIER"     value=""/>
    <property name="DEBUGLEVEL"   value=""/>
    <property name="STATIC"       value=""/>
   <property name="BUILD_DATE" value=""/>  <!--Not used-->
@@ -113,8 +113,9 @@ frerun  -x OMIP4_CORE2.xml -p ncrc4.intel18 -t prod OM4p125_IAF_csf_CORE2_r5 -r 
    <property name="FMS_LIB_DIR" value="./$(LIBS_ROOT)/$(platform)-$(target)/exec"/>
    <property name="MY_LIBS"     value="$(EXEC_ROOT)/$(FMS_LIB_DIR)"/>
    <!--experiment name="MOM6_SIS2_compile"-->
-   <xi:include href="awg_include/xml_building_blocks/om4_compile_postxanadu.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_SIS2_compile'])"/>
-   <xi:include href="awg_include/xml_building_blocks/om4_compile_postxanadu.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_SIS2_compile_symmetric'])"/>
+   <xi:include href="awg_include/xml_building_blocks/om4_compile_2021.02.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_SIS2_compile'])"/>
+   <xi:include href="awg_include/xml_building_blocks/om4_compile_2021.02.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_SIS2_compile_symmetric'])"/>
+   <xi:include href="awg_include/xml_building_blocks/om4_compile_2021.02.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_SIS2_compile_FMS2'])"/>
    <!--/experiment-->
 
    <!--The property MOM6_EXAMPLES should point to the mom6 directory that is checked out. It is needed by MOM6 to access its input data files-->
@@ -1413,6 +1414,10 @@ endif
         <dataSource site="orion">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
      </dataFile>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
+	<dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
+     </dataFile>
 
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/SIS_input</dataSource>
@@ -1457,6 +1462,10 @@ $baseDate
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+     </dataFile>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
+	<dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
      </dataFile>
     </input>
    </experiment>
@@ -2143,6 +2152,10 @@ $baseDate
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.SIS</dataSource>
+     </dataFile>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
+	<dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
      </dataFile>
     </input>
    </experiment>
