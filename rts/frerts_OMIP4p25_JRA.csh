@@ -2,10 +2,13 @@
 set -v
 # Automatic Build and Run on Gaea using fre
 XML_FILE=OMIP4p25_JRA1.4.xml  #The xml to test
-RELEASE='2019.01.03'   #The FMS release to test
-MOM6_DATE='2019.08.08'                     #The MOM6 tag date to test
-MOM6_GIT_TAG="dev\/gfdl\/2019.08.08" #The MOM6 tag to test
-FRESTEM="FMS${RELEASE}_mom6_${MOM6_DATE}_min"         #The FRESTEM to use
+RELEASE='2021.02'     #'2021.02-beta1'   #The FMS release to test
+CPL_GIT_TAG='2021.02'
+MOM6_DATE='20210630'   #'20210603'        #The MOM6 tag date to test
+MOM6_GIT_TAG="be1b331" #"ea0b2bd"    #The MOM6 tag to test
+#MOM6_DATE='ESM4_v1.0.3'      #The MOM6 tag date to test
+#MOM6_GIT_TAG="ESM4\/v1.0.3" #The MOM6 tag to test
+FRESTEM="FMS${RELEASE}_mom6_${MOM6_DATE}"
 GROUP="gfdl_f"
 #List of the experiments in the xml to run regression for
 EXPERIMENT_LIST="OM4p25_JRA55do1.4_r6_cycle1"
@@ -14,7 +17,7 @@ DEBUGLEVEL='_0'
 PLATFORM="ncrc4.intel18"
 TARGET="prod"
 REFERENCE_TAG='xanadu_esm4_20190304_mom6_2019.08.08'
-FRE_VERSION='bronx-18'
+FRE_VERSION='bronx-19'
 
 #########################################
 #Users do not need to edit anything below

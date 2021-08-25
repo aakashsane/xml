@@ -10,17 +10,17 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p5_JRA55do1.4_cycle1 -r basi
 -->
 
 <experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <property name="RELEASE"      value="2019.01.03"/> <!-- git tag for general component source code-->
+  <property name="RELEASE"      value="2021.02"/> <!-- git tag for general component source code-->
   <property name="FMS_GIT_TAG"  value="$(RELEASE)"/>    <!-- git tag for shared source code -->
-  <property name="CPL_GIT_TAG"  value="2020.03"/>       <!-- git tag for shared source code -->
-  <property name="NULL_TAG"     value="master"/>        <!-- git tag for shared source code -->
-  <property name="OCEAN_BGC_GIT_TAG" value="199f2f24"/> <!-- git tag for ocean_shared source code -->
-  <property name="MOM6_DATE"      value="2019.08.08"/>               <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG"   value="dev/gfdl/2019.08.08"/>              <!-- git tag for MOM6 source code -->
+  <property name="CPL_GIT_TAG"  value="$(RELEASE)"/>       <!-- git tag for shared source code -->
+  <property name="NULL_TAG"     value="$(RELEASE)"/>        <!-- git tag for shared source code -->
+  <property name="OCEAN_BGC_GIT_TAG" value="$(RELEASE)"/> <!-- git tag for ocean_shared source code -->
+  <property name="MOM6_DATE"      value="20210630"/>               <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"   value="be1b331"/>              <!-- git tag for MOM6 source code -->
   <property name="MOM6_GIT_FIX" value=""/>   <!-- git tag for MOM6 source code -->
   <property name="FRE_STEM"     value="FMS$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
-  <property name="GFDL_GROUP"     value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <property name="GFDL_GROUP"  value="gfdl_f"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
   <property name="OM4_ANALYSIS"   value="ice_ocean_SIS2/OM4_05"/>  <!--example containing .frepp scripts for analysis-->
   <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
   <property name="PROD_SIMTIME"   value="60"/>
@@ -29,7 +29,8 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p5_JRA55do1.4_cycle1 -r basi
   <property name="CHUNK_LENGTH_B" value="20yr"/>
   <!--Start year of PP -->
   <property name="PP_START_YEAR"   value="1958"/>      <!--Use these values for CORE2 dynamic forcing runs -->
-  <property name="FRE_VERSION"     value="bronx-18"/> <!-- fre version to be used -->
+  <property name="FRE_VERSION"     value="bronx-19"/> <!-- fre version to be used -->
+  <property name="JRA_version"     value="1-4-0"/>    
   <property name="ProjectID"       value="CMIP6"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
   <!--pp fixer scripts for CMIP6-->
@@ -47,9 +48,12 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p5_JRA55do1.4_cycle1 -r basi
   <property name="AWG_INPUT_HOME_GFDL"  value="/nbhome/$USER/$(FRE_STEM)$(PLATINFO)/$(name)/mdt_xml/awg_include"/>
   <property name="OBGCdataset"   value="/lustre/f2/pdata/gfdl/cmip6/datasets/OMIP"/>
   <property name="append_to_setup_csh"  value="set fyear=1958"/><!--The start year of forcing dataseti. FRE hack to set fyear.-->
+  <property name="PROG_MAIN"   value="coupler/coupler_main.o"/>
   <setup>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel18'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc3.intel18'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.gnu7'])"/>
+    <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.pgi19'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc4-intel18'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc3-intel18'])"/>
     <xi:include href="awg_include/xml_building_blocks/platforms.xml" xpointer="xpointer(//freInclude/platform[@name='orion.intel18'])"/>
@@ -76,13 +80,12 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p5_JRA55do1.4_cycle1 -r basi
    </freInclude>
 
    <!--= COMPILE =-->
-   <property name="PROG_MAIN"   value="coupler/coupler_main.o"/>
    <property name="LIBS_ROOT"   value="MOM6_SIS2_compile"/>
    <property name="FMS_LIB_DIR" value="./$(LIBS_ROOT)/$(platform)-$(target)/exec"/>
    <property name="MY_LIBS"     value="$(EXEC_ROOT)/$(FMS_LIB_DIR)"/>
 
    <!--experiment name="MOM6_SIS2_compile"-->
-   <xi:include href="awg_include/xml_building_blocks/om4_compile_postxanadu.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_SIS2_compile'])"/>
+   <xi:include href="awg_include/xml_building_blocks/om4_compile_2021.02.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_SIS2_compile'])"/>
    <!--/experiment-->
 
    <!--The property MOM6_EXAMPLES should point to the mom6 directory that is checked out. It is needed by MOM6 to access its input data files-->
@@ -196,11 +199,11 @@ No additional diurnal cycle imposed
        max_output_fields = 1800
        mix_snapshot_average_fields=.false.
      </namelist>
-     <!--
+     
      <namelist name="data_override_nml">
        reproduce_null_char_bug = .true. !this is needed to reproduce old (wrong) answers with FMS2020.04
      </namelist>
-     -->
+     
      <dataFile label="namelist" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/input.nml</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_05/input.nml</dataSource>
@@ -296,6 +299,44 @@ SIS_OVERRIDE_EOF
       <regression name="debug">
         <run days="2" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
         <run days="1 1" > <xi:include href="awg_include/xml_building_blocks/layouts.xml" xpointer="xpointer(//freInclude[@name='resourceparams_O256']/node())"/> </run>
+      </regression>
+      <regression name="restart">
+      <run days="15 16" > 
+      <resources jobWallclock="01:00:00">
+               <ice                            layout = "216,8"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+               <ocn ranks="1728" threads="1"   layout = "48,36"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+      </resources>
+      </run>
+      <run days="15 16" > 
+      <resources jobWallclock="01:00:00">
+               <ice                            layout = "48,36"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+               <ocn ranks="1728" threads="1"   layout = "48,36"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+      </resources>
+      </run>
+      <run days="15 16" > 
+      <resources jobWallclock="01:00:00">
+               <ice                            layout = "96,18"   io_layout = "1,2" mask_table="MOM_mask_table"/>
+               <ocn ranks="1728" threads="1"   layout = "48,36"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+      </resources>
+      </run>
+      <run days="15 16" > 
+      <resources jobWallclock="01:00:00">
+               <ice                            layout = "192,9"   io_layout = "1,3" mask_table="MOM_mask_table"/>
+               <ocn ranks="1728" threads="1"   layout = "48,36"   io_layout = "1,4" mask_table="MOM_mask_table"/>
+      </resources>
+      </run>
+      <run days="15 16" > 
+      <resources jobWallclock="01:00:00">
+               <ice                            layout = "180,10"   io_layout = "1,2" mask_table="MOM_mask_table"/>
+               <ocn ranks="1800" threads="1"   layout = "180,10"   io_layout = "1,2" mask_table="MOM_mask_table"/>
+      </resources>
+      </run>
+      <run days="15 16" > 
+      <resources jobWallclock="01:00:00">
+               <ice                            layout = "100,18"   io_layout = "1,2" mask_table="MOM_mask_table"/>
+               <ocn ranks="1800" threads="1"   layout = "100,18"   io_layout = "1,2" mask_table="MOM_mask_table"/>
+      </resources>
+      </run>
       </regression>
       <reference restart="$(REFERENCE)/archive/1x1m0d_1057x1o/restart/19580201.tar"/>
    </runtime>
@@ -428,6 +469,10 @@ SIS_OVERRIDE_EOF
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/diag_table.SIS</dataSource>
         <dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025.JRA/diag_table.SIS</dataSource>
+     </dataFile>
+     <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
+	<dataSource site="gfdl">$(NB_ROOT)/mom6/ice_ocean_SIS2/OM4_025/diag_table.icebergs</dataSource>
      </dataFile>
      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_05/SIS_input</dataSource>
