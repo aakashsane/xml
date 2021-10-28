@@ -76,9 +76,12 @@ NOTES:
   <property name="ATM_PHYS_GIT_TAG"  value="8a30ff9a"/>      <!-- gitlab tag for atmos_phys source code -->  
   <property name="LAND_GIT_TAG"      value="xanadu"/>        <!-- git tag for LAND_LAD2 source code -->  
   <property name="OCEAN_BGC_GIT_TAG" value="8dda39f"/>       <!-- git tag for ocean_BGC component -->
-  <property name="MOM6_DATE"         value="devgfdl_20210308"/> <!-- arbitrary date string for MOM6 source code -->
-  <property name="MOM6EX_GIT_TAG"    value="b3321c68"/>      <!-- git tag for MOM6-examples source code -->
-  <property name="MOM6_GIT_TAG"      value="e7a80bcf"/>      <!-- git tag for MOM6 source code -->
+  <!--property name="MOM6_DATE"         value="devgfdl_20210308"/--> <!-- arbitrary date string for MOM6 source code -->
+  <property name="MOM6_DATE"         value="devgfdl_20210706"/> <!-- arbitrary date string for MOM6 source code -->
+  <!--property name="MOM6EX_GIT_TAG"    value="b3321c68"/-->      <!-- git tag for MOM6-examples source code -->
+  <property name="MOM6EX_GIT_TAG"    value="be1b331"/>      <!-- git tag for MOM6-examples source code -->
+  <!--property name="MOM6_GIT_TAG"      value="e7a80bcf"/-->      <!-- git tag for MOM6 source code -->
+  <property name="MOM6_GIT_TAG"      value="52fe576"/>      <!-- git tag for MOM6 source code -->
   <property name="MOM6_GIT_FIX"      value=""/>       <!-- git tag for MOM6 source code -->
   <property name="BERGS_GIT_TAG"     value="0908ff0f"/>       <!-- git tag for icebergs source code -->
   <property name="FRE_STEM"  value="FMS$(RELEASE)_$(MOM6_DATE)"/>     <!-- customize as needed -->
@@ -95,8 +98,8 @@ NOTES:
   <property name="CHUNK_LENGTH_B"   value="10yr"/>
   <property name="PP_START_YEAR"    value="0001" />
   <property name="PP_CPLD_START"    value="0001" />
-  <property name="PROD_RUNTIME"     value="10:00:00"/><!--Maximum wall clock per simulation-->
-  <property name="PROD_SEGTIME"     value="10:00:00"/><!--Wall clock per segment (usually 1 year)-->
+  <property name="PROD_RUNTIME"     value="16:00:00"/><!--Maximum wall clock per simulation-->
+  <property name="PROD_SEGTIME"     value="16:00:00"/><!--Wall clock per segment (usually 1 year)-->
 
   <!--The following properties need to be set only if the user wants to monitor the run progress at MDBI
       and are not needed for the run or post-processing -->   
@@ -104,7 +107,7 @@ NOTES:
   <property name="EXP_CPLD_END"     value="0100"/> <!--simulation end   year--> 
   
   <!--The rest of the properties need not to be changed by the user unless to customize the run-->
-  <property name="FRE_VERSION"     value="bronx-18"/> <!-- fre version to be used -->
+  <property name="FRE_VERSION"     value="bronx-19"/> <!-- fre version to be used -->
   <property name="ProjectID"       value="MDT"/>      <!-- database top level -->
   <property name="ANALYSIS_SWITCH" value="on"/>       <!-- on/off switch for ATM/LND analysis -->
   <property name="TS_ANALYSIS_SWITCH" value="off"/>   <!-- on/off switch for ATM/LND time series analysis -->
@@ -209,7 +212,8 @@ Experiment to build executable.
       </compile>
     </component>
 
-    <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic_symmetric mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ mom6/src/MOM6/config_src/external/ODA_hooks ocean_BGC/generic_tracers ocean_BGC/mocsy/src">
+    <!--component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/dynamic_symmetric mom6/src/MOM6/config_src/coupled_driver mom6/src/MOM6/src/*/ mom6/src/MOM6/src/*/*/ mom6/src/MOM6/config_src/external/ODA_hooks ocean_BGC/generic_tracers ocean_BGC/mocsy/src"-->
+    <component name="mom6" requires="fms" paths="mom6/src/MOM6/config_src/{infra/FMS1,memory/dynamic_symmetric,drivers/FMS_cap,external} mom6/src/MOM6/src/{*,*/*}/ mom6/src/MOM6/pkg/GSW-Fortran/{modules,toolbox}/ mom6/src/MOM6/pkg/CVMix-src/{src,src/drivers,src/shared}/">
       <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6EX_GIT_TAG)" communityGrid="Tripolar"/>
        <source versionControl="git" root="https://github.com/NOAA-GFDL">
         <codeBase version="master"> ocean_BGC.git </codeBase>
@@ -255,7 +259,8 @@ Experiment to build executable.
       </compile>
     </component>
 
-    <component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" > 
+    <!--component name="sis2" paths="mom6/src/SIS2/config_src/dynamic_symmetric mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" -->
+    <component name="sis2" paths="mom6/src/SIS2/config_src/{dynamic_symmetric,external}/ mom6/src/SIS2/src mom6/src/icebergs ice_param" requires="fms mom6" includeDir="$root/$(LIBS_ROOT)/src/mom6/src/MOM6/src/framework" >
        <source versionControl="git" root="https://github.com/NOAA-GFDL">
            <codeBase version="$(ICE_PARAM_GIT_TAG)"> ice_param.git </codeBase>
        </source>
@@ -564,6 +569,9 @@ set nyblocks = $nyblock
        <!--The following is a copy of /ncrc/home2/John.Krasting/diag_z3.nc -->
        <dataSource platform="$(platform)">$(ARCHIVE_NNZ)/input/xanadu/diag_z3.nc</dataSource>
       </dataFile>
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+       <dataSource platform="$(platform)">/lustre/f2/pdata/gfdl/cmip6/datasets/OMIP/diagnostic/diag_rho2.nc</dataSource>
+      </dataFile>
 
       <namelist name="MOM_input_nml" >
          output_directory = './',
@@ -621,8 +629,9 @@ set nyblocks = $nyblock
      </input>
   </freInclude>
 
-  <experiment name="CM4_piControl_c192_OM4p125_v4_hydrography20210614_recycleICE" inherit="CM4_piControl_c192_OM4p125_v5_proto1"/>
-  <experiment name="CM4_piControl_c192_OM4p125_v5_proto1" inherit="CM4_piControl_c192_OM4p125_v3">
+  <experiment name="CM4_piControl_c192_OM4p125_v5" inherit="CM4_piControl_c192_OM4p125_v3">
+  <!--experiment name="CM4_piControl_c192_OM4p125_v4_hydrography20210614_recycleICE" inherit="CM4_piControl_c192_OM4p125_v5_proto1"-->
+  <!--experiment name="CM4_piControl_c192_OM4p125_v5_proto1" inherit="CM4_piControl_c192_OM4p125_v3"-->
 <description>
 	Updated initCond with spun-up land from CM4_c192L33_OM4_025_initCond_1950cntl_new remapped to the new 1/8 degree grid
 	Updated static_vegetation climatology files consistent with the new 1/8 degree grid
@@ -644,9 +653,21 @@ set nyblocks = $nyblock
          /lustre/f2/dev/Raphael.Dussin/archive/FMS2019.01.03_devgfdl_20201120/CM4_piControl_c192_OM4p125/gfdl.ncrc4-intel18-prod-openmp/restart/01010101.tar
 	  
           Note: With the new river netwrok data hydrographyKDunne20210614 we may not need to recycle lake restarts anymore.The model ran 1 month without lake recycled.
-      -->
+
+      First 50 years (v5_proto1) init from this restart:
       <dataSource platform="$(platform)">/lustre/f2/dev/Niki.Zadeh/archive/input/xanadu/CM4_c192L33_OM4_025_initCond_1950cntl_new.remapLND.recycleIce.v20210614.tar</dataSource>
+      continuing the run with restart year 51 from v5_proto1
+      -->
+      <!--dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/archive/FMS2019.01.03_devgfdl_20210308/CM4_piControl_c192_OM4p125_v5_proto1/ncrc4.intel18-prod-openmp/archive/restart/00510101.tar</dataSource-->
+      <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/archive/FMS2019.01.03_devgfdl_20210308/CM4_piControl_c192_OM4p125_v5_proto1/ncrc4.intel18-prod-openmp/archive/restart/00510101_combined_ice.tar</dataSource>
      </dataFile>
+     <namelist name="MOM_input_nml" >
+         output_directory = './',
+         input_filename = 'r'
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input','INPUT/MOM_layout','INPUT/MOM_override'
+     </namelist>
      <namelist name="SIS_input_nml" >
          output_directory = './',
          input_filename = 'r'
@@ -655,8 +676,107 @@ set nyblocks = $nyblock
          parameter_filename = 'INPUT/SIS_input','INPUT/SIS_layout','INPUT/SIS_override'
      </namelist>
      <namelist name="frecheck_nml"> start_date = 0001,01,01,0,0,0, </namelist><!--Ignore this. Used only be frecheck-->
+
+     <csh><![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+! 1/8 degree parameter changes
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override TOPO_EDITS_FILE = ""
+#override TIDEAMP_FILE = "tidal_amplitude_TPXO9_OM4p125.v20200922.nc"
+#override KAPPA_H2_FACTOR = 6.4 ! increase from 2.8 recommended by Raph ! increase from 0.84 recommended by Matt
+#override CHL_FILE = "seawifs-clim-1997-2010.2880x2240.v20200921.nc"
+#override CHL_VARNAME = "chlor_a"
+#override DT = 300.0                      !   [s] !reduced from 900.0 for OM4_025
+#override DT_THERM = 3600.0               !   [s] !reduced from 7200.0 for OM4_025
+#override BAD_VAL_SST_MIN = -5.0  ! decreased from default of -3.0 to avoid extremes in 1/8 degree model
+#override U_TRUNC_FILE = "MOM_U_truncations"
+#override V_TRUNC_FILE = "MOM_V_truncations"
+#override USE_generic_tracer = False
+#override USE_RIVER_HEAT_CONTENT = False
+#override USE_CALVING_HEAT_CONTENT = False
+#override ENERGYSAVEDAYS = 1
+#override TOPO_FILE = "ocean_topog.nc"
+!parameters for using /ncrc/home2/John.Krasting/diag_z3.nc
+#override NUM_DIAG_COORDS = 3
+#override DIAG_COORDS = "z Z ZSTAR", "rho2 RHO2 RHO", "z3 Z3 ZSTAR"
+#override DIAG_COORD_DEF_RHO2 = "FILE:diag_rho2.nc,interfaces=rho2"
+DIAG_COORD_DEF_Z3 = "FILE:diag_z3.nc,interfaces=z_i"
+! New tuning parameters
+#override CHANNEL_LIST_FILE = "MOM_channels_global_125"
+! Kappa Shear
+#override VERTEX_SHEAR = True
+#override USE_RESTRICTIVE_TOLERANCE_CHECK = True
+! ePBL
+#override ENERGETICS_SFC_PBL = True
+#override EPBL_IS_ADDITIVE = False
+#override TKE_DECAY = 0.001
+#override EPBL_MSTAR_SCHEME = "REICHL_H18"
+#override MSTAR = 0.0
+#override RH18_MSTAR_CN3 = -6.0
+#override NSTAR = 0.06
+#override MSTAR_CONV_ADJ = 0.66
+#override USE_MLD_ITERATION = True
+#override EPBL_VEL_SCALE_SCHEME = "REICHL_H18"
+#override WSTAR_USTAR_COEF = 15.
+#override EPBL_VEL_SCALE_FACTOR = 0.5477
+#override VSTAR_SURF_FAC = 1.8258
+#override EPBL_TRANSITION_SCALE = 0.01
+#override EPBL_LT = True
+#override EPBL_LANGMUIR_SCHEME = "ADDITIVE"
+#override LT_MOD_LAC1 = 0.0
+#override LT_MOD_LAC2 = 0.0
+#override LT_MOD_LAC3 = 0.0
+#override LT_MOD_LAC4 = 0.8
+#override LT_MOD_LAC5 = 0.8
+#override LT_ENHANCE_COEF = 0.1056
+#override LT_ENHANCE_EXP = -1.
+#override LA_DEPTH_RATIO = 0.2
+! Alistar MLE tuning
+#override DEFAULT_2018_ANSWERS = False
+#override KAPPA_SHEAR_ITER_BUG=False
+! BBL
+#override BBL_EFFIC=0.01
+! Tiny minimum thickness
+MIN_THICKNESS = 1.0E-10
+! MLE (this is the big unknown)
+#override MLE_FRONT_LENGTH=500.0
+#override MLE_MLD_DECAY_TIME=8.64E5
+! Higher order interpolation
+#override INTERPOLATION_SCHEME="PPM_H4"
+! Tiny minimum thickness
+MIN_THICKNESS = 1.0E-10
+# Coriolis
+#override CORIOLIS_SCHEME = "SADOURNY75_ENSTRO"
+#override CORIOLIS_EN_DIS = True
+!changes in diffusivity
+#override KD_MIN = 0.0
+#override KD_ADD = 2.0e-6
+
+#override RESTART_CHECKSUMS_REQUIRED = False
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override NIGLOBAL = 2880
+#override NJGLOBAL = 2240
+#override DT_ICE_DYNAMICS = 450 !reduced from 1200.0 for OM4_025
+#override DT_RHEOLOGY = 25.0
+#override U_TRUNC_FILE = "SIS_U_truncations"
+#override V_TRUNC_FILE = "SIS_V_truncations"
+#override TOPO_FILE = "ocean_topog.nc"
+!Ice albedo variation
+#override ICE_DELTA_EDD_R_ICE  = 0.0
+#override ICE_DELTA_EDD_R_SNOW = 0.0
+#override ICE_DELTA_EDD_R_POND = 0.0
+
+#override RESTART_CHECKSUMS_REQUIRED = False
+SIS_OVERRIDE_EOF
+
+     ]]></csh>
      </input>
   </experiment>   
+
+
   <experiment name="CM4_piControl_c192_OM4p125_v4_hydrography20210614" inherit="CM4_piControl_c192_OM4p125_v3">
 <description>
 	Updated initCond with spun-up land from CM4_c192L33_OM4_025_initCond_1950cntl_new remapped to the new 1/8 degree grid
@@ -880,7 +1000,7 @@ SIS_OVERRIDE_EOF
       <namelist name="diag_manager_nml">
         mix_snapshot_average_fields = .false.,
         max_input_fields = 1200,
-        max_output_fields = 1800
+        max_output_fields = 5000
         max_axes = 150
         max_num_axis_sets = 100
         max_files = 75
@@ -1065,6 +1185,18 @@ $baseDate
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_sections_OM4p125</dataSource>
       </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_OM4_swmt</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_OM4p125_wmt3d_d2</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_vortbudget</dataSource>
+      </dataFile>
+      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">$(AWG_INPUT_HOME)/diag_table/diag_table_MDTF</dataSource>
+      </dataFile>
 
       <!-- CMIP6 atmos monthly fields -->
       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
@@ -1114,7 +1246,7 @@ $baseDate
     <runtime>
       <production simTime="$(PROD_SIMTIME)" units="years">
           <segment simTime="12" units="months"/>
-             <resources jobWallclock="10:00:00" segRuntime="10:00:00">
+             <resources jobWallclock="16:00:00" segRuntime="16:00:00">
                <atm ranks="864" threads="2"    layout = "6,24"   io_layout = "1,8" />
                <lnd                            layout = "6,24"   io_layout = "1,8" />
                <ice                            layout = "36,24"  io_layout = "1,8" />
