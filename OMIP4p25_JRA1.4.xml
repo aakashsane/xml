@@ -233,6 +233,22 @@ USE_generic_tracer = False
 #override BAD_VAL_SST_MIN = -2.5
 MOM_OVERRIDE_EOF
 
+#override BBL_EFFIC = 0.01
+#override TKE_DECAY = 0.001
+#override EPBL_MSTAR_SCHEME = "REICHL_H18"
+#override MSTAR_CONV_ADJ = 0.66
+#override EPBL_VEL_SCALE_SCHEME = "REICHL_H18"
+#override EPBL_VEL_SCALE_FACTOR = 0.5477
+#override VSTAR_SURF_FAC = 1.8258
+#override LT_MOD_LAC4 = 0.8
+#override LT_MOD_LAC5 = 0.8
+#override RH18_MSTAR_CN3 = -6.0
+#override WSTAR_USTAR_COEF = 15.
+#override MSTAR = 0.0
+#override LT_ENHANCE_COEF = 0.1056
+#override LT_ENHANCE_EXP = -1.
+#override LA_DEPTH_RATIO = 0.2
+
      ]]></csh>
 
    </input>
@@ -433,6 +449,11 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
        <dataSource platform="$(platform)">$(JRA_dataset_p25)/geothermal_davies2013_v1.nc</dataSource>
       </dataFile>
 
+      <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+	      <dataSource platform="$(platform)">/fullpath/lustre/etctec/xyz.nc</dataSource>
+      </dataFile>
+
+
      <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource site="ncrc">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/diag_table.MOM6</dataSource>
         <dataSource site="orion">$(MOM6_EXAMPLES)/ice_ocean_SIS2/OM4_025.JRA/diag_table.MOM6</dataSource>
@@ -445,6 +466,13 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
  "ocean_model", "salt_flux_added",    "salt_flux_added",    "ocean_annual", "all", "mean", "none",2
  "ocean_model", "vprec",              "vprec",              "ocean_month", "all", "mean", "none",2
  "ocean_model", "salt_flux_added",    "salt_flux_added",    "ocean_month", "all", "mean", "none",2
+
+ # New MOM6 ocean diagnostics
+ "ocean_model", "MLD_EN1",            "MLD_EN1",            "ocean_month", "all", "mean", "none",2
+ "ocean_model", "MLD_EN2",            "MLD_EN2",            "ocean_month", "all", "mean", "none",2
+ "ocean_model", "MLD_EN3",            "MLD_EN3",            "ocean_month", "all", "mean", "none",2
+ "ocean_model", "ePBL_h_ML",          "ePBL_h_ML",          "ocean_month", "all", "mean", "none",2
+ "ocean_model_z", "N2",                 "N2",             "ocean_month_z", "all", "mean", "none",2
       </diagTable>
 
      <namelist name="MOM_input_nml" >
