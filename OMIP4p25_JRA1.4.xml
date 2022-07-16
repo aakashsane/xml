@@ -91,6 +91,164 @@ frerun  -x OMIP_JRA.xml -p ncrc4.intel18 -t prod OM4p25_JRA55do1.4_r6_cycle1 -r 
    <!--The property MOM6_EXAMPLES should point to the mom6 directory that is checked out. It is needed by MOM6 to access its input data files-->
    <property name="MOM6_EXAMPLES"  value="$root/$(LIBS_ROOT)/src/mom6"/>
 
+   
+   <freInclude name="OM4_common">
+    <input>
+     <csh type="always">
+        <![CDATA[
+#------------------------------------------
+## Find out whether to restart.
+
+if ( $currentSeg == 1 ) then
+   set restart_flag = 'n'
+else
+   set restart_flag = 'r'
+   #Because of a technical issue FRE does not delete old uncombined restarts before copying the new ones for the next segment
+   #The INPUT/ ends up with inconsistent restart files which at best cause the model to crash right away.
+   if(-e $work/INPUT/MOM.res.nc.0000 ) \rm -rf $work/INPUT/MOM.res*.nc
+endif
+
+ln -s $work/INPUT/ocean_topog.nc $work/INPUT/topog.nc
+
+touch $work/INPUT/MOM_override
+touch $work/INPUT/SIS_override
+touch $work/INPUT/MOM_layout
+touch $work/INPUT/SIS_layout
+
+# Record the job stdout location for later use timings database
+cat >> $HOME/frejobs_stdout <<EOF_frejobs
+$stdoutDir/$FRE_JOBID
+EOF_frejobs
+
+
+
+cat > $work/INPUT/MOM_layout << MOM_LAYOUT_EOF
+#override IO_LAYOUT = $ocn_io_layout
+#override LAYOUT    = $ocn_layout
+#override MASKTABLE = $ocn_mask_table
+#override OCEAN_OMP_THREADS = $ocn_threads
+MOM_LAYOUT_EOF
+
+cat > $work/INPUT/SIS_layout << SIS_LAYOUT_EOF
+#override IO_LAYOUT = $ice_io_layout
+#override LAYOUT    = $ice_layout
+#override MASKTABLE = $ice_mask_table
+SIS_LAYOUT_EOF
+
+cat > $work/INPUT/SIS_diurnal << SIS_diurnal_EOF
+ADD_DIURNAL_SW = True ! This must ONLY be used in the ice-ocean mode if forcing is not diurnal (e.g. CORE), NOT fully coupled mode.
+SIS_diurnal_EOF
+
+# Copy AWG and OWG ascii input files to GFDL (waiting for FRE to do this for us)
+if ( $?flagOutputXferOn && $?flagOutputPostProcessOn && $currentSeg == 1 ) then
+  #gcp --batch does not understand some variations of home filesystem like /autofs/mnt/ncrc-svm1_home1 so we need to massage rtsxml to comply
+  set xmldirlocal = `dirname $rtsxml | sed -r "s/^\/(autofs|ncrc)\/.+\/$USER\//\~$USER\//"`
+  set xmldirRemote = `echo $xmldirlocal | sed -r "$patternSedHome"`
+  set platform_domain = `perl -T -e "use Net::Domain(hostdomain) ; print hostdomain"`
+  if ("${platform_domain}" == "ncrc.gov") then
+    set xmldirRemote = `echo $xmldirlocal | sed -r "$patternSedHome;$patternSedCTMP;$patternSedCPERM"`
+    gcp --batch -cd -r --sync $xmldirlocal/awg_include gfdl:$(NB_ROOT)/mdt_xml/
+    gcp --batch -cd -r --sync $xmldirlocal/awg_include gfdl:$xmldirRemote/
+  endif
+  #trick to copy MOM6 directory but avoid traversing the .datasets links
+  tar cvf mom6.tar --exclude='.datasets' -C $(MOM6_EXAMPLES) . > /dev/null
+  mkdir mom6
+  tar xvf mom6.tar -C ./mom6 > /dev/null
+  if ("${platform_domain}" == "ncrc.gov") then
+    gcp --batch -cd -r --sync mom6 gfdl:$(NB_ROOT)/
+  else if ("${platform_domain}" =~ *"fairmont.rdhpcs.noaa.gov"* ) then
+    gcp -cd -r --sync mom6 gfdl:$(NB_ROOT)/
+  endif
+endif
+
+#Add required BLING gas flux fields if they do not exist in the restarts
+#to be able to start from older runs that did not have these gas fluxes
+if ( $currentSeg == 1 ) then
+   #The following values for kw and deltap fields are arbitrary and do not matter, the fields just need to exist!
+   #These kw and deltap fields do not need to be restarted as they are calculated from alpha and csurf values!
+   #This has to be fixed in the source code in future with a new coupler flux design.
+   foreach resfile ( `ls $work/INPUT/ice_bling.res.nc*` )
+      ncdump -h $resfile | grep o2_flux_deltap_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_deltap_ice=co2_flux_flux_ice*0.0+1000.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_deltap_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_deltap_ice=co2_flux_flux_ice*0.0+1000.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep o2_flux_kw_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_kw_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_kw_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_kw_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      #gross flux0
+      ncdump -h $resfile | grep o2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep nh4_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'nh4_flux_flux0_ice=co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   foreach resfile ( `ls $work/INPUT/ice_ocmip_sf6.res.nc*` )
+      ncdump -h $resfile | grep sf6_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'sf6_flux_flux0_ice=sf6_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   foreach resfile ( `ls $work/INPUT/ice_ocmip2_cfc.res.nc*` )
+      ncdump -h $resfile | grep cfc11_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'cfc11_flux_flux0_ice=cfc11_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep cfc12_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'cfc12_flux_flux0_ice=cfc12_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   foreach resfile ( `ls $work/INPUT/ice_ocmip_abiotic.res.nc*` )
+      ncdump -h $resfile | grep ab14co2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'ab14co2_flux_flux0_ice=ab14co2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep abco2_flux_flux0_ice > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'abco2_flux_flux0_ice=abco2_flux_flux_ice*0.0+0.001' $resfile $resfile
+      endif
+   end
+   #
+   #Add Schmidt number to restart if it does not exist so that the model can use old restart files.
+   #A value of 660 make it consistent with the old ( "non-generic") formulation that did not have a separate sc_no
+   foreach resfile ( `ls $work/INPUT/ocean_bling_airsea_flux.res.nc*` )
+      ncdump -h $resfile | grep o2_flux_sc_no_ocn > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'o2_flux_sc_no_ocn=o2_flux_alpha_ocn*0.0+660.0' $resfile $resfile
+      endif
+      ncdump -h $resfile | grep co2_flux_sc_no_ocn > /dev/null
+      if ($status != 0) then
+        ncap -O -s 'co2_flux_sc_no_ocn=co2_flux_alpha_ocn*0.0+660.0' $resfile $resfile
+      endif
+   end
+
+
+   #Xanadu has a bug fix for airsea flux restart checksums and they don't match the old checksums in the files
+   chmod +w $work/INPUT/ocean_bling_airsea_flux.res.nc
+   ncatted -O -a checksum,,d,, $work/INPUT/ocean_bling_airsea_flux.res.nc
+
+endif
+
+      ]]></csh>
+    </input>
+   </freInclude>
+
    <!--****************************************************************************************-->
    <!--***************************** 1/4 degree experiments        ****************************-->
    <!--****************************************************************************************-->
